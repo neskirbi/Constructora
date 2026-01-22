@@ -26,6 +26,9 @@ class ADestajo extends Authenticatable
         });
     }
     
-    protected $fillable = ['id', 'name', 'email', 'password'];
+    protected $fillable = [
+        'id', 'nombres', 'apellidos', 'mail', 'pass', 'passtemp', 'principal'
+    ];
+    
     protected $hidden = ['password', 'remember_token'];
 }

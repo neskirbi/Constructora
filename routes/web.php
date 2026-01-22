@@ -19,6 +19,20 @@ Route::get('/', function () {
     $hayAdministradores = Administrador::count() > 0;
     
     if ($hayAdministradores) {
+        
+        if(Auth::guard('administradores')->check()){
+        return redirect('administradores');
+        }  
+        if(Auth::guard('aingresos')->check()){
+            return redirect('ingresos');
+        }  
+        if(Auth::guard('adestajos')->check()){
+            return redirect('destajos');
+        }  
+        if(Auth::guard('acompras')->check()){
+            return redirect('vehiculossoporte');
+        }  
+
         return view('login');
     } else {
         return redirect()->route('start');
@@ -36,15 +50,32 @@ Route::get('/start', function () {
     return view('start');
 })->name('start');
 
+
+// Login (solo si hay administradores)
+Route::get('logout', 'App\Http\Controllers\LoginController@Logout');
+
 // Login (solo si hay administradores)
 Route::post('login', 'App\Http\Controllers\LoginController@Login');
 
 // Registro (desde start)
 Route::post('reg', 'App\Http\Controllers\LoginController@Reg');
 
-// Home/dashboard (protegido)
-Route::middleware(['auth'])->group(function () {
-    Route::get('/home', function () {
-        return view('home');
-    });
-});
+//Reset de pass
+Route::post('update-password', 'App\Http\Controllers\LoginController@UpdatePassword');
+
+/**
+ * Rutas Administradores
+ */
+
+Route::resource('administradores', 'App\Http\Controllers\Administradores\AdministradorController')
+    ->middleware(['auth:administradores']);
+
+/**
+ * Rutas Aingresos
+ */
+
+Route::resource('contratos', 'App\Http\Controllers\Aingresos\ContratoController')
+    ->middleware(['auth:aingresos']);
+
+Route::resource('ingresos', 'App\Http\Controllers\Aingresos\IngresoController')
+    ->middleware(['auth:aingresos']);

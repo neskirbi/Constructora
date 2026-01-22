@@ -13,8 +13,6 @@ class Administrador extends Authenticatable
     protected $table = 'administradores';
     protected $primaryKey = 'id';
     public $incrementing = false;
-    protected $keyType = 'string';
-    
     protected static function boot()
     {
         parent::boot();

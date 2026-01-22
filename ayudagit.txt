@@ -1,0 +1,17 @@
+/*
+*Esto crea todas las tablas (pero borra datos)
+*/
+php artisan migrate:refresh
+
+/*
+*Refresca solo una tabla en base de datos
+*Cambiar tabla por el nombre de la migracion que se creo
+*/
+php artisan migrate:refresh --path=/database/migrations/2026_01_22_204008_create_contratos.php
+
+/*
+*Crea una migracion en laravel para el diseño de una tabla de la base de datos 
+*Cambiar tabla por el nombre de la tabla(en minusculas)
+*/
+
+php artisan make:migrtion create_table
