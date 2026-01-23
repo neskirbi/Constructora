@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     @include('header')
-    <title>Restaurar</title>
+    <title>{{Empresa()}} | Reset</title>
     <style>
         .password-match {
             color: green;

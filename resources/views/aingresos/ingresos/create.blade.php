@@ -2,9 +2,9 @@
 <html lang="es">
 <head>
     @include('header')
-    <title>{{Empresa()}} | Contratos</title>
+    <title>{{Empresa()}} | Ingresos</title>
     
-    <!-- Estilos personalizados (los mismos del create) -->
+    <!-- Estilos personalizados -->
     <style>
         .card-formulario {
             border: 1px solid #e0e0e0;
@@ -125,28 +125,27 @@
                 <!-- Título y botón -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                        <h1 class="h3 mb-1 text-gray-800">Editar Contrato</h1>
-                        <p class="text-muted mb-0">Editando: {{ $contrato->contrato_no }}</p>
+                        <h1 class="h3 mb-1 text-gray-800">Nuevo Contrato</h1>
+                        <p class="text-muted mb-0">Complete el formulario para registrar un nuevo contrato</p>
                     </div>
                     <div>
-                        <a href="{{ route('ingresos.index') }}" class="btn btn-outline-secondary">
+                        <button class="btn btn-outline-secondary" onclick="window.history.back()">
                             <i class="fas fa-arrow-left me-1"></i> Regresar
-                        </a>
+                        </button>
                     </div>
                 </div>
                 
-                <!-- Formulario de edición -->
+                <!-- Formulario -->
                 <div class="card card-formulario">
                     <div class="card-header card-header-form">
                         <h5 class="mb-0">
-                            <i class="fas fa-edit me-2 text-warning"></i>
-                            Editar Información del Contrato
+                            <i class="fas fa-file-contract me-2 text-primary"></i>
+                            Información del Contrato
                         </h5>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('contratos.update', $contrato->id) }}" method="POST">
+                        <form action="{{ route('contratos.store') }}" method="POST">
                             @csrf
-                            @method('PUT')
                             
                             <!-- Sección 1: Información General -->
                             <div class="form-section">
@@ -154,6 +153,8 @@
                                     <i class="fas fa-info-circle me-2"></i>
                                     Información General
                                 </h5>
+
+                                
                                 
                                 <div class="row">
                                     <div class="col-md-12">
@@ -166,7 +167,7 @@
                                                       name="obra" 
                                                       rows="2"
                                                       placeholder="Descripción detallada de la obra..."
-                                                      required>{{ old('obra', $contrato->obra) }}</textarea>
+                                                      required>{{ old('obra') }}</textarea>
                                             @error('obra')
                                                 <div class="text-danger small mt-1">{{ $message }}</div>
                                             @enderror
@@ -184,7 +185,7 @@
                                                    class="form-control form-control-custom" 
                                                    id="contrato_no" 
                                                    name="contrato_no" 
-                                                   value="{{ old('contrato_no', $contrato->contrato_no) }}"
+                                                   value="{{ old('contrato_no') }}"
                                                    placeholder="Ej: CTO-2024-001"
                                                    required>
                                             @error('contrato_no')
@@ -202,7 +203,7 @@
                                                    class="form-control form-control-custom" 
                                                    id="contrato_fecha" 
                                                    name="contrato_fecha" 
-                                                   value="{{ old('contrato_fecha', $contrato->contrato_fecha ? $contrato->contrato_fecha->format('Y-m-d') : '') }}"
+                                                   value="{{ old('contrato_fecha') }}"
                                                    required>
                                             @error('contrato_fecha')
                                                 <div class="text-danger small mt-1">{{ $message }}</div>
@@ -221,7 +222,7 @@
                                                    class="form-control form-control-custom" 
                                                    id="obras" 
                                                    name="obras" 
-                                                   value="{{ old('obras', $contrato->obras) }}"
+                                                   value="{{ old('obras') }}"
                                                    placeholder="Código interno de la obra">
                                             <div class="help-text">Identificador interno de la obra</div>
                                         </div>
@@ -236,7 +237,7 @@
                                                    class="form-control form-control-custom" 
                                                    id="duracion" 
                                                    name="duracion" 
-                                                   value="{{ old('duracion', $contrato->duracion) }}"
+                                                   value="{{ old('duracion') }}"
                                                    placeholder="Ej: 12 meses, 6 semanas">
                                             <div class="help-text">Tiempo estimado para la obra</div>
                                         </div>
@@ -261,7 +262,7 @@
                                                    class="form-control form-control-custom" 
                                                    id="cliente" 
                                                    name="cliente" 
-                                                   value="{{ old('cliente', $contrato->cliente) }}"
+                                                   value="{{ old('cliente') }}"
                                                    placeholder="Nombre o razón social del cliente"
                                                    required>
                                             @error('cliente')
@@ -279,7 +280,7 @@
                                                    class="form-control form-control-custom" 
                                                    id="empresa" 
                                                    name="empresa" 
-                                                   value="{{ old('empresa', $contrato->empresa) }}"
+                                                   value="{{ old('empresa') }}"
                                                    placeholder="Empresa del cliente">
                                         </div>
                                     </div>
@@ -295,7 +296,7 @@
                                                    class="form-control form-control-custom" 
                                                    id="razon_social" 
                                                    name="razon_social" 
-                                                   value="{{ old('razon_social', $contrato->razon_social) }}"
+                                                   value="{{ old('razon_social') }}"
                                                    placeholder="Razón social completa">
                                         </div>
                                     </div>
@@ -309,7 +310,7 @@
                                                    class="form-control form-control-custom" 
                                                    id="rfc" 
                                                    name="rfc" 
-                                                   value="{{ old('rfc', $contrato->rfc) }}"
+                                                   value="{{ old('rfc') }}"
                                                    placeholder="RFC del cliente"
                                                    maxlength="20">
                                         </div>
@@ -326,7 +327,7 @@
                                                    class="form-control form-control-custom" 
                                                    id="representante_legal" 
                                                    name="representante_legal" 
-                                                   value="{{ old('representante_legal', $contrato->representante_legal) }}"
+                                                   value="{{ old('representante_legal') }}"
                                                    placeholder="Nombre del representante legal">
                                         </div>
                                     </div>
@@ -350,7 +351,7 @@
                                                    class="form-control form-control-custom" 
                                                    id="lugar" 
                                                    name="lugar" 
-                                                   value="{{ old('lugar', $contrato->lugar) }}"
+                                                   value="{{ old('lugar') }}"
                                                    placeholder="Ciudad, Estado donde se realizará la obra"
                                                    required>
                                             @error('lugar')
@@ -368,7 +369,7 @@
                                                    class="form-control form-control-custom" 
                                                    id="inicio_de_obra" 
                                                    name="inicio_de_obra" 
-                                                   value="{{ old('inicio_de_obra', $contrato->inicio_de_obra ? $contrato->inicio_de_obra->format('Y-m-d') : '') }}">
+                                                   value="{{ old('inicio_de_obra') }}">
                                         </div>
                                     </div>
                                     
@@ -381,7 +382,7 @@
                                                    class="form-control form-control-custom" 
                                                    id="terminacion_de_obra" 
                                                    name="terminacion_de_obra" 
-                                                   value="{{ old('terminacion_de_obra', $contrato->terminacion_de_obra ? $contrato->terminacion_de_obra->format('Y-m-d') : '') }}">
+                                                   value="{{ old('terminacion_de_obra') }}">
                                         </div>
                                     </div>
                                 </div>
@@ -396,7 +397,7 @@
                                                    class="form-control form-control-custom" 
                                                    id="frente" 
                                                    name="frente" 
-                                                   value="{{ old('frente', $contrato->frente) }}"
+                                                   value="{{ old('frente') }}"
                                                    placeholder="Frente de trabajo">
                                         </div>
                                     </div>
@@ -410,7 +411,7 @@
                                                    class="form-control form-control-custom" 
                                                    id="gerencia" 
                                                    name="gerencia" 
-                                                   value="{{ old('gerencia', $contrato->gerencia) }}"
+                                                   value="{{ old('gerencia') }}"
                                                    placeholder="Gerencia responsable">
                                         </div>
                                     </div>
@@ -436,7 +437,7 @@
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="importe" 
                                                        name="importe" 
-                                                       value="{{ old('importe', $contrato->importe) }}"
+                                                       value="{{ old('importe') }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -455,7 +456,7 @@
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="iva" 
                                                        name="iva" 
-                                                       value="{{ old('iva', $contrato->iva) }}"
+                                                       value="{{ old('iva') }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -474,7 +475,7 @@
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="total" 
                                                        name="total" 
-                                                       value="{{ old('total', $contrato->total) }}"
+                                                       value="{{ old('total') }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -495,7 +496,7 @@
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="importe_total" 
                                                        name="importe_total" 
-                                                       value="{{ old('importe_total', $contrato->importe_total) }}"
+                                                       value="{{ old('importe_total') }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0"
@@ -518,7 +519,7 @@
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="anticipo" 
                                                        name="anticipo" 
-                                                       value="{{ old('anticipo', $contrato->anticipo) }}"
+                                                       value="{{ old('anticipo') }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -537,7 +538,7 @@
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="total_total" 
                                                        name="total_total" 
-                                                       value="{{ old('total_total', $contrato->total_total) }}"
+                                                       value="{{ old('total_total') }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -568,7 +569,7 @@
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="importe_convenio" 
                                                        name="importe_convenio" 
-                                                       value="{{ old('importe_convenio', $contrato->importe_convenio) }}"
+                                                       value="{{ old('importe_convenio') }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -587,7 +588,7 @@
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="total_convenio" 
                                                        name="total_convenio" 
-                                                       value="{{ old('total_convenio', $contrato->total_convenio) }}"
+                                                       value="{{ old('total_convenio') }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -614,7 +615,7 @@
                                                       id="observaciones" 
                                                       name="observaciones" 
                                                       rows="3"
-                                                      placeholder="Notas adicionales, especificaciones técnicas, condiciones especiales...">{{ old('observaciones', $contrato->observaciones) }}</textarea>
+                                                      placeholder="Notas adicionales, especificaciones técnicas, condiciones especiales...">{{ old('observaciones') }}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -630,7 +631,7 @@
                                                    class="form-control form-control-custom" 
                                                    id="telefono" 
                                                    name="telefono" 
-                                                   value="{{ old('telefono', $contrato->telefono) }}"
+                                                   value="{{ old('telefono') }}"
                                                    placeholder="Teléfono de contacto">
                                         </div>
                                     </div>
@@ -644,7 +645,7 @@
                                                    class="form-control form-control-custom" 
                                                    id="mail_facturas" 
                                                    name="mail_facturas" 
-                                                   value="{{ old('mail_facturas', $contrato->mail_facturas) }}"
+                                                   value="{{ old('mail_facturas') }}"
                                                    placeholder="email@ejemplo.com">
                                         </div>
                                     </div>
@@ -659,11 +660,11 @@
                                     </small>
                                 </div>
                                 <div class="d-flex gap-2">
-                                    <a href="{{ route('ingresos.index') }}" class="btn btn-cancel btn-outline-secondary">
+                                    <button type="button" class="btn btn-cancel btn-outline-secondary" onclick="window.history.back()">
                                         <i class="fas fa-times me-1"></i> Cancelar
-                                    </a>
+                                    </button>
                                     <button type="submit" class="btn btn-submit btn-primary">
-                                        <i class="fas fa-save me-1"></i> Actualizar Contrato
+                                        <i class="fas fa-save me-1"></i> Guardar Contrato
                                     </button>
                                 </div>
                             </div>
@@ -717,6 +718,13 @@
                         this.value = '';
                     }
                 });
+            }
+            
+            // Auto-llenar fecha actual en contrato si está vacío
+            const contratoFecha = document.getElementById('contrato_fecha');
+            if (contratoFecha && !contratoFecha.value) {
+                const today = new Date().toISOString().split('T')[0];
+                contratoFecha.value = today;
             }
         });
     </script>

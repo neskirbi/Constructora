@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    @include('header')
-    <title>{{Empresa()}} | Plantilla</title>
+    @include('header')    
+    <title>{{Empresa()}} | Ingresos</title>
 
     
     <!-- Estilos personalizados -->
@@ -14,12 +14,12 @@
     <div class="main-container">
         @include('toast.toasts')
 
-        @include('administradores.sidebar')
+        @include('aingresos.sidebar')
         
 
         <!-- Contenido principal -->
         <main class="main-content" id="mainContent">
-            @include('administradores.navbar')
+            @include('aingresos.navbar')
 
             <!-- Área de contenido -->
             <div class="content-area">

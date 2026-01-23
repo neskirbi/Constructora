@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     @include('header')
-    <title>{{Empresa()}} | Contratos</title>
+    <title>{{Empresa()}} | Ingresos</title>
     
     <!-- Estilos personalizados (los mismos del create) -->
     <style>

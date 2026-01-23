@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     @include('header')
+    <title>{{Empresa()}} | Start</title>
     <style>
         :root {
             --primary-blue: #0d1b48;

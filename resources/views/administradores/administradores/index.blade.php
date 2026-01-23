@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     @include('header')
-
+    <title>{{Empresa()}} | Administradores</title>
     
     <!-- Estilos personalizados -->
     <style>

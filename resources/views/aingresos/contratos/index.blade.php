@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     @include('header')
+    <title>{{Empresa()}} | Contratos</title>
     
     <!-- Estilos personalizados -->
     <style>
