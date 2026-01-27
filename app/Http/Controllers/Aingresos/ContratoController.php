@@ -50,36 +50,23 @@ class ContratoController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-        /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request){
         try {
-            // Validar todos los campos del formulario
+            // Validar todos los campos del formulario según la estructura de la tabla
             $validatedData = $request->validate([
                 // Información general
-                'contrato_no' => 'required|string|max:255|unique:contratos',
-                'obra' => 'required|string',
-                'obras' => 'nullable|string|max:255',
-                'contrato_fecha' => 'required|date',
-                'duracion' => 'nullable|string|max:255',
-                
-                // Información de la empresa
+                'obra' => 'nullable|string',
                 'empresa' => 'nullable|string|max:255',
+                'contrato_no' => 'required|string|max:255|unique:contratos',
                 'frente' => 'nullable|string|max:255',
                 'gerencia' => 'nullable|string|max:255',
+                'cliente' => 'nullable|string|max:255',
+                'lugar' => 'nullable|string|max:255',
                 
-                // Datos del cliente
-                'cliente' => 'required|string|max:255',
-                'lugar' => 'required|string|max:255',
-                
-                // Montos principales
-                'importe' => 'nullable|numeric|min:0',
-                'iva' => 'nullable|numeric|min:0',
-                'total' => 'nullable|numeric|min:0',
+                // Montos del contrato
+                'importe_contrato' => 'nullable|numeric|min:0',
+                'iva_contrato' => 'nullable|numeric|min:0',
+                'total_contrato' => 'nullable|numeric|min:0',
                 
                 // Montos de convenio
                 'importe_convenio' => 'nullable|numeric|min:0',
@@ -87,25 +74,27 @@ class ContratoController extends Controller
                 'total_convenio' => 'nullable|numeric|min:0',
                 
                 // Montos totales
-                'importe_total' => 'required|numeric|min:0',
+                'importe_total' => 'nullable|numeric|min:0',
                 'iva_total' => 'nullable|numeric|min:0',
                 'total_total' => 'nullable|numeric|min:0',
                 
                 // Anticipo
                 'anticipo' => 'nullable|numeric|min:0',
                 
-                // Fechas de obra
+                // Duración y fechas
+                'duracion' => 'nullable|string|max:255',
+                'contrato_fecha' => 'nullable|date',
                 'inicio_de_obra' => 'nullable|date',
                 'terminacion_de_obra' => 'nullable|date',
                 
                 // Observaciones
                 'observaciones' => 'nullable|string',
                 
-                // Datos fiscales del cliente
+                // Datos fiscales
                 'razon_social' => 'nullable|string|max:255',
                 'rfc' => 'nullable|string|max:20',
                 
-                // Dirección del cliente
+                // Dirección
                 'calle_y_numero' => 'nullable|string|max:255',
                 'colonia' => 'nullable|string|max:255',
                 'codigo_postal' => 'nullable|string|max:10',
@@ -114,6 +103,10 @@ class ContratoController extends Controller
                 
                 // Contacto
                 'telefono' => 'nullable|string|max:255',
+                
+                // Coordenadas
+                'latitud' => 'nullable|numeric',
+                'longitud' => 'nullable|numeric',
                 
                 // Datos bancarios
                 'banco' => 'nullable|string|max:255',
@@ -129,47 +122,46 @@ class ContratoController extends Controller
             ], [
                 'contrato_no.required' => 'El número de contrato es obligatorio',
                 'contrato_no.unique' => 'Este número de contrato ya existe',
-                'obra.required' => 'El nombre de la obra es obligatorio',
-                'cliente.required' => 'El nombre del cliente es obligatorio',
-                'lugar.required' => 'La ubicación es obligatoria',
-                'importe_total.required' => 'El importe total es obligatorio',
-                'importe_total.numeric' => 'El importe total debe ser un número',
-                'contrato_fecha.required' => 'La fecha del contrato es obligatoria',
                 'mail_facturas.email' => 'El correo electrónico no es válido',
             ]);
 
-            // Generar ID único con GetUuid()
-            $id = GetUuid();
+            // Generar ID único (ajusta esta función según tu aplicación)
+            $id = GetUuid(); // O usa: $id = \Illuminate\Support\Str::uuid();
             
             // Preparar todos los datos para insertar
             $datosContrato = [
                 'id' => $id,
                 'contrato_no' => $validatedData['contrato_no'],
-                'obra' => $validatedData['obra'],
-                'cliente' => $validatedData['cliente'],
-                'lugar' => $validatedData['lugar'],
-                'importe_total' => $validatedData['importe_total'],
-                'contrato_fecha' => $validatedData['contrato_fecha'],
                 
-                // Campos opcionales - usar null si están vacíos
-                'obras' => $validatedData['obras'] ?? null,
+                // Campos de la tabla - usando null si no están presentes
+                'obra' => $validatedData['obra'] ?? null,
                 'empresa' => $validatedData['empresa'] ?? null,
                 'frente' => $validatedData['frente'] ?? null,
                 'gerencia' => $validatedData['gerencia'] ?? null,
-                'duracion' => $validatedData['duracion'] ?? null,
+                'cliente' => $validatedData['cliente'] ?? null,
+                'lugar' => $validatedData['lugar'] ?? null,
                 
-                // Montos
-                'importe' => $validatedData['importe'] ?? null,
-                'iva' => $validatedData['iva'] ?? null,
-                'total' => $validatedData['total'] ?? null,
+                // Montos del contrato
+                'importe_contrato' => $validatedData['importe_contrato'] ?? null,
+                'iva_contrato' => $validatedData['iva_contrato'] ?? null,
+                'total_contrato' => $validatedData['total_contrato'] ?? null,
+                
+                // Montos de convenio
                 'importe_convenio' => $validatedData['importe_convenio'] ?? null,
                 'iva_convenio' => $validatedData['iva_convenio'] ?? null,
                 'total_convenio' => $validatedData['total_convenio'] ?? null,
+                
+                // Montos totales
+                'importe_total' => $validatedData['importe_total'] ?? null,
                 'iva_total' => $validatedData['iva_total'] ?? null,
                 'total_total' => $validatedData['total_total'] ?? null,
+                
+                // Anticipo
                 'anticipo' => $validatedData['anticipo'] ?? null,
                 
-                // Fechas
+                // Duración y fechas
+                'duracion' => $validatedData['duracion'] ?? null,
+                'contrato_fecha' => $validatedData['contrato_fecha'] ?? null,
                 'inicio_de_obra' => $validatedData['inicio_de_obra'] ?? null,
                 'terminacion_de_obra' => $validatedData['terminacion_de_obra'] ?? null,
                 
@@ -190,6 +182,10 @@ class ContratoController extends Controller
                 // Contacto
                 'telefono' => $validatedData['telefono'] ?? null,
                 
+                // Coordenadas
+                'latitud' => $validatedData['latitud'] ?? null,
+                'longitud' => $validatedData['longitud'] ?? null,
+                
                 // Bancarios
                 'banco' => $validatedData['banco'] ?? null,
                 'n_cuenta' => $validatedData['n_cuenta'] ?? null,
@@ -201,20 +197,11 @@ class ContratoController extends Controller
                 
                 // Representante
                 'representante_legal' => $validatedData['representante_legal'] ?? null,
+                
+                // Timestamps
+                'created_at' => now(),
+                'updated_at' => now(),
             ];
-
-            // Calcular totales si faltan
-            if (empty($datosContrato['total']) && !empty($datosContrato['importe']) && !empty($datosContrato['iva'])) {
-                $datosContrato['total'] = $datosContrato['importe'] + $datosContrato['iva'];
-            }
-            
-            if (empty($datosContrato['total_convenio']) && !empty($datosContrato['importe_convenio']) && !empty($datosContrato['iva_convenio'])) {
-                $datosContrato['total_convenio'] = $datosContrato['importe_convenio'] + $datosContrato['iva_convenio'];
-            }
-            
-            if (empty($datosContrato['total_total']) && !empty($datosContrato['importe_total']) && !empty($datosContrato['iva_total'])) {
-                $datosContrato['total_total'] = $datosContrato['importe_total'] + $datosContrato['iva_total'];
-            }
 
             // Crear el contrato en la base de datos
             $contrato = Contrato::create($datosContrato);

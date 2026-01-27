@@ -14,18 +14,17 @@ class CreateContratos extends Migration
     public function up()
     {
         Schema::create('contratos', function (Blueprint $table) {
-            $table->string('id',32)->primarykey();
-            $table->string('obras')->nullable();
+            $table->string('id',32)->unique();
+            $table->text('obra')->nullable();
             $table->string('empresa')->nullable();
             $table->string('contrato_no')->nullable();
             $table->string('frente')->nullable();
             $table->string('gerencia')->nullable();
             $table->string('cliente')->nullable();
-            $table->text('obra')->nullable();
             $table->string('lugar')->nullable();
-            $table->decimal('importe', 15, 2)->nullable();
-            $table->decimal('iva', 15, 2)->nullable();
-            $table->decimal('total', 15, 2)->nullable();
+            $table->decimal('importe_contrato', 15, 2)->nullable();
+            $table->decimal('iva_contrato', 15, 2)->nullable();
+            $table->decimal('total_contrato', 15, 2)->nullable();
             $table->decimal('importe_convenio', 15, 2)->nullable();
             $table->decimal('iva_convenio', 15, 2)->nullable();
             $table->decimal('total_convenio', 15, 2)->nullable();
@@ -46,6 +45,9 @@ class CreateContratos extends Migration
             $table->string('delegacion')->nullable();
             $table->string('municipio')->nullable();
             $table->string('telefono')->nullable();
+            $table->decimal('latitud', 10, 8)->nullable();
+            $table->decimal('longitud', 11, 8)->nullable();
+            
             $table->string('banco')->nullable();
             $table->string('n_cuenta')->nullable();
             $table->string('sucursal')->nullable();

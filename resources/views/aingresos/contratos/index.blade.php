@@ -443,11 +443,6 @@
                                    title="Ver detalles">
                                     <i class="fas fa-eye me-1"></i> Ver
                                 </a>
-                                <a href="{{ route('contratos.edit', $contrato->id) }}" 
-                                   class="btn btn-sm btn-outline-warning"
-                                   title="Editar contrato">
-                                    <i class="fas fa-edit me-1"></i> Editar
-                                </a>
                                 <button onclick="confirmDelete('{{ $contrato->id }}', '{{ addslashes($contrato->obra ?? 'Contrato') }}')" 
                                         class="btn btn-sm btn-outline-danger"
                                         title="Eliminar contrato">

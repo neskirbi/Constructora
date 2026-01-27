@@ -2,9 +2,9 @@
 <html lang="es">
 <head>
     @include('header')
-    <title>{{Empresa()}} | Contratos</title>
+    <title>{{Empresa()}} | Editar Contrato</title>
     
-    <!-- Estilos personalizados (los mismos del create) -->
+    <!-- Estilos personalizados -->
     <style>
         .card-formulario {
             border: 1px solid #e0e0e0;
@@ -100,6 +100,29 @@
             text-align: right;
         }
         
+        /* Estilos para el mapa */
+        .map-container {
+            height: 300px;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            margin-bottom: 10px;
+        }
+        
+        .map-coordinates {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .coordinates-display {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-family: monospace;
+            margin-top: 5px;
+        }
+        
         @media (max-width: 768px) {
             .form-section {
                 padding: 1rem;
@@ -108,8 +131,15 @@
             .card-header-form {
                 padding: 1rem;
             }
+            
+            .map-container {
+                height: 250px;
+            }
         }
     </style>
+    
+    <!-- Incluir Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initMap" async defer></script>
 </head>
 <body>
     <div class="main-container">
@@ -129,7 +159,7 @@
                         <p class="text-muted mb-0">Editando: {{ $contrato->contrato_no }}</p>
                     </div>
                     <div>
-                        <a href="{{ route('ingresos.index') }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('contratos.index') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left me-1"></i> Regresar
                         </a>
                     </div>
@@ -158,15 +188,14 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="form-group-custom">
-                                            <label for="obra" class="form-label-custom required-label">
+                                            <label for="obra" class="form-label-custom">
                                                 Nombre de la Obra
                                             </label>
                                             <textarea class="form-control form-control-custom" 
                                                       id="obra" 
                                                       name="obra" 
                                                       rows="2"
-                                                      placeholder="Descripción detallada de la obra..."
-                                                      required>{{ old('obra', $contrato->obra) }}</textarea>
+                                                      placeholder="Descripción detallada de la obra...">{{ old('obra', $contrato->obra) }}</textarea>
                                             @error('obra')
                                                 <div class="text-danger small mt-1">{{ $message }}</div>
                                             @enderror
@@ -195,18 +224,15 @@
                                     
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="contrato_fecha" class="form-label-custom required-label">
-                                                Fecha del Contrato
+                                            <label for="empresa" class="form-label-custom">
+                                                Empresa/Organización
                                             </label>
-                                            <input type="date" 
+                                            <input type="text" 
                                                    class="form-control form-control-custom" 
-                                                   id="contrato_fecha" 
-                                                   name="contrato_fecha" 
-                                                   value="{{ old('contrato_fecha', $contrato->contrato_fecha ? $contrato->contrato_fecha->format('Y-m-d') : '') }}"
-                                                   required>
-                                            @error('contrato_fecha')
-                                                <div class="text-danger small mt-1">{{ $message }}</div>
-                                            @enderror
+                                                   id="empresa" 
+                                                   name="empresa" 
+                                                   value="{{ old('empresa', $contrato->empresa) }}"
+                                                   placeholder="Empresa del cliente">
                                         </div>
                                     </div>
                                 </div>
@@ -214,31 +240,29 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="obras" class="form-label-custom">
-                                                Referencia Interna
+                                            <label for="frente" class="form-label-custom">
+                                                Frente de Trabajo
                                             </label>
                                             <input type="text" 
                                                    class="form-control form-control-custom" 
-                                                   id="obras" 
-                                                   name="obras" 
-                                                   value="{{ old('obras', $contrato->obras) }}"
-                                                   placeholder="Código interno de la obra">
-                                            <div class="help-text">Identificador interno de la obra</div>
+                                                   id="frente" 
+                                                   name="frente" 
+                                                   value="{{ old('frente', $contrato->frente) }}"
+                                                   placeholder="Descripción del frente de trabajo">
                                         </div>
                                     </div>
                                     
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="duracion" class="form-label-custom">
-                                                Duración
+                                            <label for="gerencia" class="form-label-custom">
+                                                Gerencia Responsable
                                             </label>
                                             <input type="text" 
                                                    class="form-control form-control-custom" 
-                                                   id="duracion" 
-                                                   name="duracion" 
-                                                   value="{{ old('duracion', $contrato->duracion) }}"
-                                                   placeholder="Ej: 12 meses, 6 semanas">
-                                            <div class="help-text">Tiempo estimado para la obra</div>
+                                                   id="gerencia" 
+                                                   name="gerencia" 
+                                                   value="{{ old('gerencia', $contrato->gerencia) }}"
+                                                   placeholder="Gerencia responsable">
                                         </div>
                                     </div>
                                 </div>
@@ -254,7 +278,7 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="cliente" class="form-label-custom required-label">
+                                            <label for="cliente" class="form-label-custom">
                                                 Nombre del Cliente
                                             </label>
                                             <input type="text" 
@@ -262,8 +286,7 @@
                                                    id="cliente" 
                                                    name="cliente" 
                                                    value="{{ old('cliente', $contrato->cliente) }}"
-                                                   placeholder="Nombre o razón social del cliente"
-                                                   required>
+                                                   placeholder="Nombre o razón social del cliente">
                                             @error('cliente')
                                                 <div class="text-danger small mt-1">{{ $message }}</div>
                                             @enderror
@@ -272,15 +295,15 @@
                                     
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="empresa" class="form-label-custom">
-                                                Empresa/Organización
+                                            <label for="lugar" class="form-label-custom">
+                                                Lugar del Proyecto
                                             </label>
                                             <input type="text" 
                                                    class="form-control form-control-custom" 
-                                                   id="empresa" 
-                                                   name="empresa" 
-                                                   value="{{ old('empresa', $contrato->empresa) }}"
-                                                   placeholder="Empresa del cliente">
+                                                   id="lugar" 
+                                                   name="lugar" 
+                                                   value="{{ old('lugar', $contrato->lugar) }}"
+                                                   placeholder="Ciudad, Estado donde se realizará la obra">
                                         </div>
                                     </div>
                                 </div>
@@ -317,7 +340,7 @@
                                 </div>
                                 
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-6">
                                         <div class="form-group-custom">
                                             <label for="representante_legal" class="form-label-custom">
                                                 Representante Legal
@@ -333,55 +356,82 @@
                                 </div>
                             </div>
                             
-                            <!-- Sección 3: Ubicación y Fechas -->
+                            <!-- Sección 3: Ubicación y Dirección -->
                             <div class="form-section">
                                 <h5 class="section-title">
                                     <i class="fas fa-map-marker-alt me-2"></i>
-                                    Ubicación y Fechas
+                                    Ubicación y Dirección
                                 </h5>
                                 
+                                <!-- Mapa de Google -->
+                                <div class="row mb-4">
+                                    <div class="col-md-12">
+                                        <div class="form-group-custom">
+                                            <label class="form-label-custom">
+                                                <i class="fas fa-map-marked-alt me-2"></i>
+                                                Seleccionar Ubicación en Mapa
+                                            </label>
+                                            <div id="map" class="map-container"></div>
+                                            <div class="map-coordinates">
+                                                Coordenadas seleccionadas:
+                                            </div>
+                                            <div class="coordinates-display">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="mb-2">
+                                                            <label class="form-label-custom small">Latitud:</label>
+                                                            <input type="text" 
+                                                                   class="form-control form-control-custom bg-light" 
+                                                                   id="latitud_display" 
+                                                                   readonly
+                                                                   value="{{ old('latitud', $contrato->latitud) }}">
+                                                            <input type="hidden" id="latitud" name="latitud" value="{{ old('latitud', $contrato->latitud) }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="mb-2">
+                                                            <label class="form-label-custom small">Longitud:</label>
+                                                            <input type="text" 
+                                                                   class="form-control form-control-custom bg-light" 
+                                                                   id="longitud_display" 
+                                                                   readonly
+                                                                   value="{{ old('longitud', $contrato->longitud) }}">
+                                                            <input type="hidden" id="longitud" name="longitud" value="{{ old('longitud', $contrato->longitud) }}">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Dirección del proyecto -->
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="lugar" class="form-label-custom required-label">
-                                                Ubicación/Lugar
+                                            <label for="calle_y_numero" class="form-label-custom">
+                                                Calle y Número
                                             </label>
                                             <input type="text" 
                                                    class="form-control form-control-custom" 
-                                                   id="lugar" 
-                                                   name="lugar" 
-                                                   value="{{ old('lugar', $contrato->lugar) }}"
-                                                   placeholder="Ciudad, Estado donde se realizará la obra"
-                                                   required>
-                                            @error('lugar')
-                                                <div class="text-danger small mt-1">{{ $message }}</div>
-                                            @enderror
+                                                   id="calle_y_numero" 
+                                                   name="calle_y_numero" 
+                                                   value="{{ old('calle_y_numero', $contrato->calle_y_numero) }}"
+                                                   placeholder="Calle, número, colonia">
                                         </div>
                                     </div>
                                     
-                                    <div class="col-md-3">
+                                    <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="inicio_de_obra" class="form-label-custom">
-                                                Fecha Inicio Obra
+                                            <label for="colonia" class="form-label-custom">
+                                                Colonia
                                             </label>
-                                            <input type="date" 
+                                            <input type="text" 
                                                    class="form-control form-control-custom" 
-                                                   id="inicio_de_obra" 
-                                                   name="inicio_de_obra" 
-                                                   value="{{ old('inicio_de_obra', $contrato->inicio_de_obra ? $contrato->inicio_de_obra->format('Y-m-d') : '') }}">
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-3">
-                                        <div class="form-group-custom">
-                                            <label for="terminacion_de_obra" class="form-label-custom">
-                                                Fecha Terminación Obra
-                                            </label>
-                                            <input type="date" 
-                                                   class="form-control form-control-custom" 
-                                                   id="terminacion_de_obra" 
-                                                   name="terminacion_de_obra" 
-                                                   value="{{ old('terminacion_de_obra', $contrato->terminacion_de_obra ? $contrato->terminacion_de_obra->format('Y-m-d') : '') }}">
+                                                   id="colonia" 
+                                                   name="colonia" 
+                                                   value="{{ old('colonia', $contrato->colonia) }}"
+                                                   placeholder="Colonia">
                                         </div>
                                     </div>
                                 </div>
@@ -389,54 +439,84 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="frente" class="form-label-custom">
-                                                Frente
+                                            <label for="municipio" class="form-label-custom">
+                                                Municipio/Alcaldía
                                             </label>
                                             <input type="text" 
                                                    class="form-control form-control-custom" 
-                                                   id="frente" 
-                                                   name="frente" 
-                                                   value="{{ old('frente', $contrato->frente) }}"
-                                                   placeholder="Frente de trabajo">
+                                                   id="municipio" 
+                                                   name="municipio" 
+                                                   value="{{ old('municipio', $contrato->municipio) }}"
+                                                   placeholder="Municipio o alcaldía">
                                         </div>
                                     </div>
                                     
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="gerencia" class="form-label-custom">
-                                                Gerencia
+                                            <label for="delegacion" class="form-label-custom">
+                                                Delegación/Zona
                                             </label>
                                             <input type="text" 
                                                    class="form-control form-control-custom" 
-                                                   id="gerencia" 
-                                                   name="gerencia" 
-                                                   value="{{ old('gerencia', $contrato->gerencia) }}"
-                                                   placeholder="Gerencia responsable">
+                                                   id="delegacion" 
+                                                   name="delegacion" 
+                                                   value="{{ old('delegacion', $contrato->delegacion) }}"
+                                                   placeholder="Delegación o zona">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label for="codigo_postal" class="form-label-custom">
+                                                Código Postal
+                                            </label>
+                                            <input type="text" 
+                                                   class="form-control form-control-custom" 
+                                                   id="codigo_postal" 
+                                                   name="codigo_postal" 
+                                                   value="{{ old('codigo_postal', $contrato->codigo_postal) }}"
+                                                   placeholder="Código postal">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label for="telefono" class="form-label-custom">
+                                                Teléfono
+                                            </label>
+                                            <input type="text" 
+                                                   class="form-control form-control-custom" 
+                                                   id="telefono" 
+                                                   name="telefono" 
+                                                   value="{{ old('telefono', $contrato->telefono) }}"
+                                                   placeholder="Teléfono de contacto">
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             
-                            <!-- Sección 4: Montos Económicos -->
+                            <!-- Sección 4: Montos del Contrato -->
                             <div class="form-section">
                                 <h5 class="section-title">
                                     <i class="fas fa-dollar-sign me-2"></i>
-                                    Montos Económicos
+                                    Montos del Contrato
                                 </h5>
                                 
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="importe" class="form-label-custom">
-                                                Importe
+                                            <label for="importe_contrato" class="form-label-custom">
+                                                Importe Contrato
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input" 
-                                                       id="importe" 
-                                                       name="importe" 
-                                                       value="{{ old('importe', $contrato->importe) }}"
+                                                       id="importe_contrato" 
+                                                       name="importe_contrato" 
+                                                       value="{{ old('importe_contrato', $contrato->importe_contrato) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -446,16 +526,16 @@
                                     
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="iva" class="form-label-custom">
-                                                IVA
+                                            <label for="iva_contrato" class="form-label-custom">
+                                                IVA Contrato
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input" 
-                                                       id="iva" 
-                                                       name="iva" 
-                                                       value="{{ old('iva', $contrato->iva) }}"
+                                                       id="iva_contrato" 
+                                                       name="iva_contrato" 
+                                                       value="{{ old('iva_contrato', $contrato->iva_contrato) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -465,16 +545,16 @@
                                     
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="total" class="form-label-custom">
-                                                Total
+                                            <label for="total_contrato" class="form-label-custom">
+                                                Total Contrato
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input" 
-                                                       id="total" 
-                                                       name="total" 
-                                                       value="{{ old('total', $contrato->total) }}"
+                                                       id="total_contrato" 
+                                                       name="total_contrato" 
+                                                       value="{{ old('total_contrato', $contrato->total_contrato) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -482,79 +562,14 @@
                                         </div>
                                     </div>
                                 </div>
-                                
-                                <div class="row mt-3">
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="importe_total" class="form-label-custom required-label">
-                                                Importe Total
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="importe_total" 
-                                                       name="importe_total" 
-                                                       value="{{ old('importe_total', $contrato->importe_total) }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0"
-                                                       required>
-                                            </div>
-                                            @error('importe_total')
-                                                <div class="text-danger small mt-1">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="anticipo" class="form-label-custom">
-                                                Anticipo
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="anticipo" 
-                                                       name="anticipo" 
-                                                       value="{{ old('anticipo', $contrato->anticipo) }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="total_total" class="form-label-custom">
-                                                Total General
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="total_total" 
-                                                       name="total_total" 
-                                                       value="{{ old('total_total', $contrato->total_total) }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Campos de convenio (opcionales) -->
-                                <div class="row mt-4">
-                                    <div class="col-md-12">
-                                        <h6 class="text-muted mb-3">
-                                            <i class="fas fa-handshake me-2"></i>
-                                            Convenio (opcional)
-                                        </h6>
-                                    </div>
-                                </div>
+                            </div>
+                            
+                            <!-- Sección 5: Montos de Convenio -->
+                            <div class="form-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-handshake me-2"></i>
+                                    Montos de Convenio
+                                </h5>
                                 
                                 <div class="row">
                                     <div class="col-md-4">
@@ -569,6 +584,25 @@
                                                        id="importe_convenio" 
                                                        name="importe_convenio" 
                                                        value="{{ old('importe_convenio', $contrato->importe_convenio) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="iva_convenio" class="form-label-custom">
+                                                IVA Convenio
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input" 
+                                                       id="iva_convenio" 
+                                                       name="iva_convenio" 
+                                                       value="{{ old('iva_convenio', $contrato->iva_convenio) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -597,7 +631,74 @@
                                 </div>
                             </div>
                             
-                            <!-- Sección 5: Información Adicional -->
+                            <!-- Sección 6: Montos Totales -->
+                            <div class="form-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-calculator me-2"></i>
+                                    Montos Totales
+                                </h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="importe_total" class="form-label-custom">
+                                                Importe Total
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input" 
+                                                       id="importe_total" 
+                                                       name="importe_total" 
+                                                       value="{{ old('importe_total', $contrato->importe_total) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="iva_total" class="form-label-custom">
+                                                IVA Total
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input" 
+                                                       id="iva_total" 
+                                                       name="iva_total" 
+                                                       value="{{ old('iva_total', $contrato->iva_total) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="total_total" class="form-label-custom">
+                                                Total General
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input" 
+                                                       id="total_total" 
+                                                       name="total_total" 
+                                                       value="{{ old('total_total', $contrato->total_total) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sección 7: Información Adicional -->
                             <div class="form-section">
                                 <h5 class="section-title">
                                     <i class="fas fa-sticky-note me-2"></i>
@@ -605,6 +706,83 @@
                                 </h5>
                                 
                                 <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label for="anticipo" class="form-label-custom">
+                                                Anticipo
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input" 
+                                                       id="anticipo" 
+                                                       name="anticipo" 
+                                                       value="{{ old('anticipo', $contrato->anticipo) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label for="duracion" class="form-label-custom">
+                                                Duración
+                                            </label>
+                                            <input type="text" 
+                                                   class="form-control form-control-custom" 
+                                                   id="duracion" 
+                                                   name="duracion" 
+                                                   value="{{ old('duracion', $contrato->duracion) }}"
+                                                   placeholder="Ej: 12 meses, 6 semanas">
+                                            <div class="help-text">Tiempo estimado para la obra</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="contrato_fecha" class="form-label-custom">
+                                                Fecha del Contrato
+                                            </label>
+                                            <input type="date" 
+                                                   class="form-control form-control-custom" 
+                                                   id="contrato_fecha" 
+                                                   name="contrato_fecha" 
+                                                   value="{{ old('contrato_fecha', $contrato->contrato_fecha ? $contrato->contrato_fecha->format('Y-m-d') : '') }}">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="inicio_de_obra" class="form-label-custom">
+                                                Fecha Inicio Obra
+                                            </label>
+                                            <input type="date" 
+                                                   class="form-control form-control-custom" 
+                                                   id="inicio_de_obra" 
+                                                   name="inicio_de_obra" 
+                                                   value="{{ old('inicio_de_obra', $contrato->inicio_de_obra ? $contrato->inicio_de_obra->format('Y-m-d') : '') }}">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="terminacion_de_obra" class="form-label-custom">
+                                                Fecha Terminación Obra
+                                            </label>
+                                            <input type="date" 
+                                                   class="form-control form-control-custom" 
+                                                   id="terminacion_de_obra" 
+                                                   name="terminacion_de_obra" 
+                                                   value="{{ old('terminacion_de_obra', $contrato->terminacion_de_obra ? $contrato->terminacion_de_obra->format('Y-m-d') : '') }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-3">
                                     <div class="col-md-12">
                                         <div class="form-group-custom">
                                             <label for="observaciones" class="form-label-custom">
@@ -618,27 +796,81 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                            
+                            <!-- Sección 8: Datos Bancarios -->
+                            <div class="form-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-university me-2"></i>
+                                    Datos Bancarios
+                                </h5>
                                 
-                                <!-- Información de contacto -->
-                                <div class="row mt-3">
+                                <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="telefono" class="form-label-custom">
-                                                Teléfono
+                                            <label for="banco" class="form-label-custom">
+                                                Banco
                                             </label>
                                             <input type="text" 
                                                    class="form-control form-control-custom" 
-                                                   id="telefono" 
-                                                   name="telefono" 
-                                                   value="{{ old('telefono', $contrato->telefono) }}"
-                                                   placeholder="Teléfono de contacto">
+                                                   id="banco" 
+                                                   name="banco" 
+                                                   value="{{ old('banco', $contrato->banco) }}"
+                                                   placeholder="Nombre del banco">
                                         </div>
                                     </div>
                                     
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
+                                            <label for="n_cuenta" class="form-label-custom">
+                                                Número de Cuenta
+                                            </label>
+                                            <input type="text" 
+                                                   class="form-control form-control-custom" 
+                                                   id="n_cuenta" 
+                                                   name="n_cuenta" 
+                                                   value="{{ old('n_cuenta', $contrato->n_cuenta) }}"
+                                                   placeholder="Número de cuenta bancaria">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label for="sucursal" class="form-label-custom">
+                                                Sucursal
+                                            </label>
+                                            <input type="text" 
+                                                   class="form-control form-control-custom" 
+                                                   id="sucursal" 
+                                                   name="sucursal" 
+                                                   value="{{ old('sucursal', $contrato->sucursal) }}"
+                                                   placeholder="Sucursal bancaria">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label for="clabe_interbancaria" class="form-label-custom">
+                                                CLABE Interbancaria
+                                            </label>
+                                            <input type="text" 
+                                                   class="form-control form-control-custom" 
+                                                   id="clabe_interbancaria" 
+                                                   name="clabe_interbancaria" 
+                                                   value="{{ old('clabe_interbancaria', $contrato->clabe_interbancaria) }}"
+                                                   placeholder="CLABE interbancaria (18 dígitos)"
+                                                   maxlength="18">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group-custom">
                                             <label for="mail_facturas" class="form-label-custom">
-                                                Email Facturas
+                                                Email para Facturas
                                             </label>
                                             <input type="email" 
                                                    class="form-control form-control-custom" 
@@ -659,12 +891,13 @@
                                     </small>
                                 </div>
                                 <div class="d-flex gap-2">
-                                    <a href="{{ route('ingresos.index') }}" class="btn btn-cancel btn-outline-secondary">
+                                    <a href="{{ route('contratos.index') }}" class="btn btn-cancel btn-outline-secondary">
                                         <i class="fas fa-times me-1"></i> Cancelar
                                     </a>
                                     <button type="submit" class="btn btn-submit btn-primary">
                                         <i class="fas fa-save me-1"></i> Actualizar Contrato
                                     </button>
+                                
                                 </div>
                             </div>
                         </form>
@@ -677,43 +910,113 @@
     @include('footer')
     
     <script>
-        // Auto-calcular campos relacionados
-        document.addEventListener('DOMContentLoaded', function() {
-            // Calcular total si se llena importe e IVA
-            const importeInput = document.getElementById('importe');
-            const ivaInput = document.getElementById('iva');
-            const totalInput = document.getElementById('total');
+        // Variables globales para el mapa
+        let map;
+        let marker;
+        let geocoder;
+        let defaultLat = {{ $contrato->latitud ?: '19.432608' }};
+        let defaultLng = {{ $contrato->longitud ?: '-99.133209' }};
+        
+        // Función para inicializar el mapa
+        function initMap() {
+            // Coordenadas iniciales
+            const initialLocation = { 
+                lat: parseFloat(defaultLat), 
+                lng: parseFloat(defaultLng) 
+            };
             
-            function calcularTotal() {
-                const importe = parseFloat(importeInput.value) || 0;
-                const iva = parseFloat(ivaInput.value) || 0;
-                const total = importe + iva;
+            // Crear mapa
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: initialLocation,
+                zoom: {{ $contrato->latitud ? '14' : '10' }},
+                mapTypeId: 'roadmap'
+            });
+            
+            // Inicializar geocoder
+            geocoder = new google.maps.Geocoder();
+            
+            // Si hay coordenadas existentes, poner marcador
+            if (parseFloat(defaultLat) && parseFloat(defaultLng)) {
+                const existingLocation = { lat: parseFloat(defaultLat), lng: parseFloat(defaultLng) };
                 
-                if (!isNaN(total) && total >= 0) {
-                    totalInput.value = total.toFixed(2);
-                }
+                marker = new google.maps.Marker({
+                    position: existingLocation,
+                    map: map,
+                    draggable: true,
+                    animation: google.maps.Animation.DROP
+                });
+                
+                // Escuchar cuando se arrastra el marcador
+                marker.addListener('dragend', function(event) {
+                    updateCoordinates(event.latLng.lat(), event.latLng.lng());
+                });
+                
+                map.setCenter(existingLocation);
+                map.setZoom(16);
+                updateCoordinates(defaultLat, defaultLng);
             }
             
-            if (importeInput && ivaInput && totalInput) {
-                importeInput.addEventListener('input', calcularTotal);
-                ivaInput.addEventListener('input', calcularTotal);
+            // Escuchar clics en el mapa
+            map.addListener('click', function(event) {
+                placeMarker(event.latLng);
+            });
+        }
+        
+        // Función para colocar marcador
+        function placeMarker(location) {
+            if (marker) {
+                marker.setPosition(location);
+            } else {
+                marker = new google.maps.Marker({
+                    position: location,
+                    map: map,
+                    draggable: true,
+                    animation: google.maps.Animation.DROP
+                });
+                
+                // Escuchar cuando se arrastra el marcador
+                marker.addListener('dragend', function(event) {
+                    updateCoordinates(event.latLng.lat(), event.latLng.lng());
+                });
             }
             
-            // Validar fechas
+            updateCoordinates(location.lat(), location.lng());
+        }
+        
+        // Función para actualizar coordenadas
+        function updateCoordinates(lat, lng) {
+            document.getElementById('latitud').value = lat;
+            document.getElementById('longitud').value = lng;
+            document.getElementById('latitud_display').value = lat.toFixed(6);
+            document.getElementById('longitud_display').value = lng.toFixed(6);
+        }
+        
+        // Función para confirmar eliminación
+                
+        // Validar fechas
+        document.addEventListener('DOMContentLoaded', function() {
             const inicioObra = document.getElementById('inicio_de_obra');
             const finObra = document.getElementById('terminacion_de_obra');
             
             if (inicioObra && finObra) {
                 inicioObra.addEventListener('change', function() {
                     if (this.value && finObra.value && this.value > finObra.value) {
-                        alert('La fecha de inicio no puede ser posterior a la fecha de terminación');
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Fecha inválida',
+                            text: 'La fecha de inicio no puede ser posterior a la fecha de terminación'
+                        });
                         this.value = '';
                     }
                 });
                 
                 finObra.addEventListener('change', function() {
                     if (this.value && inicioObra.value && this.value < inicioObra.value) {
-                        alert('La fecha de terminación no puede ser anterior a la fecha de inicio');
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Fecha inválida',
+                            text: 'La fecha de terminación no puede ser anterior a la fecha de inicio'
+                        });
                         this.value = '';
                     }
                 });

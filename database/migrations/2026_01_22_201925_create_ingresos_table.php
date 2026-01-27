@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class UpdateIngresosTable extends Migration
+class CreateIngresosTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,25 +14,12 @@ class UpdateIngresosTable extends Migration
     public function up()
     {
       Schema::create('ingresos', function (Blueprint $table) {
-            $table->string('id',32)->primarykey();
-            $table->string('n_obra')->nullable();
-            $table->string('empresa')->nullable();
-            $table->string('numero_de_contrato')->nullable();
-            $table->text('descripcion_segun_contrato')->nullable();
-            $table->string('referencia_interna')->nullable();
-            $table->string('cliente')->nullable();
-            $table->string('area')->nullable();
-            $table->date('fecha_firma_de_contrato')->nullable();
-            $table->date('fecha_inicio_de_obra')->nullable();
-            $table->date('fecha_terminacion_de_obra')->nullable();
-            $table->decimal('importe_de_anticipo_c_iva', 15, 2)->nullable();
-            $table->decimal('importe_de_contrato_c_iva', 15, 2)->nullable();
-            $table->decimal('convenio_aplicacion_de_monto_c_iva', 15, 2)->nullable();
-            $table->decimal('total_a_cobrar_contrato_c_iva', 15, 2)->nullable();
+            $table->string('id',32)->unique();
+            $table->string('id_contrato',32);
+            $table->string('area')->nullable();  
             $table->string('estimacion')->nullable();
-            $table->string('periodo')->nullable();
-            $table->date('del')->nullable();
-            $table->date('al')->nullable();
+            $table->date('periodo_del')->nullable();
+            $table->date('periodo_al')->nullable();
             $table->string('factura')->nullable();
             $table->date('fecha_factura')->nullable();
             $table->decimal('importe_de_estimacion', 15, 2)->nullable();
