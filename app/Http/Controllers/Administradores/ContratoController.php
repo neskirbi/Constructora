@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Aingresos;
+namespace App\Http\Controllers\Administradores;
 
 use App\Http\Controllers\Controller;
 use App\Models\Contrato;
@@ -37,11 +37,11 @@ class ContratoController extends Controller
         // Obtener los contratos con paginación (15 por página)
         $contratos = $query->orderBy('created_at', 'desc')->paginate();
         
-        return view('aingresos.contratos.index', compact('contratos'));
+        return view('administradores.contratos.index', compact('contratos'));
     }
 
     function create(){
-        return view('aingresos.contratos.create');
+        return view('administradores.contratos.create');
     }
 
     /**
@@ -131,7 +131,6 @@ class ContratoController extends Controller
             // Preparar todos los datos para insertar
             $datosContrato = [
                 'id' => $id,
-                'id_usuario' => GetId(),
                 'contrato_no' => $validatedData['contrato_no'],
                 
                 // Campos de la tabla - usando null si no están presentes
@@ -208,7 +207,7 @@ class ContratoController extends Controller
             $contrato = Contrato::create($datosContrato);
 
             // Redireccionar con mensaje de éxito
-            return redirect()->route('contratos.index')
+            return redirect()->route('acontratos.index')
                 ->with('success', 'Contrato ' . $contrato->contrato_no . ' creado exitosamente');
 
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -241,11 +240,11 @@ class ContratoController extends Controller
             $contrato = Contrato::findOrFail($id);
             
             // Cargar la vista de edición (reutilizamos el formulario CREATE)
-            return view('aingresos.contratos.show', compact('contrato'));
+            return view('administradores.contratos.show', compact('contrato'));
             
         } catch (\Exception $e) {
             // Si no se encuentra el contrato
-            return redirect()->route('contratos.index')
+            return redirect()->route('acontratos.index')
                 ->with('error', 'Contrato no encontrado: ' . $e->getMessage());
         }
     }
@@ -347,7 +346,7 @@ class ContratoController extends Controller
             $contrato->update($validated);
             
             // Redireccionar con mensaje de éxito
-            return redirect('contratos'.'/'.$contrato->id)
+            return redirect('acontratos'.'/'.$contrato->id)
                 ->with('success', 'Contrato "' . $contrato->contrato_no . '" actualizado exitosamente.');
                 
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -387,19 +386,19 @@ class ContratoController extends Controller
             $contrato->delete();
             
             // Redireccionar con mensaje de éxito
-            return redirect()->route('contratos.index')
+            return redirect()->route('acontratos.index')
                 ->with('success', 'Contrato "' . $contratoNo . '" - "' . $obraNombre . '" eliminado exitosamente.');
                 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             // Si no se encuentra el contrato
-            return redirect()->route('contratos.index')
+            return redirect()->route('acontratos.index')
                 ->with('error', 'El contrato no existe o ya fue eliminado.');
                 
         } catch (\Exception $e) {
             // Para cualquier otro error
             \Log::error('Error al eliminar contrato ID ' . $id . ': ' . $e->getMessage());
             
-            return redirect()->route('contratos.index')
+            return redirect()->route('acontratos.index')
                 ->with('error', 'Error al eliminar el contrato: ' . $e->getMessage());
         }
     }

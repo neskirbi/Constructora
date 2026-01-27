@@ -16,6 +16,7 @@ class CreateIngresosTable extends Migration
       Schema::create('ingresos', function (Blueprint $table) {
             $table->string('id',32)->unique();
             $table->string('id_contrato',32);
+            $table->string('id_usuario',32)->default('');
             $table->string('area')->nullable();  
             $table->string('estimacion')->nullable();
             $table->date('periodo_del')->nullable();
@@ -47,9 +48,7 @@ class CreateIngresosTable extends Migration
             $table->decimal('por_facturar', 15, 2)->nullable();
             $table->string('status')->nullable();
             $table->decimal('estimado_menos_deducciones', 15, 2)->nullable();
-            $table->string('n_cuenta')->nullable();
-            $table->string('sucursal')->nullable();
-            $table->string('clabe_interbancaria')->nullable();
+            $table->integer('verificado')->default(1);
             $table->timestamps();
         });
     }

@@ -206,8 +206,8 @@
         }
         
         .status-rechazado {
-            background-color: #f8d7da;
-            color: #721c24;
+            background-color: #d1ecf1;
+            color: #0c5460;
         }
     </style>
 </head>
@@ -372,8 +372,8 @@
                                                 $statusText = 'Verificado';
                                             } else
                                             if($verificado == '0') {
-                                                $statusClass = 'status-rechazado';
-                                                $statusText = 'Rechazado';
+                                                $statusClass = 'status-verificado';
+                                                $statusText = 'Verificado';
                                             }
                                         @endphp
                                         <span class="status-badge {{ $statusClass }}">
@@ -381,22 +381,20 @@
                                         </span>
                                     </td>
                                     <td>
-                                       
+                                        @if($ingreso->verificado!=1)
                                         <div class="btn-group" role="group">
                                             <a href="{{ route('ingresos.show', $ingreso->id) }}" 
                                                class="btn btn-sm btn-outline-primary"
                                                title="Ver/Editar">
                                                 <i class="fas fa-edit"></i>
-                                            </a> 
-                                            @if($ingreso->verificado==1)
+                                            </a>
                                             <button onclick="confirmDelete('{{ $ingreso->id }}', '{{ addslashes($ingreso->estimacion ?? 'Ingreso') }}')" 
                                                     class="btn btn-sm btn-outline-danger"
                                                     title="Eliminar">
                                                 <i class="fas fa-trash"></i>
                                             </button>
-                                              @endif
                                         </div>
-                                      
+                                        @endif
                                     </td>
                                 </tr>
                                 @endforeach

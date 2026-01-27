@@ -135,6 +135,31 @@ function GetUuid(){
         return 'No autenticado';
     }
 
+     function GetId() {
+        // Intenta con cada guard en orden de prioridad
+        if (Auth::guard('administradores')->check()) {
+            $user = Auth::guard('administradores')->user();
+            return trim($user->id);
+        }
+        
+        if (Auth::guard('aingresos')->check()) {
+            $user = Auth::guard('aingresos')->user();
+            return trim($user->id);
+        }
+        
+        if (Auth::guard('adestajos')->check()) {
+            $user = Auth::guard('adestajos')->user();
+            return trim($user->id);
+        }
+        
+        if (Auth::guard('acompras')->check()) {
+            $user = Auth::guard('acompras')->user();
+            return trim($user->id);
+        }
+        
+        return 'Invitado';
+    }
+
 
     function Comentarios(){
         //Escribir simpre arriba de esta funcion las nuevas funciones.

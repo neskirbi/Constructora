@@ -14,6 +14,10 @@
                     <span class="menu-text">Administradores</span>
                 </a>
                 
+                <a href="{{url('acontratos')}}" class="menu-item">
+                    <i class="fas fa-file-contract menu-icon"></i>
+                    <span class="menu-text">Contratos</span>
+                </a>
                 <!--<a href="#" class="menu-item">
                     <i class="fas fa-tasks menu-icon"></i>
                     <span class="menu-text">Proyectos</span>

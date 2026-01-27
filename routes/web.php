@@ -70,6 +70,8 @@ Route::post('update-password', 'App\Http\Controllers\LoginController@UpdatePassw
 Route::resource('administradores', 'App\Http\Controllers\Administradores\AdministradorController')
     ->middleware(['auth:administradores']);
 
+    Route::resource('acontratos', 'App\Http\Controllers\Administradores\ContratoController')
+    ->middleware(['auth:administradores']);
 /**
  * Rutas Aingresos
  */

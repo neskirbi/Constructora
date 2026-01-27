@@ -15,6 +15,7 @@ class CreateContratos extends Migration
     {
         Schema::create('contratos', function (Blueprint $table) {
             $table->string('id',32)->unique();
+            $table->string('id_usuario',32)->default('');
             $table->text('obra')->nullable();
             $table->string('empresa')->nullable();
             $table->string('contrato_no')->nullable();

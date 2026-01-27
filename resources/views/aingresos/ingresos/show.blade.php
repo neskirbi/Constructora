@@ -2,9 +2,9 @@
 <html lang="es">
 <head>
     @include('header')
-    <title>{{Empresa()}} | Ingresos</title>
+    <title>{{Empresa()}} | Ver/Editar Ingreso</title>
     
-    <!-- Estilos personalizados (los mismos del create) -->
+    <!-- Estilos personalizados -->
     <style>
         .card-formulario {
             border: 1px solid #e0e0e0;
@@ -58,6 +58,11 @@
             box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
         }
         
+        .form-control-custom:disabled {
+            background-color: #e9ecef;
+            opacity: 1;
+        }
+        
         .btn-submit {
             padding: 0.625rem 1.5rem;
             font-weight: 500;
@@ -100,6 +105,66 @@
             text-align: right;
         }
         
+        .contrato-info {
+            background-color: #e7f1ff;
+            border: 1px solid #b6d4fe;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .contrato-info-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .contrato-info-label {
+            font-weight: 600;
+            color: #0d6efd;
+            min-width: 120px;
+            display: inline-block;
+        }
+        
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .status-pendiente {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-aprobado {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-rechazado {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .info-display {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 0.75rem 1rem;
+            min-height: 38px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .form-actions {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 1rem 0;
+            border-top: 1px solid #dee2e6;
+            margin-top: 2rem;
+        }
+        
         @media (max-width: 768px) {
             .form-section {
                 padding: 1rem;
@@ -107,6 +172,11 @@
             
             .card-header-form {
                 padding: 1rem;
+            }
+            
+            .form-actions {
+                position: static;
+                margin-top: 1rem;
             }
         }
     </style>
@@ -125,8 +195,7 @@
                 <!-- Título y botón -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                        <h1 class="h3 mb-1 text-gray-800">Editar Contrato</h1>
-                        <p class="text-muted mb-0">Editando: {{ $contrato->contrato_no }}</p>
+                        <h1 class="h3 mb-1 text-gray-800">Ingreso</h1>
                     </div>
                     <div>
                         <a href="{{ route('ingresos.index') }}" class="btn btn-outline-secondary">
@@ -135,136 +204,101 @@
                     </div>
                 </div>
                 
+                <!-- Información del estado -->
+                <div class="alert alert-info mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-info-circle me-2"></i>
+                            Estado de verificación: 
+                            @php
+                                $verificado = $ingreso->verificado ?? 1;
+                                if($verificado == 1) {
+                                    echo '<span class="status-badge status-pendiente ms-2">Pendiente (1)</span>';
+                                } elseif($verificado == 0) {
+                                    echo '<span class="status-badge status-rechazado ms-2">Rechazado (0)</span>';
+                                } elseif($verificado == 2) {
+                                    echo '<span class="status-badge status-aprobado ms-2">Aprobado (2)</span>';
+                                }
+                            @endphp
+                        </div>
+                        <div>
+                            @if($ingreso->verificado == 1)
+                                <span class="text-success">
+                                    <i class="fas fa-edit me-1"></i> Formulario editable
+                                </span>
+                            @else
+                                <span class="text-danger">
+                                    <i class="fas fa-lock me-1"></i> Formulario bloqueado
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Formulario de edición -->
                 <div class="card card-formulario">
                     <div class="card-header card-header-form">
                         <h5 class="mb-0">
-                            <i class="fas fa-edit me-2 text-warning"></i>
-                            Editar Información del Contrato
+                            <i class="fas fa-edit me-2 text-primary"></i>
+                            {{ $ingreso->verificado == 1 ? 'Editar Ingreso' : 'Ver Ingreso' }}
                         </h5>
                     </div>
                     <div class="card-body">
-                        <form action="{{ route('contratos.update', $contrato->id) }}" method="POST">
+                        <form action="{{ route('ingresos.update', $ingreso->id) }}" method="POST" id="ingresoForm">
                             @csrf
                             @method('PUT')
                             
-                            <!-- Sección 1: Información General -->
+                            <!-- Sección 1: Información del Contrato (SOLO LECTURA) -->
+                            <div class="form-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-file-contract me-2"></i>
+                                    Información del Contrato
+                                </h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group-custom">
+                                            <label class="form-label-custom">
+                                                Contrato (No editable)
+                                            </label>
+                                            <div class="info-display">
+                                                @if($ingreso->contrato)
+                                                    <strong>{{ $ingreso->contrato->contrato_no }}</strong> - {{ $ingreso->contrato->obra }}
+                                                    <br>
+                                                    <small class="text-muted">Cliente: {{ $ingreso->contrato->cliente }}</small>
+                                                @else
+                                                    <span class="text-danger">Contrato no encontrado</span>
+                                                @endif
+                                            </div>
+                                            <!-- Campo oculto con el id_contrato actual -->
+                                            <input type="hidden" name="id_contrato" value="{{ $ingreso->id_contrato }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sección 2: Información Básica del Ingreso -->
                             <div class="form-section">
                                 <h5 class="section-title">
                                     <i class="fas fa-info-circle me-2"></i>
-                                    Información General
-                                </h5>
-                                
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group-custom">
-                                            <label for="obra" class="form-label-custom required-label">
-                                                Nombre de la Obra
-                                            </label>
-                                            <textarea class="form-control form-control-custom" 
-                                                      id="obra" 
-                                                      name="obra" 
-                                                      rows="2"
-                                                      placeholder="Descripción detallada de la obra..."
-                                                      required>{{ old('obra', $contrato->obra) }}</textarea>
-                                            @error('obra')
-                                                <div class="text-danger small mt-1">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group-custom">
-                                            <label for="contrato_no" class="form-label-custom required-label">
-                                                Número de Contrato
-                                            </label>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom" 
-                                                   id="contrato_no" 
-                                                   name="contrato_no" 
-                                                   value="{{ old('contrato_no', $contrato->contrato_no) }}"
-                                                   placeholder="Ej: CTO-2024-001"
-                                                   required>
-                                            @error('contrato_no')
-                                                <div class="text-danger small mt-1">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-6">
-                                        <div class="form-group-custom">
-                                            <label for="contrato_fecha" class="form-label-custom required-label">
-                                                Fecha del Contrato
-                                            </label>
-                                            <input type="date" 
-                                                   class="form-control form-control-custom" 
-                                                   id="contrato_fecha" 
-                                                   name="contrato_fecha" 
-                                                   value="{{ old('contrato_fecha', $contrato->contrato_fecha ? $contrato->contrato_fecha->format('Y-m-d') : '') }}"
-                                                   required>
-                                            @error('contrato_fecha')
-                                                <div class="text-danger small mt-1">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group-custom">
-                                            <label for="obras" class="form-label-custom">
-                                                Referencia Interna
-                                            </label>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom" 
-                                                   id="obras" 
-                                                   name="obras" 
-                                                   value="{{ old('obras', $contrato->obras) }}"
-                                                   placeholder="Código interno de la obra">
-                                            <div class="help-text">Identificador interno de la obra</div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-6">
-                                        <div class="form-group-custom">
-                                            <label for="duracion" class="form-label-custom">
-                                                Duración
-                                            </label>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom" 
-                                                   id="duracion" 
-                                                   name="duracion" 
-                                                   value="{{ old('duracion', $contrato->duracion) }}"
-                                                   placeholder="Ej: 12 meses, 6 semanas">
-                                            <div class="help-text">Tiempo estimado para la obra</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Sección 2: Datos del Cliente -->
-                            <div class="form-section">
-                                <h5 class="section-title">
-                                    <i class="fas fa-user-tie me-2"></i>
-                                    Datos del Cliente
+                                    Información Básica
                                 </h5>
                                 
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="cliente" class="form-label-custom required-label">
-                                                Nombre del Cliente
+                                            <label for="estimacion" class="form-label-custom required-label">
+                                                Estimación No.
                                             </label>
                                             <input type="text" 
-                                                   class="form-control form-control-custom" 
-                                                   id="cliente" 
-                                                   name="cliente" 
-                                                   value="{{ old('cliente', $contrato->cliente) }}"
-                                                   placeholder="Nombre o razón social del cliente"
-                                                   required>
-                                            @error('cliente')
+                                                   class="form-control form-control-custom {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                   id="estimacion" 
+                                                   name="estimacion" 
+                                                   value="{{ old('estimacion', $ingreso->estimacion) }}"
+                                                   placeholder="Ej: EST-001"
+                                                   required
+                                                   {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                            @error('estimacion')
                                                 <div class="text-danger small mt-1">{{ $message }}</div>
                                             @enderror
                                         </div>
@@ -272,15 +306,16 @@
                                     
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="empresa" class="form-label-custom">
-                                                Empresa/Organización
+                                            <label for="area" class="form-label-custom">
+                                                Área
                                             </label>
                                             <input type="text" 
-                                                   class="form-control form-control-custom" 
-                                                   id="empresa" 
-                                                   name="empresa" 
-                                                   value="{{ old('empresa', $contrato->empresa) }}"
-                                                   placeholder="Empresa del cliente">
+                                                   class="form-control form-control-custom {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                   id="area" 
+                                                   name="area" 
+                                                   value="{{ old('area', $ingreso->area) }}"
+                                                   placeholder="Ej: Administración, Obra Civil"
+                                                   {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
                                         </div>
                                     </div>
                                 </div>
@@ -288,158 +323,58 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="razon_social" class="form-label-custom">
-                                                Razón Social
+                                            <label for="periodo_del" class="form-label-custom">
+                                                Periodo Del
                                             </label>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom" 
-                                                   id="razon_social" 
-                                                   name="razon_social" 
-                                                   value="{{ old('razon_social', $contrato->razon_social) }}"
-                                                   placeholder="Razón social completa">
+                                            <input type="date" 
+                                                   class="form-control form-control-custom {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                   id="periodo_del" 
+                                                   name="periodo_del" 
+                                                   value="{{ old('periodo_del', $ingreso->periodo_del ? $ingreso->periodo_del->format('Y-m-d') : '') }}"
+                                                   {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
                                         </div>
                                     </div>
                                     
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="rfc" class="form-label-custom">
-                                                RFC
+                                            <label for="periodo_al" class="form-label-custom">
+                                                Periodo Al
                                             </label>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom" 
-                                                   id="rfc" 
-                                                   name="rfc" 
-                                                   value="{{ old('rfc', $contrato->rfc) }}"
-                                                   placeholder="RFC del cliente"
-                                                   maxlength="20">
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group-custom">
-                                            <label for="representante_legal" class="form-label-custom">
-                                                Representante Legal
-                                            </label>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom" 
-                                                   id="representante_legal" 
-                                                   name="representante_legal" 
-                                                   value="{{ old('representante_legal', $contrato->representante_legal) }}"
-                                                   placeholder="Nombre del representante legal">
+                                            <input type="date" 
+                                                   class="form-control form-control-custom {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                   id="periodo_al" 
+                                                   name="periodo_al" 
+                                                   value="{{ old('periodo_al', $ingreso->periodo_al ? $ingreso->periodo_al->format('Y-m-d') : '') }}"
+                                                   {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             
-                            <!-- Sección 3: Ubicación y Fechas -->
+                            <!-- Sección 3: Montos de la Estimación -->
                             <div class="form-section">
                                 <h5 class="section-title">
-                                    <i class="fas fa-map-marker-alt me-2"></i>
-                                    Ubicación y Fechas
-                                </h5>
-                                
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group-custom">
-                                            <label for="lugar" class="form-label-custom required-label">
-                                                Ubicación/Lugar
-                                            </label>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom" 
-                                                   id="lugar" 
-                                                   name="lugar" 
-                                                   value="{{ old('lugar', $contrato->lugar) }}"
-                                                   placeholder="Ciudad, Estado donde se realizará la obra"
-                                                   required>
-                                            @error('lugar')
-                                                <div class="text-danger small mt-1">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-3">
-                                        <div class="form-group-custom">
-                                            <label for="inicio_de_obra" class="form-label-custom">
-                                                Fecha Inicio Obra
-                                            </label>
-                                            <input type="date" 
-                                                   class="form-control form-control-custom" 
-                                                   id="inicio_de_obra" 
-                                                   name="inicio_de_obra" 
-                                                   value="{{ old('inicio_de_obra', $contrato->inicio_de_obra ? $contrato->inicio_de_obra->format('Y-m-d') : '') }}">
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-3">
-                                        <div class="form-group-custom">
-                                            <label for="terminacion_de_obra" class="form-label-custom">
-                                                Fecha Terminación Obra
-                                            </label>
-                                            <input type="date" 
-                                                   class="form-control form-control-custom" 
-                                                   id="terminacion_de_obra" 
-                                                   name="terminacion_de_obra" 
-                                                   value="{{ old('terminacion_de_obra', $contrato->terminacion_de_obra ? $contrato->terminacion_de_obra->format('Y-m-d') : '') }}">
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group-custom">
-                                            <label for="frente" class="form-label-custom">
-                                                Frente
-                                            </label>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom" 
-                                                   id="frente" 
-                                                   name="frente" 
-                                                   value="{{ old('frente', $contrato->frente) }}"
-                                                   placeholder="Frente de trabajo">
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-6">
-                                        <div class="form-group-custom">
-                                            <label for="gerencia" class="form-label-custom">
-                                                Gerencia
-                                            </label>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom" 
-                                                   id="gerencia" 
-                                                   name="gerencia" 
-                                                   value="{{ old('gerencia', $contrato->gerencia) }}"
-                                                   placeholder="Gerencia responsable">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Sección 4: Montos Económicos -->
-                            <div class="form-section">
-                                <h5 class="section-title">
-                                    <i class="fas fa-dollar-sign me-2"></i>
-                                    Montos Económicos
+                                    <i class="fas fa-calculator me-2"></i>
+                                    Montos de la Estimación
                                 </h5>
                                 
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="importe" class="form-label-custom">
-                                                Importe
+                                            <label for="importe_de_estimacion" class="form-label-custom">
+                                                Importe de Estimación
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="importe" 
-                                                       name="importe" 
-                                                       value="{{ old('importe', $contrato->importe) }}"
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="importe_de_estimacion" 
+                                                       name="importe_de_estimacion" 
+                                                       value="{{ old('importe_de_estimacion', $ingreso->importe_de_estimacion) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
-                                                       min="0">
+                                                       min="0"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
                                             </div>
                                         </div>
                                     </div>
@@ -452,219 +387,585 @@
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
                                                        id="iva" 
                                                        name="iva" 
-                                                       value="{{ old('iva', $contrato->iva) }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="total" class="form-label-custom">
-                                                Total
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="total" 
-                                                       name="total" 
-                                                       value="{{ old('total', $contrato->total) }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row mt-3">
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="importe_total" class="form-label-custom required-label">
-                                                Importe Total
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="importe_total" 
-                                                       name="importe_total" 
-                                                       value="{{ old('importe_total', $contrato->importe_total) }}"
+                                                       value="{{ old('iva', $ingreso->iva) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0"
-                                                       required>
-                                            </div>
-                                            @error('importe_total')
-                                                <div class="text-danger small mt-1">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="anticipo" class="form-label-custom">
-                                                Anticipo
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="anticipo" 
-                                                       name="anticipo" 
-                                                       value="{{ old('anticipo', $contrato->anticipo) }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
                                             </div>
                                         </div>
                                     </div>
                                     
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="total_total" class="form-label-custom">
-                                                Total General
+                                            <label for="total_estimacion_con_iva" class="form-label-custom">
+                                                Total con IVA
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="total_total" 
-                                                       name="total_total" 
-                                                       value="{{ old('total_total', $contrato->total_total) }}"
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="total_estimacion_con_iva" 
+                                                       name="total_estimacion_con_iva" 
+                                                       value="{{ old('total_estimacion_con_iva', $ingreso->total_estimacion_con_iva) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
-                                                       min="0">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Campos de convenio (opcionales) -->
-                                <div class="row mt-4">
-                                    <div class="col-md-12">
-                                        <h6 class="text-muted mb-3">
-                                            <i class="fas fa-handshake me-2"></i>
-                                            Convenio (opcional)
-                                        </h6>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="importe_convenio" class="form-label-custom">
-                                                Importe Convenio
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="importe_convenio" 
-                                                       name="importe_convenio" 
-                                                       value="{{ old('importe_convenio', $contrato->importe_convenio) }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="total_convenio" class="form-label-custom">
-                                                Total Convenio
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="total_convenio" 
-                                                       name="total_convenio" 
-                                                       value="{{ old('total_convenio', $contrato->total_convenio) }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
+                                                       min="0"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             
-                            <!-- Sección 5: Información Adicional -->
+                            <!-- Sección 4: Deducciones -->
                             <div class="form-section">
                                 <h5 class="section-title">
-                                    <i class="fas fa-sticky-note me-2"></i>
-                                    Información Adicional
+                                    <i class="fas fa-minus-circle me-2"></i>
+                                    Deducciones
                                 </h5>
                                 
                                 <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="observaciones" class="form-label-custom">
-                                                Observaciones
+                                            <label for="retenciones_o_sanciones" class="form-label-custom">
+                                                Retenciones/Sanciones
                                             </label>
-                                            <textarea class="form-control form-control-custom" 
-                                                      id="observaciones" 
-                                                      name="observaciones" 
-                                                      rows="3"
-                                                      placeholder="Notas adicionales, especificaciones técnicas, condiciones especiales...">{{ old('observaciones', $contrato->observaciones) }}</textarea>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="retenciones_o_sanciones" 
+                                                       name="retenciones_o_sanciones" 
+                                                       value="{{ old('retenciones_o_sanciones', $ingreso->retenciones_o_sanciones) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="cargos_adicionales_35_porciento" class="form-label-custom">
+                                                Cargos Adicionales 35%
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="cargos_adicionales_35_porciento" 
+                                                       name="cargos_adicionales_35_porciento" 
+                                                       value="{{ old('cargos_adicionales_35_porciento', $ingreso->cargos_adicionales_35_porciento) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="retencion_5_al_millar" class="form-label-custom">
+                                                Retención 5‰
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="retencion_5_al_millar" 
+                                                       name="retencion_5_al_millar" 
+                                                       value="{{ old('retencion_5_al_millar', $ingreso->retencion_5_al_millar) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 
-                                <!-- Información de contacto -->
-                                <div class="row mt-3">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="sancion_atraso_presentacion_estimacion" class="form-label-custom">
+                                                Sanción Atraso Presentación
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="sancion_atraso_presentacion_estimacion" 
+                                                       name="sancion_atraso_presentacion_estimacion" 
+                                                       value="{{ old('sancion_atraso_presentacion_estimacion', $ingreso->sancion_atraso_presentacion_estimacion) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="sancion_atraso_de_obra" class="form-label-custom">
+                                                Sanción Atraso de Obra
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="sancion_atraso_de_obra" 
+                                                       name="sancion_atraso_de_obra" 
+                                                       value="{{ old('sancion_atraso_de_obra', $ingreso->sancion_atraso_de_obra) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="sancion_por_obra_mal_ejecutada" class="form-label-custom">
+                                                Sanción Obra Mal Ejecutada
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="sancion_por_obra_mal_ejecutada" 
+                                                       name="sancion_por_obra_mal_ejecutada" 
+                                                       value="{{ old('sancion_por_obra_mal_ejecutada', $ingreso->sancion_por_obra_mal_ejecutada) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="retencion_por_atraso_en_programa_de_obra" class="form-label-custom">
+                                                Retención Atraso Programa
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="retencion_por_atraso_en_programa_de_obra" 
+                                                       name="retencion_por_atraso_en_programa_de_obra" 
+                                                       value="{{ old('retencion_por_atraso_en_programa_de_obra', $ingreso->retencion_por_atraso_en_programa_de_obra) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="amortizacion_anticipo" class="form-label-custom">
+                                                Amortización Anticipo
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="amortizacion_anticipo" 
+                                                       name="amortizacion_anticipo" 
+                                                       value="{{ old('amortizacion_anticipo', $ingreso->amortizacion_anticipo) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="amortizacion_con_iva" class="form-label-custom">
+                                                Amortización con IVA
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="amortizacion_con_iva" 
+                                                       name="amortizacion_con_iva" 
+                                                       value="{{ old('amortizacion_con_iva', $ingreso->amortizacion_con_iva) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="total_deducciones" class="form-label-custom">
+                                                Total Deducciones
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="total_deducciones" 
+                                                       name="total_deducciones" 
+                                                       value="{{ old('total_deducciones', $ingreso->total_deducciones) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="estimado_menos_deducciones" class="form-label-custom">
+                                                Estimado - Deducciones
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="estimado_menos_deducciones" 
+                                                       name="estimado_menos_deducciones" 
+                                                       value="{{ old('estimado_menos_deducciones', $ingreso->estimado_menos_deducciones) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sección 5: Facturación y Cobro -->
+                            <div class="form-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-file-invoice-dollar me-2"></i>
+                                    Facturación y Cobro
+                                </h5>
+                                
+                                <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="telefono" class="form-label-custom">
-                                                Teléfono
+                                            <label for="factura" class="form-label-custom">
+                                                No. de Factura
                                             </label>
                                             <input type="text" 
-                                                   class="form-control form-control-custom" 
-                                                   id="telefono" 
-                                                   name="telefono" 
-                                                   value="{{ old('telefono', $contrato->telefono) }}"
-                                                   placeholder="Teléfono de contacto">
+                                                   class="form-control form-control-custom {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                   id="factura" 
+                                                   name="factura" 
+                                                   value="{{ old('factura', $ingreso->factura) }}"
+                                                   placeholder="Ej: FAC-001"
+                                                   {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
                                         </div>
                                     </div>
                                     
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="mail_facturas" class="form-label-custom">
-                                                Email Facturas
+                                            <label for="fecha_factura" class="form-label-custom">
+                                                Fecha Factura
                                             </label>
-                                            <input type="email" 
-                                                   class="form-control form-control-custom" 
-                                                   id="mail_facturas" 
-                                                   name="mail_facturas" 
-                                                   value="{{ old('mail_facturas', $contrato->mail_facturas) }}"
-                                                   placeholder="email@ejemplo.com">
+                                            <input type="date" 
+                                                   class="form-control form-control-custom {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                   id="fecha_factura" 
+                                                   name="fecha_factura" 
+                                                   value="{{ old('fecha_factura', $ingreso->fecha_factura ? $ingreso->fecha_factura->format('Y-m-d') : '') }}"
+                                                   {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label for="fecha_elaboracion" class="form-label-custom">
+                                                Fecha Elaboración
+                                            </label>
+                                            <input type="date" 
+                                                   class="form-control form-control-custom {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                   id="fecha_elaboracion" 
+                                                   name="fecha_elaboracion" 
+                                                   value="{{ old('fecha_elaboracion', $ingreso->fecha_elaboracion ? $ingreso->fecha_elaboracion->format('Y-m-d') : '') }}"
+                                                   {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label for="importe_facturado" class="form-label-custom">
+                                                Importe Facturado
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="importe_facturado" 
+                                                       name="importe_facturado" 
+                                                       value="{{ old('importe_facturado', $ingreso->importe_facturado) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sección 6: Líquidos y Estado -->
+                            <div class="form-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-money-bill-wave me-2"></i>
+                                    Líquidos y Estado
+                                </h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="liquido_a_cobrar" class="form-label-custom">
+                                                Líquido a Cobrar
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="liquido_a_cobrar" 
+                                                       name="liquido_a_cobrar" 
+                                                       value="{{ old('liquido_a_cobrar', $ingreso->liquido_a_cobrar) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="liquido_cobrado" class="form-label-custom">
+                                                Líquido Cobrado
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="liquido_cobrado" 
+                                                       name="liquido_cobrado" 
+                                                       value="{{ old('liquido_cobrado', $ingreso->liquido_cobrado) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="por_cobrar" class="form-label-custom">
+                                                Por Cobrar
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="por_cobrar" 
+                                                       name="por_cobrar" 
+                                                       value="{{ old('por_cobrar', $ingreso->por_cobrar) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="fecha_cobro" class="form-label-custom">
+                                                Fecha de Cobro
+                                            </label>
+                                            <input type="date" 
+                                                   class="form-control form-control-custom {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                   id="fecha_cobro" 
+                                                   name="fecha_cobro" 
+                                                   value="{{ old('fecha_cobro', $ingreso->fecha_cobro ? $ingreso->fecha_cobro->format('Y-m-d') : '') }}"
+                                                   {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="status" class="form-label-custom">
+                                                Estado
+                                            </label>
+                                            <select class="form-control form-control-custom {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                    id="status" 
+                                                    name="status"
+                                                    {{ $ingreso->verificado != 1 ? 'disabled' : '' }}>
+                                                <option value="pendiente" {{ old('status', $ingreso->status) == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
+                                                <option value="pagado" {{ old('status', $ingreso->status) == 'pagado' ? 'selected' : '' }}>Pagado</option>
+                                                <option value="parcial" {{ old('status', $ingreso->status) == 'parcial' ? 'selected' : '' }}>Parcial</option>
+                                                <option value="cancelado" {{ old('status', $ingreso->status) == 'cancelado' ? 'selected' : '' }}>Cancelado</option>
+                                            </select>
+                                            @if($ingreso->verificado != 1)
+                                                <input type="hidden" name="status" value="{{ $ingreso->status }}">
+                                            @endif
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                </div>
+                            </div>
+                            
+                            <!-- Sección 7: Avance de Obra -->
+                            <div class="form-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-chart-line me-2"></i>
+                                    Avance de Obra
+                                </h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="avance_obra_estimacion" class="form-label-custom">
+                                                Avance Estimación (%)
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="avance_obra_estimacion" 
+                                                       name="avance_obra_estimacion" 
+                                                       value="{{ old('avance_obra_estimacion', $ingreso->avance_obra_estimacion) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0"
+                                                       max="100"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="avance_obra_real" class="form-label-custom">
+                                                Avance Real (%)
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="avance_obra_real" 
+                                                       name="avance_obra_real" 
+                                                       value="{{ old('avance_obra_real', $ingreso->avance_obra_real) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0"
+                                                       max="100"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="porcentaje_avance_financiero" class="form-label-custom">
+                                                Avance Financiero (%)
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="porcentaje_avance_financiero" 
+                                                       name="porcentaje_avance_financiero" 
+                                                       value="{{ old('porcentaje_avance_financiero', $ingreso->porcentaje_avance_financiero) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0"
+                                                       max="100"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sección 8: Por Facturar -->
+                            <div class="form-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-file-invoice me-2"></i>
+                                    Por Facturar
+                                </h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label for="por_facturar" class="form-label-custom">
+                                                Por Facturar
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="por_facturar" 
+                                                       name="por_facturar" 
+                                                       value="{{ old('por_facturar', $ingreso->por_facturar) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             
                             <!-- Botones de acción -->
-                            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                                <div>
-                                    <small class="text-muted">
-                                        Los campos marcados con <span class="text-danger">*</span> son obligatorios
-                                    </small>
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <a href="{{ route('ingresos.index') }}" class="btn btn-cancel btn-outline-secondary">
-                                        <i class="fas fa-times me-1"></i> Cancelar
-                                    </a>
-                                    <button type="submit" class="btn btn-submit btn-primary">
-                                        <i class="fas fa-save me-1"></i> Actualizar Contrato
-                                    </button>
+                            <div class="form-actions">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <small class="text-muted">
+                                            @if($ingreso->verificado == 1)
+                                                Los campos marcados con <span class="text-danger">*</span> son obligatorios
+                                            @else
+                                                <i class="fas fa-lock me-1 text-danger"></i> El formulario está bloqueado porque no está pendiente (verificado ≠ 1)
+                                            @endif
+                                        </small>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ route('ingresos.index') }}" class="btn btn-cancel btn-outline-secondary">
+                                            <i class="fas fa-times me-1"></i> Cancelar
+                                        </a>
+                                        @if($ingreso->verificado == 1)
+                                            <button type="submit" class="btn btn-submit btn-primary">
+                                                <i class="fas fa-save me-1"></i> Guardar Cambios
+                                            </button>
+                                        @else
+                                            <button type="button" class="btn btn-secondary" disabled>
+                                                <i class="fas fa-lock me-1"></i> Solo lectura
+                                            </button>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                         </form>
@@ -677,44 +978,36 @@
     @include('footer')
     
     <script>
-        // Auto-calcular campos relacionados
+        // Validar fechas del periodo
         document.addEventListener('DOMContentLoaded', function() {
-            // Calcular total si se llena importe e IVA
-            const importeInput = document.getElementById('importe');
-            const ivaInput = document.getElementById('iva');
-            const totalInput = document.getElementById('total');
+            const periodoDel = document.getElementById('periodo_del');
+            const periodoAl = document.getElementById('periodo_al');
             
-            function calcularTotal() {
-                const importe = parseFloat(importeInput.value) || 0;
-                const iva = parseFloat(ivaInput.value) || 0;
-                const total = importe + iva;
-                
-                if (!isNaN(total) && total >= 0) {
-                    totalInput.value = total.toFixed(2);
-                }
-            }
-            
-            if (importeInput && ivaInput && totalInput) {
-                importeInput.addEventListener('input', calcularTotal);
-                ivaInput.addEventListener('input', calcularTotal);
-            }
-            
-            // Validar fechas
-            const inicioObra = document.getElementById('inicio_de_obra');
-            const finObra = document.getElementById('terminacion_de_obra');
-            
-            if (inicioObra && finObra) {
-                inicioObra.addEventListener('change', function() {
-                    if (this.value && finObra.value && this.value > finObra.value) {
-                        alert('La fecha de inicio no puede ser posterior a la fecha de terminación');
+            if (periodoDel && periodoAl) {
+                periodoDel.addEventListener('change', function() {
+                    if (this.value && periodoAl.value && this.value > periodoAl.value) {
+                        alert('La fecha "Del" no puede ser posterior a la fecha "Al"');
                         this.value = '';
                     }
                 });
                 
-                finObra.addEventListener('change', function() {
-                    if (this.value && inicioObra.value && this.value < inicioObra.value) {
-                        alert('La fecha de terminación no puede ser anterior a la fecha de inicio');
+                periodoAl.addEventListener('change', function() {
+                    if (this.value && periodoDel.value && this.value < periodoDel.value) {
+                        alert('La fecha "Al" no puede ser anterior a la fecha "Del"');
                         this.value = '';
+                    }
+                });
+            }
+            
+            // Deshabilitar envío del formulario si no es editable
+            const form = document.getElementById('ingresoForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const verificado = {{ $ingreso->verificado }};
+                    if (verificado != 1) {
+                        e.preventDefault();
+                        alert('No se puede editar este ingreso porque no está pendiente (verificado ≠ 1)');
+                        return false;
                     }
                 });
             }
