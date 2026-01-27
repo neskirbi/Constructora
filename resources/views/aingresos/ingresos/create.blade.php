@@ -726,19 +726,7 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="verificado" class="form-label-custom">
-                                                Verificado
-                                            </label>
-                                            <select class="form-control form-control-custom" 
-                                                    id="verificado" 
-                                                    name="verificado">
-                                                <option value="1" {{ old('verificado', 1) == 1 ? 'selected' : '' }}>Sí</option>
-                                                <option value="0" {{ old('verificado') == 0 ? 'selected' : '' }}>No</option>
-                                            </select>
-                                        </div>
-                                    </div>
+                                    
                                 </div>
                             </div>
                             
