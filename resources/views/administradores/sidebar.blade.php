@@ -23,6 +23,13 @@
                     <i class="fas fa-money-bill-wave menu-icon"></i>
                     <span class="menu-text">Ingresos</span>
                 </a>
+                
+                <a href="{{url('reportes/ingresos')}}" class="menu-item">
+                    <i class="fas fa-file-alt menu-icon"></i>
+                    <span class="menu-text">Reporte de Ingresos</span>
+                </a>
+
+  
                 <!--<a href="#" class="menu-item">
                     <i class="fas fa-tasks menu-icon"></i>
                     <span class="menu-text">Proyectos</span>

@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Administrador;
+use App\Http\Controllers\Reportes\ReporteIngresosController;
 
 /*
 |--------------------------------------------------------------------------
@@ -70,11 +72,12 @@ Route::post('update-password', 'App\Http\Controllers\LoginController@UpdatePassw
 Route::resource('administradores', 'App\Http\Controllers\Administradores\AdministradorController')
     ->middleware(['auth:administradores']);
 
-    Route::resource('acontratos', 'App\Http\Controllers\Administradores\ContratoController')
+Route::resource('acontratos', 'App\Http\Controllers\Administradores\ContratoController')
     ->middleware(['auth:administradores']);
 
-    Route::resource('aingresos', 'App\Http\Controllers\Administradores\IngresoController')
+Route::resource('aingresos', 'App\Http\Controllers\Administradores\IngresoController')
     ->middleware(['auth:administradores']);
+
 /**
  * Rutas Aingresos
  */
@@ -84,3 +87,23 @@ Route::resource('contratos', 'App\Http\Controllers\Aingresos\ContratoController'
 
 Route::resource('ingresos', 'App\Http\Controllers\Aingresos\IngresoController')
     ->middleware(['auth:aingresos']);
+
+
+/**
+ * Reportes de Ingresos
+ * IMPORTANTE: Añade el middleware correspondiente según quién debe acceder
+ */
+Route::prefix('reportes')->group(function () {
+    // Si solo los administradores pueden ver reportes:
+    Route::get('/ingresos', [ReporteIngresosController::class, 'index'])
+        ->name('reportes.ingresos')
+        ->middleware(['auth:administradores']); // O el guard que corresponda
+    
+    Route::post('/ingresos/generar', [ReporteIngresosController::class, 'generar'])
+        ->name('reportes.ingresos.generar')
+        ->middleware(['auth:administradores']);
+    
+    Route::post('/ingresos/exportar-excel', [ReporteIngresosController::class, 'exportarExcel'])
+        ->name('reportes.ingresos.exportar.excel')
+        ->middleware(['auth:administradores']);
+});
