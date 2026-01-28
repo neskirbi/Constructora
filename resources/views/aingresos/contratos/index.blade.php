@@ -229,267 +229,269 @@
 
             <!-- Área de contenido -->
             <div class="content-area">
-                <!-- Título y botón -->
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <div>
-                        <h1 class="h3 mb-1 text-gray-800">Contratos</h1>
-                        <p class="text-muted mb-0">Gestión de contratos de obra</p>
-                    </div>
-                    <div>
-                        <button class="btn btn-primary" onclick="window.location.href='{{ route('contratos.create') }}'">
-                            <i class="fas fa-plus me-1"></i> Agregar Contrato
-                        </button>
-                    </div>
-                </div>
-                
-                
-                
-                <!-- Filtros -->
-                <div class="search-container">
-                    <form action="{{ route('contratos.index') }}" method="GET" class="row">
-                        <div class="col-md-10">
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0">
-                                    <i class="fas fa-search text-muted"></i>
-                                </span>
-                                <input type="text" 
-                                       class="form-control border-start-0" 
-                                       name="search" 
-                                       placeholder="Buscar por obra, contrato, cliente, ubicación..." 
-                                       value="{{ request('search') }}"
-                                       title="Buscar en: obra, número de contrato, cliente, ubicación, empresa">
-                                @if(request()->has('search') && !empty(request('search')))
-                                <a href="{{ route('contratos.index', array_merge(request()->except('search'), ['search' => ''])) }}" 
-                                   class="input-group-text bg-light text-danger" 
-                                   title="Limpiar búsqueda">
-                                    <i class="fas fa-times"></i>
-                                </a>
-                                @endif
-                            </div>
+                <div class="container-fluid py-4">
+                    <!-- Título y botón -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h1 class="h3 mb-1 text-gray-800"><i class="fas fa-file-contract me'2"></i> Contratos</h1>
+                            <p class="text-muted mb-0">Gestión de contratos de obra</p>
                         </div>
-                        <div class="col-md-2">
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-search me-1"></i> Buscar
-                                </button>
-                            </div>
+                        <div>
+                            <button class="btn btn-primary" onclick="window.location.href='{{ route('contratos.create') }}'">
+                                <i class="fas fa-plus me-1"></i> Agregar Contrato
+                            </button>
                         </div>
-                    </form>
+                    </div>
                     
-                    @if(request()->has('search'))
-                    <div class="mt-3">
-                        <small class="text-muted">
-                            Resultados para: <strong>"{{ request('search') }}"</strong>
-                        </small>
-                        <a href="{{ route('contratos.index') }}" class="btn btn-sm btn-outline-danger ms-3">
-                            <i class="fas fa-times me-1"></i> Limpiar búsqueda
-                        </a>
+                    
+                    
+                    <!-- Filtros -->
+                    <div class="search-container">
+                        <form action="{{ route('contratos.index') }}" method="GET" class="row">
+                            <div class="col-md-10">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="fas fa-search text-muted"></i>
+                                    </span>
+                                    <input type="text" 
+                                        class="form-control border-start-0" 
+                                        name="search" 
+                                        placeholder="Buscar por obra, contrato, cliente, ubicación..." 
+                                        value="{{ request('search') }}"
+                                        title="Buscar en: obra, número de contrato, cliente, ubicación, empresa">
+                                    @if(request()->has('search') && !empty(request('search')))
+                                    <a href="{{ route('contratos.index', array_merge(request()->except('search'), ['search' => ''])) }}" 
+                                    class="input-group-text bg-light text-danger" 
+                                    title="Limpiar búsqueda">
+                                        <i class="fas fa-times"></i>
+                                    </a>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search me-1"></i> Buscar
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        
+                        @if(request()->has('search'))
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                Resultados para: <strong>"{{ request('search') }}"</strong>
+                            </small>
+                            <a href="{{ route('contratos.index') }}" class="btn btn-sm btn-outline-danger ms-3">
+                                <i class="fas fa-times me-1"></i> Limpiar búsqueda
+                            </a>
+                        </div>
+                        @endif
                     </div>
+                    
+                    <!-- Lista de Contratos en Tarjetas -->
+                    @if($contratos->count() > 0)
+                        @foreach($contratos as $contrato)
+                        <div class="card card-contrato">
+                            <div class="card-body">
+                                <!-- Encabezado con nombre de obra y número de contrato -->
+                                <div class="obra-header">
+                                    <div class="flex-grow-1">
+                                        <div class="obra-nombre" 
+                                            data-bs-toggle="tooltip" 
+                                            data-bs-placement="top" 
+                                            title="{{ $contrato->obra ?? 'Sin nombre de obra' }}">
+                                            {{ Str::limit($contrato->obra ?? 'Sin nombre de obra', 100) }}
+                                        </div>
+                                        <div class="contrato-badge d-inline-block">
+                                            <i class="fas fa-file-contract me-1"></i>
+                                            {{ $contrato->contrato_no ?? 'N/A' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Fila de información (debajo del nombre) -->
+                                <div class="info-row">
+                                    <div class="info-item">
+                                        <div class="info-title">Cliente</div>
+                                        <div class="info-value" 
+                                            data-bs-toggle="tooltip" 
+                                            data-bs-placement="top" 
+                                            title="{{ $contrato->cliente ?? 'No especificado' }}">
+                                            {{ Str::limit($contrato->cliente ?? 'No especificado', 40) }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="info-item">
+                                        <div class="info-title">Empresa</div>
+                                        <div class="info-value" 
+                                            data-bs-toggle="tooltip" 
+                                            data-bs-placement="top" 
+                                            title="{{ $contrato->empresa ?? 'No especificado' }}">
+                                            {{ Str::limit($contrato->empresa ?? 'No especificado', 40) }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="info-item">
+                                        <div class="info-title">Ubicación</div>
+                                        <div class="info-value" 
+                                            data-bs-toggle="tooltip" 
+                                            data-bs-placement="top" 
+                                            title="{{ $contrato->lugar ?? 'No especificada' }}">
+                                            {{ Str::limit($contrato->lugar ?? 'No especificada', 40) }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="info-item">
+                                        <div class="info-title">Fecha Contrato</div>
+                                        <div class="info-value">
+                                            @if($contrato->contrato_fecha)
+                                                {{ date('d/m/Y', strtotime($contrato->contrato_fecha)) }}
+                                            @else
+                                                No definida
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Fila adicional con más información -->
+                                <div class="info-row">
+                                    <div class="info-item">
+                                        <div class="info-title">Inicio Obra</div>
+                                        <div class="info-value">
+                                            @if($contrato->inicio_de_obra)
+                                                {{ date('d/m/Y', strtotime($contrato->inicio_de_obra)) }}
+                                            @else
+                                                No definida
+                                            @endif
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="info-item">
+                                        <div class="info-title">Fin Obra</div>
+                                        <div class="info-value">
+                                            @if($contrato->terminacion_de_obra)
+                                                {{ date('d/m/Y', strtotime($contrato->terminacion_de_obra)) }}
+                                            @else
+                                                No definida
+                                            @endif
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="info-item">
+                                        <div class="info-title">Duración</div>
+                                        <div class="info-value">
+                                            {{ $contrato->duracion ?? 'No especificada' }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="info-item">
+                                        <div class="info-title">Frente</div>
+                                        <div class="info-value" 
+                                            data-bs-toggle="tooltip" 
+                                            data-bs-placement="top" 
+                                            title="{{ $contrato->frente ?? 'No especificado' }}">
+                                            {{ Str::limit($contrato->frente ?? 'No especificado', 30) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Montos en tarjetas profesionales -->
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-4">
+                                        <div class="card border-0 shadow-sm h-100">
+                                            <div class="card-body text-center p-4">
+                                                <div class="mb-3">
+                                                    <i class="fas fa-file-invoice-dollar fa-2x" style="color: #282828;"></i>
+                                                </div>
+                                                <h6 class="text-muted mb-2">Importe Total</h6>
+                                                <h3 class="fw-bold mb-0 text-dark">${{ number_format($contrato->importe_total ?? 0, 2) }}</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="card border-0 shadow-sm h-100">
+                                            <div class="card-body text-center p-4">
+                                                <div class="mb-3">
+                                                    <i class="fas fa-hand-holding-usd fa-2x" style="color: #282828;"></i>
+                                                </div>
+                                                <h6 class="text-muted mb-2">Anticipo</h6>
+                                                <h3 class="fw-bold mb-0 text-dark">${{ number_format($contrato->anticipo ?? 0, 2) }}</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    @if($contrato->total_total)
+                                    <div class="col-md-4">
+                                        <div class="card border-0 shadow-sm h-100">
+                                            <div class="card-body text-center p-4">
+                                                <div class="mb-3">
+                                                    <i class="fas fa-chart-line fa-2x" style="color: #282828;"></i>
+                                                </div>
+                                                <h6 class="text-muted mb-2">Total General</h6>
+                                                <h3 class="fw-bold mb-0 text-dark">${{ number_format($contrato->total_total ?? 0, 2) }}</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endif
+                                </div>
+                                
+                                <!-- Botones de acción -->
+                                <div class="actions-container">
+                                    <a href="{{ route('contratos.show', $contrato->id) }}" 
+                                    class="btn btn-sm btn-outline-primary"
+                                    title="Ver detalles">
+                                        <i class="fas fa-eye me-1"></i> Ver
+                                    </a>
+                                    <button onclick="confirmDelete('{{ $contrato->id }}', '{{ addslashes($contrato->obra ?? 'Contrato') }}')" 
+                                            class="btn btn-sm btn-outline-danger"
+                                            title="Eliminar contrato">
+                                        <i class="fas fa-trash me-1"></i> Eliminar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                        
+                        <!-- Paginación -->
+                        <div class="pagination-container">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <small class="text-muted">
+                                        Mostrando {{ $contratos->firstItem() }} - {{ $contratos->lastItem() }} de {{ $contratos->total() }} registros
+                                    </small>
+                                </div>
+                                <nav aria-label="Page navigation">
+                                    {{ $contratos->appends(request()->query())->links('pagination::bootstrap-4') }}
+                                </nav>
+                            </div>
+                        </div>
+                    @else
+                        <!-- Estado vacío -->
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-file-contract fa-4x text-muted"></i>
+                            </div>
+                            <h4 class="text-muted mb-3">No se encontraron contratos</h4>
+                            <p class="text-muted mb-4">
+                                @if(request()->has('search'))
+                                No hay resultados que coincidan con tu búsqueda.
+                                @else
+                                No hay contratos registrados aún.
+                                @endif
+                            </p>
+                            @if(request()->has('search'))
+                            <a href="{{ route('contratos.index') }}" class="btn btn-outline-secondary me-2">
+                                <i class="fas fa-times me-1"></i> Limpiar búsqueda
+                            </a>
+                            @endif
+                            <button class="btn btn-primary" onclick="window.location.href='{{ route('contratos.create') }}'">
+                                <i class="fas fa-plus me-1"></i> Agregar primer contrato
+                            </button>
+                        </div>
                     @endif
                 </div>
-                
-                <!-- Lista de Contratos en Tarjetas -->
-                @if($contratos->count() > 0)
-                    @foreach($contratos as $contrato)
-                    <div class="card card-contrato">
-                        <div class="card-body">
-                            <!-- Encabezado con nombre de obra y número de contrato -->
-                            <div class="obra-header">
-                                <div class="flex-grow-1">
-                                    <div class="obra-nombre" 
-                                         data-bs-toggle="tooltip" 
-                                         data-bs-placement="top" 
-                                         title="{{ $contrato->obra ?? 'Sin nombre de obra' }}">
-                                        {{ Str::limit($contrato->obra ?? 'Sin nombre de obra', 100) }}
-                                    </div>
-                                    <div class="contrato-badge d-inline-block">
-                                        <i class="fas fa-file-contract me-1"></i>
-                                        {{ $contrato->contrato_no ?? 'N/A' }}
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Fila de información (debajo del nombre) -->
-                            <div class="info-row">
-                                <div class="info-item">
-                                    <div class="info-title">Cliente</div>
-                                    <div class="info-value" 
-                                         data-bs-toggle="tooltip" 
-                                         data-bs-placement="top" 
-                                         title="{{ $contrato->cliente ?? 'No especificado' }}">
-                                        {{ Str::limit($contrato->cliente ?? 'No especificado', 40) }}
-                                    </div>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-title">Empresa</div>
-                                    <div class="info-value" 
-                                         data-bs-toggle="tooltip" 
-                                         data-bs-placement="top" 
-                                         title="{{ $contrato->empresa ?? 'No especificado' }}">
-                                        {{ Str::limit($contrato->empresa ?? 'No especificado', 40) }}
-                                    </div>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-title">Ubicación</div>
-                                    <div class="info-value" 
-                                         data-bs-toggle="tooltip" 
-                                         data-bs-placement="top" 
-                                         title="{{ $contrato->lugar ?? 'No especificada' }}">
-                                        {{ Str::limit($contrato->lugar ?? 'No especificada', 40) }}
-                                    </div>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-title">Fecha Contrato</div>
-                                    <div class="info-value">
-                                        @if($contrato->contrato_fecha)
-                                            {{ date('d/m/Y', strtotime($contrato->contrato_fecha)) }}
-                                        @else
-                                            No definida
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Fila adicional con más información -->
-                            <div class="info-row">
-                                <div class="info-item">
-                                    <div class="info-title">Inicio Obra</div>
-                                    <div class="info-value">
-                                        @if($contrato->inicio_de_obra)
-                                            {{ date('d/m/Y', strtotime($contrato->inicio_de_obra)) }}
-                                        @else
-                                            No definida
-                                        @endif
-                                    </div>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-title">Fin Obra</div>
-                                    <div class="info-value">
-                                        @if($contrato->terminacion_de_obra)
-                                            {{ date('d/m/Y', strtotime($contrato->terminacion_de_obra)) }}
-                                        @else
-                                            No definida
-                                        @endif
-                                    </div>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-title">Duración</div>
-                                    <div class="info-value">
-                                        {{ $contrato->duracion ?? 'No especificada' }}
-                                    </div>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-title">Frente</div>
-                                    <div class="info-value" 
-                                         data-bs-toggle="tooltip" 
-                                         data-bs-placement="top" 
-                                         title="{{ $contrato->frente ?? 'No especificado' }}">
-                                        {{ Str::limit($contrato->frente ?? 'No especificado', 30) }}
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Montos en tarjetas profesionales -->
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-4">
-                                    <div class="card border-0 shadow-sm h-100">
-                                        <div class="card-body text-center p-4">
-                                            <div class="mb-3">
-                                                <i class="fas fa-file-invoice-dollar fa-2x" style="color: #282828;"></i>
-                                            </div>
-                                            <h6 class="text-muted mb-2">Importe Total</h6>
-                                            <h3 class="fw-bold mb-0 text-dark">${{ number_format($contrato->importe_total ?? 0, 2) }}</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <div class="card border-0 shadow-sm h-100">
-                                        <div class="card-body text-center p-4">
-                                            <div class="mb-3">
-                                                <i class="fas fa-hand-holding-usd fa-2x" style="color: #282828;"></i>
-                                            </div>
-                                            <h6 class="text-muted mb-2">Anticipo</h6>
-                                            <h3 class="fw-bold mb-0 text-dark">${{ number_format($contrato->anticipo ?? 0, 2) }}</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                @if($contrato->total_total)
-                                <div class="col-md-4">
-                                    <div class="card border-0 shadow-sm h-100">
-                                        <div class="card-body text-center p-4">
-                                            <div class="mb-3">
-                                                <i class="fas fa-chart-line fa-2x" style="color: #282828;"></i>
-                                            </div>
-                                            <h6 class="text-muted mb-2">Total General</h6>
-                                            <h3 class="fw-bold mb-0 text-dark">${{ number_format($contrato->total_total ?? 0, 2) }}</h3>
-                                        </div>
-                                    </div>
-                                </div>
-                                @endif
-                            </div>
-                            
-                            <!-- Botones de acción -->
-                            <div class="actions-container">
-                                <a href="{{ route('contratos.show', $contrato->id) }}" 
-                                   class="btn btn-sm btn-outline-primary"
-                                   title="Ver detalles">
-                                    <i class="fas fa-eye me-1"></i> Ver
-                                </a>
-                                <button onclick="confirmDelete('{{ $contrato->id }}', '{{ addslashes($contrato->obra ?? 'Contrato') }}')" 
-                                        class="btn btn-sm btn-outline-danger"
-                                        title="Eliminar contrato">
-                                    <i class="fas fa-trash me-1"></i> Eliminar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                    
-                    <!-- Paginación -->
-                    <div class="pagination-container">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <small class="text-muted">
-                                    Mostrando {{ $contratos->firstItem() }} - {{ $contratos->lastItem() }} de {{ $contratos->total() }} registros
-                                </small>
-                            </div>
-                            <nav aria-label="Page navigation">
-                                {{ $contratos->appends(request()->query())->links('pagination::bootstrap-4') }}
-                            </nav>
-                        </div>
-                    </div>
-                @else
-                    <!-- Estado vacío -->
-                    <div class="empty-state">
-                        <div class="empty-state-icon">
-                            <i class="fas fa-file-contract fa-4x text-muted"></i>
-                        </div>
-                        <h4 class="text-muted mb-3">No se encontraron contratos</h4>
-                        <p class="text-muted mb-4">
-                            @if(request()->has('search'))
-                            No hay resultados que coincidan con tu búsqueda.
-                            @else
-                            No hay contratos registrados aún.
-                            @endif
-                        </p>
-                        @if(request()->has('search'))
-                        <a href="{{ route('contratos.index') }}" class="btn btn-outline-secondary me-2">
-                            <i class="fas fa-times me-1"></i> Limpiar búsqueda
-                        </a>
-                        @endif
-                        <button class="btn btn-primary" onclick="window.location.href='{{ route('contratos.create') }}'">
-                            <i class="fas fa-plus me-1"></i> Agregar primer contrato
-                        </button>
-                    </div>
-                @endif
             </div>
         </main>
     </div>
