@@ -100,7 +100,7 @@
             color: #856404;
         }
         
-        .status-aprobado {
+        .status-verificado {
             background-color: #d4edda;
             color: #155724;
         }
@@ -139,11 +139,11 @@
 <body>
     <div class="main-container">
         @include('toast.toasts')
-        @include('aingresos.sidebar')
+        @include('administradores.sidebar')
         
         <!-- Contenido principal -->
         <main class="main-content" id="mainContent">
-            @include('aingresos.navbar')
+            @include('administradores.navbar')
 
             <!-- Área de contenido -->
             <div class="content-area">
@@ -173,7 +173,7 @@
                                 } elseif($verificado == 0) {
                                     echo '<span class="status-badge status-rechazado ms-2">Rechazado (0)</span>';
                                 } elseif($verificado == 2) {
-                                    echo '<span class="status-badge status-aprobado ms-2">Aprobado (2)</span>';
+                                    echo '<span class="status-badge status-verificado ms-2">Verificado (2)</span>';
                                 }
                             @endphp
                         </div>
@@ -649,53 +649,6 @@
                                                readonly>
                                     </div>
                                 </div>
-                                
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Estado
-                                        </label>
-                                        @php
-                                            $status = $ingreso->status ?? 'pendiente';
-                                            $statusText = 'Pendiente';
-                                            $statusClass = 'badge bg-warning';
-                                            
-                                            if($status == 'pagado') {
-                                                $statusText = 'Pagado';
-                                                $statusClass = 'badge bg-success';
-                                            } elseif($status == 'parcial') {
-                                                $statusText = 'Parcial';
-                                                $statusClass = 'badge bg-info';
-                                            } elseif($status == 'cancelado') {
-                                                $statusText = 'Cancelado';
-                                                $statusClass = 'badge bg-danger';
-                                            }
-                                        @endphp
-                                        <div class="info-display">
-                                            <span class="{{ $statusClass }}">{{ $statusText }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Verificado
-                                        </label>
-                                        <div class="info-display">
-                                            @php
-                                                $verificado = $ingreso->verificado ?? 1;
-                                                if($verificado == 1) {
-                                                    echo '<span class="badge bg-warning">Pendiente (1)</span>';
-                                                } elseif($verificado == 0) {
-                                                    echo '<span class="badge bg-danger">Rechazado (0)</span>';
-                                                } elseif($verificado == 2) {
-                                                    echo '<span class="badge bg-success">Aprobado (2)</span>';
-                                                }
-                                            @endphp
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                         
@@ -779,16 +732,117 @@
                             </div>
                         </div>
                         
-                        <!-- Solo botón de regreso -->
-                        <div class="d-flex justify-content-end pt-3 border-top">
-                            <a href="{{ route('ingresos.index') }}" class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-left me-1"></i> Volver al listado
-                            </a>
-                        </div>
+                        <!-- Botones de acción -->
+<div class="d-flex justify-content-between pt-3 border-top">
+    <a href="{{ route('ingresos.index') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i> Volver al listado
+    </a>
+    
+    @if($ingreso->verificado == 1)
+    <div>
+        <!-- Botón Rechazar -->
+        <button type="button" class="btn btn-outline-danger me-2" 
+                data-bs-toggle="modal" 
+                data-bs-target="#rechazarModal">
+            <i class="fas fa-times me-1"></i> Rechazar
+        </button>
+        
+        <!-- Botón Verificar -->
+        <button type="button" class="btn btn-success" 
+                data-bs-toggle="modal" 
+                data-bs-target="#verificarModal">
+            <i class="fas fa-check me-1"></i> Verificar
+        </button>
+    </div>
+    @endif
+</div>
+
                     </div>
                 </div>
             </div>
         </main>
+    </div>
+
+   <!-- Modal Rechazar -->
+    <div class="modal fade" id="rechazarModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 bg-light">
+                    <h5 class="modal-title text-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Confirmar Rechazo
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3">
+                        <i class="fas fa-times-circle fa-3x text-danger mb-3"></i>
+                        <h5 class="mb-2">¿Rechazar este ingreso?</h5>
+                        <p class="text-muted mb-0">
+                            Estimación: <strong>{{ $ingreso->estimacion ?? 'N/A' }}</strong>
+                        </p>
+                        <p class="text-danger small mt-2">
+                            <i class="fas fa-info-circle me-1"></i>
+                            El estado cambiará a "Rechazado"
+                        </p>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Cancelar
+                    </button>
+                    <form method="POST" action="{{ route('aingresos.update', $ingreso->id) }}">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="verificado" value="0">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-ban me-1"></i> Sí, Rechazar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Verificar -->
+    <div class="modal fade" id="verificarModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 bg-light">
+                    <h5 class="modal-title text-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Confirmar Verificación
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="mb-3">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <h5 class="mb-2">¿Verificar este ingreso?</h5>
+                        <p class="text-muted mb-0">
+                            Estimación: <strong>{{ $ingreso->estimacion ?? 'N/A' }}</strong>
+                        </p>
+                        <p class="text-success small mt-2">
+                            <i class="fas fa-info-circle me-1"></i>
+                            El estado cambiará a "Verificado"
+                        </p>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Cancelar
+                    </button>
+                    <form method="POST" action="{{ route('aingresos.update', $ingreso->id) }}">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="verificado" value="2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check me-1"></i> Sí, Verificar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     @include('footer')

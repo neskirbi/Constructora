@@ -72,6 +72,9 @@ Route::resource('administradores', 'App\Http\Controllers\Administradores\Adminis
 
     Route::resource('acontratos', 'App\Http\Controllers\Administradores\ContratoController')
     ->middleware(['auth:administradores']);
+
+    Route::resource('aingresos', 'App\Http\Controllers\Administradores\IngresoController')
+    ->middleware(['auth:administradores']);
 /**
  * Rutas Aingresos
  */

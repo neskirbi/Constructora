@@ -710,22 +710,7 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="status" class="form-label-custom">
-                                                Estado
-                                            </label>
-                                            <select class="form-control form-control-custom" 
-                                                    id="status" 
-                                                    name="status">
-                                                <option value="pendiente" {{ old('status') == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
-                                                <option value="pagado" {{ old('status') == 'pagado' ? 'selected' : '' }}>Pagado</option>
-                                                <option value="parcial" {{ old('status') == 'parcial' ? 'selected' : '' }}>Parcial</option>
-                                                <option value="cancelado" {{ old('status') == 'cancelado' ? 'selected' : '' }}>Cancelado</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    
+                                   
                                     
                                 </div>
                             </div>

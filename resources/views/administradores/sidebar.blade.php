@@ -18,6 +18,11 @@
                     <i class="fas fa-file-contract menu-icon"></i>
                     <span class="menu-text">Contratos</span>
                 </a>
+                
+                <a href="{{url('aingresos')}}" class="menu-item">
+                    <i class="fas fa-money-bill-wave menu-icon"></i>
+                    <span class="menu-text">Ingresos</span>
+                </a>
                 <!--<a href="#" class="menu-item">
                     <i class="fas fa-tasks menu-icon"></i>
                     <span class="menu-text">Proyectos</span>

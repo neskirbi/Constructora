@@ -814,25 +814,7 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="status" class="form-label-custom">
-                                                Estado
-                                            </label>
-                                            <select class="form-control form-control-custom {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
-                                                    id="status" 
-                                                    name="status"
-                                                    {{ $ingreso->verificado != 1 ? 'disabled' : '' }}>
-                                                <option value="pendiente" {{ old('status', $ingreso->status) == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
-                                                <option value="pagado" {{ old('status', $ingreso->status) == 'pagado' ? 'selected' : '' }}>Pagado</option>
-                                                <option value="parcial" {{ old('status', $ingreso->status) == 'parcial' ? 'selected' : '' }}>Parcial</option>
-                                                <option value="cancelado" {{ old('status', $ingreso->status) == 'cancelado' ? 'selected' : '' }}>Cancelado</option>
-                                            </select>
-                                            @if($ingreso->verificado != 1)
-                                                <input type="hidden" name="status" value="{{ $ingreso->status }}">
-                                            @endif
-                                        </div>
-                                    </div>
+                                   
                                     
                                     
                                 </div>

@@ -10,14 +10,14 @@
             <div class="sidebar-menu">
                 
                 <a href="{{url('contratos')}}" class="menu-item">
-    <i class="fas fa-file-contract menu-icon"></i>
-    <span class="menu-text">Contratos</span>
-</a>
+                    <i class="fas fa-file-contract menu-icon"></i>
+                    <span class="menu-text">Contratos</span>
+                </a>
 
                  <a href="{{url('ingresos')}}" class="menu-item">
-    <i class="fas fa-money-bill-wave menu-icon"></i>
-    <span class="menu-text">Ingresos</span>
-</a>
+                    <i class="fas fa-money-bill-wave menu-icon"></i>
+                    <span class="menu-text">Ingresos</span>
+                </a>
                 <!--
                <a href="{{url('ingresos')}}" class="menu-item">
                     <i class="fas fa-tasks menu-icon"></i>

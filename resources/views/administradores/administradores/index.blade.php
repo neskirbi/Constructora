@@ -5,74 +5,19 @@
     <title>{{Empresa()}} | Administradores</title>
     
     <!-- Estilos personalizados -->
-    <style>
-        .delete-user-btn {
-    transition: all 0.2s ease;
-}
-
-.delete-user-btn:hover {
-    background-color: #dc3545;
-    color: white;
-    transform: scale(1.05);
-}
-
-.modal-content {
-    border: none;
-    border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-.modal-header {
-    border-radius: 10px 10px 0 0;
-}
-
-.btn-danger {
-    transition: all 0.3s ease;
-}
-
-.btn-danger:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
-}
-
-
-       .usuario-section {
-            transition: all 0.3s ease;
-        }
-        
-        .usuario-section.hidden {
-            display: none;
-        }
-        
-        .table-row {
-            transition: all 0.3s ease;
-        }
-        
-        .table-row.hidden {
-            display: none;
-        }
-        
-        .filter-active {
-            border-color: #0d6efd !important;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-        }
-    </style>
+   
 </head>
 <body>
     <div class="main-container">
         @include('toast.toasts')
-
-        @include('administradores.sidebar')
-        
+        @include('administradores.sidebar')        
 
         <!-- Contenido principal -->
         <main class="main-content" id="mainContent">
             @include('administradores.navbar')
 
             <!-- Área de contenido -->
-            <div class="content-area">
-                
-                
+            <div class="content-area">                
               <div class="container-fluid py-4">
         <!-- Título y botón agregar -->
         <div class="d-flex justify-content-between align-items-center mb-4">
