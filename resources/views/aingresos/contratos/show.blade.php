@@ -333,8 +333,7 @@
                                                    id="rfc" 
                                                    name="rfc" 
                                                    value="{{ old('rfc', $contrato->rfc) }}"
-                                                   placeholder="RFC del cliente"
-                                                   maxlength="20">
+                                                   placeholder="RFC del cliente">
                                         </div>
                                     </div>
                                 </div>
@@ -409,14 +408,14 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="calle_y_numero" class="form-label-custom">
+                                            <label for="calle_numero" class="form-label-custom">
                                                 Calle y Número
                                             </label>
                                             <input type="text" 
                                                    class="form-control form-control-custom" 
-                                                   id="calle_y_numero" 
-                                                   name="calle_y_numero" 
-                                                   value="{{ old('calle_y_numero', $contrato->calle_y_numero) }}"
+                                                   id="calle_numero" 
+                                                   name="calle_numero" 
+                                                   value="{{ old('calle_numero', $contrato->calle_numero) }}"
                                                    placeholder="Calle, número, colonia">
                                         </div>
                                     </div>
@@ -439,29 +438,29 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="municipio" class="form-label-custom">
+                                            <label for="alcaldia_municipio" class="form-label-custom">
                                                 Municipio/Alcaldía
                                             </label>
                                             <input type="text" 
                                                    class="form-control form-control-custom" 
-                                                   id="municipio" 
-                                                   name="municipio" 
-                                                   value="{{ old('municipio', $contrato->municipio) }}"
+                                                   id="alcaldia_municipio" 
+                                                   name="alcaldia_municipio" 
+                                                   value="{{ old('alcaldia_municipio', $contrato->alcaldia_municipio) }}"
                                                    placeholder="Municipio o alcaldía">
                                         </div>
                                     </div>
                                     
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="delegacion" class="form-label-custom">
-                                                Delegación/Zona
+                                            <label for="entidad" class="form-label-custom">
+                                                Entidad
                                             </label>
                                             <input type="text" 
                                                    class="form-control form-control-custom" 
-                                                   id="delegacion" 
-                                                   name="delegacion" 
-                                                   value="{{ old('delegacion', $contrato->delegacion) }}"
-                                                   placeholder="Delegación o zona">
+                                                   id="entidad" 
+                                                   name="entidad" 
+                                                   value="{{ old('entidad', $contrato->entidad) }}"
+                                                   placeholder="Estado o entidad federativa">
                                         </div>
                                     </div>
                                 </div>
@@ -505,85 +504,55 @@
                                 </h5>
                                 
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="importe_contrato" class="form-label-custom">
-                                                Importe Contrato
+                                            <label for="concepto" class="form-label-custom">
+                                                Concepto
                                             </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="importe_contrato" 
-                                                       name="importe_contrato" 
-                                                       value="{{ old('importe_contrato', $contrato->importe_contrato) }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
-                                            </div>
+                                            <select class="form-control form-control-custom" 
+                                                    id="concepto" 
+                                                    name="concepto">
+                                                <option value="">Seleccionar concepto...</option>
+                                                <option value="TOTAL CONTRATO" {{ old('concepto', $contrato->concepto) == 'TOTAL CONTRATO' ? 'selected' : '' }}>TOTAL CONTRATO</option>
+                                                <option value="CONVENIO APLIACION" {{ old('concepto', $contrato->concepto) == 'CONVENIO APLIACION' ? 'selected' : '' }}>CONVENIO APLIACION</option>
+                                            </select>
                                         </div>
                                     </div>
                                     
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="iva_contrato" class="form-label-custom">
-                                                IVA Contrato
+                                            <label for="porcentaje_iva" class="form-label-custom">
+                                                Porcentaje IVA (%)
                                             </label>
                                             <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input" 
-                                                       id="iva_contrato" 
-                                                       name="iva_contrato" 
-                                                       value="{{ old('iva_contrato', $contrato->iva_contrato) }}"
+                                                       id="porcentaje_iva" 
+                                                       value="{{ $contrato->subtotal && $contrato->iva ? round(($contrato->iva / $contrato->subtotal) * 100, 2) : '16' }}"
                                                        step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
+                                                       placeholder="16.00"
+                                                       min="0"
+                                                       max="100">
+                                                <span class="input-group-text">%</span>
                                             </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="total_contrato" class="form-label-custom">
-                                                Total Contrato
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="total_contrato" 
-                                                       name="total_contrato" 
-                                                       value="{{ old('total_contrato', $contrato->total_contrato) }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
-                                            </div>
+                                            <div class="help-text">Ingrese el porcentaje de IVA a aplicar</div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            
-                            <!-- Sección 5: Montos de Convenio -->
-                            <div class="form-section">
-                                <h5 class="section-title">
-                                    <i class="fas fa-handshake me-2"></i>
-                                    Montos de Convenio
-                                </h5>
                                 
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="importe_convenio" class="form-label-custom">
-                                                Importe Convenio
+                                            <label for="subtotal" class="form-label-custom">
+                                                Subtotal
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input" 
-                                                       id="importe_convenio" 
-                                                       name="importe_convenio" 
-                                                       value="{{ old('importe_convenio', $contrato->importe_convenio) }}"
+                                                       id="subtotal" 
+                                                       name="subtotal" 
+                                                       value="{{ old('subtotal', $contrato->subtotal) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -591,104 +560,62 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="iva_convenio" class="form-label-custom">
-                                                IVA Convenio
+                                            <label for="iva" class="form-label-custom">
+                                                IVA
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input" 
-                                                       id="iva_convenio" 
-                                                       name="iva_convenio" 
-                                                       value="{{ old('iva_convenio', $contrato->iva_convenio) }}"
+                                                       id="iva" 
+                                                       name="iva" 
+                                                       value="{{ old('iva', $contrato->iva) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
-                                                       min="0">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="total_convenio" class="form-label-custom">
-                                                Total Convenio
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="total_convenio" 
-                                                       name="total_convenio" 
-                                                       value="{{ old('total_convenio', $contrato->total_convenio) }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
+                                                       min="0"
+                                                       readonly
+                                                       style="background-color: #f8f9fa;">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            
-                            <!-- Sección 6: Montos Totales -->
-                            <div class="form-section">
-                                <h5 class="section-title">
-                                    <i class="fas fa-calculator me-2"></i>
-                                    Montos Totales
-                                </h5>
                                 
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="importe_total" class="form-label-custom">
-                                                Importe Total
+                                            <label for="total" class="form-label-custom">
+                                                Total
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input" 
-                                                       id="importe_total" 
-                                                       name="importe_total" 
-                                                       value="{{ old('importe_total', $contrato->importe_total) }}"
+                                                       id="total" 
+                                                       name="total" 
+                                                       value="{{ old('total', $contrato->total) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
-                                                       min="0">
+                                                       min="0"
+                                                       readonly
+                                                       style="background-color: #f8f9fa;">
                                             </div>
                                         </div>
                                     </div>
                                     
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="iva_total" class="form-label-custom">
-                                                IVA Total
+                                            <label for="monto_anticipo" class="form-label-custom">
+                                                Anticipo
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input" 
-                                                       id="iva_total" 
-                                                       name="iva_total" 
-                                                       value="{{ old('iva_total', $contrato->iva_total) }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="total_total" class="form-label-custom">
-                                                Total General
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="total_total" 
-                                                       name="total_total" 
-                                                       value="{{ old('total_total', $contrato->total_total) }}"
+                                                       id="monto_anticipo" 
+                                                       name="monto_anticipo" 
+                                                       value="{{ old('monto_anticipo', $contrato->monto_anticipo) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -698,7 +625,7 @@
                                 </div>
                             </div>
                             
-                            <!-- Sección 7: Información Adicional -->
+                            <!-- Sección 5: Información Adicional -->
                             <div class="form-section">
                                 <h5 class="section-title">
                                     <i class="fas fa-sticky-note me-2"></i>
@@ -706,25 +633,6 @@
                                 </h5>
                                 
                                 <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group-custom">
-                                            <label for="anticipo" class="form-label-custom">
-                                                Anticipo
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="anticipo" 
-                                                       name="anticipo" 
-                                                       value="{{ old('anticipo', $contrato->anticipo) }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
                                             <label for="duracion" class="form-label-custom">
@@ -744,40 +652,40 @@
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="contrato_fecha" class="form-label-custom">
+                                            <label for="fecha_contrato" class="form-label-custom">
                                                 Fecha del Contrato
                                             </label>
                                             <input type="date" 
                                                    class="form-control form-control-custom" 
-                                                   id="contrato_fecha" 
-                                                   name="contrato_fecha" 
-                                                   value="{{ old('contrato_fecha', $contrato->contrato_fecha ? $contrato->contrato_fecha->format('Y-m-d') : '') }}">
+                                                   id="fecha_contrato" 
+                                                   name="fecha_contrato" 
+                                                   value="{{ old('fecha_contrato', $contrato->fecha_contrato ? $contrato->fecha_contrato->format('Y-m-d') : '') }}">
                                         </div>
                                     </div>
                                     
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="inicio_de_obra" class="form-label-custom">
+                                            <label for="fecha_inicio_obra" class="form-label-custom">
                                                 Fecha Inicio Obra
                                             </label>
                                             <input type="date" 
                                                    class="form-control form-control-custom" 
-                                                   id="inicio_de_obra" 
-                                                   name="inicio_de_obra" 
-                                                   value="{{ old('inicio_de_obra', $contrato->inicio_de_obra ? $contrato->inicio_de_obra->format('Y-m-d') : '') }}">
+                                                   id="fecha_inicio_obra" 
+                                                   name="fecha_inicio_obra" 
+                                                   value="{{ old('fecha_inicio_obra', $contrato->fecha_inicio_obra ? $contrato->fecha_inicio_obra->format('Y-m-d') : '') }}">
                                         </div>
                                     </div>
                                     
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="terminacion_de_obra" class="form-label-custom">
+                                            <label for="fecha_terminacion_obra" class="form-label-custom">
                                                 Fecha Terminación Obra
                                             </label>
                                             <input type="date" 
                                                    class="form-control form-control-custom" 
-                                                   id="terminacion_de_obra" 
-                                                   name="terminacion_de_obra" 
-                                                   value="{{ old('terminacion_de_obra', $contrato->terminacion_de_obra ? $contrato->terminacion_de_obra->format('Y-m-d') : '') }}">
+                                                   id="fecha_terminacion_obra" 
+                                                   name="fecha_terminacion_obra" 
+                                                   value="{{ old('fecha_terminacion_obra', $contrato->fecha_terminacion_obra ? $contrato->fecha_terminacion_obra->format('Y-m-d') : '') }}">
                                         </div>
                                     </div>
                                 </div>
@@ -798,7 +706,7 @@
                                 </div>
                             </div>
                             
-                            <!-- Sección 8: Datos Bancarios -->
+                            <!-- Sección 6: Datos Bancarios -->
                             <div class="form-section">
                                 <h5 class="section-title">
                                     <i class="fas fa-university me-2"></i>
@@ -822,14 +730,14 @@
                                     
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="n_cuenta" class="form-label-custom">
+                                            <label for="no_cuenta" class="form-label-custom">
                                                 Número de Cuenta
                                             </label>
                                             <input type="text" 
                                                    class="form-control form-control-custom" 
-                                                   id="n_cuenta" 
-                                                   name="n_cuenta" 
-                                                   value="{{ old('n_cuenta', $contrato->n_cuenta) }}"
+                                                   id="no_cuenta" 
+                                                   name="no_cuenta" 
+                                                   value="{{ old('no_cuenta', $contrato->no_cuenta) }}"
                                                    placeholder="Número de cuenta bancaria">
                                         </div>
                                     </div>
@@ -897,7 +805,6 @@
                                     <button type="submit" class="btn btn-submit btn-primary">
                                         <i class="fas fa-save me-1"></i> Actualizar Contrato
                                     </button>
-                                
                                 </div>
                             </div>
                         </form>
@@ -991,12 +898,57 @@
             document.getElementById('longitud_display').value = lng.toFixed(6);
         }
         
-        // Función para confirmar eliminación
-                
-        // Validar fechas
+        // Función para calcular IVA y Total
+        function calcularMontos() {
+            const subtotal = parseFloat(document.getElementById('subtotal').value) || 0;
+            const porcentajeIva = parseFloat(document.getElementById('porcentaje_iva').value) || 0;
+            
+            // Calcular IVA
+            const ivaCalculado = (subtotal * porcentajeIva) / 100;
+            
+            // Calcular Total
+            const totalCalculado = subtotal + ivaCalculado;
+            
+            // Actualizar campos
+            document.getElementById('iva').value = ivaCalculado.toFixed(2);
+            document.getElementById('total').value = totalCalculado.toFixed(2);
+        }
+        
+        // Escuchar cambios en subtotal y porcentaje IVA
         document.addEventListener('DOMContentLoaded', function() {
-            const inicioObra = document.getElementById('inicio_de_obra');
-            const finObra = document.getElementById('terminacion_de_obra');
+            const subtotalInput = document.getElementById('subtotal');
+            const porcentajeIvaInput = document.getElementById('porcentaje_iva');
+            
+            if (subtotalInput && porcentajeIvaInput) {
+                subtotalInput.addEventListener('input', calcularMontos);
+                porcentajeIvaInput.addEventListener('input', calcularMontos);
+                
+                // Calcular valores iniciales si hay datos pre-cargados
+                if (subtotalInput.value || porcentajeIvaInput.value) {
+                    calcularMontos();
+                }
+            }
+            
+            // Validar que el porcentaje IVA esté entre 0 y 100
+            if (porcentajeIvaInput) {
+                porcentajeIvaInput.addEventListener('change', function() {
+                    if (this.value < 0) {
+                        this.value = 0;
+                    } else if (this.value > 100) {
+                        this.value = 100;
+                    }
+                    calcularMontos();
+                });
+            }
+            
+            // Remover el atributo name del campo porcentaje_iva para que no se envíe al servidor
+            if (porcentajeIvaInput) {
+                porcentajeIvaInput.removeAttribute('name');
+            }
+            
+            // Validar fechas
+            const inicioObra = document.getElementById('fecha_inicio_obra');
+            const finObra = document.getElementById('fecha_terminacion_obra');
             
             if (inicioObra && finObra) {
                 inicioObra.addEventListener('change', function() {

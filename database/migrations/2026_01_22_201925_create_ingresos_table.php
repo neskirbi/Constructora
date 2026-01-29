@@ -18,7 +18,7 @@ class CreateIngresosTable extends Migration
             $table->string('id_contrato',32);
             $table->string('id_usuario',32)->default('');
             $table->string('area')->nullable();  
-            $table->string('estimacion')->nullable();
+            $table->string('no_estimacion')->nullable();
             $table->date('periodo_del')->nullable();
             $table->date('periodo_al')->nullable();
             $table->string('factura')->nullable();

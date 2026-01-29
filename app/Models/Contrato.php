@@ -12,11 +12,10 @@ class Contrato extends Model
     protected $table = 'contratos';
     protected $primaryKey = 'id';
     public $incrementing = false;
-    protected $keyType = 'string';
-
+    
     protected $fillable = [
         'id',
-        'obras',
+        'id_usuario',
         'empresa',
         'contrato_no',
         'frente',
@@ -24,55 +23,48 @@ class Contrato extends Model
         'cliente',
         'obra',
         'lugar',
-        'importe',
+        'concepto',
+        'subtotal',
         'iva',
         'total',
-        'importe_convenio',
-        'iva_convenio',
-        'total_convenio',
-        'importe_total',
-        'iva_total',
-        'total_total',
-        'anticipo',
+        'monto_anticipo',
         'duracion',
-        'contrato_fecha',
-        'inicio_de_obra',
-        'terminacion_de_obra',
+        'fecha_contrato',
+        'fecha_inicio_obra',
+        'fecha_terminacion_obra',
         'observaciones',
         'razon_social',
         'rfc',
-        'calle_y_numero',
+        'calle_numero',
         'colonia',
         'codigo_postal',
-        'delegacion',
-        'municipio',
+        'entidad',
+        'alcaldia_municipio',
         'telefono',
+        'latitud',
+        'longitud',
         'banco',
-        'n_cuenta',
+        'no_cuenta',
         'sucursal',
         'clabe_interbancaria',
         'mail_facturas',
         'representante_legal',
-    ];
-
-    protected $dates = [
-        'contrato_fecha',
-        'inicio_de_obra',
-        'terminacion_de_obra',
         'created_at',
         'updated_at'
     ];
 
+    // Agrega esto para convertir las fechas a Carbon
     protected $casts = [
-        'importe' => 'decimal:2',
+        'fecha_contrato' => 'date',
+        'fecha_inicio_obra' => 'date',
+        'fecha_terminacion_obra' => 'date',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'subtotal' => 'decimal:2',
         'iva' => 'decimal:2',
         'total' => 'decimal:2',
-        'importe_convenio' => 'decimal:2',
-        'iva_convenio' => 'decimal:2',
-        'total_convenio' => 'decimal:2',
-        'importe_total' => 'decimal:2',
-        'iva_total' => 'decimal:2',
-        'total_total' => 'decimal:2',
-        'anticipo' => 'decimal:2',
+        'monto_anticipo' => 'decimal:2',
+        'latitud' => 'decimal:8',
+        'longitud' => 'decimal:8',
     ];
 }

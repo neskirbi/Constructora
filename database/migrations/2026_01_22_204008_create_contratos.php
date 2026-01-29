@@ -16,45 +16,42 @@ class CreateContratos extends Migration
         Schema::create('contratos', function (Blueprint $table) {
             $table->string('id',32)->unique();
             $table->string('id_usuario',32)->default('');
-            $table->text('obra')->nullable();
+            
+             // Columnas del Excel
             $table->string('empresa')->nullable();
             $table->string('contrato_no')->nullable();
             $table->string('frente')->nullable();
             $table->string('gerencia')->nullable();
             $table->string('cliente')->nullable();
+            $table->string('obra')->nullable();
             $table->string('lugar')->nullable();
-            $table->decimal('importe_contrato', 15, 2)->nullable();
-            $table->decimal('iva_contrato', 15, 2)->nullable();
-            $table->decimal('total_contrato', 15, 2)->nullable();
-            $table->decimal('importe_convenio', 15, 2)->nullable();
-            $table->decimal('iva_convenio', 15, 2)->nullable();
-            $table->decimal('total_convenio', 15, 2)->nullable();
-            $table->decimal('importe_total', 15, 2)->nullable();
-            $table->decimal('iva_total', 15, 2)->nullable();
-            $table->decimal('total_total', 15, 2)->nullable();
-            $table->decimal('anticipo', 15, 2)->nullable();
+            $table->string('concepto',50)->nullable();
+            $table->decimal('subtotal', 15, 2)->nullable();
+            $table->decimal('iva', 15, 2)->nullable();
+            $table->decimal('total', 15, 2)->nullable();
+            $table->decimal('monto_anticipo', 15, 2)->nullable();
             $table->string('duracion')->nullable();
-            $table->date('contrato_fecha')->nullable();
-            $table->date('inicio_de_obra')->nullable();
-            $table->date('terminacion_de_obra')->nullable();
+            $table->date('fecha_contrato')->nullable();
+            $table->date('fecha_inicio_obra')->nullable();
+            $table->date('fecha_terminacion_obra')->nullable();
             $table->text('observaciones')->nullable();
             $table->string('razon_social')->nullable();
-            $table->string('rfc', 20)->nullable();
-            $table->string('calle_y_numero')->nullable();
+            $table->string('rfc')->nullable();
+            $table->string('calle_numero')->nullable();
             $table->string('colonia')->nullable();
-            $table->string('codigo_postal', 10)->nullable();
-            $table->string('delegacion')->nullable();
-            $table->string('municipio')->nullable();
-            $table->string('telefono')->nullable();
+            $table->string('codigo_postal')->nullable();
+            $table->string('entidad')->nullable();
+            $table->string('alcaldia_municipio')->nullable();
+            $table->string('telefono')->nullable();            
             $table->decimal('latitud', 10, 8)->nullable();
             $table->decimal('longitud', 11, 8)->nullable();
-            
             $table->string('banco')->nullable();
-            $table->string('n_cuenta')->nullable();
+            $table->string('no_cuenta')->nullable();
             $table->string('sucursal')->nullable();
             $table->string('clabe_interbancaria')->nullable();
             $table->string('mail_facturas')->nullable();
             $table->string('representante_legal')->nullable();
+
             $table->timestamps();
         });
     }
