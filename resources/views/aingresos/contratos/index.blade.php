@@ -440,12 +440,12 @@
                                 <!-- Botones de acción -->
                                 <div class="actions-container">
                                     <a href="{{ route('contratos.show', $contrato->id) }}" 
-                                    class="btn btn-sm btn-outline-primary"
+                                    class="btn btn-primary"
                                     title="Ver detalles">
                                         <i class="fas fa-eye me-1"></i> Ver
                                     </a>
                                     <button onclick="confirmDelete('{{ $contrato->id }}', '{{ addslashes($contrato->obra ?? 'Contrato') }}')" 
-                                            class="btn btn-sm btn-outline-danger"
+                                            class="btn btn-outline-danger"
                                             title="Eliminar contrato">
                                         <i class="fas fa-trash me-1"></i> Eliminar
                                     </button>

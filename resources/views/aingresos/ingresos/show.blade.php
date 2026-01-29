@@ -262,10 +262,10 @@
                                                 Contrato (No editable)
                                             </label>
                                             <div class="info-display">
-                                                @if($ingreso->contrato)
-                                                    <strong>{{ $ingreso->contrato->contrato_no }}</strong> - {{ $ingreso->contrato->obra }}
+                                                @if($contrato)
+                                                    <strong>{{ $contrato->contrato_no ?? 'N/A' }}</strong> - {{ $contrato->obra ?? '' }}
                                                     <br>
-                                                    <small class="text-muted">Cliente: {{ $ingreso->contrato->cliente }}</small>
+                                                    <small class="text-muted">Cliente: {{ $contrato->cliente ?? 'Sin cliente' }}</small>
                                                 @else
                                                     <span class="text-danger">Contrato no encontrado</span>
                                                 @endif
@@ -287,40 +287,23 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="estimacion" class="form-label-custom required-label">
+                                            <label for="no_estimacion" class="form-label-custom required-label">
                                                 Estimación No.
                                             </label>
                                             <input type="text" 
                                                    class="form-control form-control-custom {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
-                                                   id="estimacion" 
-                                                   name="estimacion" 
-                                                   value="{{ old('estimacion', $ingreso->estimacion) }}"
+                                                   id="no_estimacion" 
+                                                   name="no_estimacion" 
+                                                   value="{{ old('no_estimacion', $ingreso->no_estimacion) }}"
                                                    placeholder="Ej: EST-001"
                                                    required
                                                    {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
-                                            @error('estimacion')
+                                            @error('no_estimacion')
                                                 <div class="text-danger small mt-1">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
                                     
-                                    <div class="col-md-6">
-                                        <div class="form-group-custom">
-                                            <label for="area" class="form-label-custom">
-                                                Área
-                                            </label>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
-                                                   id="area" 
-                                                   name="area" 
-                                                   value="{{ old('area', $ingreso->area) }}"
-                                                   placeholder="Ej: Administración, Obra Civil"
-                                                   {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
                                             <label for="periodo_del" class="form-label-custom">
@@ -330,11 +313,13 @@
                                                    class="form-control form-control-custom {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
                                                    id="periodo_del" 
                                                    name="periodo_del" 
-                                                   value="{{ old('periodo_del', $ingreso->periodo_del ? $ingreso->periodo_del->format('Y-m-d') : '') }}"
+                                                   value="{{ old('periodo_del', $ingreso->periodo_del) }}"
                                                    {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
                                         </div>
                                     </div>
-                                    
+                                </div>
+                                
+                                <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
                                             <label for="periodo_al" class="form-label-custom">
@@ -344,7 +329,7 @@
                                                    class="form-control form-control-custom {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
                                                    id="periodo_al" 
                                                    name="periodo_al" 
-                                                   value="{{ old('periodo_al', $ingreso->periodo_al ? $ingreso->periodo_al->format('Y-m-d') : '') }}"
+                                                   value="{{ old('periodo_al', $ingreso->periodo_al) }}"
                                                    {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
                                         </div>
                                     </div>
@@ -361,16 +346,16 @@
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="importe_de_estimacion" class="form-label-custom">
+                                            <label for="importe_estimacion" class="form-label-custom">
                                                 Importe de Estimación
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
-                                                       id="importe_de_estimacion" 
-                                                       name="importe_de_estimacion" 
-                                                       value="{{ old('importe_de_estimacion', $ingreso->importe_de_estimacion) }}"
+                                                       id="importe_estimacion" 
+                                                       name="importe_estimacion" 
+                                                       value="{{ old('importe_estimacion', $ingreso->importe_estimacion) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0"
@@ -419,14 +404,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            
-                            <!-- Sección 4: Deducciones -->
-                            <div class="form-section">
-                                <h5 class="section-title">
-                                    <i class="fas fa-minus-circle me-2"></i>
-                                    Deducciones
-                                </h5>
                                 
                                 <div class="row">
                                     <div class="col-md-4">
@@ -451,16 +428,45 @@
                                     
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="cargos_adicionales_35_porciento" class="form-label-custom">
-                                                Cargos Adicionales 35%
+                                            <label for="estimado_menos_deducciones" class="form-label-custom">
+                                                Estimado - Deducciones
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
-                                                       id="cargos_adicionales_35_porciento" 
-                                                       name="cargos_adicionales_35_porciento" 
-                                                       value="{{ old('cargos_adicionales_35_porciento', $ingreso->cargos_adicionales_35_porciento) }}"
+                                                       id="estimado_menos_deducciones" 
+                                                       name="estimado_menos_deducciones" 
+                                                       value="{{ old('estimado_menos_deducciones', $ingreso->estimado_menos_deducciones) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sección 4: Deducciones Específicas -->
+                            <div class="form-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-minus-circle me-2"></i>
+                                    Deducciones Específicas
+                                </h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="cargos_adicionales_3_5" class="form-label-custom">
+                                                3.5% Cargos Adicionales
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="cargos_adicionales_3_5" 
+                                                       name="cargos_adicionales_3_5" 
+                                                       value="{{ old('cargos_adicionales_3_5', $ingreso->cargos_adicionales_3_5) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0"
@@ -472,7 +478,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
                                             <label for="retencion_5_al_millar" class="form-label-custom">
-                                                Retención 5‰
+                                                Retención 5 al Millar
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
@@ -488,21 +494,19 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                
-                                <div class="row">
+                                    
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="sancion_atraso_presentacion_estimacion" class="form-label-custom">
+                                            <label for="sancion_atrazo_presentacion_estimacion" class="form-label-custom">
                                                 Sanción Atraso Presentación
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
-                                                       id="sancion_atraso_presentacion_estimacion" 
-                                                       name="sancion_atraso_presentacion_estimacion" 
-                                                       value="{{ old('sancion_atraso_presentacion_estimacion', $ingreso->sancion_atraso_presentacion_estimacion) }}"
+                                                       id="sancion_atrazo_presentacion_estimacion" 
+                                                       name="sancion_atrazo_presentacion_estimacion" 
+                                                       value="{{ old('sancion_atrazo_presentacion_estimacion', $ingreso->sancion_atrazo_presentacion_estimacion) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0"
@@ -510,7 +514,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
+                                </div>
+                                
+                                <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
                                             <label for="sancion_atraso_de_obra" class="form-label-custom">
@@ -550,21 +556,19 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                
-                                <div class="row">
+                                    
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="retencion_por_atraso_en_programa_de_obra" class="form-label-custom">
+                                            <label for="retencion_por_atraso_en_programa_obra" class="form-label-custom">
                                                 Retención Atraso Programa
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
-                                                       id="retencion_por_atraso_en_programa_de_obra" 
-                                                       name="retencion_por_atraso_en_programa_de_obra" 
-                                                       value="{{ old('retencion_por_atraso_en_programa_de_obra', $ingreso->retencion_por_atraso_en_programa_de_obra) }}"
+                                                       id="retencion_por_atraso_en_programa_obra" 
+                                                       name="retencion_por_atraso_en_programa_obra" 
+                                                       value="{{ old('retencion_por_atraso_en_programa_obra', $ingreso->retencion_por_atraso_en_programa_obra) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0"
@@ -572,7 +576,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
+                                </div>
+                                
+                                <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
                                             <label for="amortizacion_anticipo" class="form-label-custom">
@@ -612,9 +618,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                
-                                <div class="row">
+                                    
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
                                             <label for="total_deducciones" class="form-label-custom">
@@ -634,40 +638,21 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="estimado_menos_deducciones" class="form-label-custom">
-                                                Estimado - Deducciones
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
-                                                       id="estimado_menos_deducciones" 
-                                                       name="estimado_menos_deducciones" 
-                                                       value="{{ old('estimado_menos_deducciones', $ingreso->estimado_menos_deducciones) }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                             
-                            <!-- Sección 5: Facturación y Cobro -->
+                            <!-- Sección 5: Facturación -->
                             <div class="form-section">
                                 <h5 class="section-title">
                                     <i class="fas fa-file-invoice-dollar me-2"></i>
-                                    Facturación y Cobro
+                                    Facturación
                                 </h5>
                                 
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
                                             <label for="factura" class="form-label-custom">
-                                                No. de Factura
+                                                Factura
                                             </label>
                                             <input type="text" 
                                                    class="form-control form-control-custom {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
@@ -688,27 +673,13 @@
                                                    class="form-control form-control-custom {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
                                                    id="fecha_factura" 
                                                    name="fecha_factura" 
-                                                   value="{{ old('fecha_factura', $ingreso->fecha_factura ? $ingreso->fecha_factura->format('Y-m-d') : '') }}"
+                                                   value="{{ old('fecha_factura', $ingreso->fecha_factura) }}"
                                                    {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
                                         </div>
                                     </div>
                                 </div>
                                 
                                 <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group-custom">
-                                            <label for="fecha_elaboracion" class="form-label-custom">
-                                                Fecha Elaboración
-                                            </label>
-                                            <input type="date" 
-                                                   class="form-control form-control-custom {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
-                                                   id="fecha_elaboracion" 
-                                                   name="fecha_elaboracion" 
-                                                   value="{{ old('fecha_elaboracion', $ingreso->fecha_elaboracion ? $ingreso->fecha_elaboracion->format('Y-m-d') : '') }}"
-                                                   {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
-                                        </div>
-                                    </div>
-                                    
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
                                             <label for="importe_facturado" class="form-label-custom">
@@ -731,11 +702,11 @@
                                 </div>
                             </div>
                             
-                            <!-- Sección 6: Líquidos y Estado -->
+                            <!-- Sección 6: Cobros -->
                             <div class="form-section">
                                 <h5 class="section-title">
                                     <i class="fas fa-money-bill-wave me-2"></i>
-                                    Líquidos y Estado
+                                    Cobros
                                 </h5>
                                 
                                 <div class="row">
@@ -781,8 +752,24 @@
                                     
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
+                                            <label for="fecha_cobro" class="form-label-custom">
+                                                Fecha Cobro
+                                            </label>
+                                            <input type="date" 
+                                                   class="form-control form-control-custom {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                   id="fecha_cobro" 
+                                                   name="fecha_cobro" 
+                                                   value="{{ old('fecha_cobro', $ingreso->fecha_cobro) }}"
+                                                   {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
                                             <label for="por_cobrar" class="form-label-custom">
-                                                Por Cobrar
+                                                POR COBRAR
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
@@ -797,26 +784,44 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                
-                                <div class="row">
+                                    
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="fecha_cobro" class="form-label-custom">
-                                                Fecha de Cobro
+                                            <label for="por_facturar" class="form-label-custom">
+                                                POR FACTURAR
                                             </label>
-                                            <input type="date" 
-                                                   class="form-control form-control-custom {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
-                                                   id="fecha_cobro" 
-                                                   name="fecha_cobro" 
-                                                   value="{{ old('fecha_cobro', $ingreso->fecha_cobro ? $ingreso->fecha_cobro->format('Y-m-d') : '') }}"
-                                                   {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="por_facturar" 
+                                                       name="por_facturar" 
+                                                       value="{{ old('por_facturar', $ingreso->por_facturar) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                            </div>
                                         </div>
                                     </div>
                                     
-                                   
-                                    
-                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="por_estimar" class="form-label-custom">
+                                                Por Estimar
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                       id="por_estimar" 
+                                                       name="por_estimar" 
+                                                       value="{{ old('por_estimar', $ingreso->por_estimar) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -831,7 +836,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
                                             <label for="avance_obra_estimacion" class="form-label-custom">
-                                                Avance Estimación (%)
+                                                Avance Obra Estimación (%)
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <input type="number" 
@@ -852,7 +857,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
                                             <label for="avance_obra_real" class="form-label-custom">
-                                                Avance Real (%)
+                                                Avance Obra Real (%)
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <input type="number" 
@@ -873,7 +878,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
                                             <label for="porcentaje_avance_financiero" class="form-label-custom">
-                                                Avance Financiero (%)
+                                                % Avance Financiero
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <input type="number" 
@@ -893,30 +898,27 @@
                                 </div>
                             </div>
                             
-                            <!-- Sección 8: Por Facturar -->
+                            <!-- Sección 8: Estado -->
                             <div class="form-section">
                                 <h5 class="section-title">
-                                    <i class="fas fa-file-invoice me-2"></i>
-                                    Por Facturar
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Estado
                                 </h5>
                                 
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="por_facturar" class="form-label-custom">
-                                                Por Facturar
+                                            <label for="status" class="form-label-custom">
+                                                Status
                                             </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
-                                                       id="por_facturar" 
-                                                       name="por_facturar" 
-                                                       value="{{ old('por_facturar', $ingreso->por_facturar) }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       {{ $ingreso->verificado != 1 ? 'readonly' : '' }}>
-                                            </div>
+                                            <select class="form-control form-control-custom {{ $ingreso->verificado != 1 ? 'bg-light' : '' }}" 
+                                                    id="status" 
+                                                    name="status"
+                                                    {{ $ingreso->verificado != 1 ? 'disabled' : '' }}>
+                                                <option value="">Seleccionar status...</option>
+                                                <option value="pagado" {{ old('status', $ingreso->status) == 'pagado' ? 'selected' : '' }}>Pagado</option>
+                                                <option value="en_tramite" {{ old('status', $ingreso->status) == 'en_tramite' ? 'selected' : '' }}>En Trámite</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -994,6 +996,71 @@
                 });
             }
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+        // Campos de DEDUCCIÓN (sanciones/retrociones)
+        const deduccionFields = [
+            'retenciones_o_sanciones',
+            'cargos_adicionales_3_5',
+            'retencion_5_al_millar',
+            'sancion_atrazo_presentacion_estimacion',
+            'sancion_atraso_de_obra',
+            'sancion_por_obra_mal_ejecutada',
+            'retencion_por_atraso_en_programa_obra'
+            // NOTA: amortizacion_anticipo y amortizacion_con_iva NO se incluyen
+            // porque no son deducciones por incumplimiento
+        ];
+
+        // Campos de AMORTIZACIÓN (parte del pago normal)
+        const amortizacionFields = [
+            'amortizacion_anticipo',
+            'amortizacion_con_iva'
+        ];
+
+        // Campo total de deducciones (bloqueado)
+        const totalDeduccionesInput = document.getElementById('total_deducciones');
+        
+        // Hacer el campo de total de deducciones de solo lectura
+        if (totalDeduccionesInput) {
+            totalDeduccionesInput.readOnly = true;
+            totalDeduccionesInput.style.backgroundColor = '#f8f9fa';
+            totalDeduccionesInput.style.cursor = 'not-allowed';
+        }
+
+        // Función para calcular el total de DEDUCCIONES (solo sanciones/retrociones)
+        function calcularTotalDeducciones() {
+            let total = 0;
+            
+            deduccionFields.forEach(fieldName => {
+                const field = document.getElementById(fieldName);
+                if (field && field.value) {
+                    total += parseFloat(field.value) || 0;
+                }
+            });
+            
+            if (totalDeduccionesInput) {
+                // Formatear a 2 decimales
+                totalDeduccionesInput.value = total.toFixed(2);
+            }
+        }
+
+        // Agregar event listeners a los campos de DEDUCCIÓN
+        deduccionFields.forEach(fieldName => {
+            const field = document.getElementById(fieldName);
+            if (field) {
+                field.addEventListener('input', calcularTotalDeducciones);
+                field.addEventListener('blur', function() {
+                    if (this.value) {
+                        this.value = parseFloat(this.value).toFixed(2);
+                    }
+                    calcularTotalDeducciones();
+                });
+            }
+        });
+
+        // Calcular inicialmente si hay valores precargados
+        calcularTotalDeducciones();
+    });
     </script>
 </body>
 </html>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Aingresos;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB; 
 use App\Models\Ingreso;
 use App\Models\Contrato;
 use Illuminate\Http\Request;
@@ -19,27 +20,33 @@ class IngresoController extends Controller
         // Obtener parámetros de búsqueda
         $search = $request->input('search');
         
-        // Construir consulta base con relación a contrato
-        $query = Ingreso::with('contrato');
+        // Construir consulta base SIN with()
+        $query = Ingreso::query();
         
         // Aplicar búsqueda si existe
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('estimacion', 'like', "%{$search}%")
-                  ->orWhere('factura', 'like', "%{$search}%")
-                  ->orWhere('area', 'like', "%{$search}%")
-                  ->orWhereHas('contrato', function($q2) use ($search) {
-                      $q2->where('contrato_no', 'like', "%{$search}%")
-                         ->orWhere('obra', 'like', "%{$search}%")
-                         ->orWhere('cliente', 'like', "%{$search}%");
-                  });
+                // Buscar en campos directos de ingresos (actualizados a los nuevos nombres)
+                $q->where('no_estimacion', 'like', "%{$search}%")
+                ->orWhere('factura', 'like', "%{$search}%")
+                ->orWhere('status', 'like', "%{$search}%")
+                // Buscar en contratos usando join manual
+                ->orWhereExists(function ($subquery) use ($search) {
+                    $subquery->select(DB::raw(1))
+                            ->from('contratos')
+                            ->whereColumn('contratos.id', 'ingresos.id_contrato')
+                            ->where(function ($q2) use ($search) {
+                                $q2->where('contratos.contrato_no', 'like', "%{$search}%")
+                                    ->orWhere('contratos.obra', 'like', "%{$search}%")
+                                    ->orWhere('contratos.cliente', 'like', "%{$search}%");
+                            });
+                });
             });
         }
         
         // Obtener los ingresos con paginación
-        $ingresos = $query->orderBy('fecha_elaboracion', 'desc')
-                         ->orderBy('created_at', 'desc')
-                         ->paginate(15);
+        $ingresos = $query->orderBy('created_at', 'desc')
+                        ->paginate(15);
         
         return view('aingresos.ingresos.index', compact('ingresos'));
     }
@@ -68,26 +75,24 @@ class IngresoController extends Controller
         // Validación de campos
         $validated = $request->validate([
             'id_contrato' => 'required|exists:contratos,id',
-            'area' => 'nullable|string|max:255',
-            'estimacion' => 'required|string|max:255',
+            'no_estimacion' => 'required|string|max:255',
             'periodo_del' => 'nullable|date',
             'periodo_al' => 'nullable|date|after_or_equal:periodo_del',
             'factura' => 'nullable|string|max:255',
             'fecha_factura' => 'nullable|date',
-            'importe_de_estimacion' => 'nullable|numeric|min:0',
+            'importe_estimacion' => 'nullable|numeric|min:0',
             'iva' => 'nullable|numeric|min:0',
             'retenciones_o_sanciones' => 'nullable|numeric|min:0',
             'total_estimacion_con_iva' => 'nullable|numeric|min:0',
-            'fecha_elaboracion' => 'nullable|date',
             'avance_obra_estimacion' => 'nullable|numeric|min:0|max:100',
             'avance_obra_real' => 'nullable|numeric|min:0|max:100',
             'porcentaje_avance_financiero' => 'nullable|numeric|min:0|max:100',
-            'cargos_adicionales_35_porciento' => 'nullable|numeric|min:0',
+            'cargos_adicionales_3_5' => 'nullable|numeric|min:0',
             'retencion_5_al_millar' => 'nullable|numeric|min:0',
-            'sancion_atraso_presentacion_estimacion' => 'nullable|numeric|min:0',
+            'sancion_atrazo_presentacion_estimacion' => 'nullable|numeric|min:0',
             'sancion_atraso_de_obra' => 'nullable|numeric|min:0',
             'sancion_por_obra_mal_ejecutada' => 'nullable|numeric|min:0',
-            'retencion_por_atraso_en_programa_de_obra' => 'nullable|numeric|min:0',
+            'retencion_por_atraso_en_programa_obra' => 'nullable|numeric|min:0',
             'amortizacion_anticipo' => 'nullable|numeric|min:0',
             'amortizacion_con_iva' => 'nullable|numeric|min:0',
             'total_deducciones' => 'nullable|numeric|min:0',
@@ -97,47 +102,16 @@ class IngresoController extends Controller
             'fecha_cobro' => 'nullable|date',
             'por_cobrar' => 'nullable|numeric|min:0',
             'por_facturar' => 'nullable|numeric|min:0',
-            'status' => 'nullable|string|in:pendiente,pagado,parcial,cancelado',
+            'por_estimar' => 'nullable|numeric|min:0',
+            'status' => 'nullable|string|in:pagado,en_tramite',
             'estimado_menos_deducciones' => 'nullable|numeric',
             'verificado' => 'nullable|integer',
         ]);
         
         // Generar ID único usando la función helper GetUuid()
         $validated['id'] = GetUuid();
-        
-        // Calcular total deducciones si no se proporcionó
-        if (!isset($validated['total_deducciones']) || $validated['total_deducciones'] === null) {
-            $deducciones = [
-                'retenciones_o_sanciones',
-                'cargos_adicionales_35_porciento',
-                'retencion_5_al_millar',
-                'sancion_atraso_presentacion_estimacion',
-                'sancion_atraso_de_obra',
-                'sancion_por_obra_mal_ejecutada',
-                'retencion_por_atraso_en_programa_de_obra',
-                'amortizacion_anticipo',
-                'amortizacion_con_iva'
-            ];
-            
-            $totalDeducciones = 0;
-            foreach ($deducciones as $deduccion) {
-                $totalDeducciones += $validated[$deduccion] ?? 0;
-            }
-            $validated['total_deducciones'] = $totalDeducciones;
-        }
-        
-        // Calcular estimado menos deducciones si no se proporcionó
-        if (!isset($validated['estimado_menos_deducciones']) || $validated['estimado_menos_deducciones'] === null) {
-            $importeEstimacion = $validated['importe_de_estimacion'] ?? 0;
-            $iva = $validated['iva'] ?? 0;
-            $totalConIva = $importeEstimacion + $iva;
-            $validated['estimado_menos_deducciones'] = $totalConIva - ($validated['total_deducciones'] ?? 0);
-        }
-        
-        // Calcular por cobrar si no se proporcionó
-        if (!isset($validated['por_cobrar']) || $validated['por_cobrar'] === null) {
-            $validated['por_cobrar'] = ($validated['liquido_a_cobrar'] ?? 0) - ($validated['liquido_cobrado'] ?? 0);
-        }
+
+        $validated['id_usuario'] = GetId();
         
         // Crear el ingreso
         $ingreso = Ingreso::create($validated);
@@ -152,14 +126,17 @@ class IngresoController extends Controller
      * @param  string  $id
      * @return \Illuminate\Http\Response
      */
-    function show($id)
+   function show($id)
     {
-        $ingreso = Ingreso::with('contrato')->findOrFail($id);
+        $ingreso = Ingreso::findOrFail($id);
+        
+        // Obtener el contrato manualmente (sin relación)
+        $contrato = Contrato::where('id', $ingreso->id_contrato)->first();
         
         // Obtener contratos para el select en caso de edición
         $contratos = Contrato::orderBy('contrato_no', 'asc')->get();
         
-        return view('aingresos.ingresos.show', compact('ingreso', 'contratos'));
+        return view('aingresos.ingresos.show', compact('ingreso', 'contrato', 'contratos'));
     }
 
     /**
@@ -177,26 +154,24 @@ class IngresoController extends Controller
         // Validación de campos (similar a store)
         $validated = $request->validate([
             'id_contrato' => 'required|exists:contratos,id',
-            'area' => 'nullable|string|max:255',
-            'estimacion' => 'required|string|max:255',
+            'no_estimacion' => 'required|string|max:255',
             'periodo_del' => 'nullable|date',
             'periodo_al' => 'nullable|date|after_or_equal:periodo_del',
             'factura' => 'nullable|string|max:255',
             'fecha_factura' => 'nullable|date',
-            'importe_de_estimacion' => 'nullable|numeric|min:0',
+            'importe_estimacion' => 'nullable|numeric|min:0',
             'iva' => 'nullable|numeric|min:0',
             'retenciones_o_sanciones' => 'nullable|numeric|min:0',
             'total_estimacion_con_iva' => 'nullable|numeric|min:0',
-            'fecha_elaboracion' => 'nullable|date',
             'avance_obra_estimacion' => 'nullable|numeric|min:0|max:100',
             'avance_obra_real' => 'nullable|numeric|min:0|max:100',
             'porcentaje_avance_financiero' => 'nullable|numeric|min:0|max:100',
-            'cargos_adicionales_35_porciento' => 'nullable|numeric|min:0',
+            'cargos_adicionales_3_5' => 'nullable|numeric|min:0',
             'retencion_5_al_millar' => 'nullable|numeric|min:0',
-            'sancion_atraso_presentacion_estimacion' => 'nullable|numeric|min:0',
+            'sancion_atrazo_presentacion_estimacion' => 'nullable|numeric|min:0',
             'sancion_atraso_de_obra' => 'nullable|numeric|min:0',
             'sancion_por_obra_mal_ejecutada' => 'nullable|numeric|min:0',
-            'retencion_por_atraso_en_programa_de_obra' => 'nullable|numeric|min:0',
+            'retencion_por_atraso_en_programa_obra' => 'nullable|numeric|min:0',
             'amortizacion_anticipo' => 'nullable|numeric|min:0',
             'amortizacion_con_iva' => 'nullable|numeric|min:0',
             'total_deducciones' => 'nullable|numeric|min:0',
@@ -206,7 +181,8 @@ class IngresoController extends Controller
             'fecha_cobro' => 'nullable|date',
             'por_cobrar' => 'nullable|numeric|min:0',
             'por_facturar' => 'nullable|numeric|min:0',
-            'status' => 'nullable|string|in:pendiente,pagado,parcial,cancelado',
+            'por_estimar' => 'nullable|numeric|min:0',
+            'status' => 'nullable|string|in:pagado,en_tramite',
             'estimado_menos_deducciones' => 'nullable|numeric',
             'verificado' => 'nullable|integer',
         ]);

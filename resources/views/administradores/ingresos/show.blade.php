@@ -125,6 +125,50 @@
             color: #212529;
         }
         
+        /* Estilos de secciones que me pediste */
+        .form-section {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #426ec1;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .info-item {
+            padding: 0.75rem 0;
+        }
+        
+        .info-item .info-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-text {
+            font-size: 0.95rem;
+            color: #212529;
+            margin: 0;
+            padding: 0.5rem 0;
+        }
+        
+        .info-value {
+            font-weight: 500;
+            color: #212529;
+        }
+        
+        .info-value.monto {
+            color: #198754;
+            font-weight: 600;
+        }
+        
         @media (max-width: 768px) {
             .form-section {
                 padding: 1rem;
@@ -132,6 +176,10 @@
             
             .card-header-form {
                 padding: 1rem;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -154,7 +202,7 @@
                         <p class="text-muted mb-0">ID: {{ $ingreso->id }}</p>
                     </div>
                     <div>
-                        <a href="{{ route('ingresos.index') }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('aingresos.index') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left me-1"></i> Regresar
                         </a>
                     </div>
@@ -202,84 +250,51 @@
                                 Información del Contrato
                             </h5>
                             
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Contrato
-                                        </label>
-                                        <div class="info-display">
-                                            @if($ingreso->contrato)
-                                                <p class="info-display-text mb-0">
-                                                    <strong>{{ $ingreso->contrato->contrato_no }}</strong> - {{ $ingreso->contrato->obra }}
-                                                    <br>
-                                                    <small class="text-muted">Cliente: {{ $ingreso->contrato->cliente }}</small>
-                                                </p>
-                                            @else
-                                                <span class="text-danger">Contrato no encontrado</span>
-                                            @endif
-                                        </div>
-                                    </div>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">Contrato</div>
+                                    <p class="info-text">
+                                        @if($contrato)
+                                            <strong>{{ $contrato->contrato_no ?? 'N/A' }}</strong>
+                                            <br>
+                                            <span class="text-muted" style="font-size: 0.9rem;">
+                                                {{ $contrato->obra ?? '' }}
+                                                <br>
+                                                Cliente: {{ $contrato->cliente ?? 'Sin cliente' }}
+                                            </span>
+                                        @else
+                                            <span class="text-danger">Contrato no encontrado</span>
+                                        @endif
+                                    </p>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Sección 2: Información Básica del Ingreso -->
+                        <!-- Sección 2: Información Básica -->
                         <div class="form-section">
                             <h5 class="section-title">
                                 <i class="fas fa-info-circle me-2"></i>
                                 Información Básica
                             </h5>
                             
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Estimación No.
-                                        </label>
-                                        <input type="text" 
-                                               class="form-control form-control-custom" 
-                                               value="{{ $ingreso->estimacion }}"
-                                               readonly>
-                                    </div>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">Estimación No.</div>
+                                    <p class="info-text info-value">{{ $ingreso->no_estimacion ?? 'N/A' }}</p>
                                 </div>
                                 
-                                <div class="col-md-6">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Área
-                                        </label>
-                                        <input type="text" 
-                                               class="form-control form-control-custom" 
-                                               value="{{ $ingreso->area ?? 'No especificado' }}"
-                                               readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Periodo Del
-                                        </label>
-                                        <input type="text" 
-                                               class="form-control form-control-custom" 
-                                               value="{{ $ingreso->periodo_del ? $ingreso->periodo_del->format('d/m/Y') : 'No especificado' }}"
-                                               readonly>
-                                    </div>
+                                <div class="info-item">
+                                    <div class="info-label">Periodo Del</div>
+                                    <p class="info-text info-value">
+                                        {{ $ingreso->periodo_del ? date('d/m/Y', strtotime($ingreso->periodo_del)) : 'No especificado' }}
+                                    </p>
                                 </div>
                                 
-                                <div class="col-md-6">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Periodo Al
-                                        </label>
-                                        <input type="text" 
-                                               class="form-control form-control-custom" 
-                                               value="{{ $ingreso->periodo_al ? $ingreso->periodo_al->format('d/m/Y') : 'No especificado' }}"
-                                               readonly>
-                                    </div>
+                                <div class="info-item">
+                                    <div class="info-label">Periodo Al</div>
+                                    <p class="info-text info-value">
+                                        {{ $ingreso->periodo_al ? date('d/m/Y', strtotime($ingreso->periodo_al)) : 'No especificado' }}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -291,363 +306,154 @@
                                 Montos de la Estimación
                             </h5>
                             
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Importe de Estimación
-                                        </label>
-                                        <div class="input-group input-group-custom">
-                                            <span class="input-group-text">$</span>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom numeric-input" 
-                                                   value="{{ number_format($ingreso->importe_de_estimacion ?? 0, 2) }}"
-                                                   readonly>
-                                        </div>
-                                    </div>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">Importe de Estimación</div>
+                                    <p class="info-text info-value monto">${{ number_format($ingreso->importe_estimacion ?? 0, 2) }}</p>
                                 </div>
                                 
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            IVA
-                                        </label>
-                                        <div class="input-group input-group-custom">
-                                            <span class="input-group-text">$</span>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom numeric-input" 
-                                                   value="{{ number_format($ingreso->iva ?? 0, 2) }}"
-                                                   readonly>
-                                        </div>
-                                    </div>
+                                <div class="info-item">
+                                    <div class="info-label">IVA</div>
+                                    <p class="info-text info-value monto">${{ number_format($ingreso->iva ?? 0, 2) }}</p>
                                 </div>
                                 
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Total con IVA
-                                        </label>
-                                        <div class="input-group input-group-custom">
-                                            <span class="input-group-text">$</span>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom numeric-input" 
-                                                   value="{{ number_format($ingreso->total_estimacion_con_iva ?? 0, 2) }}"
-                                                   readonly>
-                                        </div>
-                                    </div>
+                                <div class="info-item">
+                                    <div class="info-label">Total con IVA</div>
+                                    <p class="info-text info-value monto">${{ number_format($ingreso->total_estimacion_con_iva ?? 0, 2) }}</p>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">Retenciones/Sanciones</div>
+                                    <p class="info-text info-value">${{ number_format($ingreso->retenciones_o_sanciones ?? 0, 2) }}</p>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">Estimado - Deducciones</div>
+                                    <p class="info-text info-value monto">${{ number_format($ingreso->estimado_menos_deducciones ?? 0, 2) }}</p>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Sección 4: Deducciones -->
-                        <div class="form-section">
-                            <h5 class="section-title">
-                                <i class="fas fa-minus-circle me-2"></i>
-                                Deducciones
-                            </h5>
-                            
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Retenciones/Sanciones
-                                        </label>
-                                        <div class="input-group input-group-custom">
-                                            <span class="input-group-text">$</span>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom numeric-input" 
-                                                   value="{{ number_format($ingreso->retenciones_o_sanciones ?? 0, 2) }}"
-                                                   readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Cargos Adicionales 35%
-                                        </label>
-                                        <div class="input-group input-group-custom">
-                                            <span class="input-group-text">$</span>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom numeric-input" 
-                                                   value="{{ number_format($ingreso->cargos_adicionales_35_porciento ?? 0, 2) }}"
-                                                   readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Retención 5‰
-                                        </label>
-                                        <div class="input-group input-group-custom">
-                                            <span class="input-group-text">$</span>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom numeric-input" 
-                                                   value="{{ number_format($ingreso->retencion_5_al_millar ?? 0, 2) }}"
-                                                   readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Sanción Atraso Presentación
-                                        </label>
-                                        <div class="input-group input-group-custom">
-                                            <span class="input-group-text">$</span>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom numeric-input" 
-                                                   value="{{ number_format($ingreso->sancion_atraso_presentacion_estimacion ?? 0, 2) }}"
-                                                   readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Sanción Atraso de Obra
-                                        </label>
-                                        <div class="input-group input-group-custom">
-                                            <span class="input-group-text">$</span>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom numeric-input" 
-                                                   value="{{ number_format($ingreso->sancion_atraso_de_obra ?? 0, 2) }}"
-                                                   readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Sanción Obra Mal Ejecutada
-                                        </label>
-                                        <div class="input-group input-group-custom">
-                                            <span class="input-group-text">$</span>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom numeric-input" 
-                                                   value="{{ number_format($ingreso->sancion_por_obra_mal_ejecutada ?? 0, 2) }}"
-                                                   readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Retención Atraso Programa
-                                        </label>
-                                        <div class="input-group input-group-custom">
-                                            <span class="input-group-text">$</span>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom numeric-input" 
-                                                   value="{{ number_format($ingreso->retencion_por_atraso_en_programa_de_obra ?? 0, 2) }}"
-                                                   readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Amortización Anticipo
-                                        </label>
-                                        <div class="input-group input-group-custom">
-                                            <span class="input-group-text">$</span>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom numeric-input" 
-                                                   value="{{ number_format($ingreso->amortizacion_anticipo ?? 0, 2) }}"
-                                                   readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Amortización con IVA
-                                        </label>
-                                        <div class="input-group input-group-custom">
-                                            <span class="input-group-text">$</span>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom numeric-input" 
-                                                   value="{{ number_format($ingreso->amortizacion_con_iva ?? 0, 2) }}"
-                                                   readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Total Deducciones
-                                        </label>
-                                        <div class="input-group input-group-custom">
-                                            <span class="input-group-text">$</span>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom numeric-input" 
-                                                   value="{{ number_format($ingreso->total_deducciones ?? 0, 2) }}"
-                                                   readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Estimado - Deducciones
-                                        </label>
-                                        <div class="input-group input-group-custom">
-                                            <span class="input-group-text">$</span>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom numeric-input" 
-                                                   value="{{ number_format($ingreso->estimado_menos_deducciones ?? 0, 2) }}"
-                                                   readonly>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Sección 5: Facturación y Cobro -->
+                        <!-- Sección 4: Facturación -->
                         <div class="form-section">
                             <h5 class="section-title">
                                 <i class="fas fa-file-invoice-dollar me-2"></i>
-                                Facturación y Cobro
+                                Facturación
                             </h5>
                             
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            No. de Factura
-                                        </label>
-                                        <input type="text" 
-                                               class="form-control form-control-custom" 
-                                               value="{{ $ingreso->factura ?? 'No especificado' }}"
-                                               readonly>
-                                    </div>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">Factura</div>
+                                    <p class="info-text info-value">{{ $ingreso->factura ?? 'No especificado' }}</p>
                                 </div>
                                 
-                                <div class="col-md-6">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Fecha Factura
-                                        </label>
-                                        <input type="text" 
-                                               class="form-control form-control-custom" 
-                                               value="{{ $ingreso->fecha_factura ? $ingreso->fecha_factura->format('d/m/Y') : 'No especificado' }}"
-                                               readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Fecha Elaboración
-                                        </label>
-                                        <input type="text" 
-                                               class="form-control form-control-custom" 
-                                               value="{{ $ingreso->fecha_elaboracion ? $ingreso->fecha_elaboracion->format('d/m/Y') : 'No especificado' }}"
-                                               readonly>
-                                    </div>
+                                <div class="info-item">
+                                    <div class="info-label">Fecha Factura</div>
+                                    <p class="info-text info-value">
+                                        {{ $ingreso->fecha_factura ? date('d/m/Y', strtotime($ingreso->fecha_factura)) : 'No especificado' }}
+                                    </p>
                                 </div>
                                 
-                                <div class="col-md-6">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Importe Facturado
-                                        </label>
-                                        <div class="input-group input-group-custom">
-                                            <span class="input-group-text">$</span>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom numeric-input" 
-                                                   value="{{ number_format($ingreso->importe_facturado ?? 0, 2) }}"
-                                                   readonly>
-                                        </div>
-                                    </div>
+                                <div class="info-item">
+                                    <div class="info-label">Importe Facturado</div>
+                                    <p class="info-text info-value monto">${{ number_format($ingreso->importe_facturado ?? 0, 2) }}</p>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Sección 6: Líquidos y Estado -->
+                        <!-- Sección 5: Deducciones Específicas -->
+                        <div class="form-section">
+                            <h5 class="section-title">
+                                <i class="fas fa-minus-circle me-2"></i>
+                                Deducciones Específicas
+                            </h5>
+                            
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">3.5% Cargos Adicionales</div>
+                                    <p class="info-text info-value">${{ number_format($ingreso->cargos_adicionales_3_5 ?? 0, 2) }}</p>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">Retención 5 al Millar</div>
+                                    <p class="info-text info-value">${{ number_format($ingreso->retencion_5_al_millar ?? 0, 2) }}</p>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">Sanción Atraso Presentación</div>
+                                    <p class="info-text info-value">${{ number_format($ingreso->sancion_atrazo_presentacion_estimacion ?? 0, 2) }}</p>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">Sanción Atraso de Obra</div>
+                                    <p class="info-text info-value">${{ number_format($ingreso->sancion_atraso_de_obra ?? 0, 2) }}</p>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">Sanción Obra Mal Ejecutada</div>
+                                    <p class="info-text info-value">${{ number_format($ingreso->sancion_por_obra_mal_ejecutada ?? 0, 2) }}</p>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">Retención Atraso Programa</div>
+                                    <p class="info-text info-value">${{ number_format($ingreso->retencion_por_atraso_en_programa_obra ?? 0, 2) }}</p>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">Amortización Anticipo</div>
+                                    <p class="info-text info-value">${{ number_format($ingreso->amortizacion_anticipo ?? 0, 2) }}</p>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">Amortización con IVA</div>
+                                    <p class="info-text info-value">${{ number_format($ingreso->amortizacion_con_iva ?? 0, 2) }}</p>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">Total Deducciones</div>
+                                    <p class="info-text info-value monto">${{ number_format($ingreso->total_deducciones ?? 0, 2) }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Sección 6: Cobros -->
                         <div class="form-section">
                             <h5 class="section-title">
                                 <i class="fas fa-money-bill-wave me-2"></i>
-                                Líquidos y Estado
+                                Cobros
                             </h5>
                             
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Líquido a Cobrar
-                                        </label>
-                                        <div class="input-group input-group-custom">
-                                            <span class="input-group-text">$</span>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom numeric-input" 
-                                                   value="{{ number_format($ingreso->liquido_a_cobrar ?? 0, 2) }}"
-                                                   readonly>
-                                        </div>
-                                    </div>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">Líquido a Cobrar</div>
+                                    <p class="info-text info-value monto">${{ number_format($ingreso->liquido_a_cobrar ?? 0, 2) }}</p>
                                 </div>
                                 
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Líquido Cobrado
-                                        </label>
-                                        <div class="input-group input-group-custom">
-                                            <span class="input-group-text">$</span>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom numeric-input" 
-                                                   value="{{ number_format($ingreso->liquido_cobrado ?? 0, 2) }}"
-                                                   readonly>
-                                        </div>
-                                    </div>
+                                <div class="info-item">
+                                    <div class="info-label">Líquido Cobrado</div>
+                                    <p class="info-text info-value monto">${{ number_format($ingreso->liquido_cobrado ?? 0, 2) }}</p>
                                 </div>
                                 
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Por Cobrar
-                                        </label>
-                                        <div class="input-group input-group-custom">
-                                            <span class="input-group-text">$</span>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom numeric-input" 
-                                                   value="{{ number_format($ingreso->por_cobrar ?? 0, 2) }}"
-                                                   readonly>
-                                        </div>
-                                    </div>
+                                <div class="info-item">
+                                    <div class="info-label">Fecha Cobro</div>
+                                    <p class="info-text info-value">
+                                        {{ $ingreso->fecha_cobro ? date('d/m/Y', strtotime($ingreso->fecha_cobro)) : 'No especificado' }}
+                                    </p>
                                 </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Fecha de Cobro
-                                        </label>
-                                        <input type="text" 
-                                               class="form-control form-control-custom" 
-                                               value="{{ $ingreso->fecha_cobro ? $ingreso->fecha_cobro->format('d/m/Y') : 'No especificado' }}"
-                                               readonly>
-                                    </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">POR COBRAR</div>
+                                    <p class="info-text info-value">${{ number_format($ingreso->por_cobrar ?? 0, 2) }}</p>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">POR FACTURAR</div>
+                                    <p class="info-text info-value">${{ number_format($ingreso->por_facturar ?? 0, 2) }}</p>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">Por Estimar</div>
+                                    <p class="info-text info-value">${{ number_format($ingreso->por_estimar ?? 0, 2) }}</p>
                                 </div>
                             </div>
                         </div>
@@ -659,103 +465,70 @@
                                 Avance de Obra
                             </h5>
                             
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Avance Estimación (%)
-                                        </label>
-                                        <div class="input-group input-group-custom">
-                                            <input type="text" 
-                                                   class="form-control form-control-custom numeric-input" 
-                                                   value="{{ number_format($ingreso->avance_obra_estimacion ?? 0, 2) }}"
-                                                   readonly>
-                                            <span class="input-group-text">%</span>
-                                        </div>
-                                    </div>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">Avance Obra Estimación (%)</div>
+                                    <p class="info-text info-value">{{ number_format($ingreso->avance_obra_estimacion ?? 0, 2) }}%</p>
                                 </div>
                                 
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Avance Real (%)
-                                        </label>
-                                        <div class="input-group input-group-custom">
-                                            <input type="text" 
-                                                   class="form-control form-control-custom numeric-input" 
-                                                   value="{{ number_format($ingreso->avance_obra_real ?? 0, 2) }}"
-                                                   readonly>
-                                            <span class="input-group-text">%</span>
-                                        </div>
-                                    </div>
+                                <div class="info-item">
+                                    <div class="info-label">Avance Obra Real (%)</div>
+                                    <p class="info-text info-value">{{ number_format($ingreso->avance_obra_real ?? 0, 2) }}%</p>
                                 </div>
                                 
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Avance Financiero (%)
-                                        </label>
-                                        <div class="input-group input-group-custom">
-                                            <input type="text" 
-                                                   class="form-control form-control-custom numeric-input" 
-                                                   value="{{ number_format($ingreso->porcentaje_avance_financiero ?? 0, 2) }}"
-                                                   readonly>
-                                            <span class="input-group-text">%</span>
-                                        </div>
-                                    </div>
+                                <div class="info-item">
+                                    <div class="info-label">% Avance Financiero</div>
+                                    <p class="info-text info-value">{{ number_format($ingreso->porcentaje_avance_financiero ?? 0, 2) }}%</p>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Sección 8: Por Facturar -->
+                        <!-- Sección 8: Estado -->
                         <div class="form-section">
                             <h5 class="section-title">
-                                <i class="fas fa-file-invoice me-2"></i>
-                                Por Facturar
+                                <i class="fas fa-info-circle me-2"></i>
+                                Estado
                             </h5>
                             
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Por Facturar
-                                        </label>
-                                        <div class="input-group input-group-custom">
-                                            <span class="input-group-text">$</span>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom numeric-input" 
-                                                   value="{{ number_format($ingreso->por_facturar ?? 0, 2) }}"
-                                                   readonly>
-                                        </div>
-                                    </div>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">Status</div>
+                                    <p class="info-text info-value">{{ ucfirst($ingreso->status ?? 'No especificado') }}</p>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">Fecha Creación</div>
+                                    <p class="info-text info-value">
+                                        {{ $ingreso->created_at ? date('d/m/Y H:i', strtotime($ingreso->created_at)) : 'No especificado' }}
+                                    </p>
                                 </div>
                             </div>
                         </div>
                         
                         <!-- Botones de acción -->
-<div class="d-flex justify-content-between pt-3 border-top">
-    <a href="{{ route('ingresos.index') }}" class="btn btn-outline-secondary">
-        <i class="fas fa-arrow-left me-1"></i> Volver al listado
-    </a>
-    
-    @if($ingreso->verificado == 1)
-    <div>
-        <!-- Botón Rechazar -->
-        <button type="button" class="btn btn-outline-danger me-2" 
-                data-bs-toggle="modal" 
-                data-bs-target="#rechazarModal">
-            <i class="fas fa-times me-1"></i> Rechazar
-        </button>
-        
-        <!-- Botón Verificar -->
-        <button type="button" class="btn btn-success" 
-                data-bs-toggle="modal" 
-                data-bs-target="#verificarModal">
-            <i class="fas fa-check me-1"></i> Verificar
-        </button>
-    </div>
-    @endif
-</div>
+                        <div class="d-flex justify-content-between pt-3 border-top">
+                            <a href="{{ route('aingresos.index') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Volver al listado
+                            </a>
+                            
+                            @if($ingreso->verificado == 1)
+                            <div>
+                                <!-- Botón Rechazar -->
+                                <button type="button" class="btn btn-outline-danger me-2" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#rechazarModal">
+                                    <i class="fas fa-times me-1"></i> Rechazar
+                                </button>
+                                
+                                <!-- Botón Verificar -->
+                                <button type="button" class="btn btn-success" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#verificarModal">
+                                    <i class="fas fa-check me-1"></i> Verificar
+                                </button>
+                            </div>
+                            @endif
+                        </div>
 
                     </div>
                 </div>
@@ -779,7 +552,7 @@
                         <i class="fas fa-times-circle fa-3x text-danger mb-3"></i>
                         <h5 class="mb-2">¿Rechazar este ingreso?</h5>
                         <p class="text-muted mb-0">
-                            Estimación: <strong>{{ $ingreso->estimacion ?? 'N/A' }}</strong>
+                            Estimación: <strong>{{ $ingreso->no_estimacion ?? 'N/A' }}</strong>
                         </p>
                         <p class="text-danger small mt-2">
                             <i class="fas fa-info-circle me-1"></i>
@@ -820,7 +593,7 @@
                         <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
                         <h5 class="mb-2">¿Verificar este ingreso?</h5>
                         <p class="text-muted mb-0">
-                            Estimación: <strong>{{ $ingreso->estimacion ?? 'N/A' }}</strong>
+                            Estimación: <strong>{{ $ingreso->no_estimacion ?? 'N/A' }}</strong>
                         </p>
                         <p class="text-success small mt-2">
                             <i class="fas fa-info-circle me-1"></i>

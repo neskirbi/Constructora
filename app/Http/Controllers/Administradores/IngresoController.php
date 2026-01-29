@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Administradores;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB; 
 use App\Models\Ingreso;
 use App\Models\Contrato;
 use Illuminate\Http\Request;
@@ -19,27 +20,33 @@ class IngresoController extends Controller
         // Obtener parámetros de búsqueda
         $search = $request->input('search');
         
-        // Construir consulta base con relación a contrato
-        $query = Ingreso::with('contrato');
+        // Construir consulta base SIN with()
+        $query = Ingreso::query();
         
         // Aplicar búsqueda si existe
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('estimacion', 'like', "%{$search}%")
-                  ->orWhere('factura', 'like', "%{$search}%")
-                  ->orWhere('area', 'like', "%{$search}%")
-                  ->orWhereHas('contrato', function($q2) use ($search) {
-                      $q2->where('contrato_no', 'like', "%{$search}%")
-                         ->orWhere('obra', 'like', "%{$search}%")
-                         ->orWhere('cliente', 'like', "%{$search}%");
-                  });
+                // Buscar en campos directos de ingresos (actualizados a los nuevos nombres)
+                $q->where('no_estimacion', 'like', "%{$search}%")
+                ->orWhere('factura', 'like', "%{$search}%")
+                ->orWhere('status', 'like', "%{$search}%")
+                // Buscar en contratos usando join manual
+                ->orWhereExists(function ($subquery) use ($search) {
+                    $subquery->select(DB::raw(1))
+                            ->from('contratos')
+                            ->whereColumn('contratos.id', 'ingresos.id_contrato')
+                            ->where(function ($q2) use ($search) {
+                                $q2->where('contratos.contrato_no', 'like', "%{$search}%")
+                                    ->orWhere('contratos.obra', 'like', "%{$search}%")
+                                    ->orWhere('contratos.cliente', 'like', "%{$search}%");
+                            });
+                });
             });
         }
         
         // Obtener los ingresos con paginación
-        $ingresos = $query->orderBy('fecha_elaboracion', 'desc')
-                         ->orderBy('created_at', 'desc')
-                         ->paginate(15);
+        $ingresos = $query->orderBy('created_at', 'desc')
+                        ->paginate(15);
         
         return view('administradores.ingresos.index', compact('ingresos'));
     }
@@ -152,14 +159,17 @@ class IngresoController extends Controller
      * @param  string  $id
      * @return \Illuminate\Http\Response
      */
-    function show($id)
+   function show($id)
     {
-        $ingreso = Ingreso::with('contrato')->findOrFail($id);
+        $ingreso = Ingreso::findOrFail($id);
+        
+        // Obtener el contrato manualmente (sin relación)
+        $contrato = Contrato::where('id', $ingreso->id_contrato)->first();
         
         // Obtener contratos para el select en caso de edición
         $contratos = Contrato::orderBy('contrato_no', 'asc')->get();
         
-        return view('administradores.ingresos.show', compact('ingreso', 'contratos'));
+        return view('administradores.ingresos.show', compact('ingreso', 'contrato', 'contratos'));
     }
 
     /**

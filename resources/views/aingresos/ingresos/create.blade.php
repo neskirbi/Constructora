@@ -166,7 +166,7 @@
                         <form action="{{ route('ingresos.store') }}" method="POST" id="ingresoForm">
                             @csrf
                             
-                            <!-- Sección 1: Selección de Contrato -->
+                            <!-- Sección 1: Información del Contrato -->
                             <div class="form-section">
                                 <h5 class="section-title">
                                     <i class="fas fa-file-contract me-2"></i>
@@ -197,50 +197,26 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            
-                            <!-- Sección 2: Información Básica del Ingreso -->
-                            <div class="form-section">
-                                <h5 class="section-title">
-                                    <i class="fas fa-info-circle me-2"></i>
-                                    Información Básica
-                                </h5>
                                 
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="estimacion" class="form-label-custom required-label">
-                                                Estimación No.
+                                            <label for="no_estimacion" class="form-label-custom required-label">
+                                                No. de Estimación
                                             </label>
                                             <input type="text" 
                                                    class="form-control form-control-custom" 
-                                                   id="estimacion" 
-                                                   name="estimacion" 
-                                                   value="{{ old('estimacion') }}"
+                                                   id="no_estimacion" 
+                                                   name="no_estimacion" 
+                                                   value="{{ old('no_estimacion') }}"
                                                    placeholder="Ej: EST-001"
                                                    required>
-                                            @error('estimacion')
+                                            @error('no_estimacion')
                                                 <div class="text-danger small mt-1">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
                                     
-                                    <div class="col-md-6">
-                                        <div class="form-group-custom">
-                                            <label for="area" class="form-label-custom">
-                                                Área
-                                            </label>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom" 
-                                                   id="area" 
-                                                   name="area" 
-                                                   value="{{ old('area') }}"
-                                                   placeholder="Ej: Administración, Obra Civil">
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
                                             <label for="periodo_del" class="form-label-custom">
@@ -253,7 +229,9 @@
                                                    value="{{ old('periodo_del') }}">
                                         </div>
                                     </div>
-                                    
+                                </div>
+                                
+                                <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
                                             <label for="periodo_al" class="form-label-custom">
@@ -269,7 +247,7 @@
                                 </div>
                             </div>
                             
-                            <!-- Sección 3: Montos de la Estimación -->
+                            <!-- Sección 2: Montos de la Estimación -->
                             <div class="form-section">
                                 <h5 class="section-title">
                                     <i class="fas fa-calculator me-2"></i>
@@ -279,16 +257,16 @@
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="importe_de_estimacion" class="form-label-custom">
+                                            <label for="importe_estimacion" class="form-label-custom">
                                                 Importe de Estimación
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input" 
-                                                       id="importe_de_estimacion" 
-                                                       name="importe_de_estimacion" 
-                                                       value="{{ old('importe_de_estimacion') }}"
+                                                       id="importe_estimacion" 
+                                                       name="importe_estimacion" 
+                                                       value="{{ old('importe_estimacion') }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -318,7 +296,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
                                             <label for="total_estimacion_con_iva" class="form-label-custom">
-                                                Total con IVA
+                                                Total Estimación con IVA
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
@@ -334,20 +312,12 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            
-                            <!-- Sección 4: Deducciones -->
-                            <div class="form-section">
-                                <h5 class="section-title">
-                                    <i class="fas fa-minus-circle me-2"></i>
-                                    Deducciones
-                                </h5>
                                 
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
                                             <label for="retenciones_o_sanciones" class="form-label-custom">
-                                                Retenciones/Sanciones
+                                                Retenciones o Sanciones
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
@@ -365,16 +335,111 @@
                                     
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="cargos_adicionales_35_porciento" class="form-label-custom">
-                                                Cargos Adicionales 35%
+                                            <label for="estimado_menos_deducciones" class="form-label-custom">
+                                                Estimado menos Deducciones
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input" 
-                                                       id="cargos_adicionales_35_porciento" 
-                                                       name="cargos_adicionales_35_porciento" 
-                                                       value="{{ old('cargos_adicionales_35_porciento') }}"
+                                                       id="estimado_menos_deducciones" 
+                                                       name="estimado_menos_deducciones" 
+                                                       value="{{ old('estimado_menos_deducciones') }}"
+                                                       step="0.01"
+                                                       placeholder="0.00">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sección 3: Avance de Obra -->
+                            <div class="form-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-chart-line me-2"></i>
+                                    Avance de Obra
+                                </h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="avance_obra_estimacion" class="form-label-custom">
+                                                Avance Obra Estimación (%)
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input" 
+                                                       id="avance_obra_estimacion" 
+                                                       name="avance_obra_estimacion" 
+                                                       value="{{ old('avance_obra_estimacion') }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0">
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="avance_obra_real" class="form-label-custom">
+                                                Avance Obra Real (%)
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input" 
+                                                       id="avance_obra_real" 
+                                                       name="avance_obra_real" 
+                                                       value="{{ old('avance_obra_real') }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0">
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="porcentaje_avance_financiero" class="form-label-custom">
+                                                % Avance Financiero
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input" 
+                                                       id="porcentaje_avance_financiero" 
+                                                       name="porcentaje_avance_financiero" 
+                                                       value="{{ old('porcentaje_avance_financiero') }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0">
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sección 4: Deducciones Específicas -->
+                            <div class="form-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-minus-circle me-2"></i>
+                                    Deducciones Específicas
+                                </h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="cargos_adicionales_3_5" class="form-label-custom">
+                                                3.5% Cargos Adicionales
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input" 
+                                                       id="cargos_adicionales_3_5" 
+                                                       name="cargos_adicionales_3_5" 
+                                                       value="{{ old('cargos_adicionales_3_5') }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -385,7 +450,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
                                             <label for="retencion_5_al_millar" class="form-label-custom">
-                                                Retención 5‰
+                                                Retención 5 al Millar
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
@@ -400,28 +465,28 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                
-                                <div class="row">
+                                    
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="sancion_atraso_presentacion_estimacion" class="form-label-custom">
-                                                Sanción Atraso Presentación
+                                            <label for="sancion_atrazo_presentacion_estimacion" class="form-label-custom">
+                                                Sanción Atraso Presentación Estimación
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input" 
-                                                       id="sancion_atraso_presentacion_estimacion" 
-                                                       name="sancion_atraso_presentacion_estimacion" 
-                                                       value="{{ old('sancion_atraso_presentacion_estimacion') }}"
+                                                       id="sancion_atrazo_presentacion_estimacion" 
+                                                       name="sancion_atrazo_presentacion_estimacion" 
+                                                       value="{{ old('sancion_atrazo_presentacion_estimacion') }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
                                             </div>
                                         </div>
                                     </div>
-                                    
+                                </div>
+                                
+                                <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
                                             <label for="sancion_atraso_de_obra" class="form-label-custom">
@@ -444,7 +509,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
                                             <label for="sancion_por_obra_mal_ejecutada" class="form-label-custom">
-                                                Sanción Obra Mal Ejecutada
+                                                Sanción por Obra Mal Ejecutada
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
@@ -459,28 +524,28 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                
-                                <div class="row">
+                                    
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="retencion_por_atraso_en_programa_de_obra" class="form-label-custom">
-                                                Retención Atraso Programa
+                                            <label for="retencion_por_atraso_en_programa_obra" class="form-label-custom">
+                                                Retención por Atraso en Programa de Obra
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input" 
-                                                       id="retencion_por_atraso_en_programa_de_obra" 
-                                                       name="retencion_por_atraso_en_programa_de_obra" 
-                                                       value="{{ old('retencion_por_atraso_en_programa_de_obra') }}"
+                                                       id="retencion_por_atraso_en_programa_obra" 
+                                                       name="retencion_por_atraso_en_programa_obra" 
+                                                       value="{{ old('retencion_por_atraso_en_programa_obra') }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
                                             </div>
                                         </div>
                                     </div>
-                                    
+                                </div>
+                                
+                                <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
                                             <label for="amortizacion_anticipo" class="form-label-custom">
@@ -503,7 +568,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
                                             <label for="amortizacion_con_iva" class="form-label-custom">
-                                                Amortización con IVA
+                                                Amortización con I.V.A.
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
@@ -518,9 +583,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                
-                                <div class="row">
+                                    
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
                                             <label for="total_deducciones" class="form-label-custom">
@@ -539,39 +602,21 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="estimado_menos_deducciones" class="form-label-custom">
-                                                Estimado - Deducciones
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="estimado_menos_deducciones" 
-                                                       name="estimado_menos_deducciones" 
-                                                       value="{{ old('estimado_menos_deducciones') }}"
-                                                       step="0.01"
-                                                       placeholder="0.00">
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                             
-                            <!-- Sección 5: Facturación y Cobro -->
+                            <!-- Sección 5: Facturación -->
                             <div class="form-section">
                                 <h5 class="section-title">
                                     <i class="fas fa-file-invoice-dollar me-2"></i>
-                                    Facturación y Cobro
+                                    Facturación
                                 </h5>
                                 
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
                                             <label for="factura" class="form-label-custom">
-                                                No. de Factura
+                                                Factura
                                             </label>
                                             <input type="text" 
                                                    class="form-control form-control-custom" 
@@ -599,19 +644,6 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
-                                            <label for="fecha_elaboracion" class="form-label-custom">
-                                                Fecha Elaboración
-                                            </label>
-                                            <input type="date" 
-                                                   class="form-control form-control-custom" 
-                                                   id="fecha_elaboracion" 
-                                                   name="fecha_elaboracion" 
-                                                   value="{{ old('fecha_elaboracion', date('Y-m-d')) }}">
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-6">
-                                        <div class="form-group-custom">
                                             <label for="importe_facturado" class="form-label-custom">
                                                 Importe Facturado
                                             </label>
@@ -631,11 +663,11 @@
                                 </div>
                             </div>
                             
-                            <!-- Sección 6: Líquidos y Estado -->
+                            <!-- Sección 6: Cobros -->
                             <div class="form-section">
                                 <h5 class="section-title">
                                     <i class="fas fa-money-bill-wave me-2"></i>
-                                    Líquidos y Estado
+                                    Cobros
                                 </h5>
                                 
                                 <div class="row">
@@ -679,8 +711,23 @@
                                     
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
+                                            <label for="fecha_cobro" class="form-label-custom">
+                                                Fecha Cobro
+                                            </label>
+                                            <input type="date" 
+                                                   class="form-control form-control-custom" 
+                                                   id="fecha_cobro" 
+                                                   name="fecha_cobro" 
+                                                   value="{{ old('fecha_cobro') }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
                                             <label for="por_cobrar" class="form-label-custom">
-                                                Por Cobrar
+                                                POR COBRAR
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
@@ -694,109 +741,11 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="fecha_cobro" class="form-label-custom">
-                                                Fecha de Cobro
-                                            </label>
-                                            <input type="date" 
-                                                   class="form-control form-control-custom" 
-                                                   id="fecha_cobro" 
-                                                   name="fecha_cobro" 
-                                                   value="{{ old('fecha_cobro') }}">
-                                        </div>
-                                    </div>
-                                    
-                                   
-                                    
-                                </div>
-                            </div>
-                            
-                            <!-- Sección 7: Avance de Obra -->
-                            <div class="form-section">
-                                <h5 class="section-title">
-                                    <i class="fas fa-chart-line me-2"></i>
-                                    Avance de Obra
-                                </h5>
-                                
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="avance_obra_estimacion" class="form-label-custom">
-                                                Avance Estimación (%)
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="avance_obra_estimacion" 
-                                                       name="avance_obra_estimacion" 
-                                                       value="{{ old('avance_obra_estimacion') }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0"
-                                                       max="100">
-                                                <span class="input-group-text">%</span>
-                                            </div>
-                                        </div>
-                                    </div>
                                     
                                     <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="avance_obra_real" class="form-label-custom">
-                                                Avance Real (%)
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="avance_obra_real" 
-                                                       name="avance_obra_real" 
-                                                       value="{{ old('avance_obra_real') }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0"
-                                                       max="100">
-                                                <span class="input-group-text">%</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="porcentaje_avance_financiero" class="form-label-custom">
-                                                Avance Financiero (%)
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="porcentaje_avance_financiero" 
-                                                       name="porcentaje_avance_financiero" 
-                                                       value="{{ old('porcentaje_avance_financiero') }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0"
-                                                       max="100">
-                                                <span class="input-group-text">%</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Sección 8: Por Facturar -->
-                            <div class="form-section">
-                                <h5 class="section-title">
-                                    <i class="fas fa-file-invoice me-2"></i>
-                                    Por Facturar
-                                </h5>
-                                
-                                <div class="row">
-                                    <div class="col-md-6">
                                         <div class="form-group-custom">
                                             <label for="por_facturar" class="form-label-custom">
-                                                Por Facturar
+                                                POR FACTURAR
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
@@ -808,6 +757,49 @@
                                                        step="0.01"
                                                        placeholder="0.00">
                                             </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="por_estimar" class="form-label-custom">
+                                                Por Estimar
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input" 
+                                                       id="por_estimar" 
+                                                       name="por_estimar" 
+                                                       value="{{ old('por_estimar') }}"
+                                                       step="0.01"
+                                                       placeholder="0.00">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Sección 7: Estado -->
+                            <div class="form-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Estado
+                                </h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label for="status" class="form-label-custom">
+                                                Status
+                                            </label>
+                                            <select class="form-control form-control-custom" 
+                                                    id="status" 
+                                                    name="status">
+                                                <option value="">Seleccionar status...</option>
+                                                <option value="pagado" {{ old('status') == 'pagado' ? 'selected' : '' }}>Pagado</option>
+                                                <option value="en_tramite" {{ old('status') == 'en_tramite' ? 'selected' : '' }}>En Trámite</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -837,29 +829,71 @@
     </div>
 
     @include('footer')
-    
     <script>
-        // Validar fechas del periodo
-        document.addEventListener('DOMContentLoaded', function() {
-            const periodoDel = document.getElementById('periodo_del');
-            const periodoAl = document.getElementById('periodo_al');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Campos de DEDUCCIÓN (sanciones/retrociones)
+        const deduccionFields = [
+            'retenciones_o_sanciones',
+            'cargos_adicionales_3_5',
+            'retencion_5_al_millar',
+            'sancion_atrazo_presentacion_estimacion',
+            'sancion_atraso_de_obra',
+            'sancion_por_obra_mal_ejecutada',
+            'retencion_por_atraso_en_programa_obra'
+            // NOTA: amortizacion_anticipo y amortizacion_con_iva NO se incluyen
+            // porque no son deducciones por incumplimiento
+        ];
+
+        // Campos de AMORTIZACIÓN (parte del pago normal)
+        const amortizacionFields = [
+            'amortizacion_anticipo',
+            'amortizacion_con_iva'
+        ];
+
+        // Campo total de deducciones (bloqueado)
+        const totalDeduccionesInput = document.getElementById('total_deducciones');
+        
+        // Hacer el campo de total de deducciones de solo lectura
+        if (totalDeduccionesInput) {
+            totalDeduccionesInput.readOnly = true;
+            totalDeduccionesInput.style.backgroundColor = '#f8f9fa';
+            totalDeduccionesInput.style.cursor = 'not-allowed';
+        }
+
+        // Función para calcular el total de DEDUCCIONES (solo sanciones/retrociones)
+        function calcularTotalDeducciones() {
+            let total = 0;
             
-            if (periodoDel && periodoAl) {
-                periodoDel.addEventListener('change', function() {
-                    if (this.value && periodoAl.value && this.value > periodoAl.value) {
-                        alert('La fecha "Del" no puede ser posterior a la fecha "Al"');
-                        this.value = '';
+            deduccionFields.forEach(fieldName => {
+                const field = document.getElementById(fieldName);
+                if (field && field.value) {
+                    total += parseFloat(field.value) || 0;
+                }
+            });
+            
+            if (totalDeduccionesInput) {
+                // Formatear a 2 decimales
+                totalDeduccionesInput.value = total.toFixed(2);
+            }
+        }
+
+        // Agregar event listeners a los campos de DEDUCCIÓN
+        deduccionFields.forEach(fieldName => {
+            const field = document.getElementById(fieldName);
+            if (field) {
+                field.addEventListener('input', calcularTotalDeducciones);
+                field.addEventListener('blur', function() {
+                    if (this.value) {
+                        this.value = parseFloat(this.value).toFixed(2);
                     }
-                });
-                
-                periodoAl.addEventListener('change', function() {
-                    if (this.value && periodoDel.value && this.value < periodoDel.value) {
-                        alert('La fecha "Al" no puede ser anterior a la fecha "Del"');
-                        this.value = '';
-                    }
+                    calcularTotalDeducciones();
                 });
             }
         });
-    </script>
+
+        // Calcular inicialmente si hay valores precargados
+        calcularTotalDeducciones();
+    });
+</script>
 </body>
 </html>
