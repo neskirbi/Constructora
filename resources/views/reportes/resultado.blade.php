@@ -20,6 +20,18 @@
         .status-verificado { background-color: #d4edda; color: #155724; }
         .status-pendiente { background-color: #fff3cd; color: #856404; }
         .status-rechazado { background-color: #f8d7da; color: #721c24; }
+        
+        /* Estilos para valores monetarios */
+        .monto {
+            text-align: right;
+            font-family: monospace;
+        }
+        .monto-positivo {
+            color: #198754;
+        }
+        .monto-negativo {
+            color: #dc3545;
+        }
     </style>
 </head>
 <body>
@@ -57,7 +69,7 @@
                         </div>
                         
                         <div class="card-body">
-                            <!-- Resumen -->
+                            <!-- Resumen mejorado -->
                             <div class="row mb-4">
                                 <div class="col-md-3">
                                     <div class="card border-left-primary shadow h-100 py-2">
@@ -105,14 +117,14 @@
                                             <div class="row no-gutters align-items-center">
                                                 <div class="col mr-2">
                                                     <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                                        Total con IVA
+                                                        Importe Facturado
                                                     </div>
                                                     <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                        ${{ number_format($totales['total_con_iva'], 2) }}
+                                                        ${{ number_format($totales['importe_facturado'], 2) }}
                                                     </div>
                                                 </div>
                                                 <div class="col-auto">
-                                                    <i class="fas fa-calculator fa-2x text-gray-300"></i>
+                                                    <i class="fas fa-file-invoice-dollar fa-2x text-gray-300"></i>
                                                 </div>
                                             </div>
                                         </div>
@@ -125,10 +137,10 @@
                                             <div class="row no-gutters align-items-center">
                                                 <div class="col mr-2">
                                                     <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                                        Líquido a Cobrar
+                                                        Líquido Cobrado
                                                     </div>
                                                     <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                        ${{ number_format($totales['liquido_cobrar'], 2) }}
+                                                        ${{ number_format($totales['liquido_cobrado'], 2) }}
                                                     </div>
                                                 </div>
                                                 <div class="col-auto">
@@ -155,6 +167,7 @@
                                             <th>Importe Estimación</th>
                                             <th>IVA</th>
                                             <th>Total con IVA</th>
+                                            <th>Importe Facturado</th>
                                             <th>Líquido a Cobrar</th>
                                             <th>Fecha Cobro</th>
                                             <th>Estado</th>
@@ -163,26 +176,33 @@
                                     <tbody>
                                         @foreach($ingresos as $ingreso)
                                         <tr>
-                                            <td>{{ $ingreso->contrato_no }}</td>
-                                            <td>{{ $ingreso->obra }}</td>
-                                            <td>{{ $ingreso->cliente }}</td>
-                                            <td>{{ $ingreso->estimacion }}</td>
+                                            <td>{{ $ingreso->contrato_no ?? 'N/A' }}</td>
+                                            <td>{{ $ingreso->obra ?? 'N/A' }}</td>
+                                            <td>{{ $ingreso->cliente ?? 'Sin cliente' }}</td>
+                                            <td>{{ $ingreso->no_estimacion ?? 'N/A' }}</td>
                                             <td>
-                                                {{ date('d/m/Y', strtotime($ingreso->periodo_del)) }} -<br>
-                                                {{ date('d/m/Y', strtotime($ingreso->periodo_al)) }}
+                                                @if($ingreso->periodo_del && $ingreso->periodo_al)
+                                                    {{ date('d/m/Y', strtotime($ingreso->periodo_del)) }} -<br>
+                                                    {{ date('d/m/Y', strtotime($ingreso->periodo_al)) }}
+                                                @else
+                                                    <span class="text-muted">No especificado</span>
+                                                @endif
                                             </td>
                                             <td>
                                                 @if($ingreso->factura)
                                                     {{ $ingreso->factura }}<br>
+                                                    @if($ingreso->fecha_factura)
                                                     <small>{{ date('d/m/Y', strtotime($ingreso->fecha_factura)) }}</small>
+                                                    @endif
                                                 @else
                                                     <span class="text-muted">Sin factura</span>
                                                 @endif
                                             </td>
-                                            <td>${{ number_format($ingreso->importe_de_estimacion, 2) }}</td>
-                                            <td>${{ number_format($ingreso->iva, 2) }}</td>
-                                            <td>${{ number_format($ingreso->total_estimacion_con_iva, 2) }}</td>
-                                            <td class="text-success">${{ number_format($ingreso->liquido_a_cobrar, 2) }}</td>
+                                            <td class="monto">${{ number_format($ingreso->importe_estimacion ?? 0, 2) }}</td>
+                                            <td class="monto">${{ number_format($ingreso->iva ?? 0, 2) }}</td>
+                                            <td class="monto monto-positivo">${{ number_format($ingreso->total_estimacion_con_iva ?? 0, 2) }}</td>
+                                            <td class="monto">${{ number_format($ingreso->importe_facturado ?? 0, 2) }}</td>
+                                            <td class="monto monto-positivo">${{ number_format($ingreso->liquido_a_cobrar ?? 0, 2) }}</td>
                                             <td>
                                                 @if($ingreso->fecha_cobro)
                                                     {{ date('d/m/Y', strtotime($ingreso->fecha_cobro)) }}
@@ -211,10 +231,11 @@
                                         <!-- Fila de totales -->
                                         <tr class="total-row">
                                             <td colspan="6" class="text-end"><strong>TOTALES:</strong></td>
-                                            <td><strong>${{ number_format($totales['importe_estimacion'], 2) }}</strong></td>
-                                            <td><strong>${{ number_format($totales['iva'], 2) }}</strong></td>
-                                            <td><strong>${{ number_format($totales['total_con_iva'], 2) }}</strong></td>
-                                            <td><strong>${{ number_format($totales['liquido_cobrar'], 2) }}</strong></td>
+                                            <td class="monto"><strong>${{ number_format($totales['importe_estimacion'], 2) }}</strong></td>
+                                            <td class="monto"><strong>${{ number_format($totales['iva'], 2) }}</strong></td>
+                                            <td class="monto"><strong>${{ number_format($totales['total_con_iva'], 2) }}</strong></td>
+                                            <td class="monto"><strong>${{ number_format($totales['importe_facturado'], 2) }}</strong></td>
+                                            <td class="monto"><strong>${{ number_format($totales['liquido_cobrar'], 2) }}</strong></td>
                                             <td colspan="2"></td>
                                         </tr>
                                     </tbody>
@@ -253,9 +274,9 @@
                                                 </button>
                                             </form>
                                             
-                                            <!--<button type="button" class="btn btn-primary" onclick="window.print()">
+                                            <button type="button" class="btn btn-primary" onclick="window.print()">
                                                 <i class="fas fa-print me-1"></i> Imprimir
-                                            </button>-->
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -269,5 +290,24 @@
     </div>
 
     @include('footer')
+    
+    <script>
+        // Función para formatear números como moneda
+        function formatCurrency(value) {
+            return '$' + parseFloat(value).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+        
+        // Aplicar formato a todas las celdas con clase 'monto'
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ya están formateados en PHP, solo agregamos validación
+            const montos = document.querySelectorAll('.monto');
+            montos.forEach(function(monto) {
+                const text = monto.textContent.trim();
+                if (text && !text.startsWith('$')) {
+                    monto.textContent = formatCurrency(text);
+                }
+            });
+        });
+    </script>
 </body>
 </html>
