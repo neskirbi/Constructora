@@ -141,9 +141,9 @@
             <!-- Área de contenido -->
             <div class="content-area">
                 <!-- Título y botón -->
-                  <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                     
+                       
                     </div>
                     <div>
                         <a href="{{ route('acontratos.index') }}" class="btn btn-outline-secondary">
@@ -331,7 +331,7 @@
                                                     <div class="mb-2">
                                                         <label class="form-label-custom small">Latitud:</label>
                                                         <div class="info-value @if(empty($contrato->latitud)) info-value-empty @endif">
-                                                            {{ $contrato->latitud ?: 'No especificada' }}
+                                                            {{ $contrato->latitud ? number_format($contrato->latitud, 8) : 'No especificada' }}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -339,7 +339,7 @@
                                                     <div class="mb-2">
                                                         <label class="form-label-custom small">Longitud:</label>
                                                         <div class="info-value @if(empty($contrato->longitud)) info-value-empty @endif">
-                                                            {{ $contrato->longitud ?: 'No especificada' }}
+                                                            {{ $contrato->longitud ? number_format($contrato->longitud, 8) : 'No especificada' }}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -356,8 +356,8 @@
                                         <label class="form-label-custom">
                                             Calle y Número
                                         </label>
-                                        <div class="info-value @if(empty($contrato->calle_y_numero)) info-value-empty @endif">
-                                            {{ $contrato->calle_y_numero ?: 'No especificado' }}
+                                        <div class="info-value @if(empty($contrato->calle_numero)) info-value-empty @endif">
+                                            {{ $contrato->calle_numero ?: 'No especificado' }}
                                         </div>
                                     </div>
                                 </div>
@@ -380,8 +380,8 @@
                                         <label class="form-label-custom">
                                             Municipio/Alcaldía
                                         </label>
-                                        <div class="info-value @if(empty($contrato->municipio)) info-value-empty @endif">
-                                            {{ $contrato->municipio ?: 'No especificado' }}
+                                        <div class="info-value @if(empty($contrato->alcaldia_municipio)) info-value-empty @endif">
+                                            {{ $contrato->alcaldia_municipio ?: 'No especificado' }}
                                         </div>
                                     </div>
                                 </div>
@@ -389,10 +389,10 @@
                                 <div class="col-md-6">
                                     <div class="form-group-custom">
                                         <label class="form-label-custom">
-                                            Delegación/Zona
+                                            Entidad
                                         </label>
-                                        <div class="info-value @if(empty($contrato->delegacion)) info-value-empty @endif">
-                                            {{ $contrato->delegacion ?: 'No especificado' }}
+                                        <div class="info-value @if(empty($contrato->entidad)) info-value-empty @endif">
+                                            {{ $contrato->entidad ?: 'No especificado' }}
                                         </div>
                                     </div>
                                 </div>
@@ -423,21 +423,21 @@
                             </div>
                         </div>
                         
-                        <!-- Sección 4: Montos del Contrato -->
+                        <!-- Sección 4: Montos Financieros -->
                         <div class="form-section">
                             <h5 class="section-title">
                                 <i class="fas fa-dollar-sign me-2"></i>
-                                Montos del Contrato
+                                Montos Financieros
                             </h5>
                             
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group-custom">
                                         <label class="form-label-custom">
-                                            Importe Contrato
+                                            Concepto
                                         </label>
-                                        <div class="info-value @if(empty($contrato->importe_contrato)) info-value-empty @endif">
-                                            ${{ number_format($contrato->importe_contrato, 2) ?: '0.00' }}
+                                        <div class="info-value @if(empty($contrato->concepto)) info-value-empty @endif">
+                                            {{ $contrato->concepto ?: 'No especificado' }}
                                         </div>
                                     </div>
                                 </div>
@@ -445,10 +445,10 @@
                                 <div class="col-md-4">
                                     <div class="form-group-custom">
                                         <label class="form-label-custom">
-                                            IVA Contrato
+                                            Subtotal
                                         </label>
-                                        <div class="info-value @if(empty($contrato->iva_contrato)) info-value-empty @endif">
-                                            ${{ number_format($contrato->iva_contrato, 2) ?: '0.00' }}
+                                        <div class="info-value @if(empty($contrato->subtotal)) info-value-empty @endif">
+                                            ${{ number_format($contrato->subtotal ?? 0, 2) }}
                                         </div>
                                     </div>
                                 </div>
@@ -456,31 +456,23 @@
                                 <div class="col-md-4">
                                     <div class="form-group-custom">
                                         <label class="form-label-custom">
-                                            Total Contrato
+                                            IVA
                                         </label>
-                                        <div class="info-value @if(empty($contrato->total_contrato)) info-value-empty @endif">
-                                            ${{ number_format($contrato->total_contrato, 2) ?: '0.00' }}
+                                        <div class="info-value @if(empty($contrato->iva)) info-value-empty @endif">
+                                            ${{ number_format($contrato->iva ?? 0, 2) }}
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <!-- Sección 5: Montos de Convenio -->
-                        <div class="form-section">
-                            <h5 class="section-title">
-                                <i class="fas fa-handshake me-2"></i>
-                                Montos de Convenio
-                            </h5>
                             
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group-custom">
                                         <label class="form-label-custom">
-                                            Importe Convenio
+                                            Total
                                         </label>
-                                        <div class="info-value @if(empty($contrato->importe_convenio)) info-value-empty @endif">
-                                            ${{ number_format($contrato->importe_convenio, 2) ?: '0.00' }}
+                                        <div class="info-value @if(empty($contrato->total)) info-value-empty @endif">
+                                            ${{ number_format($contrato->total ?? 0, 2) }}
                                         </div>
                                     </div>
                                 </div>
@@ -488,71 +480,17 @@
                                 <div class="col-md-4">
                                     <div class="form-group-custom">
                                         <label class="form-label-custom">
-                                            IVA Convenio
+                                            Monto Anticipo
                                         </label>
-                                        <div class="info-value @if(empty($contrato->iva_convenio)) info-value-empty @endif">
-                                            ${{ number_format($contrato->iva_convenio, 2) ?: '0.00' }}
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Total Convenio
-                                        </label>
-                                        <div class="info-value @if(empty($contrato->total_convenio)) info-value-empty @endif">
-                                            ${{ number_format($contrato->total_convenio, 2) ?: '0.00' }}
+                                        <div class="info-value @if(empty($contrato->monto_anticipo)) info-value-empty @endif">
+                                            ${{ number_format($contrato->monto_anticipo ?? 0, 2) }}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Sección 6: Montos Totales -->
-                        <div class="form-section">
-                            <h5 class="section-title">
-                                <i class="fas fa-calculator me-2"></i>
-                                Montos Totales
-                            </h5>
-                            
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Importe Total
-                                        </label>
-                                        <div class="info-value @if(empty($contrato->importe_total)) info-value-empty @endif">
-                                            ${{ number_format($contrato->importe_total, 2) ?: '0.00' }}
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            IVA Total
-                                        </label>
-                                        <div class="info-value @if(empty($contrato->iva_total)) info-value-empty @endif">
-                                            ${{ number_format($contrato->iva_total, 2) ?: '0.00' }}
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Total General
-                                        </label>
-                                        <div class="info-value @if(empty($contrato->total_total)) info-value-empty @endif">
-                                            ${{ number_format($contrato->total_total, 2) ?: '0.00' }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Sección 7: Información Adicional -->
+                        <!-- Sección 5: Información Adicional -->
                         <div class="form-section">
                             <h5 class="section-title">
                                 <i class="fas fa-sticky-note me-2"></i>
@@ -560,17 +498,6 @@
                             </h5>
                             
                             <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Anticipo
-                                        </label>
-                                        <div class="info-value @if(empty($contrato->anticipo)) info-value-empty @endif">
-                                            ${{ number_format($contrato->anticipo, 2) ?: '0.00' }}
-                                        </div>
-                                    </div>
-                                </div>
-                                
                                 <div class="col-md-6">
                                     <div class="form-group-custom">
                                         <label class="form-label-custom">
@@ -590,8 +517,8 @@
                                         <label class="form-label-custom">
                                             Fecha del Contrato
                                         </label>
-                                        <div class="info-value @if(empty($contrato->contrato_fecha)) info-value-empty @endif">
-                                            {{ $contrato->contrato_fecha ? $contrato->contrato_fecha->format('d/m/Y') : 'No especificada' }}
+                                        <div class="info-value @if(empty($contrato->fecha_contrato)) info-value-empty @endif">
+                                            {{ $contrato->fecha_contrato ? \Carbon\Carbon::parse($contrato->fecha_contrato)->format('d/m/Y') : 'No especificada' }}
                                         </div>
                                     </div>
                                 </div>
@@ -601,8 +528,8 @@
                                         <label class="form-label-custom">
                                             Fecha Inicio Obra
                                         </label>
-                                        <div class="info-value @if(empty($contrato->inicio_de_obra)) info-value-empty @endif">
-                                            {{ $contrato->inicio_de_obra ? $contrato->inicio_de_obra->format('d/m/Y') : 'No especificada' }}
+                                        <div class="info-value @if(empty($contrato->fecha_inicio_obra)) info-value-empty @endif">
+                                            {{ $contrato->fecha_inicio_obra ? \Carbon\Carbon::parse($contrato->fecha_inicio_obra)->format('d/m/Y') : 'No especificada' }}
                                         </div>
                                     </div>
                                 </div>
@@ -612,8 +539,8 @@
                                         <label class="form-label-custom">
                                             Fecha Terminación Obra
                                         </label>
-                                        <div class="info-value @if(empty($contrato->terminacion_de_obra)) info-value-empty @endif">
-                                            {{ $contrato->terminacion_de_obra ? $contrato->terminacion_de_obra->format('d/m/Y') : 'No especificada' }}
+                                        <div class="info-value @if(empty($contrato->fecha_terminacion_obra)) info-value-empty @endif">
+                                            {{ $contrato->fecha_terminacion_obra ? \Carbon\Carbon::parse($contrato->fecha_terminacion_obra)->format('d/m/Y') : 'No especificada' }}
                                         </div>
                                     </div>
                                 </div>
@@ -633,7 +560,7 @@
                             </div>
                         </div>
                         
-                        <!-- Sección 8: Datos Bancarios -->
+                        <!-- Sección 6: Datos Bancarios -->
                         <div class="form-section">
                             <h5 class="section-title">
                                 <i class="fas fa-university me-2"></i>
@@ -657,8 +584,8 @@
                                         <label class="form-label-custom">
                                             Número de Cuenta
                                         </label>
-                                        <div class="info-value @if(empty($contrato->n_cuenta)) info-value-empty @endif">
-                                            {{ $contrato->n_cuenta ?: 'No especificado' }}
+                                        <div class="info-value @if(empty($contrato->no_cuenta)) info-value-empty @endif">
+                                            {{ $contrato->no_cuenta ?: 'No especificado' }}
                                         </div>
                                     </div>
                                 </div>
@@ -701,6 +628,8 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        
                     </div>
                 </div>
             </div>
@@ -713,8 +642,8 @@
         // Variables globales para el mapa
         let map;
         let marker;
-        let defaultLat = {{ $contrato->latitud ?: '19.432608' }};
-        let defaultLng = {{ $contrato->longitud ?: '-99.133209' }};
+        let defaultLat = {{ $contrato->latitud ? number_format($contrato->latitud, 8) : '19.432608' }};
+        let defaultLng = {{ $contrato->longitud ? number_format($contrato->longitud, 8) : '-99.133209' }};
         
         // Función para inicializar el mapa
         function initMap() {
@@ -732,7 +661,7 @@
             });
             
             // Si hay coordenadas existentes, poner marcador
-            if (parseFloat(defaultLat) && parseFloat(defaultLng)) {
+            if ({{ $contrato->latitud ? 'true' : 'false' }} && {{ $contrato->longitud ? 'true' : 'false' }}) {
                 const existingLocation = { lat: parseFloat(defaultLat), lng: parseFloat(defaultLng) };
                 
                 marker = new google.maps.Marker({

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Aingresos;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB; 
 use App\Models\Contrato;
 use Illuminate\Http\Request;
 
@@ -388,6 +389,19 @@ class ContratoController extends Controller
         try {
             // Buscar el contrato
             $contrato = Contrato::findOrFail($id);
+            
+            // Verificar si existen registros en la tabla ingresos relacionados con este contrato
+            $tieneIngresos = DB::table('ingresos')
+                ->where('id_contrato', $id)
+                ->exists();
+            
+            if ($tieneIngresos) {
+                // Si hay ingresos relacionados, no se puede eliminar
+                return redirect()->route('contratos.index')
+                    ->with('error', 'No se puede eliminar el contrato "' . $contrato->contrato_no . 
+                        '" porque tiene registros de ingresos asociados. ' .
+                        'Elimine primero los ingresos relacionados.');
+            }
             
             // Guardar información para el mensaje
             $contratoNo = $contrato->contrato_no;
