@@ -27,6 +27,66 @@
             background-color: #138496;
             border-color: #117a8b;
         }
+        
+        /* Estilos para el área de resultados */
+        #resultados-container {
+            display: none; /* Oculto por defecto */
+            margin-top: 20px;
+        }
+        
+        /* Estilos para la tabla del reporte (copiados de resultado.blade.php) */
+        .total-row {
+            background-color: #e8f4f8;
+            font-weight: bold;
+        }
+        .badge-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+        }
+        .status-verificado { background-color: #d4edda; color: #155724; }
+        .status-pendiente { background-color: #fff3cd; color: #856404; }
+        .status-rechazado { background-color: #f8d7da; color: #721c24; }
+        
+        .monto {
+            text-align: right;
+            font-family: monospace;
+        }
+        .monto-positivo {
+            color: #198754;
+        }
+        .monto-negativo {
+            color: #dc3545;
+        }
+        
+        /* Spinner de carga */
+        .spinner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -38,6 +98,11 @@
 
             <div class="content-area">
                 <div class="container-fluid py-4">
+                    <!-- Spinner de carga -->
+                    <div class="spinner-overlay" id="loadingSpinner">
+                        <div class="spinner"></div>
+                    </div>
+                    
                     <!-- Título -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div>
@@ -85,7 +150,7 @@
                                                class="form-control" 
                                                id="fecha_desde" 
                                                name="fecha_desde" 
-                                               value="{{ date('Y-m-01') }}"
+                                               value="{{ date('Y-m-d') }}"
                                                required>
                                     </div>
                                     
@@ -98,7 +163,7 @@
                                                class="form-control" 
                                                id="fecha_hasta" 
                                                name="fecha_hasta" 
-                                               value="{{ date('Y-m-t') }}"
+                                               value="{{ date('Y-m-d') }}"
                                                required>
                                     </div>
                                 </div>
@@ -110,9 +175,9 @@
                                             <button type="button" class="btn btn-secondary" onclick="limpiarFormulario()">
                                                 <i class="fas fa-broom me-1"></i> Limpiar
                                             </button>
-                                            <button type="submit" class="btn btn-generar">
+                                            <!--<button type="button" class="btn btn-generar" onclick="generarReporte()">
                                                 <i class="fas fa-search me-1"></i> Generar Reporte
-                                            </button>
+                                            </button>-->
                                             <button type="button" class="btn btn-exportar" onclick="exportarExcel()">
                                                 <i class="fas fa-file-excel me-1"></i> Exportar Excel
                                             </button>
@@ -122,6 +187,9 @@
                             </form>
                         </div>
                     </div>
+
+                    <!-- Contenedor para resultados -->
+                    <div id="resultados-container" style="overflow-x:scroll; "></div>
 
                     <!-- Información -->
                     <div class="card shadow">
@@ -134,7 +202,8 @@
                                 <li>Selecciona un contrato específico o "Todos los contratos" para el reporte general</li>
                                 <li>Define el período de fechas para filtrar los ingresos</li>
                                 <li>El reporte mostrará todos los ingresos registrados en el período seleccionado</li>
-                                <li>Puedes exportar el resultado a Excel (CSV)</li> <!-- Cambiado de PDF a Excel -->
+                                <li>Los resultados se cargarán debajo del formulario</li>
+                                <li>Puedes exportar el resultado a Excel (CSV)</li>
                             </ul>
                         </div>
                     </div>
@@ -156,6 +225,67 @@
             document.getElementById('id_contrato').value = 'todos';
             document.getElementById('fecha_desde').value = '';
             document.getElementById('fecha_hasta').value = '';
+            limpiarReporte();
+        }
+        
+        function limpiarReporte() {
+            document.getElementById('resultados-container').innerHTML = '';
+            document.getElementById('resultados-container').style.display = 'none';
+        }
+        
+        function generarReporte() {
+            // Validar formulario
+            const fechaDesde = document.getElementById('fecha_desde').value;
+            const fechaHasta = document.getElementById('fecha_hasta').value;
+            
+            if (!fechaDesde || !fechaHasta) {
+                alert('Por favor, selecciona ambas fechas.');
+                return;
+            }
+            
+            if (new Date(fechaHasta) < new Date(fechaDesde)) {
+                alert('La fecha "Hasta" no puede ser anterior a la fecha "Desde".');
+                return;
+            }
+            
+            // Mostrar spinner
+            document.getElementById('loadingSpinner').style.display = 'flex';
+            
+            // Obtener datos del formulario
+            const formData = new FormData(document.getElementById('reportForm'));
+            
+            // Enviar solicitud AJAX
+            fetch('{{ route("reportes.ingresos.generar") }}', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Mostrar resultados
+                const container = document.getElementById('resultados-container');
+                container.innerHTML = data.html;
+                container.style.display = 'block';
+                
+                // Desplazar hacia los resultados
+                container.scrollIntoView({ behavior: 'smooth' });
+                
+                // Ocultar spinner
+                document.getElementById('loadingSpinner').style.display = 'none';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ocurrió un error al generar el reporte. Por favor, intenta nuevamente.');
+                document.getElementById('loadingSpinner').style.display = 'none';
+            });
         }
         
         function exportarExcel() {
@@ -187,6 +317,14 @@
             tempForm.submit();
             document.body.removeChild(tempForm);
         }
+        
+        // Permitir usar Enter en el formulario
+        document.getElementById('reportForm').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                generarReporte();
+            }
+        });
     </script>
 </body>
 </html>

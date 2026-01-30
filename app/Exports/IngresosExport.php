@@ -36,33 +36,31 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             ->join('contratos', 'ingresos.id_contrato', '=', 'contratos.id')
             ->select(
                 // Campos de contrato
-                'contratos.obra',
-                'contratos.empresa',
-                'contratos.contrato_no',
                 'contratos.cliente',
+                // AREA - OMITIDO según tu indicación
                 'contratos.fecha_contrato',
-                'contratos.fecha_inicio_obra as inicio_de_obra',
-                'contratos.fecha_terminacion_obra as terminacion_de_obra',
-                'contratos.monto_anticipo as anticipo',
+                'contratos.fecha_inicio_obra as fecha_inicio_obra',
+                'contratos.fecha_terminacion_obra as fecha_terminacion_obra',
+                'contratos.monto_anticipo as monto_anticipo',
                 'contratos.total as importe_contrato',
-                'contratos.no_cuenta as n_cuenta',
-                'contratos.sucursal',
-                'contratos.clabe_interbancaria',
+                // Convenio Apliacion de monto c/IVA - OMITIDO según tu indicación
+                'contratos.total as total_a_cobrar_contrato',
                 
                 // Campos de ingresos
-                'ingresos.no_estimacion as estimacion',
+                'ingresos.no_estimacion as no_estimacion',
                 'ingresos.periodo_del',
                 'ingresos.periodo_al',
                 'ingresos.factura',
                 'ingresos.fecha_factura',
-                'ingresos.importe_estimacion as importe_de_estimacion',
+                'ingresos.importe_estimacion',
                 'ingresos.iva',
                 'ingresos.retenciones_o_sanciones',
                 'ingresos.total_estimacion_con_iva',
+                'ingresos.created_at as fecha_elaboracion',
                 'ingresos.avance_obra_estimacion',
                 'ingresos.avance_obra_real',
                 'ingresos.porcentaje_avance_financiero',
-                'ingresos.cargos_adicionales_3_5 as cargos_adicionales_35_porciento',
+                'ingresos.cargos_adicionales_3_5',
                 'ingresos.retencion_5_al_millar',
                 'ingresos.sancion_atrazo_presentacion_estimacion',
                 'ingresos.sancion_atraso_de_obra',
@@ -77,8 +75,13 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
                 'ingresos.fecha_cobro',
                 'ingresos.por_cobrar',
                 'ingresos.por_facturar',
+                // 'Por Cobrar' segunda vez - OMITIDO (solo una vez)
+                'ingresos.por_estimar',
+                'ingresos.status',
                 'ingresos.estimado_menos_deducciones',
-                'ingresos.verificado'
+                'contratos.no_cuenta',
+                'contratos.sucursal',
+                'contratos.clabe_interbancaria'
             )
             ->whereBetween('ingresos.created_at', [$this->fechaDesde, $this->fechaHasta])
             ->orderBy('ingresos.created_at');
@@ -93,32 +96,31 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
     public function headings(): array
     {
         return [
-            'N° obra',
-            'Empresa',
-            'Numero de Contrato',
-            'Descripcion según contrato',
             'Cliente',
+            // 'AREA' - OMITIDO
             'Fecha Firma de Contrato',
             'Fecha Inicio de Obra',
             'Fecha Terminación de Obra',
             'Importe de Anticipo c/IVA',
             'Importe de Contrato c/IVA',
+            'Convenio Apliacion de monto c/IVA', // Columna vacía
             'Total a cobrar contrato c/IVA',
             '# Estimación',
             'del',
             'al',
             'Factura',
-            'Fecha Factura',
+            'Fecha', // Fecha Factura
             'Importe de Estimación',
             'I.V.A.',
             'Retenciones o sanciones',
             'Total Estimacion con IVA',
+            'Fecha Elaboracion',
             'Estimación',
             'Real',
             '% Avance Financiero',
             '3.5 % Cargos Adicionales',
             'Retencion 5 al millar',
-            'Sancion atrazo presentacion estimacion',
+            'Sancion atrazo presntacion estimacion',
             'Sancion atraso de obra',
             'Sancion por obra mal ejecutada',
             'Retencion por atraso en programa de obra',
@@ -131,63 +133,144 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             'Fecha Cobro',
             'POR COBRAR',
             'POR FACTURAR',
+            // 'Por Cobrar' - OMITIDO (segunda aparición)
+            'Por Estimar',
+            'Status',
             'Estimado menos Deducciones',
             'Nº Cuenta',
             'Sucursal',
-            'Clabe Interbancaria',
-            'Estado Verificación'
+            'Clabe Interbancaria'
         ];
     }
     
     public function map($ingreso): array
     {
-        $estadoVerificado = $ingreso->verificado == '2' ? 'Verificado' : 
-                           ($ingreso->verificado == '0' ? 'Rechazado' : 'Pendiente');
-        
         return [
-            $ingreso->obra ?? '',
-            $ingreso->empresa ?? '',
-            $ingreso->contrato_no ?? '',
-            $ingreso->obra ?? '',
+            // Columna 1: Cliente
             $ingreso->cliente ?? '',
+            
+            // Columna 2: Fecha Firma de Contrato (AREA omitida)
             $this->formatDate($ingreso->fecha_contrato),
-            $this->formatDate($ingreso->inicio_de_obra),
-            $this->formatDate($ingreso->terminacion_de_obra),
-            $this->formatNumber($ingreso->anticipo),
+            
+            // Columna 3: Fecha Inicio de Obra
+            $this->formatDate($ingreso->fecha_inicio_obra),
+            
+            // Columna 4: Fecha Terminación de Obra
+            $this->formatDate($ingreso->fecha_terminacion_obra),
+            
+            // Columna 5: Importe de Anticipo c/IVA
+            $this->formatNumber($ingreso->monto_anticipo),
+            
+            // Columna 6: Importe de Contrato c/IVA
             $this->formatNumber($ingreso->importe_contrato),
-            $this->formatNumber($ingreso->importe_contrato),
-            $ingreso->estimacion ?? '',
+            
+            // Columna 7: Convenio Apliacion de monto c/IVA (vacío)
+            '', // Campo no existe en la base de datos
+            
+            // Columna 8: Total a cobrar contrato c/IVA
+            $this->formatNumber($ingreso->total_a_cobrar_contrato),
+            
+            // Columna 9: # Estimación
+            $ingreso->no_estimacion ?? '',
+            
+            // Columna 10: del
             $this->formatDate($ingreso->periodo_del),
+            
+            // Columna 11: al
             $this->formatDate($ingreso->periodo_al),
+            
+            // Columna 12: Factura
             $ingreso->factura ?? '',
+            
+            // Columna 13: Fecha (Factura)
             $this->formatDate($ingreso->fecha_factura),
-            $this->formatNumber($ingreso->importe_de_estimacion),
+            
+            // Columna 14: Importe de Estimación
+            $this->formatNumber($ingreso->importe_estimacion),
+            
+            // Columna 15: I.V.A.
             $this->formatNumber($ingreso->iva),
+            
+            // Columna 16: Retenciones o sanciones
             $this->formatNumber($ingreso->retenciones_o_sanciones),
+            
+            // Columna 17: Total Estimacion con IVA
             $this->formatNumber($ingreso->total_estimacion_con_iva),
+            
+            // Columna 18: Fecha Elaboracion
+            $this->formatDate($ingreso->fecha_elaboracion),
+            
+            // Columna 19: Estimación
             $this->formatNumber($ingreso->avance_obra_estimacion),
+            
+            // Columna 20: Real
             $this->formatNumber($ingreso->avance_obra_real),
+            
+            // Columna 21: % Avance Financiero
             $this->formatPercent($ingreso->porcentaje_avance_financiero),
-            $this->formatNumber($ingreso->cargos_adicionales_35_porciento),
+            
+            // Columna 22: 3.5 % Cargos Adicionales
+            $this->formatNumber($ingreso->cargos_adicionales_3_5),
+            
+            // Columna 23: Retencion 5 al millar
             $this->formatNumber($ingreso->retencion_5_al_millar),
+            
+            // Columna 24: Sancion atrazo presntacion estimacion
             $this->formatNumber($ingreso->sancion_atrazo_presentacion_estimacion),
+            
+            // Columna 25: Sancion atraso de obra
             $this->formatNumber($ingreso->sancion_atraso_de_obra),
+            
+            // Columna 26: Sancion por obra mal ejecutada
             $this->formatNumber($ingreso->sancion_por_obra_mal_ejecutada),
+            
+            // Columna 27: Retencion por atraso en programa de obra
             $this->formatNumber($ingreso->retencion_por_atraso_en_programa_obra),
+            
+            // Columna 28: Amortización anticipo
             $this->formatNumber($ingreso->amortizacion_anticipo),
+            
+            // Columna 29: Amortización con I.V.A.
             $this->formatNumber($ingreso->amortizacion_con_iva),
+            
+            // Columna 30: Total deducciones
             $this->formatNumber($ingreso->total_deducciones),
+            
+            // Columna 31: Importe Facturado
             $this->formatNumber($ingreso->importe_facturado),
+            
+            // Columna 32: Liquido a cobrar
             $this->formatNumber($ingreso->liquido_a_cobrar),
+            
+            // Columna 33: Liquido Cobrado
             $this->formatNumber($ingreso->liquido_cobrado),
+            
+            // Columna 34: Fecha Cobro
             $this->formatDate($ingreso->fecha_cobro),
+            
+            // Columna 35: POR COBRAR
             $this->formatNumber($ingreso->por_cobrar),
+            
+            // Columna 36: POR FACTURAR
             $this->formatNumber($ingreso->por_facturar),
+            
+            // Columna 37: Por Estimar (omitido el segundo "Por Cobrar")
+            $this->formatNumber($ingreso->por_estimar),
+            
+            // Columna 38: Status
+            $ingreso->status ?? '',
+            
+            // Columna 39: Estimado menos Deducciones
             $this->formatNumber($ingreso->estimado_menos_deducciones),
-            $ingreso->n_cuenta ?? '',
+            
+            // Columna 40: Nº Cuenta
+            $ingreso->no_cuenta ?? '',
+            
+            // Columna 41: Sucursal
             $ingreso->sucursal ?? '',
-            $ingreso->clabe_interbancaria ?? '',
-            $estadoVerificado
+            
+            // Columna 42: Clabe Interbancaria
+            $ingreso->clabe_interbancaria ?? ''
         ];
     }
     
@@ -214,21 +297,22 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
     public function columnWidths(): array
     {
         return [
-            'A' => 30, 'B' => 25, 'C' => 20, 'D' => 35, 'E' => 30, 'F' => 18,
-            'G' => 18, 'H' => 18, 'I' => 22, 'J' => 22, 'K' => 22, 'L' => 15,
-            'M' => 12, 'N' => 12, 'O' => 18, 'P' => 15, 'Q' => 22, 'R' => 15,
-            'S' => 22, 'T' => 22, 'U' => 15, 'V' => 15, 'W' => 18, 'X' => 22,
-            'Y' => 22, 'Z' => 25, 'AA' => 22, 'AB' => 25, 'AC' => 22, 'AD' => 22,
-            'AE' => 22, 'AF' => 22, 'AG' => 22, 'AH' => 22, 'AI' => 22, 'AJ' => 22,
-            'AK' => 22, 'AL' => 22, 'AM' => 22, 'AN' => 22, 'AO' => 22, 'AP' => 15,
-            'AQ' => 15, 'AR' => 20
+            'A' => 30, 'B' => 20, 'C' => 18, 'D' => 18, 'E' => 22, 
+            'F' => 22, 'G' => 30, 'H' => 22, 'I' => 15, 'J' => 12,
+            'K' => 12, 'L' => 18, 'M' => 15, 'N' => 22, 'O' => 15,
+            'P' => 22, 'Q' => 22, 'R' => 18, 'S' => 15, 'T' => 15,
+            'U' => 18, 'V' => 22, 'W' => 22, 'X' => 30, 'Y' => 22,
+            'Z' => 25, 'AA' => 22, 'AB' => 25, 'AC' => 22, 'AD' => 22,
+            'AE' => 22, 'AF' => 22, 'AG' => 22, 'AH' => 22, 'AI' => 22,
+            'AJ' => 22, 'AK' => 15, 'AL' => 15, 'AM' => 20, 'AN' => 15,
+            'AO' => 15, 'AP' => 20
         ];
     }
     
     public function styles(Worksheet $sheet)
     {
-        // Encabezados con estilo
-        $sheet->getStyle('A1:AR1')->applyFromArray([
+        // Encabezados con estilo (42 columnas: A a AP)
+        $sheet->getStyle('A1:AP1')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'size' => 11,
@@ -255,7 +339,7 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
         $sheet->getRowDimension(1)->setRowHeight(40);
         
         // Estilo para todas las celdas
-        $sheet->getStyle('A2:AR1000')->applyFromArray([
+        $sheet->getStyle('A2:AP1000')->applyFromArray([
             'alignment' => [
                 'vertical' => Alignment::VERTICAL_TOP,
                 'wrapText' => true,
@@ -276,7 +360,7 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
         }
         
         // Formato para columnas de fechas
-        $dateColumns = ['F', 'G', 'H', 'M', 'N', 'P', 'AG'];
+        $dateColumns = ['B', 'C', 'D', 'J', 'K', 'M', 'R', 'AG']; // Ajustadas según nuevas columnas
         foreach ($dateColumns as $col) {
             $sheet->getStyle($col . '2:' . $col . '1000')
                   ->getNumberFormat()
@@ -284,7 +368,7 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
         }
         
         // Formato para columnas de moneda
-        $currencyColumns = ['I', 'J', 'K', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM'];
+        $currencyColumns = ['E', 'F', 'H', 'N', 'O', 'P', 'Q', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AH', 'AI', 'AJ']; // Ajustadas
         foreach ($currencyColumns as $col) {
             $sheet->getStyle($col . '2:' . $col . '1000')
                   ->getNumberFormat()
@@ -292,12 +376,12 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
         }
         
         // Formato para porcentaje
-        $sheet->getStyle('W2:W1000')
+        $sheet->getStyle('U2:U1000')
               ->getNumberFormat()
               ->setFormatCode('0.00%');
         
         // Alternar colores de filas para mejor lectura
-        $sheet->getStyle('A2:AR1000')->applyFromArray([
+        $sheet->getStyle('A2:AP1000')->applyFromArray([
             'fill' => [
                 'fillType' => Fill::FILL_SOLID,
                 'startColor' => ['rgb' => 'F2F2F2'],
@@ -305,7 +389,7 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
         ]);
         
         // Fila impar diferente color
-        $sheet->getStyle('A3:AR3')->applyFromArray([
+        $sheet->getStyle('A3:AP3')->applyFromArray([
             'fill' => [
                 'fillType' => Fill::FILL_SOLID,
                 'startColor' => ['rgb' => 'FFFFFF'],
@@ -321,17 +405,17 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
                 $event->sheet->freezePane('A2');
                 
                 // Añadir filtros automáticos
-                $event->sheet->setAutoFilter('A1:AR1');
+                $event->sheet->setAutoFilter('A1:AP1');
                 
                 // Ajustar automáticamente el ancho de columnas basado en contenido
-                foreach (range('A', 'AR') as $column) {
+                foreach (range('A', 'AP') as $column) {
                     $event->sheet->getColumnDimension($column)->setAutoSize(false);
                 }
                 
                 // Ajustar algunas columnas específicas
-                $event->sheet->getColumnDimension('D')->setWidth(40); // Descripción
-                $event->sheet->getColumnDimension('E')->setWidth(35); // Cliente
-                $event->sheet->getColumnDimension('Z')->setWidth(30); // Sanciones largas
+                $event->sheet->getColumnDimension('A')->setWidth(30); // Cliente
+                $event->sheet->getColumnDimension('G')->setWidth(30); // Convenio Apliacion (vacío)
+                $event->sheet->getColumnDimension('X')->setWidth(30); // Sanciones largas
                 
                 // Añadir bordes exteriores gruesos
                 $highestRow = $event->sheet->getHighestRow();

@@ -115,6 +115,27 @@ class ReporteIngresosController extends Controller
                 ->first();
         }
         
+        // Si es una petición AJAX, devolver solo el contenido del reporte
+        if ($request->ajax()) {
+            $view = view('reportes.partials.resultado_tabla', compact(
+                'ingresos',
+                'fechaDesde',
+                'fechaHasta',
+                'idContrato',
+                'totales',
+                'contratoSeleccionado'
+            ))->render();
+            
+            return response()->json([
+                'html' => $view,
+                'totales' => $totales,
+                'fechaDesde' => $fechaDesde,
+                'fechaHasta' => $fechaHasta,
+                'contratoSeleccionado' => $contratoSeleccionado
+            ]);
+        }
+        
+        // Si no es AJAX, devolver la vista completa (para compatibilidad)
         return view('reportes.resultado', compact(
             'ingresos',
             'fechaDesde',
