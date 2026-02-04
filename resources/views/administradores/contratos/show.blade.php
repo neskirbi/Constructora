@@ -187,6 +187,19 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">
+                                            Referencia interna
+                                        </label>
+                                        <div class="info-value @if(empty($contrato->refinterna)) info-value-empty @endif">
+                                            {{ $contrato->refinterna ?: 'No especificado' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             
                             <div class="row">
                                 <div class="col-md-6">

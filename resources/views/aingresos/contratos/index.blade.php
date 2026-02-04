@@ -404,8 +404,8 @@
                                                 <div class="mb-3">
                                                     <i class="fas fa-file-invoice-dollar fa-2x" style="color: #282828;"></i>
                                                 </div>
-                                                <h6 class="text-muted mb-2">Importe Total</h6>
-                                                <h3 class="fw-bold mb-0 text-dark">${{ number_format($contrato->total ?? 0, 2) }}</h3>
+                                                <h6 class="text-muted mb-2">Subtotal</h6>
+                                                <h3 class="fw-bold mb-0 text-dark">${{ number_format($contrato->subtotal ?? 0, 2) }}</h3>
                                             </div>
                                         </div>
                                     </div>
@@ -416,8 +416,8 @@
                                                 <div class="mb-3">
                                                     <i class="fas fa-hand-holding-usd fa-2x" style="color: #282828;"></i>
                                                 </div>
-                                                <h6 class="text-muted mb-2">Anticipo</h6>
-                                                <h3 class="fw-bold mb-0 text-dark">${{ number_format($contrato->monto_anticipo ?? 0, 2) }}</h3>
+                                                <h6 class="text-muted mb-2">IVA</h6>
+                                                <h3 class="fw-bold mb-0 text-dark">${{ number_format($contrato->iva ?? 0, 2) }}</h3>
                                             </div>
                                         </div>
                                     </div>
@@ -429,8 +429,8 @@
                                                 <div class="mb-3">
                                                     <i class="fas fa-chart-line fa-2x" style="color: #282828;"></i>
                                                 </div>
-                                                <h6 class="text-muted mb-2">Total General</h6>
-                                                <h3 class="fw-bold mb-0 text-dark">${{ number_format($contrato->total-$contrato->monto_anticipo ?? 0, 2) }}</h3>
+                                                <h6 class="text-muted mb-2">Total</h6>
+                                                <h3 class="fw-bold mb-0 text-dark">${{ number_format($contrato->total ?? 0, 2) }}</h3>
                                             </div>
                                         </div>
                                     </div>

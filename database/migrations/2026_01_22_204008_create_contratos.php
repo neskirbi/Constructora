@@ -18,12 +18,12 @@ class CreateContratos extends Migration
             $table->string('id_usuario',32)->default('');
             
              // Columnas del Excel
+            $table->text('obra')->nullable();
             $table->string('empresa')->nullable();
             $table->string('contrato_no')->nullable();
             $table->string('frente')->nullable();
             $table->string('gerencia')->nullable();
             $table->string('cliente')->nullable();
-            $table->string('obra')->nullable();
             $table->string('lugar')->nullable();
             $table->string('concepto',50)->nullable();
             $table->decimal('subtotal', 15, 2)->nullable();

@@ -57,6 +57,7 @@ class ContratoController extends Controller
             $validatedData = $request->validate([
                 // Información general
                 'obra' => 'nullable|string',
+                'refinterna' => 'nullable|string',
                 'empresa' => 'nullable|string|max:255',
                 'contrato_no' => 'required|string|max:255|unique:contratos',
                 'frente' => 'nullable|string|max:255',
@@ -123,6 +124,7 @@ class ContratoController extends Controller
                 
                 // Campos de la tabla - usando null si no están presentes
                 'obra' => $validatedData['obra'] ?? null,
+                'refinterna' => $validatedData['refinterna'] ?? null,
                 'empresa' => $validatedData['empresa'] ?? null,
                 'frente' => $validatedData['frente'] ?? null,
                 'gerencia' => $validatedData['gerencia'] ?? null,
@@ -236,6 +238,7 @@ class ContratoController extends Controller
             $validatedData = $request->validate([
                 // Información general
                 'obra' => 'nullable|string',
+                'refinterna' => 'nullable|string',
                 'empresa' => 'nullable|string|max:255',
                 'contrato_no' => 'required|string|max:255|unique:contratos,contrato_no,' . $id . ',id',
                 'frente' => 'nullable|string|max:255',
@@ -297,6 +300,7 @@ class ContratoController extends Controller
             // Preparar todos los datos para actualizar
             $datosContrato = [
                 'obra' => $validatedData['obra'] ?? null,
+                'refinterna' => $validatedData['refinterna'] ?? null,
                 'empresa' => $validatedData['empresa'] ?? null,
                 'contrato_no' => $validatedData['contrato_no'],
                 'frente' => $validatedData['frente'] ?? null,

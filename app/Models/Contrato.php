@@ -17,6 +17,7 @@ class Contrato extends Model
         'id',
         'id_usuario',
         'empresa',
+        'refinterna',
         'contrato_no',
         'frente',
         'gerencia',

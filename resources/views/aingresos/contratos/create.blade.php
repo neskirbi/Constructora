@@ -201,6 +201,25 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label for="refinterna" class="form-label-custom">
+                                                Referencia interna
+                                            </label>
+                                            <input type="text" 
+                                                   class="form-control form-control-custom" 
+                                                   id="refinterna" 
+                                                   name="refinterna" 
+                                                   value="{{ old('refinterna') }}"
+                                                   placeholder="Referencia Interna"
+                                                   required>
+                                            @error('refinterna')
+                                                <div class="text-danger small mt-1">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
                                 
                                 <div class="row">
                                     <div class="col-md-6">
