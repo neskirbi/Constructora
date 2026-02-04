@@ -345,8 +345,8 @@
                                     <div class="info-item">
                                         <div class="info-title">Fecha Contrato</div>
                                         <div class="info-value">
-                                            @if($contrato->contrato_fecha)
-                                                {{ date('d/m/Y', strtotime($contrato->contrato_fecha)) }}
+                                            @if($contrato->fecha_contrato)
+                                                {{ date('d/m/Y', strtotime($contrato->fecha_contrato)) }}
                                             @else
                                                 No definida
                                             @endif
@@ -359,8 +359,8 @@
                                     <div class="info-item">
                                         <div class="info-title">Inicio Obra</div>
                                         <div class="info-value">
-                                            @if($contrato->inicio_de_obra)
-                                                {{ date('d/m/Y', strtotime($contrato->inicio_de_obra)) }}
+                                            @if($contrato->fecha_inicio_obra)
+                                                {{ date('d/m/Y', strtotime($contrato->fecha_inicio_obra)) }}
                                             @else
                                                 No definida
                                             @endif
@@ -370,8 +370,8 @@
                                     <div class="info-item">
                                         <div class="info-title">Fin Obra</div>
                                         <div class="info-value">
-                                            @if($contrato->terminacion_de_obra)
-                                                {{ date('d/m/Y', strtotime($contrato->terminacion_de_obra)) }}
+                                            @if($contrato->fecha_terminacion_obra)
+                                                {{ date('d/m/Y', strtotime($contrato->fecha_terminacion_obra)) }}
                                             @else
                                                 No definida
                                             @endif
@@ -440,12 +440,12 @@
                                 <!-- Botones de acción -->
                                 <div class="actions-container">
                                     <a href="{{ route('acontratos.show', $contrato->id) }}" 
-                                    class="btn btn-sm btn-outline-primary"
+                                    class="btn btn-primary"
                                     title="Ver detalles">
                                         <i class="fas fa-eye me-1"></i> Ver
                                     </a>
                                     <button onclick="confirmDelete('{{ $contrato->id }}', '{{ addslashes($contrato->obra ?? 'Contrato') }}')" 
-                                            class="btn btn-sm btn-outline-danger"
+                                            class="btn btn-danger"
                                             title="Eliminar contrato">
                                         <i class="fas fa-trash me-1"></i> Eliminar
                                     </button>
