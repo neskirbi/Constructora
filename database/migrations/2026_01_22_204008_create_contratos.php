@@ -19,6 +19,7 @@ class CreateContratos extends Migration
             
              // Columnas del Excel
             $table->text('obra')->nullable();
+            $table->string('refinterna')->nullable();
             $table->string('empresa')->nullable();
             $table->string('contrato_no')->nullable();
             $table->string('frente')->nullable();
