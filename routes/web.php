@@ -107,3 +107,12 @@ Route::prefix('reportes')->group(function () {
         ->name('reportes.ingresos.exportar.excel')
         ->middleware(['auth:administradores']);
 });
+
+
+
+/**
+ * Rutas Adestsajos
+ */
+
+Route::resource('destajos', 'App\Http\Controllers\Adestajos\DestajoController')
+    ->middleware(['auth:adestajos']);
