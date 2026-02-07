@@ -190,7 +190,7 @@ class ProveedorController extends Controller
         
         $proveedor->save();
         
-        return redirect()->route('proveedoresds.index')
+        return redirect('proveedoresds/'.$proveedor->id)
             ->with('success', 'Proveedor actualizado exitosamente');
     }
 

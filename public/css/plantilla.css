@@ -527,3 +527,71 @@
         left: auto !important;
     }
 }
+
+/* Estilos para el menú desplegable del sidebar */
+.dropdown-menu-container {
+    position: relative;
+}
+
+.sidebar .dropdown-menu {
+    position: static;
+    background: var(--color-secundario);
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
+    display: none;
+    overflow: hidden;
+}
+
+.sidebar .dropdown-menu.show {
+    display: block;
+}
+
+.sidebar .dropdown-item {
+    padding: 12px 20px 12px 48px;
+    color: var(--color-texto);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+    background: rgba(255,255,255,0.05);
+}
+
+.sidebar .dropdown-item:hover {
+    background: rgba(255,255,255,0.1);
+    color: var(--color-texto);
+    border-left-color: var(--color-accento);
+}
+
+.sidebar .dropdown-item i {
+    width: 20px;
+    margin-right: 10px;
+    font-size: 0.9rem;
+}
+
+.dropdown-arrow {
+    margin-left: auto;
+    transition: transform 0.3s ease;
+    font-size: 0.8rem;
+}
+
+.dropdown-toggle[aria-expanded="true"] .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+/* Cuando el sidebar está colapsado */
+.sidebar.collapsed .dropdown-menu {
+    display: none !important;
+}
+
+.sidebar.collapsed .dropdown-toggle {
+    justify-content: center;
+    padding: 12px;
+}
+
+.sidebar.collapsed .dropdown-toggle .dropdown-arrow {
+    display: none;
+}

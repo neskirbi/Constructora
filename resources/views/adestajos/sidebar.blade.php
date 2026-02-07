@@ -9,14 +9,14 @@
             
             <div class="sidebar-menu">
                 
-                <a href="{{url('contratos')}}" class="menu-item">
-                    <i class="fas fa-file-contract menu-icon"></i>
-                    <span class="menu-text">Contratos</span>
+                <a href="{{url('proveedoresds')}}" class="menu-item">
+                    <i class="fas fa-users menu-icon"></i>
+                    <span class="menu-text">Proveedores</span>
                 </a>
 
-                 <a href="{{url('ingresos')}}" class="menu-item">
-                    <i class="fas fa-money-bill-wave menu-icon"></i>
-                    <span class="menu-text">Ingresos</span>
+                 <a href="{{url('destajos')}}" class="menu-item">
+                   <i class="fas fa-hammer menu-icon"></i>
+                    <span class="menu-text">Destajo</span>
                 </a>
                 <!--
                <a href="{{url('ingresos')}}" class="menu-item">
