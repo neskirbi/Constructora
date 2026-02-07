@@ -114,5 +114,8 @@ Route::prefix('reportes')->group(function () {
  * Rutas Adestsajos
  */
 
+Route::resource('proveedoresds', 'App\Http\Controllers\Adestajos\ProveedorController')
+    ->middleware(['auth:adestajos']);
+
 Route::resource('destajos', 'App\Http\Controllers\Adestajos\DestajoController')
     ->middleware(['auth:adestajos']);

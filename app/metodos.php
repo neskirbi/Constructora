@@ -112,7 +112,7 @@ function GetUuid(){
         }
         
         // 3. Administrador de Destajos
-        if (Auth::guard('adestajo')->check()) {
+        if (Auth::guard('adestajos')->check()) {
             return 'Administrador de Destajos';
         }
         
