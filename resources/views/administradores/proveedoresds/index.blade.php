@@ -7,10 +7,10 @@
 <body>
     <div class="main-container">
         @include('toast.toasts')
-        @include('adestajos.sidebar')
+        @include('administradores.sidebar')
         
         <main class="main-content" id="mainContent">
-            @include('adestajos.navbar')
+            @include('administradores.navbar')
 
             <div class="content-area">
                 <div class="container-fluid py-4">
@@ -21,16 +21,13 @@
                                     <i class="fas fa-truck me-2 text-primary"></i>
                                     Proveedores
                                 </h5>
-                                <a href="{{ route('proveedoresds.create') }}" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-plus me-1"></i> Nuevo Proveedor
-                                </a>
                             </div>
                         </div>
                         
                         <div class="card-body">
                             <div class="row mb-4">
                                 <div class="col-md-6">
-                                    <form method="GET" action="{{ route('proveedoresds.index') }}">
+                                    <form method="GET" action="{{ route('aproveedoresds.index') }}">
                                         <div class="input-group">
                                             <input type="text" 
                                                    name="search" 
@@ -41,7 +38,7 @@
                                                 <i class="fas fa-search"></i>
                                             </button>
                                             @if($search)
-                                            <a href="{{ route('proveedoresds.index') }}" class="btn btn-outline-secondary btn-sm">
+                                            <a href="{{ route('aproveedoresds.index') }}" class="btn btn-outline-secondary btn-sm">
                                                 <i class="fas fa-times"></i>
                                             </a>
                                             @endif
@@ -79,7 +76,7 @@
                                                             <span class="badge bg-success">{{ $proveedor->estatus }}</span>
                                                         @elseif($proveedor->estatus == 'Inactivo')
                                                             <span class="badge bg-danger">{{ $proveedor->estatus }}</span>
-                                                        @elseif($proveedor->estatus == 'Suspendido')
+                                                        @else
                                                             <span class="badge bg-warning text-dark">{{ $proveedor->estatus }}</span>
                                                         @endif
                                                     </div>
@@ -115,16 +112,11 @@
                                             
                                             <!-- Footer -->
                                             <div class="card-footer bg-light py-2">
-                                                <div class="d-flex justify-content-end gap-2">
-                                                    <a href="{{ route('proveedoresds.show', $proveedor->id) }}" 
+                                                <div class="text-end">
+                                                    <a href="{{ route('aproveedoresds.show', $proveedor->id) }}" 
                                                        class="btn btn-outline-info btn-sm">
                                                         <i class="fas fa-eye me-1"></i> Revisar
                                                     </a>
-                                                    <button type="button" 
-                                                            class="btn btn-outline-danger btn-sm"
-                                                            onclick="confirmDelete('{{ $proveedor->id }}', '{{ $proveedor->nombre }}')">
-                                                        <i class="fas fa-trash me-1"></i> Eliminar
-                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -137,7 +129,7 @@
                                     <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
                                     <h5 class="text-muted mb-3">No se encontraron proveedores</h5>
                                     @if($search)
-                                    <a href="{{ route('proveedoresds.index') }}" class="btn btn-outline-primary btn-sm">
+                                    <a href="{{ route('aproveedoresds.index') }}" class="btn btn-outline-primary btn-sm">
                                         Mostrar todos los proveedores
                                     </a>
                                     @else
@@ -195,7 +187,7 @@
             document.getElementById('proveedorNombre').textContent = nombre;
             
             const form = document.getElementById('deleteForm');
-            form.action = '{{ route("proveedoresds.destroy", "") }}/' + id;
+            form.action = '{{ route("aproveedoresds.destroy", "") }}/' + id;
             
             const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
             modal.show();

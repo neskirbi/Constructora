@@ -6,7 +6,7 @@ use App\Models\ProveedorSer;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
-class ProveedorController extends Controller
+class ProveedordsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -26,7 +26,7 @@ class ProveedorController extends Controller
             ->orderBy('nombre', 'asc')
             ->paginate(15);
         
-        return view('administradores.proveedores.index', compact('proveedores', 'search'));
+        return view('administradores.proveedoresds.index', compact('proveedores', 'search'));
     }
 
     /**
@@ -78,7 +78,7 @@ class ProveedorController extends Controller
             'Otros'
         ];
         
-        return view('administradores.proveedores.create', compact(
+        return view('administradores.proveedoresds.create', compact(
             'estatusOptions', 
             'especialidadOptions'
         ));
@@ -159,7 +159,7 @@ class ProveedorController extends Controller
             'Otros'
         ];
         
-        return view('administradores.proveedores.show', compact(
+        return view('administradores.proveedoresds.show', compact(
             'estatusOptions', 
             'especialidadOptions',
             'proveedor'
