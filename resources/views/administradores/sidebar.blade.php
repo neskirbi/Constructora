@@ -51,6 +51,12 @@
             </div>
         </div>
 
+         <a href="{{url('adestajos')}}" class="menu-item">
+            <i class="fas fa-hammer menu-icon"></i>
+            <span class="menu-text">Destajo</span>
+        </a>
+
+
         <!-- Grupo expandible de Reportes -->
         <div class="expandable-menu-container">
             <a href="#" class="menu-item expandable-toggle" onclick="toggleReportesMenu(this)">

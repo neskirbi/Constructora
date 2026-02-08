@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Adestajos;
+namespace App\Http\Controllers\Administradores;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB; // Agrega esta línea
 use App\Models\Destajo;
 use App\Models\ProveedorSer;
 use App\Models\Contrato;
@@ -28,7 +29,7 @@ class DestajoController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(15);
         
-        return view('adestajos.destajos.index', compact('destajos', 'search'));
+        return view('administradores.destajos.index', compact('destajos', 'search'));
     }
 
     /**
@@ -58,7 +59,7 @@ class DestajoController extends Controller
         'Rollo', 'Salida'
     ];
     
-    return view('adestajos.destajos.create', compact(
+    return view('administradores.destajos.create', compact(
         'siguienteConsecutivo',
         'proveedores',
         'contratos',
@@ -147,7 +148,7 @@ class DestajoController extends Controller
             'Rollo', 'Salida'
         ];
         
-        return view('adestajos.destajos.show', compact(
+        return view('administradores.destajos.show', compact(
             'destajo',
             'proveedores',
             'contratos',
@@ -240,5 +241,65 @@ public function update(Request $request, $id)
     public function destroy($id)
     {
         //
+    }
+
+    public function confirmar(Request $request, $id)
+    {
+        try {
+            DB::beginTransaction();
+            
+            $destajo = Destajo::findOrFail($id);
+            
+            // Validar que el destajo esté pendiente
+            if ($destajo->verificado != 1) {
+                return redirect()->route('adestajos.show', $id)
+                    ->with('error', 'El destajo ya ha sido procesado anteriormente.');
+            }
+            
+            // Actualizar estado a confirmado (2)
+            $destajo->verificado = 2;
+            $destajo->save();
+            
+            DB::commit();
+            
+            return redirect()->route('adestajos.show', $id)
+                ->with('success', 'Destajo confirmado exitosamente.');
+                
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            return redirect()->route('adestajos.show', $id)
+                ->with('error', 'Error al confirmar el destajo: ' . $e->getMessage());
+        }
+    }
+
+    public function rechazar(Request $request, $id)
+    {
+        try {
+            DB::beginTransaction();
+            
+            $destajo = Destajo::findOrFail($id);
+            
+            // Validar que el destajo esté pendiente
+            if ($destajo->verificado != 1) {
+                return redirect()->route('adestajos.show', $id)
+                    ->with('error', 'El destajo ya ha sido procesado anteriormente.');
+            }
+            
+            // Actualizar estado a rechazado (0)
+            $destajo->verificado = 0;
+            $destajo->save();
+            
+            DB::commit();
+            
+            return redirect()->route('adestajos.show', $id)
+                ->with('success', 'Destajo rechazado exitosamente.');
+                
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            return redirect()->route('adestajos.show', $id)
+                ->with('error', 'Error al rechazar el destajo: ' . $e->getMessage());
+        }
     }
 }

@@ -81,10 +81,18 @@ Route::resource('aingresos', 'App\Http\Controllers\Administradores\IngresoContro
 Route::resource('aproveedoresds', 'App\Http\Controllers\Administradores\ProveedordsController')
 ->middleware(['auth:administradores']);
 
-Route::resource('aingresos', 'App\Http\Controllers\Administradores\IngresoController')
+Route::resource('adestajos', 'App\Http\Controllers\Administradores\DestajoController')
     ->middleware(['auth:administradores']);
 
     
+// Rutas adicionales para confirmar/rechazar destajos
+Route::post('adestajos/{destajo}/confirmar', [App\Http\Controllers\Administradores\DestajoController::class, 'confirmar'])
+    ->name('adestajos.confirmar')
+    ->middleware(['auth:administradores']);
+
+Route::post('adestajos/{destajo}/rechazar', [App\Http\Controllers\Administradores\DestajoController::class, 'rechazar'])
+    ->name('adestajos.rechazar')
+    ->middleware(['auth:administradores']);
 
 /**
  * Rutas Aingresos
