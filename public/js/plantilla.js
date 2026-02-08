@@ -3,10 +3,52 @@ let isSidebarCollapsed = false;
 
 // Función para inicializar dropdowns de Bootstrap
 function initializeDropdowns() {
-    // Inicializar todos los dropdowns
-    const dropdownElements = document.querySelectorAll('.dropdown-toggle');
+    // Inicializar solo dropdowns que no sean del menú expandible
+    const dropdownElements = document.querySelectorAll('.dropdown-toggle:not(.expandable-toggle)');
     dropdownElements.forEach(function(dropdown) {
         new bootstrap.Dropdown(dropdown);
+    });
+}
+
+// Función genérica para toggle de menús expandibles
+function toggleExpandableMenu(element, menuIndex) {
+    if (window.innerWidth <= 992) {
+        // En móviles, mantener comportamiento actual
+        return;
+    }
+    
+    const container = element.closest('.expandable-menu-container');
+    container.classList.toggle('expanded');
+    
+    // Guardar estado en localStorage
+    const isExpanded = container.classList.contains('expanded');
+    localStorage.setItem(`menuExpanded_${menuIndex}`, isExpanded);
+}
+
+// Asignar eventos a todos los menús expandibles
+function setupExpandableMenus() {
+    const expandableMenus = document.querySelectorAll('.expandable-menu-container');
+    
+    expandableMenus.forEach((menu, index) => {
+        const toggleBtn = menu.querySelector('.expandable-toggle');
+        
+        if (toggleBtn) {
+            // Remover cualquier evento anterior
+            const newToggleBtn = toggleBtn.cloneNode(true);
+            toggleBtn.parentNode.replaceChild(newToggleBtn, toggleBtn);
+            
+            // Asignar nuevo evento
+            newToggleBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                toggleExpandableMenu(this, index);
+            });
+            
+            // Cargar estado guardado
+            const isExpanded = localStorage.getItem(`menuExpanded_${index}`) === 'true';
+            if (isExpanded && window.innerWidth > 992) {
+                menu.classList.add('expanded');
+            }
+        }
     });
 }
 
@@ -52,6 +94,9 @@ document.addEventListener('DOMContentLoaded', function() {
         isSidebarCollapsed = true;
     }
     
+    // Configurar menús expandibles
+    setupExpandableMenus();
+    
     // Inicializar dropdowns
     initializeDropdowns();
     
@@ -84,6 +129,12 @@ window.addEventListener('resize', function() {
         mainContent.classList.remove('sidebar-collapsed');
         sidebar.classList.remove('active');
         toggleIcon.className = 'fas fa-bars';
+        
+        // En móviles, colapsar todos los menús expandibles
+        const expandableMenus = document.querySelectorAll('.expandable-menu-container');
+        expandableMenus.forEach(menu => {
+            menu.classList.remove('expanded');
+        });
     } else {
         // En pantallas grandes, restaurar estado colapsado si estaba
         const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
@@ -96,6 +147,17 @@ window.addEventListener('resize', function() {
             mainContent.classList.remove('sidebar-collapsed');
             toggleIcon.className = 'fas fa-bars';
         }
+        
+        // Restaurar estado de los menús expandibles
+        const expandableMenus = document.querySelectorAll('.expandable-menu-container');
+        expandableMenus.forEach((menu, index) => {
+            const isExpanded = localStorage.getItem(`menuExpanded_${index}`) === 'true';
+            if (isExpanded) {
+                menu.classList.add('expanded');
+            } else {
+                menu.classList.remove('expanded');
+            }
+        });
     }
 });
 
@@ -108,10 +170,19 @@ if (notificationBtn) {
 }
 
 // Cambiar elemento activo del menú
-document.querySelectorAll('.menu-item').forEach(item => {
+document.querySelectorAll('.menu-item, .submenu-item').forEach(item => {
     item.addEventListener('click', function(e) {
-        document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
-        this.classList.add('active');
+        // Solo para elementos del menú principal (no expandibles)
+        if (this.classList.contains('menu-item') && !this.classList.contains('expandable-toggle')) {
+            document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+        }
+        
+        // Para elementos del submenú
+        if (this.classList.contains('submenu-item')) {
+            document.querySelectorAll('.submenu-item').forEach(i => i.classList.remove('active'));
+            this.classList.add('active');
+        }
         
         // En móviles, cerrar sidebar después de seleccionar
         if (window.innerWidth <= 992) {
@@ -159,6 +230,38 @@ function setupLogout() {
                     logoutForm.submit();
                 }
             }
+        }
+    });
+}
+
+// Función para abrir un menú específico (útil para navegación programática)
+function openExpandableMenu(index) {
+    const expandableMenus = document.querySelectorAll('.expandable-menu-container');
+    if (expandableMenus[index]) {
+        expandableMenus[index].classList.add('expanded');
+        localStorage.setItem(`menuExpanded_${index}`, true);
+    }
+}
+
+// Función para cerrar un menú específico
+function closeExpandableMenu(index) {
+    const expandableMenus = document.querySelectorAll('.expandable-menu-container');
+    if (expandableMenus[index]) {
+        expandableMenus[index].classList.remove('expanded');
+        localStorage.setItem(`menuExpanded_${index}`, false);
+    }
+}
+
+// Función para alternar todos los menús (abrir/cerrar)
+function toggleAllExpandableMenus(open = true) {
+    const expandableMenus = document.querySelectorAll('.expandable-menu-container');
+    expandableMenus.forEach((menu, index) => {
+        if (open) {
+            menu.classList.add('expanded');
+            localStorage.setItem(`menuExpanded_${index}`, true);
+        } else {
+            menu.classList.remove('expanded');
+            localStorage.setItem(`menuExpanded_${index}`, false);
         }
     });
 }

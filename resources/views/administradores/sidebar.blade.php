@@ -23,38 +23,63 @@
             <i class="fas fa-money-bill-wave menu-icon"></i>
             <span class="menu-text">Ingresos</span>
         </a>
-        
-        <!-- Grupo desplegable de Reportes -->
-        <div class="dropdown-menu-container">
-            <a href="#" class="menu-item dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+
+        <!-- Grupo expandible de Proveedores -->
+        <div class="expandable-menu-container">
+            <a href="#" class="menu-item expandable-toggle" onclick="toggleProveedoresMenu(this)">
+                <i class="fas fa-truck menu-icon"></i>
+                <span class="menu-text">Proveedores</span>
+                <i class="fas fa-chevron-down expandable-arrow"></i>
+            </a>
+
+            <div class="expandable-submenu">
+                <a href="{{url('aproveedoresds')}}" class="submenu-item">
+                    <i class="fas fa-users submenu-icon"></i>
+                    <span class="submenu-text">Proveedores de Servicios</span>
+                </a>
+                <!-- Puedes agregar más opciones de proveedores aquí -->
+                <!--
+                <a href="{{url('aproveedores/materiales')}}" class="submenu-item">
+                    <i class="fas fa-boxes submenu-icon"></i>
+                    <span class="submenu-text">Proveedores de Materiales</span>
+                </a>
+                <a href="{{url('aproveedores/equipos')}}" class="submenu-item">
+                    <i class="fas fa-tools submenu-icon"></i>
+                    <span class="submenu-text">Proveedores de Equipos</span>
+                </a>
+                -->
+            </div>
+        </div>
+
+        <!-- Grupo expandible de Reportes -->
+        <div class="expandable-menu-container">
+            <a href="#" class="menu-item expandable-toggle" onclick="toggleReportesMenu(this)">
                 <i class="fas fa-chart-line menu-icon"></i>
                 <span class="menu-text">Reportes</span>
-                <i class="fas fa-chevron-down dropdown-arrow"></i>
+                <i class="fas fa-chevron-down expandable-arrow"></i>
             </a>
-            
-            <ul class="dropdown-menu">
-                <li>
-                    <a href="{{url('reportes/ingresos')}}" class="dropdown-item">
-                        <i class="fas fa-file-alt me-2"></i>
-                        Reporte de Ingresos
-                    </a>
-                </li>
+
+            <div class="expandable-submenu">
+                <a href="{{url('reportes/ingresos')}}" class="submenu-item">
+                    <i class="fas fa-file-alt submenu-icon"></i>
+                    <span class="submenu-text">Reporte de Ingresos</span>
+                </a>
                 <!-- Puedes agregar más reportes aquí -->
                 <!--
-                <li>
-                    <a href="{{url('reportes/gastos')}}" class="dropdown-item">
-                        <i class="fas fa-file-invoice-dollar me-2"></i>
-                        Reporte de Gastos
-                    </a>
-                </li>
-                <li>
-                    <a href="{{url('reportes/proyectos')}}" class="dropdown-item">
-                        <i class="fas fa-project-diagram me-2"></i>
-                        Reporte de Proyectos
-                    </a>
-                </li>
+                <a href="{{url('reportes/gastos')}}" class="submenu-item">
+                    <i class="fas fa-file-invoice-dollar submenu-icon"></i>
+                    <span class="submenu-text">Reporte de Gastos</span>
+                </a>
+                <a href="{{url('reportes/proyectos')}}" class="submenu-item">
+                    <i class="fas fa-project-diagram submenu-icon"></i>
+                    <span class="submenu-text">Reporte de Proyectos</span>
+                </a>
+                <a href="{{url('reportes/proveedores')}}" class="submenu-item">
+                    <i class="fas fa-truck submenu-icon"></i>
+                    <span class="submenu-text">Reporte de Proveedores</span>
+                </a>
                 -->
-            </ul>
+            </div>
         </div>
 
         <!-- Comentado el resto del menú -->
@@ -63,37 +88,6 @@
             <i class="fas fa-tasks menu-icon"></i>
             <span class="menu-text">Proyectos</span>
             <span class="menu-badge">5</span>
-        </a>
-        
-        <a href="#" class="menu-item">
-            <i class="fas fa-truck menu-icon"></i>
-            <span class="menu-text">Proveedores</span>
-        </a>
-        
-        <a href="#" class="menu-item">
-            <i class="fas fa-user-hard-hat menu-icon"></i>
-            <span class="menu-text">Empleados</span>
-            <span class="menu-badge">12</span>
-        </a>
-        
-        <a href="#" class="menu-item">
-            <i class="fas fa-tools menu-icon"></i>
-            <span class="menu-text">Equipos</span>
-        </a>
-        
-        <a href="#" class="menu-item">
-            <i class="fas fa-calculator menu-icon"></i>
-            <span class="menu-text">Presupuestos</span>
-        </a>
-        
-        <a href="#" class="menu-item">
-            <i class="fas fa-file-invoice menu-icon"></i>
-            <span class="menu-text">Facturación</span>
-        </a>
-        
-        <a href="#" class="menu-item">
-            <i class="fas fa-cog menu-icon"></i>
-            <span class="menu-text">Configuración</span>
         </a>
         -->
     </div>

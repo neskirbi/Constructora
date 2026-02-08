@@ -16,7 +16,7 @@ function Memoria(){
 }
 
 function Version(){
-    return 2;
+    return 3;
 }
 
 function GenerarPass(){  

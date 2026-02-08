@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Adestajos;
+namespace App\Http\Controllers\Administradores;
 
 use App\Models\ProveedorSer;
 use Illuminate\Http\Request;
@@ -26,7 +26,7 @@ class ProveedorController extends Controller
             ->orderBy('nombre', 'asc')
             ->paginate(15);
         
-        return view('adestajos.proveedores.index', compact('proveedores', 'search'));
+        return view('administradores.proveedores.index', compact('proveedores', 'search'));
     }
 
     /**
@@ -78,7 +78,7 @@ class ProveedorController extends Controller
             'Otros'
         ];
         
-        return view('adestajos.proveedores.create', compact(
+        return view('administradores.proveedores.create', compact(
             'estatusOptions', 
             'especialidadOptions'
         ));
@@ -159,7 +159,7 @@ class ProveedorController extends Controller
             'Otros'
         ];
         
-        return view('adestajos.proveedores.show', compact(
+        return view('administradores.proveedores.show', compact(
             'estatusOptions', 
             'especialidadOptions',
             'proveedor'
