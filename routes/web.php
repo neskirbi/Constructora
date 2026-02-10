@@ -125,6 +125,15 @@ Route::prefix('reportes')->group(function () {
 });
 
 
+ Route::prefix('reportes')->group(function () {
+    Route::get('/destajo', [App\Http\Controllers\Reportes\ReporteDestajoController::class, 'index'])
+        ->name('reportes.destajo')->middleware(['auth:administradores']);
+        
+    Route::post('/destajo/exportar', [App\Http\Controllers\Reportes\ReporteDestajoController::class, 'exportar'])
+        ->name('reportes.destajo.exportar')->middleware(['auth:administradores']);
+});
+
+
 
 /**
  * Rutas Adestsajos

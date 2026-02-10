@@ -70,6 +70,11 @@
                     <i class="fas fa-file-alt submenu-icon"></i>
                     <span class="submenu-text">Reporte de Ingresos</span>
                 </a>
+
+                <a href="{{url('reportes/destajo')}}" class="submenu-item">
+                    <i class="fas fa-file-alt submenu-icon"></i>
+                    <span class="submenu-text">Reporte de Destajo</span>
+                </a>
                 <!-- Puedes agregar más reportes aquí -->
                 <!--
                 <a href="{{url('reportes/gastos')}}" class="submenu-item">

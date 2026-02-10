@@ -17,7 +17,7 @@ class ReporteIngresosController extends Controller
             ->orderBy('contrato_no')
             ->get();
         
-        return view('reportes.ingresos', compact('contratos'));
+        return view('reportes.ingresos.ingresos', compact('contratos'));
     }
     
     public function generar(Request $request)
@@ -117,7 +117,7 @@ class ReporteIngresosController extends Controller
         
         // Si es una petición AJAX, devolver solo el contenido del reporte
         if ($request->ajax()) {
-            $view = view('reportes.partials.resultado_tabla', compact(
+            $view = view('reportes.ingresos.partials.resultado_tabla', compact(
                 'ingresos',
                 'fechaDesde',
                 'fechaHasta',
@@ -136,7 +136,7 @@ class ReporteIngresosController extends Controller
         }
         
         // Si no es AJAX, devolver la vista completa (para compatibilidad)
-        return view('reportes.resultado', compact(
+        return view('reportes.ingresos.resultado', compact(
             'ingresos',
             'fechaDesde',
             'fechaHasta',
