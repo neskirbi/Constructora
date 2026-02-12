@@ -384,7 +384,7 @@
                                         Mostrando {{ $destajos->firstItem() }} a {{ $destajos->lastItem() }} de {{ $destajos->total() }} registros
                                     </div>
                                     <div>
-                                        {{ $destajos->links() }}
+                                        {{ $destajos->appends(request()->query())->links('pagination::bootstrap-4') }}
                                     </div>
                                 </div>
                             </div>
