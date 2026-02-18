@@ -8,6 +8,12 @@
             </div>
             
             <div class="sidebar-menu">
+
+            
+                <a href="{{url('productosyservicios')}}" class="menu-item">
+                    <i class="fas fa-box menu-icon"></i>
+                    <span class="menu-text">Productos y Servicios</span>
+                </a>
                 
                 <a href="{{url('proveedoresds')}}" class="menu-item">
                     <i class="fas fa-users menu-icon"></i>

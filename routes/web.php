@@ -139,6 +139,9 @@ Route::prefix('reportes')->group(function () {
  * Rutas Adestsajos
  */
 
+Route::resource('productosyservicios', 'App\Http\Controllers\Adestajos\ProductosServiciosController')
+    ->middleware(['auth:adestajos']);
+
 Route::resource('proveedoresds', 'App\Http\Controllers\Adestajos\ProveedorController')
     ->middleware(['auth:adestajos']);
 

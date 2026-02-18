@@ -14,11 +14,11 @@ class CreateProductosyservicios extends Migration
     public function up()
     {
         Schema::create('productosyservicios', function (Blueprint $table) {
-            $table->sting('id',32)->unique();
+            $table->string('id',32)->unique();
 
-            $table->sting('clave',32);
+            $table->string('clave',32);
             $table->text('descripcion');
-            $table->sting('unidades',10);
+            $table->string('unidades',10);
             $table->float('ult_costo',20,2);
 
             $table->timestamps();
