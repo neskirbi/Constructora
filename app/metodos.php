@@ -160,6 +160,27 @@ function GetUuid(){
         return 'Invitado';
     }
 
+    function Guard() {
+        // Intenta con cada guard en orden de prioridad
+        if (Auth::guard('administradores')->check()) {
+            return 'administradores';
+        }
+        
+        if (Auth::guard('aingresos')->check()) {
+            return 'aingresos';
+        }
+        
+        if (Auth::guard('adestajos')->check()) {
+            return 'adestajos';
+        }
+        
+        if (Auth::guard('acompras')->check()) {
+            return 'acompras';
+        }
+        
+        return null; // o 'invitado' si prefieres
+    }
+
 
     function Comentarios(){
         //Escribir simpre arriba de esta funcion las nuevas funciones.

@@ -93,6 +93,11 @@
             </div>
         </div>
 
+        <a href="{{url('aproductosyservicios')}}" class="menu-item">
+            <i class="fas fa-box menu-icon"></i>
+            <span class="menu-text">Productos y Servicios</span>
+        </a>
+
         <!-- Comentado el resto del menú -->
         <!--
         <a href="#" class="menu-item">

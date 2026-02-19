@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Adestajos;
+namespace App\Http\Controllers\General;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProductoServicio;
@@ -23,7 +23,7 @@ class ProductosServiciosController extends Controller
             ->orderBy('clave')
             ->paginate(12); // 12 items por página (3 columnas x 4 filas)
         
-        return view('adestajos.productosyservicios.index', compact('productos', 'search'));
+        return view('general.productosyservicios.index', compact('productos', 'search'));
     }
 
     /**
@@ -31,7 +31,7 @@ class ProductosServiciosController extends Controller
      */
     public function create()
     {
-        return view('adestajos.productosyservicios.create');
+        return view('general.productosyservicios.create');
     }
 
     /**
@@ -82,7 +82,7 @@ class ProductosServiciosController extends Controller
                 ->with('error', 'Producto/Servicio no encontrado');
         }
 
-        return view('adestajos.productosyservicios.edit', compact('producto'));
+        return view('general.productosyservicios.show', compact('producto'));
     }
 
     /**
@@ -97,7 +97,7 @@ class ProductosServiciosController extends Controller
                 ->with('error', 'Producto/Servicio no encontrado');
         }
 
-        return view('adestajos.productosyservicios.edit', compact('producto'));
+        return view('general.productosyservicios.edit', compact('producto'));
     }
 
     /**

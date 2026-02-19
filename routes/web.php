@@ -84,6 +84,9 @@ Route::resource('aproveedoresds', 'App\Http\Controllers\Administradores\Proveedo
 Route::resource('adestajos', 'App\Http\Controllers\Administradores\DestajoController')
     ->middleware(['auth:administradores']);
 
+Route::resource('aproductosyservicios', 'App\Http\Controllers\Administradores\ProductosServiciosController')
+    ->middleware(['auth:administradores']);
+
     
 // Rutas adicionales para confirmar/rechazar destajos
 Route::post('adestajos/{destajo}/confirmar', [App\Http\Controllers\Administradores\DestajoController::class, 'confirmar'])
@@ -93,6 +96,9 @@ Route::post('adestajos/{destajo}/confirmar', [App\Http\Controllers\Administrador
 Route::post('adestajos/{destajo}/rechazar', [App\Http\Controllers\Administradores\DestajoController::class, 'rechazar'])
     ->name('adestajos.rechazar')
     ->middleware(['auth:administradores']);
+
+    Route::put('destajos/{id}/confirmar', [App\Http\Controllers\Administradores\DestajoController::class, 'confirmar'])->name('destajos.confirmar');
+Route::put('destajos/{id}/rechazar', [App\Http\Controllers\Administradores\DestajoController::class, 'rechazar'])->name('destajos.rechazar');
 
 /**
  * Rutas Aingresos
@@ -139,11 +145,19 @@ Route::prefix('reportes')->group(function () {
  * Rutas Adestsajos
  */
 
-Route::resource('productosyservicios', 'App\Http\Controllers\Adestajos\ProductosServiciosController')
-    ->middleware(['auth:adestajos']);
 
 Route::resource('proveedoresds', 'App\Http\Controllers\Adestajos\ProveedorController')
     ->middleware(['auth:adestajos']);
 
 Route::resource('destajos', 'App\Http\Controllers\Adestajos\DestajoController')
     ->middleware(['auth:adestajos']);
+
+
+
+    /**
+     * Generales
+     */
+
+    
+Route::resource('productosyservicios', 'App\Http\Controllers\General\ProductosServiciosController')
+    ->middleware(['auth:adestajos,acompras']);

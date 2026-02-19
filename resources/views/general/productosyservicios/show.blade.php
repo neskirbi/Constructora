@@ -2,91 +2,101 @@
 <html lang="es">
 <head>
     @include('header')
-    <title>{{Empresa()}} | Nuevo Producto/Servicio</title>
+    <title>{{Empresa()}} | Editar Producto/Servicio</title>
 </head>
 <body>
     <div class="main-container">
         @include('toast.toasts')
-        @include('adestajos.sidebar')
+        @if(Guard() == 'adestajos')
+            @include('adestajos.sidebar')
+        @elseif(Guard() == 'acompras')
+            @include('acompras.sidebar')
+        @else
+            <!-- Opcional: sidebar por defecto o nada -->
+        @endif
         
         <main class="main-content" id="mainContent">
-            @include('adestajos.navbar')
+            @if(Guard() == 'adestajos')
+                @include('adestajos.navbar')
+            @elseif(Guard() == 'acompras')
+                @include('acompras.navbar')
+            @else
+                <!-- Opcional: sidebar por defecto o nada -->
+            @endif
 
             <div class="content-area">
                 <div class="container-fluid py-4">
                     <!-- Card principal -->
                     <div class="card shadow-sm mb-4">
-                        <!-- Header -->
+                        <!-- Header simplificado -->
                         <div class="card-header bg-white py-3">
                             <div class="d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-plus-circle me-2 text-primary"></i>
-                                    Nuevo Producto/Servicio
-                                </h5>
-                                <a href="{{ route('productosyservicios.index') }}" class="btn btn-outline-secondary">
-                                    <i class="fas fa-arrow-left me-1"></i> Volver
-                                </a>
+                                <div class="d-flex align-items-center">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-edit me-2 text-warning"></i>
+                                        Editar Producto/Servicio
+                                    </h5>
+                                </div>
+                                <!-- Eliminados los botones de ver detalles y eliminar -->
                             </div>
                         </div>
                         
                         <!-- Body -->
                         <div class="card-body">
-                            <form method="POST" action="{{ route('productosyservicios.store') }}" id="productoForm">
+                            <!-- Etiqueta de edición -->
+                            <div class="alert alert-warning bg-warning bg-opacity-10 border-0 mb-4 d-flex align-items-center">
+                                <i class="fas fa-pencil-alt fa-lg me-2"></i>
+                                <span>Modo de edición - Modifica los campos que necesites y guarda los cambios</span>
+                            </div>
+                            
+                            <form method="POST" action="{{ route('productosyservicios.update', $producto->id) }}" id="productoForm">
                                 @csrf
+                                @method('PUT')
                                 
                                 <div class="row g-4">
-                                    <!-- Columna izquierda -->
+                                    <!-- Columna izquierda - Formulario -->
                                     <div class="col-md-8">
                                         <div class="row g-3">
                                             <!-- Clave -->
                                             <div class="col-md-4">
                                                 <label class="form-label">
+                                                    <i class="fas fa-tag me-1 text-primary"></i>
                                                     Clave <span class="text-danger">*</span>
                                                 </label>
                                                 <input type="text" 
                                                        class="form-control @error('clave') is-invalid @enderror" 
                                                        name="clave" 
-                                                       id="clave"
-                                                       value="{{ old('clave') }}"
+                                                       value="{{ old('clave', $producto->clave) }}"
                                                        maxlength="32"
-                                                       placeholder="Ej: PROD-001"
                                                        required>
                                                 @error('clave')
-                                                <div class="invalid-feedback">
-                                                    {{ $message }}
-                                                </div>
+                                                <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
-                                                <small class="text-muted">
-                                                    Máximo 32 caracteres
-                                                </small>
+                                                <small class="text-muted">Máximo 32 caracteres</small>
                                             </div>
 
                                             <!-- Unidades -->
                                             <div class="col-md-4">
                                                 <label class="form-label">
+                                                    <i class="fas fa-ruler me-1 text-primary"></i>
                                                     Unidades <span class="text-danger">*</span>
                                                 </label>
                                                 <input type="text" 
                                                        class="form-control @error('unidades') is-invalid @enderror" 
                                                        name="unidades" 
-                                                       id="unidades"
-                                                       value="{{ old('unidades') }}"
+                                                       value="{{ old('unidades', $producto->unidades) }}"
                                                        maxlength="10"
-                                                       placeholder="Ej: PZA, M2, LTS"
                                                        required>
                                                 @error('unidades')
-                                                <div class="invalid-feedback">
-                                                    {{ $message }}
-                                                </div>
+                                                <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
-                                                <small class="text-muted">
-                                                    Ej: PZA, M2, LTS, KG
-                                                </small>
+                                                <small class="text-muted">Ej: PZA, M2, LTS</small>
                                             </div>
 
                                             <!-- Último costo -->
                                             <div class="col-md-4">
                                                 <label class="form-label">
+                                                    <i class="fas fa-dollar-sign me-1 text-primary"></i>
                                                     Último costo <span class="text-danger">*</span>
                                                 </label>
                                                 <div class="input-group">
@@ -94,107 +104,76 @@
                                                     <input type="number" 
                                                            class="form-control @error('ult_costo') is-invalid @enderror" 
                                                            name="ult_costo" 
-                                                           id="ult_costo"
-                                                           value="{{ old('ult_costo') }}"
+                                                           value="{{ old('ult_costo', $producto->ult_costo) }}"
                                                            step="0.01" 
                                                            min="0"
-                                                           placeholder="0.00"
                                                            required>
                                                     @error('ult_costo')
-                                                    <div class="invalid-feedback">
-                                                        {{ $message }}
-                                                    </div>
+                                                    <div class="invalid-feedback">{{ $message }}</div>
                                                     @enderror
                                                 </div>
-                                                <small class="text-muted">
-                                                    Costo unitario actual
-                                                </small>
                                             </div>
 
-                                            <!-- Descripción (ocupa toda la fila) -->
+                                            <!-- Descripción -->
                                             <div class="col-12">
                                                 <label class="form-label">
+                                                    <i class="fas fa-align-left me-1 text-primary"></i>
                                                     Descripción <span class="text-danger">*</span>
                                                 </label>
                                                 <textarea class="form-control @error('descripcion') is-invalid @enderror" 
                                                           name="descripcion" 
-                                                          id="descripcion"
                                                           rows="5"
-                                                          placeholder="Describe el producto o servicio..."
-                                                          required>{{ old('descripcion') }}</textarea>
+                                                          required>{{ old('descripcion', $producto->descripcion) }}</textarea>
                                                 @error('descripcion')
-                                                <div class="invalid-feedback">
-                                                    {{ $message }}
-                                                </div>
+                                                <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
                                             </div>
                                         </div>
                                     </div>
 
-                                    <!-- Columna derecha - Información adicional / Ayuda -->
+                                    <!-- Columna derecha - Información del registro (simplificada) -->
                                     <div class="col-md-4">
                                         <div class="card bg-light border-0">
                                             <div class="card-body">
                                                 <h6 class="fw-bold mb-3">
-                                                    <i class="fas fa-info-circle me-2 text-primary"></i>
-                                                    Información importante
+                                                    <i class="fas fa-clock me-2 text-primary"></i>
+                                                    Información del registro
                                                 </h6>
                                                 
-                                                <div class="mb-4">
+                                                <div class="mb-3">
                                                     <small class="text-muted d-block mb-2">
-                                                        <i class="fas fa-tag me-1"></i>
-                                                        Clave:
+                                                        <i class="fas fa-tag me-1"></i>Clave actual:
                                                     </small>
-                                                    <p class="small text-muted mb-0">
-                                                        La clave debe ser única y descriptiva. Puedes usar códigos como:
-                                                        <span class="d-block mt-2 text-dark">
-                                                            <span class="badge bg-light text-dark me-1">MAT-001</span>
-                                                            <span class="badge bg-light text-dark me-1">SER-045</span>
-                                                            <span class="badge bg-light text-dark">HERR-12</span>
+                                                    <p class="small">
+                                                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
+                                                            {{ $producto->clave }}
                                                         </span>
-                                                    </p>
-                                                </div>
-
-                                                <div class="mb-4">
-                                                    <small class="text-muted d-block mb-2">
-                                                        <i class="fas fa-ruler me-1"></i>
-                                                        Unidades:
-                                                    </small>
-                                                    <p class="small text-muted mb-0">
-                                                        Utiliza abreviaturas estándar:<br>
-                                                        <span class="text-dark">PZA</span> (Piezas)<br>
-                                                        <span class="text-dark">M2</span> (Metros cuadrados)<br>
-                                                        <span class="text-dark">M3</span> (Metros cúbicos)<br>
-                                                        <span class="text-dark">ML</span> (Metro lineal)<br>
-                                                        <span class="text-dark">KG</span> (Kilogramos)<br>
-                                                        <span class="text-dark">LTS</span> (Litros)<br>
-                                                        <span class="text-dark">HR</span> (Horas)
                                                     </p>
                                                 </div>
 
                                                 <div class="mb-3">
                                                     <small class="text-muted d-block mb-2">
-                                                        <i class="fas fa-dollar-sign me-1"></i>
-                                                        Costo:
+                                                        <i class="fas fa-history me-1"></i>Última modificación:
                                                     </small>
-                                                    <p class="small text-muted mb-0">
-                                                        Ingresa el costo unitario actual del producto o servicio. 
-                                                        Este valor puede actualizarse después.
+                                                    <p class="small mb-0">
+                                                        {{ $producto->updated_at->format('d/m/Y h:i A') }}
+                                                        <br>
+                                                        <span class="text-muted">{{ $producto->updated_at->diffForHumans() }}</span>
                                                     </p>
                                                 </div>
 
                                                 <hr>
 
                                                 <div class="alert alert-info py-2 mb-0 small">
-                                                    <i class="fas fa-lightbulb me-1"></i>
-                                                    <strong>Nota:</strong> Los campos marcados con <span class="text-danger">*</span> son obligatorios.
+                                                    <i class="fas fa-info-circle me-1"></i>
+                                                    Los campos marcados con <span class="text-danger">*</span> son obligatorios
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Footer con botones de acción -->
+                                <!-- Footer con botones simplificados -->
                                 <div class="row mt-4">
                                     <div class="col-12">
                                         <hr>
@@ -202,8 +181,8 @@
                                             <a href="{{ route('productosyservicios.index') }}" class="btn btn-outline-secondary">
                                                 <i class="fas fa-times me-1"></i> Cancelar
                                             </a>
-                                            <button type="submit" class="btn btn-primary" id="btnGuardar">
-                                                <i class="fas fa-save me-1"></i> Guardar producto/servicio
+                                            <button type="submit" class="btn btn-warning" id="btnGuardar">
+                                                <i class="fas fa-save me-1"></i> Actualizar cambios
                                             </button>
                                         </div>
                                     </div>
@@ -217,32 +196,25 @@
     </div>
 
     @include('footer')
-
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('productoForm');
             const btnGuardar = document.getElementById('btnGuardar');
+            const form = document.getElementById('productoForm');
 
             form.addEventListener('submit', function() {
                 btnGuardar.disabled = true;
-                btnGuardar.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Guardando...';
+                btnGuardar.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Actualizando...';
             });
 
             // Auto-mayúsculas para clave
-            document.getElementById('clave').addEventListener('input', function(e) {
+            document.querySelector('input[name="clave"]').addEventListener('input', function(e) {
                 this.value = this.value.toUpperCase();
             });
 
             // Auto-mayúsculas para unidades
-            document.getElementById('unidades').addEventListener('input', function(e) {
+            document.querySelector('input[name="unidades"]').addEventListener('input', function(e) {
                 this.value = this.value.toUpperCase();
-            });
-
-            // Validar que el costo no sea negativo mientras se escribe
-            document.getElementById('ult_costo').addEventListener('input', function(e) {
-                if (this.value < 0) {
-                    this.value = 0;
-                }
             });
         });
     </script>

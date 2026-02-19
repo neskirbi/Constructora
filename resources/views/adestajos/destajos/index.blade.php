@@ -18,13 +18,42 @@
             transform: translateY(-2px);
         }
         .destajo-header {
-            padding: 20px;
+            padding: 15px 20px;
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             border-bottom: 1px solid #dee2e6;
             position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .destajo-header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .destajo-consecutivo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0d6efd;
+            margin: 0;
         }
         .destajo-body {
             padding: 20px;
+        }
+        .destajo-proveedor {
+            font-size: 1.1rem;
+            color: #495057;
+            font-weight: 500;
+            margin-bottom: 15px;
+            padding: 8px 15px;
+            background: #e7f1ff;
+            border-radius: 8px;
+            border-left: 4px solid #0d6efd;
+        }
+        .destajo-proveedor i {
+            color: #0d6efd;
+            margin-right: 8px;
         }
         .destajo-footer {
             padding: 15px 20px;
@@ -35,15 +64,13 @@
             align-items: center;
         }
         .destajo-estado {
-            position: absolute;
-            top: 15px;
-            right: 15px;
             padding: 5px 12px;
             border-radius: 20px;
             font-size: 0.75rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            white-space: nowrap;
         }
         .estado-rechazado {
             background: #fee;
@@ -60,39 +87,52 @@
             color: #155724;
             border: 1px solid #c3e6cb;
         }
-        .destajo-consecutivo {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #0d6efd;
-            margin-bottom: 5px;
+        /* Tabla de detalles */
+        .detalles-table {
+            width: 100%;
+            font-size: 0.9rem;
+            border-collapse: collapse;
+            margin-top: 15px;
         }
-        .destajo-clave {
-            font-size: 1.1rem;
+        .detalles-table th {
+            background-color: #f8f9fa;
+            padding: 10px;
             font-weight: 600;
             color: #495057;
-            margin-bottom: 10px;
-            display: block;
+            border-bottom: 2px solid #dee2e6;
+            text-align: left;
         }
-        .destajo-titulo {
-            font-size: 1rem;
-            color: #6c757d;
-            margin-bottom: 5px;
-            line-height: 1.5;
+        .detalles-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #e9ecef;
         }
-        .destajo-info-grid {
+        .detalles-table tr:last-child td {
+            border-bottom: none;
+        }
+        .detalles-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        .moneda {
+            color: #198754;
+            font-weight: 600;
+        }
+        .info-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 15px;
-            margin-top: 15px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
         }
         .info-item {
             display: flex;
             flex-direction: column;
         }
         .info-label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #6c757d;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -100,27 +140,6 @@
             font-size: 1rem;
             font-weight: 600;
             color: #495057;
-        }
-        .info-value.moneda {
-            color: #198754;
-        }
-        .destajo-descripcion {
-            color: #495057;
-            line-height: 1.6;
-            margin: 15px 0;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #0d6efd;
-        }
-        .destajo-referencia {
-            color: #6c757d;
-            font-size: 0.9rem;
-            font-style: italic;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 6px;
-            border-left: 3px solid #6c757d;
         }
         .btn-action {
             padding: 8px 16px;
@@ -162,10 +181,6 @@
             margin-bottom: 20px;
             color: #adb5bd;
             opacity: 0.7;
-        }
-        .empty-state h5 {
-            font-weight: 600;
-            margin-bottom: 10px;
         }
         .pagination-container {
             background: white;
@@ -232,10 +247,13 @@
                                 @foreach($destajos as $destajo)
                                 <div class="destajo-card">
                                     <div class="destajo-header">
-                                        <!-- Título principal: Clave del concepto -->
-                                        <div class="destajo-clave">{{ $destajo->clave_concepto }}</div>
-                                     
-                                        <!-- Estado del destajo - Lado derecho -->
+                                        <div class="destajo-header-left">
+                                            <div class="destajo-consecutivo">
+                                                <i class="fas fa-hashtag me-1"></i>
+                                                {{ $destajo->consecutivo }}
+                                            </div>
+                                        </div>
+                                        
                                         @php
                                             $estadoClase = '';
                                             $estadoTexto = '';
@@ -264,31 +282,33 @@
                                             {{ $estadoTexto }}
                                         </span>
                                         @endif
-                                        
-                                        <!-- Consecutivo pequeño debajo -->
-                                        <div class="mt-2">
-                                            <small class="text-muted">
-                                                Consecutivo: {{ $destajo->consecutivo }}
-                                            </small>
-                                        </div>
                                     </div>
                                     
                                     <div class="destajo-body">
-                                        <div class="destajo-info-grid">
+                                        <!-- Proveedor en el body (fuera del grid) -->
+                                        <div class="destajo-proveedor">
+                                            <i class="fas fa-building"></i>
+                                            {{ $destajo->proveedor_nombre ?? 'Proveedor no encontrado' }}
+                                        </div>
+                                        
+                                        <!-- Grid de información general del destajo -->
+                                        <div class="info-grid">
                                             <div class="info-item">
-                                                <span class="info-label">Unidad</span>
-                                                <span class="info-value">{{ $destajo->unidad_concepto }}</span>
+                                                <span class="info-label">Referencia</span>
+                                                <span class="info-value">{{ $destajo->referencia ?? 'N/A' }}</span>
                                             </div>
                                             <div class="info-item">
-                                                <span class="info-label">Cantidad</span>
-                                                <span class="info-value">{{ number_format($destajo->cantidad, 2) }}</span>
+                                                <span class="info-label">Contrato</span>
+                                                <span class="info-value">
+                                                    {{ $destajo->contrato_no ?? 'N/A' }}
+                                                </span>
                                             </div>
                                             <div class="info-item">
-                                                <span class="info-label">Costo Unitario</span>
-                                                <span class="info-value moneda">${{ number_format($destajo->costo_unitario_concepto, 2) }}</span>
+                                                <span class="info-label">Concepto</span>
+                                                <span class="info-value">{{ $destajo->clave_concepto }}</span>
                                             </div>
                                             <div class="info-item">
-                                                <span class="info-label">Subtotal</span>
+                                                <span class="info-label">Costo Operado</span>
                                                 <span class="info-value moneda">${{ number_format($destajo->costo_operado, 2) }}</span>
                                             </div>
                                             <div class="info-item">
@@ -297,35 +317,50 @@
                                             </div>
                                             <div class="info-item">
                                                 <span class="info-label">Total</span>
-                                                <span class="info-value moneda" style="color: #198754; font-size: 1.1rem;">
+                                                <span class="info-value moneda" style="font-size: 1.1rem;">
                                                     ${{ number_format($destajo->total, 2) }}
                                                 </span>
                                             </div>
-                                            <div class="info-item">
-                                                <span class="info-label">Proveedor</span>
-                                                <span class="info-value">
-                                                    @php
-                                                        $proveedorNombre = \App\Models\ProveedorSer::find($destajo->id_proveedor);
-                                                    @endphp
-                                                    {{ $proveedorNombre ? $proveedorNombre->nombre : 'N/A' }}
-                                                </span>
-                                            </div>
-                                            <div class="info-item">
-                                                <span class="info-label">Contrato</span>
-                                                <span class="info-value">
-                                                    @php
-                                                        $contratoNo = \App\Models\Contrato::find($destajo->id_contrato);
-                                                    @endphp
-                                                    {{ $contratoNo ? $contratoNo->contrato_no : 'N/A' }}
-                                                </span>
-                                            </div>
                                         </div>
-                                        
-                                        @if($destajo->referencia)
-                                        <div class="destajo-referencia mt-3">
-                                            <i class="fas fa-sticky-note me-2"></i>
-                                            <strong>Referencia:</strong> {{ $destajo->referencia }}
+
+                                        <!-- Descripción del concepto -->
+                                        @if($destajo->descripcion_concepto)
+                                        <div class="destajo-descripcion mb-3">
+                                            <i class="fas fa-align-left me-2"></i>
+                                            {{ $destajo->descripcion_concepto }}
                                         </div>
+                                        @endif
+
+                                        <!-- Tabla de detalles (productos/servicios) -->
+                                        @if(isset($destajo->detalles) && count($destajo->detalles) > 0)
+                                        <h6 class="fw-bold mb-2">
+                                            <i class="fas fa-boxes me-2"></i>
+                                            Productos / Servicios
+                                        </h6>
+                                        <table class="detalles-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Clave</th>
+                                                    <th>Descripción</th>
+                                                    <th>Unidad</th>
+                                                    <th class="text-end">Cantidad</th>
+                                                    <th class="text-end">P. Unitario</th>
+                                                    <th class="text-end">Subtotal</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($destajo->detalles as $detalle)
+                                                <tr>
+                                                    <td><strong>{{ $detalle->clave }}</strong></td>
+                                                    <td>{{ $detalle->descripcion }}</td>
+                                                    <td>{{ $detalle->unidades }}</td>
+                                                    <td class="text-end">{{ number_format($detalle->cantidad, 2) }}</td>
+                                                    <td class="text-end moneda">${{ number_format($detalle->ult_costo, 2) }}</td>
+                                                    <td class="text-end moneda">${{ number_format($detalle->cantidad * $detalle->ult_costo, 2) }}</td>
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
                                         @endif
                                     </div>
                                     
@@ -333,12 +368,12 @@
                                         <div>
                                             <small class="text-muted">
                                                 <i class="fas fa-calendar me-1"></i>
-                                                Creado: {{ $destajo->created_at->format('d/m/Y H:i') }}
+                                                Creado: {{ \Carbon\Carbon::parse($destajo->created_at)->format('d/m/Y H:i') }}
                                             </small>
                                         </div>
                                         <div class="d-flex gap-2">
                                             <a href="{{ route('destajos.show', $destajo->id) }}" 
-                                            class="btn-action btn-ver">
+                                               class="btn-action btn-ver">
                                                 <i class="fas fa-eye"></i> Ver
                                             </a>
                                             

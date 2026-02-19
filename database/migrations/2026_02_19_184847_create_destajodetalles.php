@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCSdetalles extends Migration
+class CreateDestajodetalles extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class CreateCSdetalles extends Migration
      */
     public function up()
     {
-        Schema::create('csdetalles', function (Blueprint $table) {
-            $table->string('id',32)->unique();
+        Schema::create('destajodetalles', function (Blueprint $table) {
+           $table->string('id',32)->unique();
             $table->string('id_productoservicio',32);
 
             $table->string('clave',32);
@@ -33,6 +33,6 @@ class CreateCSdetalles extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('csdetalles');
+        Schema::dropIfExists('destajodetalles');
     }
 }

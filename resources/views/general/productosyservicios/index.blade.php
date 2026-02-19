@@ -7,10 +7,22 @@
 <body>
     <div class="main-container">
         @include('toast.toasts')
-        @include('adestajos.sidebar')
+        @if(Guard() == 'adestajos')
+            @include('adestajos.sidebar')
+        @elseif(Guard() == 'acompras')
+            @include('acompras.sidebar')
+        @else
+            <!-- Opcional: sidebar por defecto o nada -->
+        @endif
         
         <main class="main-content" id="mainContent">
-            @include('adestajos.navbar')
+            @if(Guard() == 'adestajos')
+                @include('adestajos.navbar')
+            @elseif(Guard() == 'acompras')
+                @include('acompras.navbar')
+            @else
+                <!-- Opcional: sidebar por defecto o nada -->
+            @endif
 
             <div class="content-area">
                 <div class="container-fluid py-4">
@@ -61,7 +73,7 @@
                             <!-- Grid de productos -->
                             <div class="row">
                                 @forelse($productos as $producto)
-                                <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+                                <div class="col-xl-6 col-lg-6 col-md-6 mb-4">
                                     <div class="card h-100 shadow-sm">
                                         <!-- Header del card -->
                                         <div class="card-header bg-white py-3 border-bottom">
