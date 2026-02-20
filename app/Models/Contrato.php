@@ -15,6 +15,7 @@ class Contrato extends Model
     
     protected $fillable = [
         'id',
+        'consecutivo',
         'id_usuario',
         'empresa',
         'refinterna',

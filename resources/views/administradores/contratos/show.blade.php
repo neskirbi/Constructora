@@ -176,6 +176,17 @@
                             </h5>
                             
                             <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">
+                                            Consecutivo
+                                        </label>
+                                        <div class="info-value @if(empty($contrato->consecutivo)) info-value-empty @endif">
+                                            {{ $contrato->consecutivo ?: 'No especificado' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                
                                 <div class="col-md-12">
                                     <div class="form-group-custom">
                                         <label class="form-label-custom">

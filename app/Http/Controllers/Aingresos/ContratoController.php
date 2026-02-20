@@ -42,7 +42,10 @@ class ContratoController extends Controller
     }
 
     function create(){
-        return view('aingresos.contratos.create');
+        $maxConsecutivo = DB::table('contratos')->count();
+        $siguienteConsecutivo = $maxConsecutivo ? $maxConsecutivo + 1 : 1;
+
+        return view('aingresos.contratos.create', compact('siguienteConsecutivo'));
     }
 
     /**
@@ -56,6 +59,7 @@ class ContratoController extends Controller
             // Validar todos los campos del formulario según la estructura de la tabla
             $validatedData = $request->validate([
                 // Información general
+                'consecutivo' => 'nullable|integer',
                 'obra' => 'nullable|string',
                 'refinterna' => 'nullable|string',
                 'empresa' => 'nullable|string|max:255',
@@ -119,6 +123,7 @@ class ContratoController extends Controller
             // Preparar todos los datos para insertar
             $datosContrato = [
                 'id' => GetUuid(),
+                'consecutivo' => $validatedData['consecutivo'] ?? null, 
                 'id_usuario' => GetId(),
                 'contrato_no' => $validatedData['contrato_no'],
                 
@@ -237,6 +242,7 @@ class ContratoController extends Controller
             // Validar todos los campos del formulario según la estructura de la tabla
             $validatedData = $request->validate([
                 // Información general
+                'consecutivo' => 'nullable|integer',
                 'obra' => 'nullable|string',
                 'refinterna' => 'nullable|string',
                 'empresa' => 'nullable|string|max:255',
@@ -299,6 +305,7 @@ class ContratoController extends Controller
 
             // Preparar todos los datos para actualizar
             $datosContrato = [
+                'consecutivo' => $validatedData['consecutivo'] ?? null,
                 'obra' => $validatedData['obra'] ?? null,
                 'refinterna' => $validatedData['refinterna'] ?? null,
                 'empresa' => $validatedData['empresa'] ?? null,

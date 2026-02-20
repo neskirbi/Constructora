@@ -185,6 +185,24 @@
                                 </h5>
                                 
                                 <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group-custom">
+                                            <label for="consecutivo" class="form-label-custom">
+                                                Consecutivo
+                                            </label>
+                                            <input type="number" 
+                                                class="form-control form-control-custom" 
+                                                id="consecutivo" 
+                                                name="consecutivo" 
+                                                value="{{ old('consecutivo', $siguienteConsecutivo) }}"
+                                                placeholder="Número consecutivo"
+                                                min="1">
+                                            <div class="help-text">Siguiente número disponible: {{ $siguienteConsecutivo }}</div>
+                                            @error('consecutivo')
+                                                <div class="text-danger small mt-1">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
                                     <div class="col-md-12">
                                         <div class="form-group-custom">
                                             <label for="obra" class="form-label-custom">

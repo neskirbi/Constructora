@@ -36,15 +36,14 @@ class DestajoController extends Controller
         
         if ($search) {
             $query->where(function($q) use ($search) {
-                $q->where('d.clave_concepto', 'like', '%' . $search . '%')
-                ->orWhere('d.descripcion_concepto', 'like', '%' . $search . '%')
-                ->orWhere('d.referencia', 'like', '%' . $search . '%')
-                ->orWhere('c.contrato_no', 'like', '%' . $search . '%')
-                ->orWhere('p.nombre', 'like', '%' . $search . '%');
+                $q->where('d.referencia', 'like', '%' . $search . '%')
+                  ->orWhere('c.contrato_no', 'like', '%' . $search . '%')
+                  ->orWhere('p.nombre', 'like', '%' . $search . '%')
+                  ->orWhere('p.clave', 'like', '%' . $search . '%');
             });
         }
         
-        $destajos = $query->orderBy('d.created_at', 'asc')
+        $destajos = $query->orderBy('d.created_at', 'desc')
             ->paginate(15);
         
         // Obtener todos los IDs de destajos
@@ -140,16 +139,13 @@ class DestajoController extends Controller
                 'id_usuario' => $id_usuario,
                 'id_proveedor' => $request->id_proveedor,
                 'consecutivo' => $request->consecutivo,
-                'clave_concepto' => 'MULTIPLE',
-                'descripcion_concepto' => 'Múltiples productos/servicios',
-                'unidad_concepto' => 'Varios',
-                'costo_unitario_concepto' => 0,
-                'cantidad' => 1, // Esto ya no se usará realmente
                 'referencia' => $request->referencia,
                 'costo_operado' => $costo_operado,
                 'iva' => $iva_calculado,
                 'total' => $total,
                 'verificado' => 1,
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
             
             // Guardar los detalles con CANTIDAD
@@ -165,8 +161,10 @@ class DestajoController extends Controller
                     'clave' => $productoData->clave,
                     'descripcion' => $productoData->descripcion,
                     'unidades' => $productoData->unidades,
-                    'cantidad' => $producto['cantidad'], // ← AHORA SÍ GUARDAMOS LA CANTIDAD
+                    'cantidad' => $producto['cantidad'],
                     'ult_costo' => $producto['precio'],
+                    'created_at' => now(),
+                    'updated_at' => now()
                 ]);
             }
             
@@ -234,8 +232,6 @@ class DestajoController extends Controller
         
         return view('administradores.destajos.show', compact('destajo', 'detalles', 'proveedores', 'contratos', 'productos'));
     }
-
-
 
     public function edit($id)
     {
@@ -362,8 +358,10 @@ class DestajoController extends Controller
                     'clave' => $productoData->clave,
                     'descripcion' => $productoData->descripcion,
                     'unidades' => $productoData->unidades,
-                    'cantidad' => $producto['cantidad'], // ← AHORA SÍ GUARDAMOS LA CANTIDAD
+                    'cantidad' => $producto['cantidad'],
                     'ult_costo' => $producto['precio'],
+                    'created_at' => now(),
+                    'updated_at' => now()
                 ]);
             }
             
@@ -429,78 +427,70 @@ class DestajoController extends Controller
     }
 
     /**
- * Confirmar (aprobar) un destajo
- */
-public function confirmar($id)
-{
-    // Verificar si el destajo existe
-    $destajo = DB::table('destajos')
-        ->where('id', $id)
-        ->first();
-    
-    if (!$destajo) {
-        return redirect()->route('adestajos.index')
-            ->with('error', 'Destajo no encontrado');
-    }
-    
-    // Solo se puede confirmar si está pendiente (verificado = 1)
-    if ($destajo->verificado != 1) {
-        return redirect()->route('adestajos.show', $id)
-            ->with('error', 'Solo se pueden confirmar destajos en estado pendiente');
-    }
-    
-    try {
-        DB::table('destajos')
+     * Confirmar (aprobar) un destajo
+     */
+    public function confirmar($id)
+    {
+        // Verificar si el destajo existe
+        $destajo = DB::table('destajos')
             ->where('id', $id)
-            ->update([
-                'verificado' => 2, // 2 = Aprobado
-                'updated_at' => now()
-            ]);
+            ->first();
         
-        return redirect()->route('adestajos.show', $id)
-            ->with('success', 'Destajo confirmado exitosamente');
+        if (!$destajo) {
+            return redirect()->route('adestajos.index')
+                ->with('error', 'Destajo no encontrado');
+        }
+        
+        
+        
+        try {
+            DB::table('destajos')
+                ->where('id', $id)
+                ->update([
+                    'verificado' => 2, // 2 = Aprobado
+                    'updated_at' => now()
+                ]);
             
-    } catch (\Exception $e) {
-        return redirect()->route('adestajos.show', $id)
-            ->with('error', 'Error al confirmar el destajo: ' . $e->getMessage());
+            return redirect()->route('adestajos.show', $id)
+                ->with('success', 'Destajo confirmado exitosamente');
+                
+        } catch (\Exception $e) {
+            return redirect()->route('adestajos.show', $id)
+                ->with('error', 'Error al confirmar el destajo: ' . $e->getMessage());
+        }
     }
-}
 
-/**
- * Rechazar un destajo
- */
-public function rechazar($id)
-{
-    // Verificar si el destajo existe
-    $destajo = DB::table('destajos')
-        ->where('id', $id)
-        ->first();
-    
-    if (!$destajo) {
-        return redirect()->route('adestajos.index')
-            ->with('error', 'Destajo no encontrado');
-    }
-    
-    // Solo se puede rechazar si está pendiente (verificado = 1)
-    if ($destajo->verificado != 1) {
-        return redirect()->route('adestajos.show', $id)
-            ->with('error', 'Solo se pueden rechazar destajos en estado pendiente');
-    }
-    
-    try {
-        DB::table('destajos')
+    /**
+     * Rechazar un destajo
+     */
+    public function rechazar($id)
+    {
+        // Verificar si el destajo existe
+        $destajo = DB::table('destajos')
             ->where('id', $id)
-            ->update([
-                'verificado' => 0, // 0 = Rechazado
-                'updated_at' => now()
-            ]);
+            ->first();
         
-        return redirect()->route('adestajos.show', $id)
-            ->with('success', 'Destajo rechazado exitosamente');
+        if (!$destajo) {
+            return redirect()->route('adestajos.index')
+                ->with('error', 'Destajo no encontrado');
+        }
+        
+        
+        
+        try {
+            DB::table('destajos')
+                ->where('id', $id)
+                ->update([
+                    'verificado' => 0, // 0 = Rechazado
+                    'updated_at' => now()
+                ]);
             
-    } catch (\Exception $e) {
-        return redirect()->route('adestajos.show', $id)
-            ->with('error', 'Error al rechazar el destajo: ' . $e->getMessage());
+            return redirect()->route('adestajos.show', $id)
+                ->with('success', 'Destajo rechazado exitosamente');
+                
+        } catch (\Exception $e) {
+            return redirect()->route('adestajos.show', $id)
+                ->with('error', 'Error al rechazar el destajo: ' . $e->getMessage());
+        }
     }
-}
 }

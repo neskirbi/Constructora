@@ -301,10 +301,6 @@
                                                 </span>
                                             </div>
                                             <div class="info-item">
-                                                <span class="info-label">Concepto</span>
-                                                <span class="info-value">{{ $destajo->clave_concepto }}</span>
-                                            </div>
-                                            <div class="info-item">
                                                 <span class="info-label">Costo Operado</span>
                                                 <span class="info-value moneda">${{ number_format($destajo->costo_operado, 2) }}</span>
                                             </div>
@@ -319,14 +315,6 @@
                                                 </span>
                                             </div>
                                         </div>
-
-                                        <!-- Descripción del concepto -->
-                                        @if($destajo->descripcion_concepto)
-                                        <div class="destajo-descripcion mb-3">
-                                            <i class="fas fa-align-left me-2"></i>
-                                            {{ $destajo->descripcion_concepto }}
-                                        </div>
-                                        @endif
 
                                         <!-- Tabla de detalles (productos/servicios) -->
                                         @if(isset($destajo->detalles) && count($destajo->detalles) > 0)

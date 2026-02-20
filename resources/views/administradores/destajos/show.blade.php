@@ -153,6 +153,14 @@
             background: #b02a37;
             color: white;
         }
+        .btn-pendiente {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-pendiente:hover {
+            background: #e0a800;
+            color: #212529;
+        }
         .btn-regresar {
             background: #6c757d;
             color: white;
@@ -181,7 +189,7 @@
                         <div class="destajo-header">
                             <div class="destajo-consecutivo">
                                 <i class="fas fa-hashtag me-2"></i>
-                                {{ $destajo->consecutivo }}
+                                Destajo #{{ $destajo->consecutivo }}
                             </div>
                             
                             @php
@@ -235,14 +243,6 @@
                                     <span class="info-value">{{ $destajo->contrato_no ?? 'N/A' }}</span>
                                 </div>
                                 <div class="info-item">
-                                    <span class="info-label">Concepto</span>
-                                    <span class="info-value">{{ $destajo->clave_concepto }}</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">Unidad</span>
-                                    <span class="info-value">{{ $destajo->unidad_concepto }}</span>
-                                </div>
-                                <div class="info-item">
                                     <span class="info-label">Costo Operado</span>
                                     <span class="info-value moneda">${{ number_format($destajo->costo_operado, 2) }}</span>
                                 </div>
@@ -254,20 +254,11 @@
                                     <span class="info-label">Total</span>
                                     <span class="info-value moneda" style="font-size: 1.2rem;">${{ number_format($destajo->total, 2) }}</span>
                                 </div>
-                            </div>
-
-                            <!-- Descripción -->
-                            @if($destajo->descripcion_concepto)
-                            <div class="mb-4">
-                                <h6 class="fw-bold mb-2">
-                                    <i class="fas fa-align-left me-2"></i>
-                                    Descripción
-                                </h6>
-                                <div class="p-3 bg-light rounded">
-                                    {{ $destajo->descripcion_concepto }}
+                                <div class="info-item">
+                                    <span class="info-label">Creado por</span>
+                                    <span class="info-value">{{ $destajo->usuario_nombres ?? 'N/A' }} {{ $destajo->usuario_apellidos ?? '' }}</span>
                                 </div>
                             </div>
-                            @endif
 
                             <!-- Productos/Servicios -->
                             @if(isset($detalles) && count($detalles) > 0)
@@ -323,13 +314,23 @@
                                     <i class="fas fa-arrow-left"></i> Regresar
                                 </a>
                                 
-                                @if(isset($destajo->verificado) && $destajo->verificado == 1)
-                                <button type="button" class="btn-action btn-confirmar" onclick="abrirModal('confirmar', '{{ $destajo->id }}', '{{ $destajo->consecutivo }}')">
-                                    <i class="fas fa-check-circle"></i> Confirmar
-                                </button>
-                                <button type="button" class="btn-action btn-rechazar" onclick="abrirModal('rechazar', '{{ $destajo->id }}', '{{ $destajo->consecutivo }}')">
-                                    <i class="fas fa-times-circle"></i> Rechazar
-                                </button>
+                                @if(isset($destajo->verificado))
+                                    @if($destajo->verificado == 1) {{-- Pendiente --}}
+                                        <button type="button" class="btn-action btn-confirmar" onclick="abrirModal('confirmar', '{{ $destajo->id }}', '{{ $destajo->consecutivo }}')">
+                                            <i class="fas fa-check-circle"></i> Aprobar
+                                        </button>
+                                        <button type="button" class="btn-action btn-rechazar" onclick="abrirModal('rechazar', '{{ $destajo->id }}', '{{ $destajo->consecutivo }}')">
+                                            <i class="fas fa-times-circle"></i> Rechazar
+                                        </button>
+                                    @elseif($destajo->verificado == 2) {{-- Aprobado --}}
+                                        <button type="button" class="btn-action btn-rechazar" onclick="abrirModal('rechazar', '{{ $destajo->id }}', '{{ $destajo->consecutivo }}')">
+                                            <i class="fas fa-times-circle"></i> Rechazar
+                                        </button>
+                                    @elseif($destajo->verificado == 0) {{-- Rechazado --}}
+                                        <button type="button" class="btn-action btn-confirmar" onclick="abrirModal('confirmar', '{{ $destajo->id }}', '{{ $destajo->consecutivo }}')">
+                                            <i class="fas fa-check-circle"></i> Aprobar
+                                        </button>
+                                    @endif
                                 @endif
                             </div>
                         </div>
@@ -383,24 +384,22 @@
         const accionForm = document.getElementById('accionForm');
         
         if (accion === 'confirmar') {
-            modalTitle.innerHTML = '<i class="fas fa-check-circle text-success me-2"></i> Confirmar Destajo';
+            modalTitle.innerHTML = '<i class="fas fa-check-circle text-success me-2"></i> Aprobar Destajo';
             modalMessage.textContent = '¿Estás seguro de que deseas APROBAR este destajo?';
             modalBoton.className = 'btn btn-success';
-            modalBoton.innerHTML = '<i class="fas fa-check-circle me-1"></i> Sí, Confirmar';
-            // CORREGIDO:
+            modalBoton.innerHTML = '<i class="fas fa-check-circle me-1"></i> Sí, Aprobar';
             accionForm.action = '{{ route("destajos.confirmar", ":id") }}'.replace(':id', id);
-        } else {
+        } else if (accion === 'rechazar') {
             modalTitle.innerHTML = '<i class="fas fa-times-circle text-danger me-2"></i> Rechazar Destajo';
             modalMessage.textContent = '¿Estás seguro de que deseas RECHAZAR este destajo?';
             modalBoton.className = 'btn btn-danger';
             modalBoton.innerHTML = '<i class="fas fa-times-circle me-1"></i> Sí, Rechazar';
-            // CORREGIDO:
             accionForm.action = '{{ route("destajos.rechazar", ":id") }}'.replace(':id', id);
         }
         
         destajoInfo.innerHTML = '<strong>Destajo #' + consecutivo + '</strong>';
         modal.show();
     }
-</script>
+    </script>
 </body>
 </html>

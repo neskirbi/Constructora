@@ -21,24 +21,19 @@ class Destajo extends Model
         'id_usuario',
         'id_proveedor',
         'consecutivo',
-        'clave_concepto',
-        'descripcion_concepto',
-        'unidad_concepto',
-        'costo_unitario_concepto',
-        'cantidad',
         'referencia',
         'costo_operado',
         'iva',
         'total',
+        'verificado'
     ];
 
     protected $casts = [
         'consecutivo' => 'integer',
-        'costo_unitario_concepto' => 'decimal:2',
-        'cantidad' => 'decimal:2',
         'costo_operado' => 'decimal:2',
         'iva' => 'decimal:2',
         'total' => 'decimal:2',
+        'verificado' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

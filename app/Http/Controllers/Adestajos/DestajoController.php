@@ -37,15 +37,14 @@ class DestajoController extends Controller
         
         if ($search) {
             $query->where(function($q) use ($search) {
-                $q->where('d.clave_concepto', 'like', '%' . $search . '%')
-                ->orWhere('d.descripcion_concepto', 'like', '%' . $search . '%')
-                ->orWhere('d.referencia', 'like', '%' . $search . '%')
-                ->orWhere('c.contrato_no', 'like', '%' . $search . '%')
-                ->orWhere('p.nombre', 'like', '%' . $search . '%');
+                $q->where('d.referencia', 'like', '%' . $search . '%')
+                  ->orWhere('c.contrato_no', 'like', '%' . $search . '%')
+                  ->orWhere('p.nombre', 'like', '%' . $search . '%')
+                  ->orWhere('p.clave', 'like', '%' . $search . '%');
             });
         }
         
-        $destajos = $query->orderBy('d.created_at', 'asc')
+        $destajos = $query->orderBy('d.created_at', 'desc')
             ->paginate(15);
         
         // Obtener todos los IDs de destajos
@@ -109,11 +108,11 @@ class DestajoController extends Controller
             'consecutivo' => 'required|integer|min:1',
             'id_contrato' => 'required|string|exists:contratos,id',
             'id_proveedor' => 'required|string|exists:proveedores_servicios,id',
-            'referencia' => 'nullable|string|max:1500',
+            'referencia' => 'required|string|max:1500',
             'iva' => 'nullable|numeric|min:0',
             'productos' => 'required|array|min:1',
             'productos.*.id_producto' => 'required|string|exists:productosyservicios,id',
-            'productos.*.cantidad' => 'required|numeric', // Eliminado min:0.01 para permitir negativos
+            'productos.*.cantidad' => 'required|numeric',
             'productos.*.precio' => 'required|numeric',
         ]);
         
@@ -142,18 +141,16 @@ class DestajoController extends Controller
                 'id_usuario' => $id_usuario,
                 'id_proveedor' => $request->id_proveedor,
                 'consecutivo' => $request->consecutivo,
-                'clave_concepto' => 'MULTIPLE',
-                'descripcion_concepto' => 'Múltiples productos/servicios',
-                'unidad_concepto' => 'Varios',
-                'costo_unitario_concepto' => 0,
                 'referencia' => $request->referencia,
                 'costo_operado' => $costo_operado,
                 'iva' => $iva_calculado,
                 'total' => $total,
                 'verificado' => 1,
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
             
-            // Guardar los detalles con CANTIDAD
+            // Guardar los detalles
             foreach ($request->productos as $producto) {
                 $productoData = DB::table('productosyservicios')
                     ->where('id', $producto['id_producto'])
@@ -166,8 +163,10 @@ class DestajoController extends Controller
                     'clave' => $productoData->clave,
                     'descripcion' => $productoData->descripcion,
                     'unidades' => $productoData->unidades,
-                    'cantidad' => $producto['cantidad'], // Ahora acepta negativos
+                    'cantidad' => $producto['cantidad'],
                     'ult_costo' => $producto['precio'],
+                    'created_at' => now(),
+                    'updated_at' => now()
                 ]);
             }
             
@@ -307,7 +306,7 @@ class DestajoController extends Controller
             'iva' => 'nullable|numeric|min:0',
             'productos' => 'required|array|min:1',
             'productos.*.id_producto' => 'required|string|exists:productosyservicios,id',
-            'productos.*.cantidad' => 'required|numeric', // Eliminado min:0.01 para permitir negativos
+            'productos.*.cantidad' => 'required|numeric',
             'productos.*.precio' => 'required|numeric',
             'verificado' => 'nullable|integer|in:0,1,2',
         ]);
@@ -350,7 +349,7 @@ class DestajoController extends Controller
                 ->where('id_destajo', $id)
                 ->delete();
             
-            // Insertar nuevos detalles con CANTIDAD
+            // Insertar nuevos detalles
             foreach ($request->productos as $producto) {
                 $productoData = DB::table('productosyservicios')
                     ->where('id', $producto['id_producto'])
@@ -363,8 +362,10 @@ class DestajoController extends Controller
                     'clave' => $productoData->clave,
                     'descripcion' => $productoData->descripcion,
                     'unidades' => $productoData->unidades,
-                    'cantidad' => $producto['cantidad'], // Ahora acepta negativos
+                    'cantidad' => $producto['cantidad'],
                     'ult_costo' => $producto['precio'],
+                    'created_at' => now(),
+                    'updated_at' => now()
                 ]);
             }
             

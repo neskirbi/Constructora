@@ -271,42 +271,9 @@
                                     </div>
                                 </div>
 
-                                <!-- Grid de información (solo visual) -->
-                                <div class="info-grid">
-                                    <div class="info-item">
-                                        <span class="info-label">Concepto</span>
-                                        <span class="info-value">{{ $destajo->clave_concepto }}</span>
-                                    </div>
-                                    <div class="info-item">
-                                        <span class="info-label">Unidad</span>
-                                        <span class="info-value">{{ $destajo->unidad_concepto }}</span>
-                                    </div>
-                                    <div class="info-item">
-                                        <span class="info-label">Costo Operado</span>
-                                        <span class="info-value moneda">${{ number_format($destajo->costo_operado, 2) }}</span>
-                                    </div>
-                                    <div class="info-item">
-                                        <span class="info-label">IVA</span>
-                                        <span class="info-value moneda">${{ number_format($destajo->iva, 2) }}</span>
-                                    </div>
-                                    <div class="info-item">
-                                        <span class="info-label">Total</span>
-                                        <span class="info-value moneda" style="font-size: 1.2rem;">${{ number_format($destajo->total, 2) }}</span>
-                                    </div>
-                                </div>
+                                
 
-                                <!-- Descripción (solo visual) -->
-                                @if($destajo->descripcion_concepto)
-                                <div class="mb-4">
-                                    <h6 class="fw-bold mb-2">
-                                        <i class="fas fa-align-left me-2"></i>
-                                        Descripción
-                                    </h6>
-                                    <div class="p-3 bg-light rounded">
-                                        {{ $destajo->descripcion_concepto }}
-                                    </div>
-                                </div>
-                                @endif
+                               
 
                                 <!-- Sección de Productos/Servicios editable -->
                                 <div class="row mb-3">

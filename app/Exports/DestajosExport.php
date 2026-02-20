@@ -36,35 +36,104 @@ class DestajosExport implements
 
     public function collection()
     {
+        // Construir consulta base
         $query = DB::table('destajos as d')
             ->select(
+                'd.id',
                 'd.consecutivo',
                 'd.created_at',
-                'd.clave_concepto',
-                'd.descripcion_concepto',
-                'd.unidad_concepto',
-                'd.costo_unitario_concepto',
-                'd.cantidad',
                 'd.referencia',
                 'd.costo_operado',
                 'd.iva',
                 'd.total',
-                'c.refinterna',
-                'c.frente',
-                'p.clave as clave_proveedor',
-                'p.nombre as nombre_proveedor',
-                'p.clasificacion'
+                'd.verificado',
+                'c.refinterna as contrato_refinterna',
+                'c.frente as contrato_frente',
+                'c.contrato_no',
+                'c.obra as contrato_obra',
+                'p.clave as proveedor_clave',
+                'p.nombre as proveedor_nombre',
+                'p.clasificacion as proveedor_clasificacion'
             )
             ->leftJoin('contratos as c', 'd.id_contrato', '=', 'c.id')
             ->leftJoin('proveedores_servicios as p', 'd.id_proveedor', '=', 'p.id')
             ->whereBetween('d.created_at', [$this->fechaInicio . ' 00:00:00', $this->fechaFin . ' 23:59:59'])
-            ->orderBy('d.created_at', 'asc');
+            ->orderBy('d.consecutivo', 'asc');
 
-        if ($this->contratoId) {
+        // Si hay contrato específico, filtrar por él
+        if ($this->contratoId && $this->contratoId !== 'todos') {
             $query->where('d.id_contrato', $this->contratoId);
         }
 
-        return $query->get();
+        $destajos = $query->get();
+        
+        // Array para almacenar todas las filas
+        $filas = collect();
+        
+        foreach ($destajos as $destajo) {
+            // Obtener detalles de este destajo
+            $detalles = DB::table('destajodetalles')
+                ->where('id_destajo', $destajo->id)
+                ->get();
+            
+            if ($detalles->count() > 0) {
+                $primerDetalle = true;
+                foreach ($detalles as $detalle) {
+                    $fila = new \stdClass();
+                    $fila->consecutivo = $destajo->consecutivo;
+                    $fila->fecha = $destajo->created_at;
+                    $fila->obra = $destajo->contrato_obra; // NUEVA COLUMNA
+                    $fila->no_obra = $destajo->contrato_refinterna;
+                    $fila->frente = $destajo->contrato_frente;
+                    $fila->clave_proveedor = $destajo->proveedor_clave;
+                    $fila->proveedor = $destajo->proveedor_nombre;
+                    $fila->clasificacion = $destajo->proveedor_clasificacion;
+                    $fila->referencia = $destajo->referencia;
+                    $fila->clave_producto = $detalle->clave;
+                    $fila->descripcion = $detalle->descripcion;
+                    $fila->unidad = $detalle->unidades;
+                    $fila->cantidad = $detalle->cantidad;
+                    $fila->precio_unitario = $detalle->ult_costo;
+                    $fila->subtotal = $detalle->cantidad * $detalle->ult_costo;
+                    
+                    // Solo mostrar IVA y TOTAL en el primer detalle de cada destajo
+                    if ($primerDetalle) {
+                        $fila->iva_destajo = $destajo->iva;
+                        $fila->total = $destajo->total;
+                        $primerDetalle = false;
+                    } else {
+                        $fila->iva_destajo = '';
+                        $fila->total = '';
+                    }
+                    
+                    $filas->push($fila);
+                }
+            } else {
+                // Destajo sin detalles
+                $fila = new \stdClass();
+                $fila->consecutivo = $destajo->consecutivo;
+                $fila->fecha = $destajo->created_at;
+                $fila->obra = $destajo->contrato_obra; // NUEVA COLUMNA
+                $fila->no_obra = $destajo->contrato_refinterna;
+                $fila->frente = $destajo->contrato_frente;
+                $fila->clave_proveedor = $destajo->proveedor_clave;
+                $fila->proveedor = $destajo->proveedor_nombre;
+                $fila->clasificacion = $destajo->proveedor_clasificacion;
+                $fila->referencia = $destajo->referencia;
+                $fila->clave_producto = 'SIN DETALLES';
+                $fila->descripcion = 'SIN DETALLES';
+                $fila->unidad = '';
+                $fila->cantidad = 0;
+                $fila->precio_unitario = 0;
+                $fila->subtotal = 0;
+                $fila->iva_destajo = $destajo->iva;
+                $fila->total = $destajo->total;
+                
+                $filas->push($fila);
+            }
+        }
+        
+        return $filas;
     }
 
     public function headings(): array
@@ -72,49 +141,50 @@ class DestajosExport implements
         return [
             'CONSECUTIVO',
             'FECHA',
+            'OBRA', // NUEVA COLUMNA
             'NO DE OBRA',
             'FRENTE',
             'CLAVE PROVEEDOR',
-            'TIPO DE PROVEEDOR',
-            'NOMBRE PROVEEDOR',
-            'CLAVE DE CONCEPTO',
-            'DESCRIPCIÓN DEL CONCEPTO',
-            'UNIDAD DEL CONCEPTO',
-            'COSTO UNITARIO',
-            'CANTIDAD',
+            'PROVEEDOR',
+            'CLASIFICACIÓN',
             'REFERENCIA',
-            'COSTO OPERADO',
-            'IVA',
+            'CLAVE PRODUCTO',
+            'DESCRIPCIÓN',
+            'UNIDAD',
+            'CANTIDAD',
+            'PRECIO UNITARIO',
+            'SUBTOTAL',
+            'IVA DEL DESTAJO',
             'TOTAL'
         ];
     }
 
-    public function map($destajo): array
+    public function map($fila): array
     {
         return [
-            $destajo->consecutivo ?? '',
-            $destajo->created_at ? date('d/m/Y', strtotime($destajo->created_at)) : '',
-            $destajo->refinterna ?? '',
-            $destajo->frente ?? '',
-            $destajo->clave_proveedor ?? '',
-            'Destajo',
-            $destajo->nombre_proveedor ?? '',
-            $destajo->clave_concepto ?? '',
-            $destajo->descripcion_concepto ?? '',
-            $destajo->unidad_concepto ?? '',
-            $destajo->costo_unitario_concepto ?? 0,
-            $destajo->cantidad ?? 0,
-            $destajo->referencia ?? '',
-            $destajo->costo_operado ?? 0,
-            $destajo->iva ?? 0,
-            $destajo->total ?? 0,
+            $fila->consecutivo ?? '',
+            $fila->fecha ? date('d/m/Y', strtotime($fila->fecha)) : '',
+            $fila->obra ?? '', // NUEVA COLUMNA
+            $fila->no_obra ?? '',
+            $fila->frente ?? '',
+            $fila->clave_proveedor ?? '',
+            $fila->proveedor ?? '',
+            $fila->clasificacion ?? '',
+            $fila->referencia ?? '',
+            $fila->clave_producto ?? '',
+            $fila->descripcion ?? '',
+            $fila->unidad ?? '',
+            $fila->cantidad ?? 0,
+            $fila->precio_unitario ?? 0,
+            $fila->subtotal ?? 0,
+            $fila->iva_destajo ?? '',
+            $fila->total ?? '',
         ];
     }
 
     public function styles(Worksheet $sheet)
     {
         return [
-            // Estilo para el encabezado
             1 => [
                 'font' => [
                     'bold' => true,
@@ -136,12 +206,12 @@ class DestajosExport implements
     public function columnFormats(): array
     {
         return [
-            'B' => NumberFormat::FORMAT_DATE_DDMMYYYY,
-            'K' => '"$"#,##0.00', // Costo unitario
-            'L' => '#,##0.00', // Cantidad
-            'N' => '"$"#,##0.00', // Costo operado
-            'O' => '"$"#,##0.00', // IVA
-            'P' => '"$"#,##0.00', // Total
+            'B' => NumberFormat::FORMAT_DATE_DDMMYYYY,      // Fecha
+            'M' => '#,##0.00',                              // Cantidad (ahora en columna M por el desplazamiento)
+            'N' => '"$"#,##0.00',                           // Precio unitario
+            'O' => '"$"#,##0.00',                           // Subtotal
+            'P' => '"$"#,##0.00',                           // IVA del destajo
+            'Q' => '"$"#,##0.00',                           // Total
         ];
     }
 
@@ -153,7 +223,7 @@ class DestajosExport implements
                 $lastRow = $sheet->getHighestRow();
                 $lastColumn = $sheet->getHighestColumn();
 
-                // Estilo para toda la tabla
+                // Bordes para toda la tabla
                 $sheet->getStyle('A1:' . $lastColumn . $lastRow)->applyFromArray([
                     'borders' => [
                         'allBorders' => [
@@ -163,37 +233,27 @@ class DestajosExport implements
                     ],
                 ]);
 
-                // Estilo para las filas de datos
+                // Estilo para filas de datos
                 $sheet->getStyle('A2:' . $lastColumn . $lastRow)->applyFromArray([
                     'alignment' => [
                         'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
                     ],
-                    'font' => [
-                        'size' => 11,
-                    ],
+                    'font' => ['size' => 11],
                 ]);
 
-                // Alineación específica por columnas
-                // Columnas de texto a la izquierda
-                $sheet->getStyle('A2:A' . $lastRow)->getAlignment()->setHorizontal('left'); // Consecutivo
-                $sheet->getStyle('C2:G' . $lastRow)->getAlignment()->setHorizontal('left'); // Obra, Frente, Proveedor
-                $sheet->getStyle('H2:J' . $lastRow)->getAlignment()->setHorizontal('left'); // Concepto
-                $sheet->getStyle('M2:M' . $lastRow)->getAlignment()->setHorizontal('left'); // Referencia
-
-                // Columnas numéricas a la derecha
-                $sheet->getStyle('K2:L' . $lastRow)->getAlignment()->setHorizontal('right');
-                $sheet->getStyle('N2:P' . $lastRow)->getAlignment()->setHorizontal('right');
-
-                // Fecha centrada
-                $sheet->getStyle('B2:B' . $lastRow)->getAlignment()->setHorizontal('center');
+                // Alineaciones específicas (ajustadas por la nueva columna)
+                $sheet->getStyle('A2:A' . $lastRow)->getAlignment()->setHorizontal('center'); // Consecutivo
+                $sheet->getStyle('B2:B' . $lastRow)->getAlignment()->setHorizontal('center'); // Fecha
+                $sheet->getStyle('C2:C' . $lastRow)->getAlignment()->setHorizontal('left');   // Obra (NUEVA)
+                $sheet->getStyle('D2:I' . $lastRow)->getAlignment()->setHorizontal('left');   // Texto (desplazado)
+                $sheet->getStyle('J2:L' . $lastRow)->getAlignment()->setHorizontal('left');   // Producto (desplazado)
+                $sheet->getStyle('M2:Q' . $lastRow)->getAlignment()->setHorizontal('right');  // Números (desplazado)
 
                 // Encabezado centrado
                 $sheet->getStyle('A1:' . $lastColumn . '1')->getAlignment()->setHorizontal('center');
-
-                // Alto de fila para el encabezado
                 $sheet->getRowDimension('1')->setRowHeight(25);
 
-                // Alternar colores de filas (zebra striping)
+                // Zebra striping
                 for ($row = 2; $row <= $lastRow; $row++) {
                     if ($row % 2 == 0) {
                         $sheet->getStyle('A' . $row . ':' . $lastColumn . $row)->applyFromArray([
@@ -205,24 +265,37 @@ class DestajosExport implements
                     }
                 }
 
-                // Fecha de filtro en el encabezado (opcional)
-                $sheet->setCellValue('A' . ($lastRow + 2), 'Filtro aplicado:');
-                $sheet->setCellValue('B' . ($lastRow + 2), $this->fechaInicio . ' - ' . $this->fechaFin);
-                $sheet->getStyle('A' . ($lastRow + 2) . ':B' . ($lastRow + 2))->applyFromArray([
+                // Información del filtro
+                $filaInfo = $lastRow + 2;
+                $sheet->setCellValue('A' . $filaInfo, 'Filtro aplicado:');
+                $sheet->setCellValue('B' . $filaInfo, $this->fechaInicio . ' - ' . $this->fechaFin);
+                if ($this->contratoId && $this->contratoId !== 'todos') {
+                    $contrato = DB::table('contratos')->where('id', $this->contratoId)->first();
+                    $sheet->setCellValue('C' . $filaInfo, 'Contrato: ' . ($contrato->refinterna ?? $contrato->contrato_no ?? ''));
+                } else {
+                    $sheet->setCellValue('C' . $filaInfo, 'Contrato: TODOS');
+                }
+                $sheet->getStyle('A' . $filaInfo . ':C' . $filaInfo)->applyFromArray([
                     'font' => ['bold' => true],
                 ]);
 
-                // Total general
-                $sheet->setCellValue('O' . ($lastRow + 2), 'TOTAL GENERAL:');
-                $sheet->setCellValue('P' . ($lastRow + 2), '=SUM(P2:P' . $lastRow . ')');
-                $sheet->getStyle('O' . ($lastRow + 2) . ':P' . ($lastRow + 2))->applyFromArray([
+                // Totales (ajustados por el desplazamiento de columnas)
+                $filaTotales = $filaInfo + 2;
+                $sheet->setCellValue('O' . $filaTotales, 'SUBTOTAL GENERAL:'); // Columna O
+                $sheet->setCellValue('P' . $filaTotales, '=SUM(O2:O' . $lastRow . ')'); // Columna P
+                $sheet->setCellValue('Q' . $filaTotales, 'TOTAL GENERAL:'); // Columna Q
+                $sheet->setCellValue('Q' . ($filaTotales + 1), '=SUM(Q2:Q' . $lastRow . ')'); // Columna Q
+                
+                $sheet->getStyle('O' . $filaTotales . ':Q' . ($filaTotales + 1))->applyFromArray([
                     'font' => ['bold' => true],
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                         'startColor' => ['rgb' => 'FFD700'],
                     ],
                 ]);
-                $sheet->getStyle('P' . ($lastRow + 2))->getNumberFormat()->setFormatCode('"$"#,##0.00');
+                
+                $sheet->getStyle('P' . $filaTotales)->getNumberFormat()->setFormatCode('"$"#,##0.00');
+                $sheet->getStyle('Q' . ($filaTotales + 1))->getNumberFormat()->setFormatCode('"$"#,##0.00');
 
                 // Congelar paneles
                 $sheet->freezePane('A2');

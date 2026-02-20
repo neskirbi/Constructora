@@ -303,6 +303,11 @@
                                             title="{{ $contrato->obra ?? 'Sin nombre de obra' }}">
                                             {{ Str::limit($contrato->obra ?? 'Sin nombre de obra', 100) }}
                                         </div>
+                                        
+                                        <div class="contrato-badge d-inline-block">
+                                            <i class="fas fa-hashtag me-1"></i>
+                                            Consecutivo: {{ $contrato->consecutivo ?? 'N/A' }}
+                                        </div>
                                         <div class="contrato-badge d-inline-block">
                                             <i class="fas fa-file-contract me-1"></i>
                                             {{ $contrato->contrato_no ?? 'N/A' }}
