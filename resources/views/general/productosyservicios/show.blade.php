@@ -106,7 +106,6 @@
                                                            name="ult_costo" 
                                                            value="{{ old('ult_costo', $producto->ult_costo) }}"
                                                            step="0.01" 
-                                                           min="0"
                                                            required>
                                                     @error('ult_costo')
                                                     <div class="invalid-feedback">{{ $message }}</div>

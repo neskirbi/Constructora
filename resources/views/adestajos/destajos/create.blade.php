@@ -104,14 +104,15 @@
                                     <!-- Campo Referencia después de consecutivo -->
                                     <div class="col-md-3">
                                         <div class="mb-3">
-                                            <label for="referencia" class="form-label">Referencia</label>
+                                            <label for="referencia" class="form-label required-label">Referencia</label>
                                             <input type="text" 
                                                    class="form-control form-control-sm @error('referencia') is-invalid @enderror" 
                                                    id="referencia" 
                                                    name="referencia" 
                                                    value="{{ old('referencia') }}"
                                                    maxlength="1500"
-                                                   placeholder="Folio, contrato, etc.">
+                                                   placeholder="Folio, contrato, etc."
+                                                   required>
                                             @error('referencia')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -228,7 +229,6 @@
                                                                class="form-control precio-input" 
                                                                name="productos[0][precio]" 
                                                                step="0.01" 
-                                                               min="0"
                                                                required>
                                                     </div>
                                                 </td>
@@ -452,7 +452,7 @@
                     <td>
                         <div class="input-group input-group-sm">
                             <span class="input-group-text">$</span>
-                            <input type="number" class="form-control precio-input" name="productos[${index}][precio]" step="0.01" min="0" required>
+                            <input type="number" class="form-control precio-input" name="productos[${index}][precio]" step="0.01" required>
                         </div>
                     </td>
                     <td>

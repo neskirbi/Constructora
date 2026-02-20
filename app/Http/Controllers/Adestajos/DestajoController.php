@@ -10,6 +10,7 @@ use App\Models\ProveedorSer;
 use App\Models\Contrato;
 use App\Models\ProductosYServicios;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log; 
 
 class DestajoController extends Controller
 {
@@ -44,7 +45,7 @@ class DestajoController extends Controller
             });
         }
         
-        $destajos = $query->orderBy('d.created_at', 'desc')
+        $destajos = $query->orderBy('d.created_at', 'asc')
             ->paginate(15);
         
         // Obtener todos los IDs de destajos
@@ -103,6 +104,7 @@ class DestajoController extends Controller
 
     public function store(Request $request)
     {
+
         $request->validate([
             'consecutivo' => 'required|integer|min:1',
             'id_contrato' => 'required|string|exists:contratos,id',
@@ -111,8 +113,8 @@ class DestajoController extends Controller
             'iva' => 'nullable|numeric|min:0',
             'productos' => 'required|array|min:1',
             'productos.*.id_producto' => 'required|string|exists:productosyservicios,id',
-            'productos.*.cantidad' => 'required|numeric|min:0.01',
-            'productos.*.precio' => 'required|numeric|min:0',
+            'productos.*.cantidad' => 'required|numeric', // Eliminado min:0.01 para permitir negativos
+            'productos.*.precio' => 'required|numeric',
         ]);
         
         // Obtener el ID del usuario autenticado
@@ -144,7 +146,6 @@ class DestajoController extends Controller
                 'descripcion_concepto' => 'Múltiples productos/servicios',
                 'unidad_concepto' => 'Varios',
                 'costo_unitario_concepto' => 0,
-                'cantidad' => 1, // Esto ya no se usará realmente
                 'referencia' => $request->referencia,
                 'costo_operado' => $costo_operado,
                 'iva' => $iva_calculado,
@@ -165,7 +166,7 @@ class DestajoController extends Controller
                     'clave' => $productoData->clave,
                     'descripcion' => $productoData->descripcion,
                     'unidades' => $productoData->unidades,
-                    'cantidad' => $producto['cantidad'], // ← AHORA SÍ GUARDAMOS LA CANTIDAD
+                    'cantidad' => $producto['cantidad'], // Ahora acepta negativos
                     'ult_costo' => $producto['precio'],
                 ]);
             }
@@ -306,8 +307,8 @@ class DestajoController extends Controller
             'iva' => 'nullable|numeric|min:0',
             'productos' => 'required|array|min:1',
             'productos.*.id_producto' => 'required|string|exists:productosyservicios,id',
-            'productos.*.cantidad' => 'required|numeric|min:0.01',
-            'productos.*.precio' => 'required|numeric|min:0',
+            'productos.*.cantidad' => 'required|numeric', // Eliminado min:0.01 para permitir negativos
+            'productos.*.precio' => 'required|numeric',
             'verificado' => 'nullable|integer|in:0,1,2',
         ]);
         
@@ -362,7 +363,7 @@ class DestajoController extends Controller
                     'clave' => $productoData->clave,
                     'descripcion' => $productoData->descripcion,
                     'unidades' => $productoData->unidades,
-                    'cantidad' => $producto['cantidad'], // ← AHORA SÍ GUARDAMOS LA CANTIDAD
+                    'cantidad' => $producto['cantidad'], // Ahora acepta negativos
                     'ult_costo' => $producto['precio'],
                 ]);
             }

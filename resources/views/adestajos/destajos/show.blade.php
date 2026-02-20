@@ -383,7 +383,6 @@
                                                                name="productos[{{ $index }}][precio]" 
                                                                value="{{ $detalle->ult_costo }}"
                                                                step="0.01" 
-                                                               min="0"
                                                                required>
                                                     </div>
                                                 </td>
@@ -629,7 +628,7 @@
                     <td>
                         <div class="input-group input-group-sm">
                             <span class="input-group-text">$</span>
-                            <input type="number" class="form-control precio-input" name="productos[${index}][precio]" step="0.01" min="0" required>
+                            <input type="number" class="form-control precio-input" name="productos[${index}][precio]" step="0.01" required>
                         </div>
                     </td>
                     <td>

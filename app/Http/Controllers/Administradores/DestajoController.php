@@ -44,7 +44,7 @@ class DestajoController extends Controller
             });
         }
         
-        $destajos = $query->orderBy('d.created_at', 'desc')
+        $destajos = $query->orderBy('d.created_at', 'asc')
             ->paginate(15);
         
         // Obtener todos los IDs de destajos

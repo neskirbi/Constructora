@@ -9,7 +9,7 @@ class DestajoDetalle extends Model
 {
     use HasFactory;
 
-    protected $table = 'destajo_detalles';
+    protected $table = 'destajodetalles';
     
     protected $primaryKey = 'id';
     public $incrementing = false;
@@ -18,15 +18,19 @@ class DestajoDetalle extends Model
     protected $fillable = [
         'id',
         'id_destajo',
-        'id_producto',
+        'id_productoservicio',
+        'clave',
+        'descripcion',
+        'unidades',
         'cantidad',
-        'precio_unitario',
-        'referencia'
+        'ult_costo',
+        'created_at',
+        'updated_at'
     ];
 
     protected $casts = [
         'cantidad' => 'decimal:2',
-        'precio_unitario' => 'decimal:2'
+        'ult_costo' => 'decimal:2'
     ];
 
     protected static function boot()

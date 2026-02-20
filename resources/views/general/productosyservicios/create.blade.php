@@ -108,8 +108,7 @@
                                                            name="ult_costo" 
                                                            id="ult_costo"
                                                            value="{{ old('ult_costo') }}"
-                                                           step="0.01" 
-                                                           min="0"
+                                                           step="0.01"
                                                            placeholder="0.00"
                                                            required>
                                                     @error('ult_costo')

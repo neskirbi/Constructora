@@ -43,7 +43,7 @@ class ProductosServiciosController extends Controller
             'clave' => 'required|string|max:32|unique:productosyservicios,clave',
             'descripcion' => 'required|string',
             'unidades' => 'required|string|max:10',
-            'ult_costo' => 'required|numeric|min:0'
+            'ult_costo' => 'required|numeric'
         ]);
 
         try {
@@ -116,7 +116,7 @@ class ProductosServiciosController extends Controller
             'clave' => 'required|string|max:32|unique:productosyservicios,clave,' . $id . ',id',
             'descripcion' => 'required|string',
             'unidades' => 'required|string|max:10',
-            'ult_costo' => 'required|numeric|min:0'
+            'ult_costo' => 'required|numeric'
         ]);
 
         try {
