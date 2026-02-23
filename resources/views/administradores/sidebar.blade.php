@@ -55,6 +55,11 @@
             <i class="fas fa-hammer menu-icon"></i>
             <span class="menu-text">Destajo</span>
         </a>
+        
+        <a href="{{url('acompras')}}" class="menu-item">
+            <i class="fas fa-shopping-cart menu-icon"></i>
+            <span class="menu-text">Compras</span>
+        </a>
 
 
         <!-- Grupo expandible de Reportes -->
@@ -71,10 +76,18 @@
                     <span class="submenu-text">Reporte de Ingresos</span>
                 </a>
 
+                <a href="{{url('reportes/compra')}}" class="submenu-item">
+                    <i class="fas fa-file-alt submenu-icon"></i>
+                    <span class="submenu-text">Reporte de Compras</span>
+                </a>
+
                 <a href="{{url('reportes/destajo')}}" class="submenu-item">
                     <i class="fas fa-file-alt submenu-icon"></i>
                     <span class="submenu-text">Reporte de Destajo</span>
                 </a>
+
+                
+             
                 <!-- Puedes agregar más reportes aquí -->
                 <!--
                 <a href="{{url('reportes/gastos')}}" class="submenu-item">

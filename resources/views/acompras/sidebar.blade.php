@@ -21,7 +21,7 @@
                 </a>
 
                  <a href="{{url('compras')}}" class="menu-item">
-                   <i class="fas fa-hammer menu-icon"></i>
+                    <i class="fas fa-shopping-cart menu-icon"></i>
                     <span class="menu-text">Compras</span>
                 </a>
                 <!--

@@ -81,24 +81,37 @@ Route::resource('aingresos', 'App\Http\Controllers\Administradores\IngresoContro
 Route::resource('aproveedoresds', 'App\Http\Controllers\Administradores\ProveedordsController')
 ->middleware(['auth:administradores']);
 
-Route::resource('adestajos', 'App\Http\Controllers\Administradores\DestajoController')
-    ->middleware(['auth:administradores']);
+
 
 Route::resource('aproductosyservicios', 'App\Http\Controllers\Administradores\ProductosServiciosController')
     ->middleware(['auth:administradores']);
 
+
+
+// Rutas para confirmar/rechazar compras
+Route::resource('acompras', 'App\Http\Controllers\Administradores\CompraController')
+    ->middleware(['auth:administradores']);
+
+Route::put('compras/{id}/confirmar', [App\Http\Controllers\Administradores\CompraController::class, 'confirmar'])
+    ->name('compras.confirmar')
+    ->middleware(['auth:administradores']);
+
+Route::put('compras/{id}/rechazar', [App\Http\Controllers\Administradores\CompraController::class, 'rechazar'])
+    ->name('compras.rechazar')
+    ->middleware(['auth:administradores']);
+    
     
 // Rutas adicionales para confirmar/rechazar destajos
-Route::post('adestajos/{destajo}/confirmar', [App\Http\Controllers\Administradores\DestajoController::class, 'confirmar'])
-    ->name('adestajos.confirmar')
+Route::resource('adestajos', 'App\Http\Controllers\Administradores\DestajoController')
     ->middleware(['auth:administradores']);
 
-Route::post('adestajos/{destajo}/rechazar', [App\Http\Controllers\Administradores\DestajoController::class, 'rechazar'])
-    ->name('adestajos.rechazar')
+Route::put('destajos/{id}/confirmar', [App\Http\Controllers\Administradores\DestajoController::class, 'confirmar'])
+    ->name('destajos.confirmar')
     ->middleware(['auth:administradores']);
 
-    Route::put('destajos/{id}/confirmar', [App\Http\Controllers\Administradores\DestajoController::class, 'confirmar'])->name('destajos.confirmar');
-Route::put('destajos/{id}/rechazar', [App\Http\Controllers\Administradores\DestajoController::class, 'rechazar'])->name('destajos.rechazar');
+Route::put('destajos/{id}/rechazar', [App\Http\Controllers\Administradores\DestajoController::class, 'rechazar'])
+    ->name('destajos.rechazar')
+    ->middleware(['auth:administradores']);
 
 /**
  * Rutas Aingresos
@@ -115,29 +128,35 @@ Route::resource('ingresos', 'App\Http\Controllers\Aingresos\IngresoController')
  * Reportes de Ingresos
  * IMPORTANTE: Añade el middleware correspondiente según quién debe acceder
  */
-Route::prefix('reportes')->group(function () {
-    // Si solo los administradores pueden ver reportes:
-    Route::get('/ingresos', [ReporteIngresosController::class, 'index'])
-        ->name('reportes.ingresos')
-        ->middleware(['auth:administradores']); // O el guard que corresponda
+Route::prefix('reportes')->middleware(['auth:administradores'])->group(function () {
     
-    Route::post('/ingresos/generar', [ReporteIngresosController::class, 'generar'])
-        ->name('reportes.ingresos.generar')
-        ->middleware(['auth:administradores']);
+    // Reporte de Ingresos
+    Route::get('/ingresos', [App\Http\Controllers\Reportes\ReporteIngresosController::class, 'index'])
+        ->name('reportes.ingresos');
     
-    Route::post('/ingresos/exportar-excel', [ReporteIngresosController::class, 'exportarExcel'])
-        ->name('reportes.ingresos.exportar.excel')
-        ->middleware(['auth:administradores']);
-});
-
-
- Route::prefix('reportes')->group(function () {
+    Route::post('/ingresos/generar', [App\Http\Controllers\Reportes\ReporteIngresosController::class, 'generar'])
+        ->name('reportes.ingresos.generar');
+    
+    Route::post('/ingresos/exportar-excel', [App\Http\Controllers\Reportes\ReporteIngresosController::class, 'exportarExcel'])
+        ->name('reportes.ingresos.exportar.excel');
+    
+    // Reporte de Destajos
     Route::get('/destajo', [App\Http\Controllers\Reportes\ReporteDestajoController::class, 'index'])
-        ->name('reportes.destajo')->middleware(['auth:administradores']);
+        ->name('reportes.destajo');
         
     Route::post('/destajo/exportar', [App\Http\Controllers\Reportes\ReporteDestajoController::class, 'exportar'])
-        ->name('reportes.destajo.exportar')->middleware(['auth:administradores']);
+        ->name('reportes.destajo.exportar');
+    
+    // Reporte de Compras (para agregar después)
+    Route::get('/compra', [App\Http\Controllers\Reportes\ReporteCompraController::class, 'index'])
+        ->name('reportes.compra');
+        
+    Route::post('/compra/exportar', [App\Http\Controllers\Reportes\ReporteCompraController::class, 'exportar'])
+        ->name('reportes.compra.exportar');
+    
 });
+
+
 
 
 
