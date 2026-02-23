@@ -456,7 +456,7 @@
             document.getElementById('destajoNombre').textContent = nombre;
             
             const form = document.getElementById('deleteForm');
-            form.action = '{{ route("destajos.destroy", "") }}/' + id;
+            form.action = '{{ route("adestajos.destroy", "") }}/' + id;
             
             const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
             modal.show();

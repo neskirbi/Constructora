@@ -390,10 +390,8 @@ class DestajoController extends Controller
             ->first();
         
         if (!$destajo) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Destajo no encontrado'
-            ], 404);
+            return redirect()->route('adestajos.index')
+                ->with('error', 'Destajo no encontrado');
         }
         
         DB::beginTransaction();
@@ -411,18 +409,14 @@ class DestajoController extends Controller
             
             DB::commit();
             
-            return response()->json([
-                'success' => true,
-                'message' => 'Destajo eliminado exitosamente'
-            ]);
+            return redirect()->route('adestajos.index')
+                ->with('success', 'Destajo eliminado exitosamente');
             
         } catch (\Exception $e) {
             DB::rollBack();
             
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al eliminar el destajo: ' . $e->getMessage()
-            ], 500);
+            return redirect()->route('adestajos.index')
+                ->with('error', 'Error al eliminar el destajo: ' . $e->getMessage());
         }
     }
 
