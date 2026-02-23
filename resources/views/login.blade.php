@@ -94,13 +94,53 @@
         .input-group-text {
             background: #f8f9fa;
             border: 2px solid #e0e0e0;
-            border-right: none;
+            transition: all 0.3s;
+        }
+        
+        .password-toggle {
+            cursor: pointer;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-left: none;
+            border-radius: 0 8px 8px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 15px;
+            color: #666;
+            transition: all 0.3s;
+        }
+        
+        .password-toggle:hover {
+            color: var(--primary-blue);
+            background: #e9ecef;
         }
         
         .error-message {
             color: #dc3545;
             font-size: 0.875rem;
             margin-top: 5px;
+        }
+        
+        /* Estilo para el input de contraseña cuando está junto al botón */
+        .password-input-group {
+            display: flex;
+            width: 100%;
+        }
+        
+        .password-input-group .form-control {
+            border-right: none;
+            border-radius: 8px 0 0 8px;
+        }
+        
+        .password-input-group .form-control:focus {
+            border-right: none;
+            outline: none;
+        }
+        
+        .password-input-group .form-control:focus + .password-toggle {
+            border-color: var(--light-blue);
+            border-left: none;
         }
     </style>
 </head>
@@ -141,18 +181,22 @@
                         @enderror
                     </div>
                     
-                    <!-- Contraseña -->
+                    <!-- Contraseña con opción de ver/ocultar -->
                     <div class="mb-4">
                         <label class="form-label">Contraseña</label>
-                        <div class="input-group">
-                            <span class="input-group-text">
+                        <div class="password-input-group">
+                            <span class="input-group-text" style="border-right: none; border-radius: 8px 0 0 8px;">
                                 <i class="fas fa-lock"></i>
                             </span>
                             <input type="password" 
                                    class="form-control" 
                                    name="password" 
+                                   id="password"
                                    placeholder="Ingresa tu contraseña" 
                                    required>
+                            <span class="password-toggle" id="togglePassword">
+                                <i class="fas fa-eye" id="toggleIcon"></i>
+                            </span>
                         </div>
                         @error('password')
                             <div class="error-message">{{ $message }}</div>
@@ -166,7 +210,7 @@
                     </div>
                     
                     <!-- Botón de login -->
-                    <button type="submit" class="btn btn-login mb-3">
+                    <button type="submit" class="btn btn-login mb-3" id="submitBtn">
                         <i class="fas fa-sign-in-alt me-2"></i> Iniciar Sesión
                     </button>
                 
@@ -187,24 +231,51 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Efecto al enviar formulario
             const form = document.querySelector('form');
+            const submitBtn = document.getElementById('submitBtn');
+            
             form.addEventListener('submit', function(e) {
-                const btn = this.querySelector('.btn-login');
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Verificando...';
-                btn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Verificando...';
+                submitBtn.disabled = true;
             });
             
-            // Mostrar/ocultar contraseña
-            const passwordInput = document.querySelector('input[name="password"]');
-            const passwordIcon = document.querySelector('.fa-lock').parentNode;
+            // Mostrar/ocultar contraseña - Versión mejorada
+            const passwordInput = document.getElementById('password');
+            const togglePassword = document.getElementById('togglePassword');
+            const toggleIcon = document.getElementById('toggleIcon');
             
-            passwordIcon.addEventListener('click', function() {
-                if (passwordInput.type === 'password') {
-                    passwordInput.type = 'text';
-                    this.innerHTML = '<i class="fas fa-eye"></i>';
+            togglePassword.addEventListener('click', function() {
+                // Cambiar el tipo de input
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // Cambiar el icono
+                if (type === 'text') {
+                    toggleIcon.classList.remove('fa-eye');
+                    toggleIcon.classList.add('fa-eye-slash');
+                    togglePassword.setAttribute('title', 'Ocultar contraseña');
                 } else {
-                    passwordInput.type = 'password';
-                    this.innerHTML = '<i class="fas fa-lock"></i>';
+                    toggleIcon.classList.remove('fa-eye-slash');
+                    toggleIcon.classList.add('fa-eye');
+                    togglePassword.setAttribute('title', 'Mostrar contraseña');
                 }
+            });
+            
+            // Opcional: Permitir también con la tecla Enter en el botón
+            togglePassword.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.click();
+                }
+            });
+            
+            // Hacer el botón accesible con teclado
+            togglePassword.setAttribute('role', 'button');
+            togglePassword.setAttribute('tabindex', '0');
+            togglePassword.setAttribute('aria-label', 'Mostrar u ocultar contraseña');
+            
+            // Prevenir que el formulario se envíe al hacer clic en el botón de toggle
+            togglePassword.addEventListener('mousedown', function(e) {
+                e.preventDefault();
             });
         });
     </script>

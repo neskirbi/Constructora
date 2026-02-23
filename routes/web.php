@@ -32,7 +32,7 @@ Route::get('/', function () {
             return redirect('destajos');
         }  
         if(Auth::guard('acompras')->check()){
-            return redirect('vehiculossoporte');
+            return redirect('compras');
         }  
 
         return view('login');
@@ -146,18 +146,30 @@ Route::prefix('reportes')->group(function () {
  */
 
 
-Route::resource('proveedoresds', 'App\Http\Controllers\Adestajos\ProveedorController')
-    ->middleware(['auth:adestajos']);
+
 
 Route::resource('destajos', 'App\Http\Controllers\Adestajos\DestajoController')
     ->middleware(['auth:adestajos']);
 
 
+/**
+ * Rutas Compras 
+ */
 
-    /**
-     * Generales
-     */
+
+Route::resource('compras', 'App\Http\Controllers\Acompras\CompraController')
+->middleware(['auth:acompras']);
+
+
+/**
+ * Generales
+ */
 
     
+
+Route::resource('proveedoresds', 'App\Http\Controllers\General\ProveedorController')
+    ->middleware(['auth:adestajos,acompras']);
+
 Route::resource('productosyservicios', 'App\Http\Controllers\General\ProductosServiciosController')
     ->middleware(['auth:adestajos,acompras']);
+

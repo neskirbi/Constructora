@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     @include('header')
-    <title>{{Empresa()}} | Nuevo Proveedor</title>
+    <title>{{Empresa()}} | Editar Proveedor</title>
     <style>
         .required-label::after {
             content: " *";
@@ -16,11 +16,23 @@
 </head>
 <body>
     <div class="main-container">
-        @include('toast.toasts')
-        @include('adestajos.sidebar')
+       @include('toast.toasts')
+        @if(Guard() == 'adestajos')
+            @include('adestajos.sidebar')
+        @elseif(Guard() == 'acompras')
+            @include('acompras.sidebar')
+        @else
+            <!-- Opcional: sidebar por defecto o nada -->
+        @endif
         
         <main class="main-content" id="mainContent">
-            @include('adestajos.navbar')
+            @if(Guard() == 'adestajos')
+                @include('adestajos.navbar')
+            @elseif(Guard() == 'acompras')
+                @include('acompras.navbar')
+            @else
+                <!-- Opcional: sidebar por defecto o nada -->
+            @endif
 
             <div class="content-area">
                 <div class="container-fluid py-4">
@@ -28,18 +40,19 @@
                         <div class="card-header bg-white py-3">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0">
-                                    <i class="fas fa-plus-circle me-2 text-success"></i>
-                                    Nuevo Proveedor
+                                    <i class="fas fa-edit me-2 text-warning"></i>
+                                    Editar Proveedor
                                 </h5>
                                 <a href="{{ route('proveedoresds.index') }}" class="btn btn-outline-secondary btn-sm">
-                                    <i class="fas fa-arrow-left me-1"></i> Volver
+                                    <i class="fas fa-arrow-left me-1"></i> Regresar
                                 </a>
                             </div>
                         </div>
                         
                         <div class="card-body">
-                            <form action="{{ route('proveedoresds.store') }}" method="POST" id="proveedorForm">
+                            <form action="{{ route('proveedoresds.update', $proveedor->id) }}" method="POST" id="proveedorForm">
                                 @csrf
+                                @method('PUT')
                                 
                                 <div class="row">
                                     <div class="col-md-6">
@@ -49,13 +62,12 @@
                                                    class="form-control form-control-sm @error('clave') is-invalid @enderror" 
                                                    id="clave" 
                                                    name="clave" 
-                                                   value="{{ old('clave') }}"
+                                                   value="{{ old('clave', $proveedor->clave) }}"
                                                    maxlength="50"
                                                    required>
                                             @error('clave')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
-                                            <small class="text-muted">Identificador único del proveedor</small>
                                         </div>
                                         
                                         <div class="mb-3">
@@ -64,7 +76,7 @@
                                                    class="form-control form-control-sm @error('nombre') is-invalid @enderror" 
                                                    id="nombre" 
                                                    name="nombre" 
-                                                   value="{{ old('nombre') }}"
+                                                   value="{{ old('nombre', $proveedor->nombre) }}"
                                                    maxlength="255"
                                                    required>
                                             @error('nombre')
@@ -78,7 +90,7 @@
                                                    class="form-control form-control-sm @error('calle') is-invalid @enderror" 
                                                    id="calle" 
                                                    name="calle" 
-                                                   value="{{ old('calle') }}"
+                                                   value="{{ old('calle', $proveedor->calle) }}"
                                                    maxlength="255"
                                                    required>
                                             @error('calle')
@@ -94,7 +106,7 @@
                                                    class="form-control form-control-sm @error('telefono') is-invalid @enderror" 
                                                    id="telefono" 
                                                    name="telefono" 
-                                                   value="{{ old('telefono') }}"
+                                                   value="{{ old('telefono', $proveedor->telefono) }}"
                                                    maxlength="20"
                                                    required>
                                             @error('telefono')
@@ -108,7 +120,7 @@
                                                    class="form-control form-control-sm @error('clasificacion') is-invalid @enderror" 
                                                    id="clasificacion" 
                                                    name="clasificacion" 
-                                                   value="{{ old('clasificacion') }}"
+                                                   value="{{ old('clasificacion', $proveedor->clasificacion) }}"
                                                    maxlength="100"
                                                    required>
                                             @error('clasificacion')
@@ -124,7 +136,7 @@
                                                     required>
                                                 <option value="">Seleccione un estatus</option>
                                                 @foreach($estatusOptions as $option)
-                                                    <option value="{{ $option }}" {{ old('estatus') == $option ? 'selected' : '' }}>
+                                                    <option value="{{ $option }}" {{ old('estatus', $proveedor->estatus) == $option ? 'selected' : '' }}>
                                                         {{ $option }}
                                                     </option>
                                                 @endforeach
@@ -142,7 +154,7 @@
                                                     required>
                                                 <option value="">Seleccione una especialidad</option>
                                                 @foreach($especialidadOptions as $option)
-                                                    <option value="{{ $option }}" {{ old('especialidad') == $option ? 'selected' : '' }}>
+                                                    <option value="{{ $option }}" {{ old('especialidad', $proveedor->especialidad) == $option ? 'selected' : '' }}>
                                                         {{ $option }}
                                                     </option>
                                                 @endforeach
@@ -158,10 +170,10 @@
                                     <div class="col-12">
                                         <div class="d-flex justify-content-end gap-2">
                                             <a href="{{ route('proveedoresds.index') }}" class="btn btn-secondary btn-sm">
-                                                <i class="fas fa-times me-1"></i> Cancelar
+                                                Cancelar
                                             </a>
-                                            <button type="submit" class="btn btn-success btn-sm">
-                                                <i class="fas fa-save me-1"></i> Guardar Proveedor
+                                            <button type="submit" class="btn btn-warning btn-sm">
+                                                Actualizar
                                             </button>
                                         </div>
                                     </div>

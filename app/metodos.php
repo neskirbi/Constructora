@@ -117,7 +117,7 @@ function GetUuid(){
         }
         
         // 4. Administrador de Compras
-        if (Auth::guard('acompra')->check()) {
+        if (Auth::guard('acompras')->check()) {
             return 'Administrador de Compras';
         }
         

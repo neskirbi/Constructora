@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Adestajos;
+namespace App\Http\Controllers\Acompras;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Destajo;
-use App\Models\DestajoDetalle;
+use App\Models\Compra;
+use App\Models\CompraDetalle;
 use App\Models\ProveedorSer;
 use App\Models\Contrato;
 use App\Models\ProductosYServicios;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log; 
 
-class DestajoController extends Controller
+class CompraController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -21,57 +21,57 @@ class DestajoController extends Controller
     {
         $search = $request->input('search');
         
-        $query = DB::table('destajos as d')
-            ->leftJoin('contratos as c', 'd.id_contrato', '=', 'c.id')
-            ->leftJoin('proveedores_servicios as p', 'd.id_proveedor', '=', 'p.id')
+        $query = DB::table('compras as c')
+            ->leftJoin('contratos as ct', 'c.id_contrato', '=', 'ct.id')
+            ->leftJoin('proveedores_servicios as p', 'c.id_proveedor', '=', 'p.id')
             ->select(
-                'd.*',
-                'c.contrato_no',
-                'c.obra as contrato_obra',
+                'c.*',
+                'ct.contrato_no',
+                'ct.obra as contrato_obra',
                 'p.nombre as proveedor_nombre',
                 'p.clave as proveedor_clave',
             );
         
         if ($search) {
             $query->where(function($q) use ($search) {
-                $q->where('d.referencia', 'like', '%' . $search . '%')
-                  ->orWhere('c.contrato_no', 'like', '%' . $search . '%')
+                $q->where('c.referencia', 'like', '%' . $search . '%')
+                  ->orWhere('ct.contrato_no', 'like', '%' . $search . '%')
                   ->orWhere('p.nombre', 'like', '%' . $search . '%')
                   ->orWhere('p.clave', 'like', '%' . $search . '%');
             });
         }
         
-        $destajos = $query->orderBy('d.created_at', 'desc')
+        $compras = $query->orderBy('c.created_at', 'desc')
             ->paginate(15);
         
-        // Obtener todos los IDs de destajos
-        $destajoIds = $destajos->pluck('id')->toArray();
+        // Obtener todos los IDs de compras
+        $compraIds = $compras->pluck('id')->toArray();
         
-        if (!empty($destajoIds)) {
+        if (!empty($compraIds)) {
             // Obtener todos los detalles de una sola vez
-            $todosDetalles = DB::table('destajodetalles')
-                ->whereIn('id_destajo', $destajoIds)
+            $todosDetalles = DB::table('compradetalle')
+                ->whereIn('id_compra', $compraIds)
                 ->get()
-                ->groupBy('id_destajo');
+                ->groupBy('id_compra');
             
-            // Asignar los detalles a cada destajo
-            foreach ($destajos as $destajo) {
-                $destajo->detalles = $todosDetalles[$destajo->id] ?? collect([]);
+            // Asignar los detalles a cada compra
+            foreach ($compras as $compra) {
+                $compra->detalles = $todosDetalles[$compra->id] ?? collect([]);
             }
         } else {
-            foreach ($destajos as $destajo) {
-                $destajo->detalles = collect([]);
+            foreach ($compras as $compra) {
+                $compra->detalles = collect([]);
             }
         }
         
-        return view('adestajos.destajos.index', compact('destajos', 'search'));
+        return view('acompras.compras.index', compact('compras', 'search'));
     }
 
     
     public function create()
     {
         // Obtener el último consecutivo para sugerir el siguiente
-        $ultimoConsecutivo = Destajo::max('consecutivo') ?? 0;
+        $ultimoConsecutivo = Compra::max('consecutivo') ?? 0;
         $siguienteConsecutivo = $ultimoConsecutivo + 1;
         
         // Obtener proveedores activos para select
@@ -90,7 +90,7 @@ class DestajoController extends Controller
             ->orderBy('clave')
             ->get();
         
-        return view('adestajos.destajos.create', compact(
+        return view('acompras.compras.create', compact(
             'siguienteConsecutivo',
             'proveedores',
             'contratos',
@@ -114,7 +114,7 @@ class DestajoController extends Controller
         ]);
         
         // Obtener el ID del usuario autenticado
-        $id_usuario = auth('adestajos')->id();
+        $id_usuario = auth('acompras')->id();
         
         // Calcular el total de los productos
         $costo_operado = 0;
@@ -129,11 +129,11 @@ class DestajoController extends Controller
         DB::beginTransaction();
         
         try {
-            // Crear el destajo principal
-            $destajo_id = GetUuid();
+            // Crear la compra principal
+            $compra_id = GetUuid();
             
-            DB::table('destajos')->insert([
-                'id' => $destajo_id,
+            DB::table('compras')->insert([
+                'id' => $compra_id,
                 'id_contrato' => $request->id_contrato,
                 'id_usuario' => $id_usuario,
                 'id_proveedor' => $request->id_proveedor,
@@ -153,9 +153,9 @@ class DestajoController extends Controller
                     ->where('id', $producto['id_producto'])
                     ->first();
                 
-                DB::table('destajodetalles')->insert([
+                DB::table('compradetalle')->insert([
                     'id' => GetUuid(),
-                    'id_destajo' => $destajo_id,
+                    'id_compra' => $compra_id,
                     'id_productoservicio' => $producto['id_producto'],
                     'clave' => $productoData->clave,
                     'descripcion' => $productoData->descripcion,
@@ -169,14 +169,14 @@ class DestajoController extends Controller
             
             DB::commit();
             
-            return redirect()->route('destajos.index')
-                ->with('success', 'Destajo creado exitosamente');
+            return redirect()->route('compras.index')
+                ->with('success', 'Compra creada exitosamente');
                 
         } catch (\Exception $e) {
             DB::rollBack();
             
             return redirect()->back()
-                ->with('error', 'Error al crear el destajo: ' . $e->getMessage())
+                ->with('error', 'Error al crear la compra: ' . $e->getMessage())
                 ->withInput();
         }
     }
@@ -186,29 +186,29 @@ class DestajoController extends Controller
      */
     public function show($id)
     {
-        // Obtener el destajo con datos relacionados mediante JOIN
-        $destajo = DB::table('destajos as d')
-            ->leftJoin('contratos as c', 'd.id_contrato', '=', 'c.id')
-            ->leftJoin('proveedores_servicios as p', 'd.id_proveedor', '=', 'p.id')
-            ->where('d.id', $id)
+        // Obtener la compra con datos relacionados mediante JOIN
+        $compra = DB::table('compras as c')
+            ->leftJoin('contratos as ct', 'c.id_contrato', '=', 'ct.id')
+            ->leftJoin('proveedores_servicios as p', 'c.id_proveedor', '=', 'p.id')
+            ->where('c.id', $id)
             ->select(
-                'd.*',
-                'c.contrato_no',
-                'c.obra as contrato_obra',
-                'c.cliente as contrato_cliente',
+                'c.*',
+                'ct.contrato_no',
+                'ct.obra as contrato_obra',
+                'ct.cliente as contrato_cliente',
                 'p.nombre as proveedor_nombre',
                 'p.clave as proveedor_clave',
                 'p.telefono as proveedor_telefono',
             )
             ->first();
         
-        if (!$destajo) {
+        if (!$compra) {
             abort(404);
         }
         
-        // Obtener los detalles del destajo
-        $detalles = DB::table('destajodetalles')
-            ->where('id_destajo', $id)
+        // Obtener los detalles de la compra
+        $detalles = DB::table('compradetalle')
+            ->where('id_compra', $id)
             ->get();
         
         // Obtener datos para los selects
@@ -225,31 +225,31 @@ class DestajoController extends Controller
             ->orderBy('clave')
             ->get();
         
-        return view('adestajos.destajos.show', compact('destajo', 'detalles', 'proveedores', 'contratos', 'productos'));
+        return view('acompras.compras.show', compact('compra', 'detalles', 'proveedores', 'contratos', 'productos'));
     }
 
 
 
     public function edit($id)
     {
-        // Obtener el destajo
-        $destajo = DB::table('destajos')
+        // Obtener la compra
+        $compra = DB::table('compras')
             ->where('id', $id)
             ->first();
         
-        if (!$destajo) {
+        if (!$compra) {
             abort(404);
         }
         
         // Verificar si se puede editar
-        if (isset($destajo->verificado) && $destajo->verificado != 1) {
-            return redirect()->route('destajos.index')
-                ->with('error', 'No se puede editar un destajo que no está pendiente');
+        if (isset($compra->verificado) && $compra->verificado != 1) {
+            return redirect()->route('compras.index')
+                ->with('error', 'No se puede editar una compra que no está pendiente');
         }
         
-        // Obtener los detalles del destajo
-        $detalles = DB::table('destajodetalles')
-            ->where('id_destajo', $id)
+        // Obtener los detalles de la compra
+        $detalles = DB::table('compradetalle')
+            ->where('id_compra', $id)
             ->get();
         
         // Obtener datos para los selects
@@ -266,8 +266,8 @@ class DestajoController extends Controller
             ->orderBy('clave')
             ->get();
         
-        return view('adestajos.destajos.edit', compact(
-            'destajo', 
+        return view('acompras.compras.edit', compact(
+            'compra', 
             'detalles', 
             'proveedores', 
             'contratos', 
@@ -277,18 +277,18 @@ class DestajoController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Verificar si el destajo existe
-        $destajo = DB::table('destajos')
+        // Verificar si la compra existe
+        $compra = DB::table('compras')
             ->where('id', $id)
             ->first();
         
-        if (!$destajo) {
+        if (!$compra) {
             abort(404);
         }
         
-        if (isset($destajo->verificado) && $destajo->verificado != 1) {
-            return redirect()->route('destajos.index')
-                ->with('error', 'No se puede editar un destajo que no está pendiente');
+        if (isset($compra->verificado) && $compra->verificado != 1) {
+            return redirect()->route('compras.index')
+                ->with('error', 'No se puede editar una compra que no está pendiente');
         }
         
         $request->validate([
@@ -317,7 +317,7 @@ class DestajoController extends Controller
         DB::beginTransaction();
         
         try {
-            // Actualizar destajo principal
+            // Actualizar compra principal
             $updateData = [
                 'id_contrato' => $request->id_contrato,
                 'id_proveedor' => $request->id_proveedor,
@@ -333,13 +333,13 @@ class DestajoController extends Controller
                 $updateData['verificado'] = $request->verificado;
             }
             
-            DB::table('destajos')
+            DB::table('compras')
                 ->where('id', $id)
                 ->update($updateData);
             
             // Eliminar detalles antiguos
-            DB::table('destajodetalles')
-                ->where('id_destajo', $id)
+            DB::table('compradetalle')
+                ->where('id_compra', $id)
                 ->delete();
             
             // Insertar nuevos detalles
@@ -348,9 +348,9 @@ class DestajoController extends Controller
                     ->where('id', $producto['id_producto'])
                     ->first();
                 
-                DB::table('destajodetalles')->insert([
+                DB::table('compradetalle')->insert([
                     'id' => GetUuid(),
-                    'id_destajo' => $id,
+                    'id_compra' => $id,
                     'id_productoservicio' => $producto['id_producto'],
                     'clave' => $productoData->clave,
                     'descripcion' => $productoData->descripcion,
@@ -364,14 +364,14 @@ class DestajoController extends Controller
             
             DB::commit();
             
-            return redirect('destajos/' . $id)
-                ->with('success', 'Destajo actualizado exitosamente');
+            return redirect('compras/' . $id)
+                ->with('success', 'Compra actualizada exitosamente');
                 
         } catch (\Exception $e) {
             DB::rollBack();
             
             return redirect()->back()
-                ->with('error', 'Error al actualizar el destajo: ' . $e->getMessage())
+                ->with('error', 'Error al actualizar la compra: ' . $e->getMessage())
                 ->withInput();
         }
     }
@@ -381,39 +381,39 @@ class DestajoController extends Controller
      */
     public function destroy($id)
     {
-        // Verificar si el destajo existe
-        $destajo = DB::table('destajos')
+        // Verificar si la compra existe
+        $compra = DB::table('compras')
             ->where('id', $id)
             ->first();
         
-        if (!$destajo) {
-            return redirect()->route('destajos.index')
-                ->with('error', 'Destajo no encontrado');
+        if (!$compra) {
+            return redirect()->route('compras.index')
+                ->with('error', 'Compra no encontrada');
         }
         
         DB::beginTransaction();
         
         try {
             // Eliminar detalles primero
-            DB::table('destajodetalles')
-                ->where('id_destajo', $id)
+            DB::table('compradetalle')
+                ->where('id_compra', $id)
                 ->delete();
             
-            // Eliminar destajo
-            DB::table('destajos')
+            // Eliminar compra
+            DB::table('compras')
                 ->where('id', $id)
                 ->delete();
             
             DB::commit();
             
-            return redirect()->route('destajos.index')
-                ->with('success', 'Destajo eliminado exitosamente');
+            return redirect()->route('compras.index')
+                ->with('success', 'Compra eliminada exitosamente');
             
         } catch (\Exception $e) {
             DB::rollBack();
             
-            return redirect()->route('destajos.index')
-                ->with('error', 'Error al eliminar el destajo: ' . $e->getMessage());
+            return redirect()->route('compras.index')
+                ->with('error', 'Error al eliminar la compra: ' . $e->getMessage());
         }
     }
 }

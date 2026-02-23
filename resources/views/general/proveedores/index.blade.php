@@ -6,11 +6,23 @@
 </head>
 <body>
     <div class="main-container">
-        @include('toast.toasts')
-        @include('adestajos.sidebar')
+       @include('toast.toasts')
+        @if(Guard() == 'adestajos')
+            @include('adestajos.sidebar')
+        @elseif(Guard() == 'acompras')
+            @include('acompras.sidebar')
+        @else
+            <!-- Opcional: sidebar por defecto o nada -->
+        @endif
         
         <main class="main-content" id="mainContent">
-            @include('adestajos.navbar')
+            @if(Guard() == 'adestajos')
+                @include('adestajos.navbar')
+            @elseif(Guard() == 'acompras')
+                @include('acompras.navbar')
+            @else
+                <!-- Opcional: sidebar por defecto o nada -->
+            @endif
 
             <div class="content-area">
                 <div class="container-fluid py-4">
