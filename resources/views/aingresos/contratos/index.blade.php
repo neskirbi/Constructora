@@ -3,220 +3,6 @@
 <head>
     @include('header')
     <title>{{Empresa()}} | Contratos</title>
-    
-    <!-- Estilos personalizados -->
-    <style>
-        .card-contrato {
-            transition: transform 0.3s, box-shadow 0.3s;
-            border: 1px solid #e0e0e0;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            height: 100%;
-        }
-        
-        .card-contrato:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-        }
-        
-        .info-label {
-            font-weight: 600;
-            color: #495057;
-            min-width: 120px;
-        }
-        
-        .search-container {
-            background: #fff;
-            border-radius: 10px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 2rem;
-        }
-        
-        .stats-card {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 1rem;
-            text-align: center;
-            margin-bottom: 1rem;
-        }
-        
-        .stats-number {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #0d6efd;
-        }
-        
-        .stats-label {
-            font-size: 0.875rem;
-            color: #6c757d;
-        }
-        
-        .monto-total {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: #198754;
-        }
-        
-        .empty-state {
-            padding: 4rem 2rem;
-            text-align: center;
-            background: #f8f9fa;
-            border-radius: 10px;
-            border: 2px dashed #dee2e6;
-        }
-        
-        .badge-estado {
-            background-color: #6c757d;
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-        }
-        
-        .obra-nombre {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #002153;
-            margin-bottom: 0.5rem;
-            cursor: pointer;
-            position: relative;
-        }
-        
-        .info-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-            margin-bottom: 1rem;
-            padding: 0.75rem;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-        
-        .info-item {
-            flex: 1;
-            min-width: 200px;
-        }
-        
-        .info-title {
-            font-weight: 600;
-            color: #495057;
-            font-size: 0.875rem;
-            margin-bottom: 0.25rem;
-        }
-        
-        .info-value {
-            color: #212529;
-            font-size: 0.95rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            cursor: pointer;
-            position: relative;
-        }
-        
-        .info-value:hover::after {
-            content: attr(data-fulltext);
-            position: absolute;
-            bottom: 100%;
-            left: 0;
-            background: #333;
-            color: white;
-            padding: 0.5rem;
-            border-radius: 4px;
-            font-size: 0.875rem;
-            white-space: normal;
-            max-width: 300px;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        
-        .actions-container {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.5rem;
-            padding-top: 1rem;
-            border-top: 1px solid #e0e0e0;
-        }
-        
-        .obra-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 0.75rem;
-        }
-        
-        .contrato-badge {
-            background-color: #426ec1;
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-        
-        .monto-container {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 0.75rem;
-        }
-        
-        .monto-item {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .monto-label {
-            font-size: 0.75rem;
-            color: #6c757d;
-        }
-        
-        .monto-valor {
-            font-weight: 600;
-            color: #198754;
-        }
-        
-        .monto-anticipo {
-            color: #0d6efd;
-        }
-        
-        @media (max-width: 768px) {
-            .info-row {
-                gap: 1rem;
-            }
-            
-            .info-item {
-                min-width: 150px;
-                flex: 0 0 calc(50% - 0.5rem);
-            }
-            
-            .obra-header {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-            
-            .actions-container {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            
-            .monto-container {
-                flex-wrap: wrap;
-            }
-        }
-        
-        @media (max-width: 576px) {
-            .info-item {
-                flex: 0 0 100%;
-            }
-        }
-        
-        .tooltip-inner {
-            max-width: 300px;
-            text-align: left;
-        }
-    </style>
 </head>
 <body>
     <div class="main-container">
@@ -233,7 +19,7 @@
                     <!-- Título y botón -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div>
-                            <h1 class="h3 mb-1 text-gray-800"><i class="fas fa-file-contract me'2"></i> Contratos</h1>
+                            <h1 class="h3 mb-1 text-gray-800"><i class="fas fa-file-contract me-2"></i> Contratos</h1>
                             <p class="text-muted mb-0">Gestión de contratos de obra</p>
                         </div>
                         <div>
@@ -243,199 +29,177 @@
                         </div>
                     </div>
                     
-                    
-                    
                     <!-- Filtros -->
-                    <div class="search-container">
-                        <form action="{{ route('contratos.index') }}" method="GET" class="row">
-                            <div class="col-md-10">
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0">
-                                        <i class="fas fa-search text-muted"></i>
-                                    </span>
-                                    <input type="text" 
-                                        class="form-control border-start-0" 
-                                        name="search" 
-                                        placeholder="Buscar por obra, contrato, cliente, ubicación..." 
-                                        value="{{ request('search') }}"
-                                        title="Buscar en: obra, número de contrato, cliente, ubicación, empresa">
-                                    @if(request()->has('search') && !empty(request('search')))
-                                    <a href="{{ route('contratos.index', array_merge(request()->except('search'), ['search' => ''])) }}" 
-                                    class="input-group-text bg-light text-danger" 
-                                    title="Limpiar búsqueda">
-                                        <i class="fas fa-times"></i>
-                                    </a>
-                                    @endif
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <form action="{{ route('contratos.index') }}" method="GET" class="row g-3">
+                                <div class="col-md-10">
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0">
+                                            <i class="fas fa-search text-muted"></i>
+                                        </span>
+                                        <input type="text" 
+                                            class="form-control border-start-0" 
+                                            name="search" 
+                                            placeholder="Buscar por obra, contrato, cliente, ubicación..." 
+                                            value="{{ request('search') }}">
+                                        @if(request()->has('search') && !empty(request('search')))
+                                        <a href="{{ route('contratos.index', array_merge(request()->except('search'), ['search' => ''])) }}" 
+                                        class="input-group-text bg-light text-danger" 
+                                        title="Limpiar búsqueda">
+                                            <i class="fas fa-times"></i>
+                                        </a>
+                                        @endif
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-2">
-                                <div class="d-grid">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-search me-1"></i> Buscar
-                                    </button>
+                                <div class="col-md-2">
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-search me-1"></i> Buscar
+                                        </button>
+                                    </div>
                                 </div>
+                            </form>
+                            
+                            @if(request()->has('search'))
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    Resultados para: <strong>"{{ request('search') }}"</strong>
+                                </small>
+                                <a href="{{ route('contratos.index') }}" class="btn btn-sm btn-outline-danger ms-3">
+                                    <i class="fas fa-times me-1"></i> Limpiar búsqueda
+                                </a>
                             </div>
-                        </form>
-                        
-                        @if(request()->has('search'))
-                        <div class="mt-3">
-                            <small class="text-muted">
-                                Resultados para: <strong>"{{ request('search') }}"</strong>
-                            </small>
-                            <a href="{{ route('contratos.index') }}" class="btn btn-sm btn-outline-danger ms-3">
-                                <i class="fas fa-times me-1"></i> Limpiar búsqueda
-                            </a>
+                            @endif
                         </div>
-                        @endif
                     </div>
                     
                     <!-- Lista de Contratos en Tarjetas -->
                     @if($contratos->count() > 0)
                         @foreach($contratos as $contrato)
-                        <div class="card card-contrato">
+                        <div class="card shadow-sm mb-4">
                             <div class="card-body">
-                                <!-- Encabezado con nombre de obra y número de contrato -->
-                                <div class="obra-header">
-                                    <div class="flex-grow-1">
-                                        <div class="obra-nombre" 
-                                            data-bs-toggle="tooltip" 
-                                            data-bs-placement="top" 
-                                            title="{{ $contrato->obra ?? 'Sin nombre de obra' }}">
-                                            {{ Str::limit($contrato->obra ?? 'Sin nombre de obra', 100) }}
-                                        </div>
-                                        
-                                        <div class="contrato-badge d-inline-block">
-                                            <i class="fas fa-hashtag me-1"></i>
-                                            Consecutivo: {{ $contrato->consecutivo ?? 'N/A' }}
-                                        </div>
-                                        <div class="contrato-badge d-inline-block">
-                                            <i class="fas fa-file-contract me-1"></i>
-                                            {{ $contrato->contrato_no ?? 'N/A' }}
-                                        </div>
+                                <!-- Primera fila: Consecutivo, Ref. Interna, No. Contrato -->
+                                <div class="row mb-3">
+                                    <div class="col-md-4 mb-2 mb-md-0">
+                                        <small class="text-muted d-block">Consecutivo</small>
+                                        <span class="fw-bold">{{ $contrato->consecutivo ?? 'N/A' }}</span>
+                                    </div>
+                                    <div class="col-md-4 mb-2 mb-md-0">
+                                        <small class="text-muted d-block">Ref. Interna</small>
+                                        <span>{{ $contrato->refinterna ?? 'N/A' }}</span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <small class="text-muted d-block">No. Contrato</small>
+                                        <span>{{ $contrato->contrato_no ?? 'N/A' }}</span>
                                     </div>
                                 </div>
                                 
-                                <!-- Fila de información (debajo del nombre) -->
-                                <div class="info-row">
-                                    <div class="info-item">
-                                        <div class="info-title">Cliente</div>
-                                        <div class="info-value" 
-                                            data-bs-toggle="tooltip" 
-                                            data-bs-placement="top" 
-                                            title="{{ $contrato->cliente ?? 'No especificado' }}">
-                                            {{ Str::limit($contrato->cliente ?? 'No especificado', 40) }}
-                                        </div>
+                                <!-- Segunda fila: Cliente (solo, para texto largo) -->
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <small class="text-muted d-block">Cliente</small>
+                                        <span class="fw-bold" title="{{ $contrato->cliente ?? 'No especificado' }}">
+                                            {{ $contrato->cliente ?? 'No especificado' }}
+                                        </span>
                                     </div>
-                                    
-                                    <div class="info-item">
-                                        <div class="info-title">Empresa</div>
-                                        <div class="info-value" 
-                                            data-bs-toggle="tooltip" 
-                                            data-bs-placement="top" 
-                                            title="{{ $contrato->empresa ?? 'No especificado' }}">
-                                            {{ Str::limit($contrato->empresa ?? 'No especificado', 40) }}
-                                        </div>
+                                </div>
+                                
+                                <!-- Tercera fila: Obra (solo, para texto largo) -->
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <small class="text-muted d-block">Obra</small>
+                                        <span class="fw-bold" title="{{ $contrato->obra ?? 'Sin nombre de obra' }}">
+                                            {{ $contrato->obra ?? 'Sin nombre de obra' }}
+                                        </span>
                                     </div>
-                                    
-                                    <div class="info-item">
-                                        <div class="info-title">Ubicación</div>
-                                        <div class="info-value" 
-                                            data-bs-toggle="tooltip" 
-                                            data-bs-placement="top" 
-                                            title="{{ $contrato->lugar ?? 'No especificada' }}">
-                                            {{ Str::limit($contrato->lugar ?? 'No especificada', 40) }}
-                                        </div>
+                                </div>
+                                
+                                <!-- Cuarta fila: Datos adicionales (Frente, Duración) -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6 mb-2 mb-md-0">
+                                        <small class="text-muted d-block">Frente</small>
+                                        <span title="{{ $contrato->frente ?? 'No especificado' }}">
+                                            {{ $contrato->frente ?? 'No especificado' }}
+                                        </span>
                                     </div>
-                                    
-                                    <div class="info-item">
-                                        <div class="info-title">Fecha Contrato</div>
-                                        <div class="info-value">
+                                   
+                                </div>
+                                
+                                
+                                <!-- Quinta fila: Fechas y Duración -->
+                                <div class="row mb-4">
+                                    <div class="col-md-4 mb-2 mb-md-0">
+                                        <small class="text-muted d-block">Fecha Contrato</small>
+                                        <span>
                                             @if($contrato->fecha_contrato)
                                                 {{ date('d/m/Y', strtotime($contrato->fecha_contrato)) }}
                                             @else
                                                 No definida
                                             @endif
-                                        </div>
+                                        </span>
                                     </div>
-                                </div>
-                                
-                                <!-- Fila adicional con más información -->
-                                <div class="info-row">
-                                    <div class="info-item">
-                                        <div class="info-title">Inicio Obra</div>
-                                        <div class="info-value">
+                                    <div class="col-md-3 mb-2 mb-md-0">
+                                        <small class="text-muted d-block">Inicio Obra</small>
+                                        <span>
                                             @if($contrato->fecha_inicio_obra)
                                                 {{ date('d/m/Y', strtotime($contrato->fecha_inicio_obra)) }}
                                             @else
                                                 No definida
                                             @endif
-                                        </div>
+                                        </span>
                                     </div>
-                                    
-                                    <div class="info-item">
-                                        <div class="info-title">Fin Obra</div>
-                                        <div class="info-value">
+                                    <div class="col-md-3 mb-2 mb-md-0">
+                                        <small class="text-muted d-block">Fin Obra</small>
+                                        <span>
                                             @if($contrato->fecha_terminacion_obra)
                                                 {{ date('d/m/Y', strtotime($contrato->fecha_terminacion_obra)) }}
                                             @else
                                                 No definida
                                             @endif
-                                        </div>
+                                        </span>
                                     </div>
-                                    
-                                    <div class="info-item">
-                                        <div class="info-title">Duración</div>
-                                        <div class="info-value">
-                                            {{ $contrato->duracion ?? 'No especificada' }}
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="info-item">
-                                        <div class="info-title">Frente</div>
-                                        <div class="info-value" 
-                                            data-bs-toggle="tooltip" 
-                                            data-bs-placement="top" 
-                                            title="{{ $contrato->frente ?? 'No especificado' }}">
-                                            {{ Str::limit($contrato->frente ?? 'No especificado', 30) }}
-                                        </div>
+                                    <div class="col-md-2">
+                                        <small class="text-muted d-block">Duración</small>
+                                        <span>{{ $contrato->duracion ?? 'No especificada' }}</span>
                                     </div>
                                 </div>
                                 
-                                <!-- Montos en tarjetas profesionales -->
+                                <!-- Montos en tarjetas -->
                                 <div class="row g-3 mb-4">
                                     <div class="col-md-4">
-                                        <div class="card border-0 shadow-sm h-100">
-                                            <div class="card-body text-center p-4">
-                                                <div class="mb-3">
-                                                    <i class="fas fa-file-invoice-dollar fa-2x" style="color: #282828;"></i>
+                                        <div class="card border-0 bg-light">
+                                            <div class="card-body text-center">
+                                                <div class="mb-2">
+                                                    <i class="fas fa-file-invoice-dollar fa-2x text-secondary"></i>
                                                 </div>
                                                 <h6 class="text-muted mb-2">Subtotal</h6>
-                                                <h3 class="fw-bold mb-0 text-dark">${{ number_format($contrato->subtotal ?? 0, 2) }}</h3>
+                                                <h5 class="fw-bold mb-0">${{ number_format($contrato->subtotal ?? 0, 2) }}</h5>
                                             </div>
                                         </div>
                                     </div>
                                     
                                     <div class="col-md-4">
-                                        <div class="card border-0 shadow-sm h-100">
-                                            <div class="card-body text-center p-4">
-                                                <div class="mb-3">
-                                                    <i class="fas fa-hand-holding-usd fa-2x" style="color: #282828;"></i>
+                                        <div class="card border-0 bg-light">
+                                            <div class="card-body text-center">
+                                                <div class="mb-2">
+                                                    <i class="fas fa-hand-holding-usd fa-2x text-secondary"></i>
                                                 </div>
                                                 <h6 class="text-muted mb-2">IVA</h6>
-                                                <h3 class="fw-bold mb-0 text-dark">${{ number_format($contrato->iva ?? 0, 2) }}</h3>
+                                                <h5 class="fw-bold mb-0">${{ number_format($contrato->iva ?? 0, 2) }}</h5>
                                             </div>
                                         </div>
                                     </div>
                                     
                                     @if($contrato->total)
                                     <div class="col-md-4">
-                                        <div class="card border-0 shadow-sm h-100">
-                                            <div class="card-body text-center p-4">
-                                                <div class="mb-3">
-                                                    <i class="fas fa-chart-line fa-2x" style="color: #282828;"></i>
+                                        <div class="card border-0 bg-light">
+                                            <div class="card-body text-center">
+                                                <div class="mb-2">
+                                                    <i class="fas fa-chart-line fa-2x text-secondary"></i>
                                                 </div>
                                                 <h6 class="text-muted mb-2">Total</h6>
-                                                <h3 class="fw-bold mb-0 text-dark">${{ number_format($contrato->total ?? 0, 2) }}</h3>
+                                                <h5 class="fw-bold mb-0">${{ number_format($contrato->total ?? 0, 2) }}</h5>
                                             </div>
                                         </div>
                                     </div>
@@ -443,7 +207,7 @@
                                 </div>
                                 
                                 <!-- Botones de acción -->
-                                <div class="actions-container">
+                                <div class="d-flex justify-content-end gap-2">
                                     <a href="{{ route('contratos.show', $contrato->id) }}" 
                                     class="btn btn-primary"
                                     title="Ver detalles">
@@ -460,22 +224,20 @@
                         @endforeach
                         
                         <!-- Paginación -->
-                        <div class="pagination-container">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <small class="text-muted">
-                                        Mostrando {{ $contratos->firstItem() }} - {{ $contratos->lastItem() }} de {{ $contratos->total() }} registros
-                                    </small>
-                                </div>
-                                <nav aria-label="Page navigation">
-                                    {{ $contratos->appends(request()->query())->links('pagination::bootstrap-4') }}
-                                </nav>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-muted">
+                                    Mostrando {{ $contratos->firstItem() }} - {{ $contratos->lastItem() }} de {{ $contratos->total() }} registros
+                                </small>
                             </div>
+                            <nav aria-label="Page navigation">
+                                {{ $contratos->appends(request()->query())->links('pagination::bootstrap-4') }}
+                            </nav>
                         </div>
                     @else
                         <!-- Estado vacío -->
-                        <div class="empty-state">
-                            <div class="empty-state-icon">
+                        <div class="text-center py-5 bg-light rounded">
+                            <div class="mb-3">
                                 <i class="fas fa-file-contract fa-4x text-muted"></i>
                             </div>
                             <h4 class="text-muted mb-3">No se encontraron contratos</h4>
@@ -546,12 +308,6 @@
             @if(request()->has('search'))
             document.querySelector('input[name="search"]').focus();
             @endif
-            
-            // Inicializar tooltips de Bootstrap
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl)
-            });
         });
     </script>
 </body>
