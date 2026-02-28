@@ -29,6 +29,7 @@ class Contrato extends Model
         'subtotal',
         'iva',
         'total',
+        'porcentaje_anticipo', // <--- AGREGADO
         'monto_anticipo',
         'duracion',
         'fecha_contrato',
@@ -65,6 +66,7 @@ class Contrato extends Model
         'subtotal' => 'decimal:2',
         'iva' => 'decimal:2',
         'total' => 'decimal:2',
+        'porcentaje_anticipo' => 'decimal:2', // <--- AGREGADO (opcional pero recomendado)
         'monto_anticipo' => 'decimal:2',
         'latitud' => 'decimal:8',
         'longitud' => 'decimal:8',

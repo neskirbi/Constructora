@@ -30,6 +30,7 @@ class CreateContratos extends Migration
             $table->decimal('subtotal', 15, 2)->nullable();
             $table->decimal('iva', 15, 2)->nullable();
             $table->decimal('total', 15, 2)->nullable();
+             $table->decimal('porcentaje_anticipo', 10, 2)->nullable(); // AGREGAR
             $table->decimal('monto_anticipo', 15, 2)->nullable();
             $table->string('duracion')->nullable();
             $table->date('fecha_contrato')->nullable();

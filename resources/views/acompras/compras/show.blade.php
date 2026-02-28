@@ -207,7 +207,8 @@
                                                    value="{{ old('consecutivo', $compra->consecutivo) }}"
                                                    min="1"
                                                    required
-                                                   readonly>
+                                                   readonly
+                                                   noformat>
                                             @error('consecutivo')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror

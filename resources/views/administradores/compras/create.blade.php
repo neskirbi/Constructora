@@ -54,7 +54,8 @@
                                                    name="consecutivo" 
                                                    value="{{ old('consecutivo', $siguienteConsecutivo) }}"
                                                    min="1"
-                                                   required>
+                                                   required
+                                                   noformat>
                                             @error('consecutivo')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror

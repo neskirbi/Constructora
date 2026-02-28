@@ -197,7 +197,8 @@
                                                 name="consecutivo" 
                                                 value="{{ old('consecutivo', $contrato->consecutivo) }}"
                                                 placeholder="Número consecutivo"
-                                                min="1">
+                                                min="1"
+                                                noformat>
                                             @error('consecutivo')
                                                 <div class="text-danger small mt-1">{{ $message }}</div>
                                             @enderror
@@ -541,6 +542,7 @@
                                 </h5>
                                 
                                 <div class="row">
+                                    <!-- Columna Izquierda -->
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
                                             <label for="concepto" class="form-label-custom">
@@ -554,30 +556,44 @@
                                                 <option value="CONVENIO APLIACION" {{ old('concepto', $contrato->concepto) == 'CONVENIO APLIACION' ? 'selected' : '' }}>CONVENIO APLIACION</option>
                                             </select>
                                         </div>
-                                    </div>
-                                    
-                                    <div class="col-md-6">
+                                        
                                         <div class="form-group-custom">
-                                            <label for="porcentaje_iva" class="form-label-custom">
-                                                Porcentaje IVA (%)
+                                            <label for="porcentaje_anticipo" class="form-label-custom">
+                                                % Anticipo
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input" 
-                                                       id="porcentaje_iva" 
-                                                       value="{{ $contrato->subtotal && $contrato->iva ? round(($contrato->iva / $contrato->subtotal) * 100, 2) : '16' }}"
+                                                       id="porcentaje_anticipo" 
+                                                       name="porcentaje_anticipo"
+                                                       value="{{ old('porcentaje_anticipo', $contrato->porcentaje_anticipo) }}"
                                                        step="0.01"
-                                                       placeholder="16.00"
+                                                       placeholder="0.00"
                                                        min="0"
                                                        max="100">
                                                 <span class="input-group-text">%</span>
                                             </div>
-                                            <div class="help-text">Ingrese el porcentaje de IVA a aplicar</div>
+                                        </div>
+                                        
+                                        <div class="form-group-custom">
+                                            <label for="monto_anticipo" class="form-label-custom">
+                                                Anticipo
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input bg-light" 
+                                                       id="monto_anticipo" 
+                                                       name="monto_anticipo"
+                                                       value="{{ old('monto_anticipo', $contrato->monto_anticipo) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       readonly>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                
-                                <div class="row">
+                                    
+                                    <!-- Columna Derecha -->
                                     <div class="col-md-6">
                                         <div class="form-group-custom">
                                             <label for="subtotal" class="form-label-custom">
@@ -595,9 +611,25 @@
                                                        min="0">
                                             </div>
                                         </div>
-                                    </div>
-                                    
-                                    <div class="col-md-6">
+                                        
+                                        <div class="form-group-custom">
+                                            <label for="porcentaje_iva" class="form-label-custom">
+                                                % IVA
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input" 
+                                                       id="porcentaje_iva" 
+                                                       name="porcentaje_iva" 
+                                                       value="{{ old('porcentaje_iva', $contrato->porcentaje_iva ?? '16') }}"
+                                                       step="0.01"
+                                                       placeholder="16.00"
+                                                       min="0"
+                                                       max="100">
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </div>
+                                        
                                         <div class="form-group-custom">
                                             <label for="iva" class="form-label-custom">
                                                 IVA
@@ -616,11 +648,7 @@
                                                        style="background-color: #f8f9fa;">
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-6">
+                                        
                                         <div class="form-group-custom">
                                             <label for="total" class="form-label-custom">
                                                 Total
@@ -639,23 +667,21 @@
                                                        style="background-color: #f8f9fa;">
                                             </div>
                                         </div>
-                                    </div>
-                                    
-                                    <div class="col-md-6">
+                                        
                                         <div class="form-group-custom">
-                                            <label for="monto_anticipo" class="form-label-custom">
-                                                Anticipo
+                                            <label for="total_mas_anticipo" class="form-label-custom">
+                                                Total + Anticipo
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="monto_anticipo" 
-                                                       name="monto_anticipo" 
-                                                       value="{{ old('monto_anticipo', $contrato->monto_anticipo) }}"
+                                                       class="form-control form-control-custom numeric-input bg-light" 
+                                                       id="total_mas_anticipo" 
+                                                       name="total_mas_anticipo"
+                                                       value="{{ old('total_mas_anticipo', $contrato->total_mas_anticipo ?? ($contrato->total + $contrato->monto_anticipo)) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
-                                                       min="0">
+                                                       readonly>
                                             </div>
                                         </div>
                                     </div>
@@ -935,46 +961,66 @@
             document.getElementById('longitud_display').value = lng.toFixed(6);
         }
         
-        // Función para calcular IVA y Total
-        function calcularMontos() {
+        // Función para calcular todos los montos (IGUAL QUE EN CREATE)
+        function calcularMontosContrato() {
             const subtotal = parseFloat(document.getElementById('subtotal').value) || 0;
             const porcentajeIva = parseFloat(document.getElementById('porcentaje_iva').value) || 0;
+            const porcentajeAnticipo = parseFloat(document.getElementById('porcentaje_anticipo').value) || 0;
             
-            // Calcular IVA
+            // Calcular
             const ivaCalculado = (subtotal * porcentajeIva) / 100;
-            
-            // Calcular Total
             const totalCalculado = subtotal + ivaCalculado;
+            const anticipoCalculado = (totalCalculado * porcentajeAnticipo) / 100;
+            const totalMasAnticipo = totalCalculado + anticipoCalculado;
             
             // Actualizar campos
             document.getElementById('iva').value = ivaCalculado.toFixed(2);
             document.getElementById('total').value = totalCalculado.toFixed(2);
+            document.getElementById('monto_anticipo').value = anticipoCalculado.toFixed(2);
+            document.getElementById('total_mas_anticipo').value = totalMasAnticipo.toFixed(2);
+            
+            // Disparar eventos para el formateador
+            ['iva', 'total', 'monto_anticipo', 'total_mas_anticipo'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                    if (typeof $ !== 'undefined') {
+                        $(el).trigger('change');
+                    }
+                }
+            });
         }
         
-        // Escuchar cambios en subtotal y porcentaje IVA
+        // Escuchar cambios (IGUAL QUE EN CREATE)
         document.addEventListener('DOMContentLoaded', function() {
             const subtotalInput = document.getElementById('subtotal');
             const porcentajeIvaInput = document.getElementById('porcentaje_iva');
+            const porcentajeAnticipoInput = document.getElementById('porcentaje_anticipo');
             
-            if (subtotalInput && porcentajeIvaInput) {
-                subtotalInput.addEventListener('input', calcularMontos);
-                porcentajeIvaInput.addEventListener('input', calcularMontos);
+            if (subtotalInput && porcentajeIvaInput && porcentajeAnticipoInput) {
+                subtotalInput.addEventListener('input', calcularMontosContrato);
+                porcentajeIvaInput.addEventListener('input', calcularMontosContrato);
+                porcentajeAnticipoInput.addEventListener('input', calcularMontosContrato);
                 
-                // Calcular valores iniciales si hay datos pre-cargados
-                if (subtotalInput.value || porcentajeIvaInput.value) {
-                    calcularMontos();
-                }
+                // Calcular valores iniciales
+                setTimeout(calcularMontosContrato, 100);
             }
             
-            // Validar que el porcentaje IVA esté entre 0 y 100
+            // Validar % IVA
             if (porcentajeIvaInput) {
                 porcentajeIvaInput.addEventListener('change', function() {
-                    if (this.value < 0) {
-                        this.value = 0;
-                    } else if (this.value > 100) {
-                        this.value = 100;
-                    }
-                    calcularMontos();
+                    if (this.value < 0) this.value = 0;
+                    if (this.value > 100) this.value = 100;
+                    calcularMontosContrato();
+                });
+            }
+            
+            // Validar % Anticipo
+            if (porcentajeAnticipoInput) {
+                porcentajeAnticipoInput.addEventListener('change', function() {
+                    if (this.value < 0) this.value = 0;
+                    if (this.value > 100) this.value = 100;
+                    calcularMontosContrato();
                 });
             }
             

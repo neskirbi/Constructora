@@ -447,15 +447,16 @@
                             </div>
                         </div>
                         
-                        <!-- Sección 4: Montos Financieros -->
+                        <!-- Sección 4: Montos del Contrato -->
                         <div class="form-section">
                             <h5 class="section-title">
                                 <i class="fas fa-dollar-sign me-2"></i>
-                                Montos Financieros
+                                Montos del Contrato
                             </h5>
                             
                             <div class="row">
-                                <div class="col-md-4">
+                                <!-- Columna Izquierda -->
+                                <div class="col-md-6">
                                     <div class="form-group-custom">
                                         <label class="form-label-custom">
                                             Concepto
@@ -464,9 +465,32 @@
                                             {{ $contrato->concepto ?: 'No especificado' }}
                                         </div>
                                     </div>
+                                    
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">
+                                            % Anticipo
+                                        </label>
+                                        <div class="info-value @if(is_null($contrato->porcentaje_anticipo)) info-value-empty @endif">
+                                            @if(!is_null($contrato->porcentaje_anticipo))
+                                                {{ number_format($contrato->porcentaje_anticipo, 2) }}%
+                                            @else
+                                                No especificado
+                                            @endif
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">
+                                            Anticipo
+                                        </label>
+                                        <div class="info-value @if(empty($contrato->monto_anticipo)) info-value-empty @endif">
+                                            ${{ number_format($contrato->monto_anticipo ?? 0, 2) }}
+                                        </div>
+                                    </div>
                                 </div>
                                 
-                                <div class="col-md-4">
+                                <!-- Columna Derecha -->
+                                <div class="col-md-6">
                                     <div class="form-group-custom">
                                         <label class="form-label-custom">
                                             Subtotal
@@ -475,9 +499,22 @@
                                             ${{ number_format($contrato->subtotal ?? 0, 2) }}
                                         </div>
                                     </div>
-                                </div>
-                                
-                                <div class="col-md-4">
+                                    
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">
+                                            % IVA
+                                        </label>
+                                        <div class="info-value">
+                                            @php
+                                                $porcentajeIvaCalculado = 16;
+                                                if(($contrato->subtotal ?? 0) > 0 && ($contrato->iva ?? 0) > 0) {
+                                                    $porcentajeIvaCalculado = (($contrato->iva ?? 0) / $contrato->subtotal) * 100;
+                                                }
+                                            @endphp
+                                            {{ number_format($porcentajeIvaCalculado, 2) }}%
+                                        </div>
+                                    </div>
+                                    
                                     <div class="form-group-custom">
                                         <label class="form-label-custom">
                                             IVA
@@ -486,11 +523,7 @@
                                             ${{ number_format($contrato->iva ?? 0, 2) }}
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-4">
+                                    
                                     <div class="form-group-custom">
                                         <label class="form-label-custom">
                                             Total
@@ -499,15 +532,13 @@
                                             ${{ number_format($contrato->total ?? 0, 2) }}
                                         </div>
                                     </div>
-                                </div>
-                                
-                                <div class="col-md-4">
+                                    
                                     <div class="form-group-custom">
                                         <label class="form-label-custom">
-                                            Monto Anticipo
+                                            Total + Anticipo
                                         </label>
-                                        <div class="info-value @if(empty($contrato->monto_anticipo)) info-value-empty @endif">
-                                            ${{ number_format($contrato->monto_anticipo ?? 0, 2) }}
+                                        <div class="info-value">
+                                            ${{ number_format(($contrato->total ?? 0) + ($contrato->monto_anticipo ?? 0), 2) }}
                                         </div>
                                     </div>
                                 </div>

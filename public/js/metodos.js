@@ -61,427 +61,324 @@ function GenerarPass(element){
 
 
 // ==============================================
-// FORMATO DE NÚMEROS PARA INPUTS TYPE="NUMBER"
-// Agregar al final de metodos.js
+// FORMATO UNIVERSAL PARA INPUTS TYPE="NUMBER"
+// VERSIÓN CON PADDING DINÁMICO - RESPETA SPANS EXISTENTES
 // ==============================================
-
 (function() {
     'use strict';
     
-    // Configuración global
+    // Configuración
     const config = {
         decimalPlaces: 2,
         thousandSeparator: ',',
         decimalSeparator: '.',
         currencySymbol: '$',
-        enabled: true,
-        debug: false, // Cambiar a true para ver logs
-        excludeAttribute: 'noformat', // Atributo para excluir inputs
-        excludeClass: 'no-format', // Clase para excluir inputs
-        defaultMode: 0, // 0 = formato en display, 1 = formato en help text
-        helpTextClass: 'help-text', // Clase para el help text
-        helpTextPosition: 'after' // 'after' o 'before' para posición del help text
+        debug: true,
+        
+        defaultMode: 0,
+        helpTextClass: 'number-format-helper',
+        modeAttribute: 'data-format-mode',
+        excludeAttribute: 'data-no-format',
+        
+        excludePatterns: ['noformat', 'no-format', 'skip-format']
     };
     
-    // Variable de control global (la que mencionaste)
-    var helptext = 0; // 0 = formato en display, 1 = formato en help text
+    window.helptext = config.defaultMode;
     
-    // Función para debug
     function log(...args) {
         if (config.debug) console.log('[NumberFormatter]', ...args);
     }
     
-    // Función para verificar si un input debe ser excluido
-    function shouldExcludeInput(input) {
-        // Verificar por atributo data-noformat
-        if (input.hasAttribute('data-noformat') || 
-            input.hasAttribute('data-no-format') || 
-            input.hasAttribute(config.excludeAttribute)) {
-            log('Input excluido por atributo:', input.id || input.name || 'sin id');
-            return true;
+    function shouldExclude(input) {
+        if (input.hasAttribute(config.excludeAttribute)) return true;
+        for (const pattern of config.excludePatterns) {
+            if (input.hasAttribute(pattern) || input.classList.contains(pattern)) return true;
         }
-        
-        // Verificar por clase
-        if (input.classList.contains(config.excludeClass)) {
-            log('Input excluido por clase:', input.id || input.name || 'sin id');
-            return true;
-        }
-        
-        // Verificar por atributo personalizado en el HTML
-        if (input.getAttribute('noformat') !== null || 
-            input.getAttribute('no-format') !== null) {
-            log('Input excluido por atributo HTML:', input.id || input.name || 'sin id');
-            return true;
-        }
-        
         return false;
     }
     
-    // Función para obtener el modo de formato de un input específico
-    function getInputMode(input) {
-        // Verificar si tiene atributo data-helptext-mode
-        if (input.hasAttribute('data-helptext-mode')) {
-            const mode = parseInt(input.getAttribute('data-helptext-mode'));
+    function getMode(input) {
+        if (input.hasAttribute(config.modeAttribute)) {
+            const mode = parseInt(input.getAttribute(config.modeAttribute));
             if (!isNaN(mode)) return mode;
         }
-        
-        // Verificar si tiene atributo data-format-mode
-        if (input.hasAttribute('data-format-mode')) {
-            const mode = parseInt(input.getAttribute('data-format-mode'));
-            if (!isNaN(mode)) return mode;
-        }
-        
-        // Usar el modo global
-        return helptext;
+        return window.helptext;
     }
     
-    // Función para formatear número
-    function formatNumber(value, options = {}) {
-        if (value === '' || value === null || value === undefined) return '';
+    function formatNumber(value) {
+        if (value === '' || value === null || value === undefined) {
+            return config.currencySymbol + ' 0.00';
+        }
+        
         let num = parseFloat(value);
         if (isNaN(num)) return value;
         
-        const decimalPlaces = options.decimalPlaces || config.decimalPlaces;
-        const currencySymbol = options.currencySymbol || config.currencySymbol;
-        const thousandSeparator = options.thousandSeparator || config.thousandSeparator;
+        return config.currencySymbol + ' ' + 
+               num.toFixed(config.decimalPlaces)
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, config.thousandSeparator);
+    }
+    
+    // ==============================================
+    // CALCULAR PADDING NECESARIO
+    // ==============================================
+    
+    function calculatePadding(input, inputGroup) {
+        if (!inputGroup) return 75; // Padding por defecto
         
-        return currencySymbol + ' ' + 
-               num.toFixed(decimalPlaces)
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, thousandSeparator);
-    }
-    
-    // Función para extraer número del formato
-    function parseFormattedValue(formattedValue) {
-        if (!formattedValue) return '';
-        // Remover símbolo de moneda y comas
-        let cleanValue = formattedValue.replace(config.currencySymbol, '').replace(/,/g, '').trim();
-        return cleanValue;
-    }
-    
-    // Función para crear o actualizar help text
-    function updateHelpText(input, formattedValue) {
-        // Buscar help text existente
-        let helpText = input.nextElementSibling;
-        if (!helpText || !helpText.classList.contains(config.helpTextClass)) {
-            // Buscar en el contenedor padre
-            const parent = input.parentElement;
-            if (parent) {
-                helpText = parent.querySelector('.' + config.helpTextClass);
-            }
+        const children = Array.from(inputGroup.children);
+        const inputIndex = children.indexOf(input);
+        
+        // Si no hay elementos antes del input, padding normal
+        if (inputIndex <= 0) return 75;
+        
+        // Calcular ancho total de los elementos ANTES del input
+        let totalWidth = 0;
+        for (let i = 0; i < inputIndex; i++) {
+            const element = children[i];
+            // Obtener ancho real incluyendo márgenes
+            const styles = window.getComputedStyle(element);
+            const width = element.offsetWidth;
+            const marginRight = parseInt(styles.marginRight) || 0;
+            totalWidth += width + marginRight;
         }
         
-        // Si no existe help text, crearlo
-        if (!helpText) {
-            helpText = document.createElement('div');
-            helpText.className = config.helpTextClass;
-            
-            if (config.helpTextPosition === 'after') {
-                input.insertAdjacentElement('afterend', helpText);
-            } else {
-                input.insertAdjacentElement('beforebegin', helpText);
-            }
-        }
+        // Añadir un margen de seguridad (10px) y algo extra para el símbolo $
+        const paddingNeeded = totalWidth + 25; // 25px extra para el símbolo $
         
-        // Actualizar contenido
-        helpText.textContent = ' ' + formattedValue;
-        helpText.style.color = '#000000';
-        helpText.style.fontSize = '0.85rem';
-        helpText.style.marginTop = '0.25rem';
+        log(`Padding calculado para ${input.id}: ${paddingNeeded}px (elementos antes: ${totalWidth}px)`);
+        
+        return Math.max(paddingNeeded, 75); // Mínimo 75px
     }
     
-    // Clase para manejar inputs formateados
-    class FormattedNumberInput {
+    // ==============================================
+    // CLASE PRINCIPAL
+    // ==============================================
+    
+    class NumberFormatter {
         constructor(input) {
             this.input = input;
-            this.originalValue = input.value;
-            this.mode = getInputMode(input);
+            this.mode = getMode(input);
             this.display = null;
-            this.wrapper = null;
+            this.helper = null;
+            this.inputGroup = input.closest('.input-group');
             
-            log(`Input ${input.id || input.name} modo: ${this.mode === 0 ? 'Display' : 'Help Text'}`);
-            
-            this.setup();
-        }
-        
-        setup() {
-            // Verificar si debe ser excluido
-            if (shouldExcludeInput(this.input)) {
-                this.input.dataset.numberFormatted = 'skipped';
-                log('Input omitido por exclusión');
+            if (shouldExclude(input)) {
+                log('Excluido:', input.id);
+                input.dataset.numberFormatted = 'skipped';
                 return;
             }
+            
+            log('Procesando:', input.id, 'modo:', this.mode);
+            this.setup();
+            this.attachEvents();
             
             // Marcar como procesado
             this.input.dataset.numberFormatted = 'true';
             this.input.dataset.formatMode = this.mode;
             
-            // Guardar referencia al objeto
-            const self = this;
-            
-            // Configurar según el modo
+            // Actualizar inmediatamente
+            setTimeout(() => this.update(), 50);
+        }
+        
+        setup() {
             if (this.mode === 0) {
-                // Modo 0: Formato en display (wrapper)
-                this.setupDisplayMode();
+                this.setupDisplay();
             } else {
-                // Modo 1: Formato en help text
-                this.setupHelpTextMode();
-            }
-            
-            // Interceptar cambios programáticos
-            this.interceptValueChanges();
-        }
-        
-        setupDisplayMode() {
-            // Crear wrapper y display
-            this.wrapper = document.createElement('div');
-            this.wrapper.className = 'number-format-wrapper';
-            this.wrapper.style.cssText = `
-                position: relative;
-                display: inline-block;
-                width: ${this.input.offsetWidth || 200}px;
-            `;
-            
-            this.display = document.createElement('span');
-            this.display.className = 'number-format-display';
-            this.display.style.cssText = `
-                position: absolute;
-                left: 10px;
-                top: 50%;
-                transform: translateY(-50%);
-                color: #333;
-                pointer-events: none;
-                z-index: 1;
-                background: transparent;
-                font-family: inherit;
-                font-size: inherit;
-            `;
-            
-            // Insertar en el DOM
-            this.input.parentNode.insertBefore(this.wrapper, this.input);
-            this.wrapper.appendChild(this.input);
-            this.wrapper.appendChild(this.display);
-            
-            // Ajustar estilos del input
-            this.input.style.width = '100%';
-            this.input.style.paddingLeft = '70px';
-            this.input.style.boxSizing = 'border-box';
-            
-            // Actualizar display inicial
-            this.updateDisplay();
-            
-            // Event listeners
-            this.input.addEventListener('input', () => this.updateDisplay());
-            this.input.addEventListener('change', () => this.updateDisplay());
-        }
-        
-        setupHelpTextMode() {
-            // Asegurar que el input tenga márgenes para el help text
-            this.input.style.marginBottom = '5px';
-            
-            // Actualizar help text inicial
-            this.updateHelpText();
-            
-            // Event listeners
-            this.input.addEventListener('input', () => this.updateHelpText());
-            this.input.addEventListener('change', () => this.updateHelpText());
-        }
-        
-        updateDisplay() {
-            if (this.display) {
-                this.display.textContent = formatNumber(this.input.value);
+                this.setupHelpText();
             }
         }
         
-        updateHelpText() {
-            const formattedValue = formatNumber(this.input.value);
-            updateHelpText(this.input, formattedValue);
-        }
-        
-        interceptValueChanges() {
-            const self = this;
-            const input = this.input;
-            const originalDescriptor = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+        setupDisplay() {
+            // CALCULAR PADDING DINÁMICO
+            const paddingLeft = calculatePadding(this.input, this.inputGroup);
             
-            Object.defineProperty(input, 'value', {
-                set: function(v) {
-                    // Llamar al setter original
-                    originalDescriptor.set.call(this, v);
-                    // Actualizar según modo
-                    if (self.mode === 0) {
-                        self.updateDisplay.call(self);
-                    } else {
-                        self.updateHelpText.call(self);
+            // Aplicar padding al input
+            this.input.style.paddingLeft = paddingLeft + 'px';
+            
+            if (this.inputGroup) {
+                // Estamos en input-group
+                if (window.getComputedStyle(this.inputGroup).position === 'static') {
+                    this.inputGroup.style.position = 'relative';
+                }
+                
+                // Eliminar displays existentes
+                const existing = this.inputGroup.querySelectorAll('.number-format-display');
+                existing.forEach(el => el.remove());
+                
+                // Calcular posición left para el display
+                let leftPosition = 10; // Valor por defecto
+                
+                if (this.inputGroup) {
+                    const children = Array.from(this.inputGroup.children);
+                    const inputIndex = children.indexOf(this.input);
+                    
+                    // Si hay elementos antes, posicionar después del último
+                    if (inputIndex > 0) {
+                        const lastElementBefore = children[inputIndex - 1];
+                        leftPosition = lastElementBefore.offsetLeft + lastElementBefore.offsetWidth + 5;
                     }
-                    // Disparar evento para notificar cambio
-                    this.dispatchEvent(new Event('input', { bubbles: true }));
-                },
-                get: function() {
-                    return originalDescriptor.get.call(this);
-                },
-                configurable: true
+                }
+                
+                // Crear display
+                this.display = document.createElement('span');
+                this.display.className = 'number-format-display';
+                this.display.style.cssText = `
+                    position: absolute;
+                    left: ${leftPosition}px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: #495057;
+                    pointer-events: none;
+                    z-index: 10;
+                    background: transparent;
+                    font-family: inherit;
+                    font-size: inherit;
+                    white-space: nowrap;
+                    opacity: 0.9;
+                `;
+                
+                // Insertar antes del input
+                this.inputGroup.insertBefore(this.display, this.input);
+            } else {
+                // Crear wrapper
+                const wrapper = document.createElement('div');
+                wrapper.className = 'number-format-wrapper';
+                wrapper.style.cssText = `
+                    position: relative;
+                    display: inline-block;
+                    width: ${this.input.offsetWidth || 200}px;
+                `;
+                
+                this.display = document.createElement('span');
+                this.display.className = 'number-format-display';
+                this.display.style.cssText = `
+                    position: absolute;
+                    left: 10px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: #495057;
+                    pointer-events: none;
+                    z-index: 10;
+                    background: transparent;
+                    font-family: inherit;
+                    font-size: inherit;
+                    white-space: nowrap;
+                    opacity: 0.9;
+                `;
+                
+                this.input.parentNode.insertBefore(wrapper, this.input);
+                wrapper.appendChild(this.input);
+                wrapper.appendChild(this.display);
+                
+                this.input.style.width = '100%';
+                this.input.style.paddingLeft = paddingLeft + 'px';
+                this.input.style.boxSizing = 'border-box';
+            }
+        }
+        
+        setupHelpText() {
+            this.helper = document.createElement('div');
+            this.helper.className = config.helpTextClass;
+            this.helper.style.cssText = `
+                font-size: 0.85rem;
+                color: #6c757d;
+                margin-top: 0.25rem;
+                padding: 0.25rem 0.5rem;
+                border-left: 2px solid #007bff;
+                background-color: #f8f9fa;
+                border-radius: 0 4px 4px 0;
+                clear: both;
+            `;
+            
+            if (this.inputGroup) {
+                this.inputGroup.insertAdjacentElement('afterend', this.helper);
+            } else {
+                this.input.insertAdjacentElement('afterend', this.helper);
+            }
+        }
+        
+        attachEvents() {
+            // TIEMPO REAL
+            this.input.addEventListener('input', () => this.update());
+            this.input.addEventListener('keyup', () => this.update());
+            this.input.addEventListener('change', () => {
+                log('Change event en', this.input.id);
+                this.update();
+            });
+            this.input.addEventListener('blur', () => this.update());
+            
+            // Recalcular padding si cambia el tamaño de la ventana
+            window.addEventListener('resize', () => {
+                if (this.mode === 0 && this.inputGroup) {
+                    const newPadding = calculatePadding(this.input, this.inputGroup);
+                    this.input.style.paddingLeft = newPadding + 'px';
+                    
+                    // Reposicionar display
+                    const children = Array.from(this.inputGroup.children);
+                    const inputIndex = children.indexOf(this.input);
+                    if (inputIndex > 0 && this.display) {
+                        const lastElementBefore = children[inputIndex - 1];
+                        this.display.style.left = (lastElementBefore.offsetLeft + lastElementBefore.offsetWidth + 5) + 'px';
+                    }
+                }
             });
         }
+        
+        update() {
+            const formatted = formatNumber(this.input.value);
+            
+            if (this.mode === 0 && this.display) {
+                this.display.textContent = formatted;
+                log('Display actualizado:', this.input.id, '->', formatted);
+            } else if (this.mode === 1 && this.helper) {
+                this.helper.textContent = 'Valor formateado: ' + formatted;
+            }
+        }
     }
     
-    // Función principal para procesar todos los inputs
-    function processNumberInputs() {
-        if (!config.enabled) return;
-        
-        const numberInputs = document.querySelectorAll('input[type="number"]:not([data-number-formatted="true"]):not([data-number-formatted="skipped"])');
-        log(`Procesando ${numberInputs.length} inputs type="number"`);
-        
-        numberInputs.forEach(input => {
-            new FormattedNumberInput(input);
-        });
+    // ==============================================
+    // FUNCIONES GLOBALES
+    // ==============================================
+    
+    function init() {
+        const inputs = document.querySelectorAll('input[type="number"]:not([data-number-formatted])');
+        inputs.forEach(input => new NumberFormatter(input));
     }
     
-    // Función para cambiar el modo global
-    window.setHelptextMode = function(mode) {
-        helptext = mode === 0 ? 0 : 1;
-        log(`Modo global cambiado a: ${helptext === 0 ? 'Display' : 'Help Text'}`);
-        
-        // Reprocesar todos los inputs para aplicar el nuevo modo
-        document.querySelectorAll('input[type="number"]').forEach(input => {
-            // Limpiar datos anteriores
-            input.dataset.numberFormatted = '';
-            
-            // Eliminar wrapper si existe
-            const wrapper = input.closest('.number-format-wrapper');
-            if (wrapper) {
-                const parent = wrapper.parentNode;
-                parent.insertBefore(input, wrapper);
-                parent.removeChild(wrapper);
-            }
-            
-            // Eliminar help text personalizado
-            const helpText = input.nextElementSibling;
-            if (helpText && helpText.classList.contains(config.helpTextClass)) {
-                helpText.remove();
-            }
-            
-            // Resetear estilos
-            input.style.paddingLeft = '';
-            input.style.width = '';
-            input.style.marginBottom = '';
+    window.refreshNumberFormats = function() {
+        log('Refrescando todos los formatos');
+        document.querySelectorAll('input[type="number"][data-number-formatted="true"]').forEach(input => {
+            input.dispatchEvent(new Event('input', { bubbles: true }));
         });
-        
-        // Reprocesar
-        processNumberInputs();
     };
     
-    // Inicializar cuando el DOM esté listo
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', processNumberInputs);
-    } else {
-        processNumberInputs();
-    }
-    
-    // Observar cambios en el DOM (para inputs agregados dinámicamente)
-    const observer = new MutationObserver(function(mutations) {
-        let shouldProcess = false;
-        
-        mutations.forEach(mutation => {
-            if (mutation.addedNodes.length) {
-                mutation.addedNodes.forEach(node => {
-                    if (node.nodeType === 1) { // Element node
-                        if (node.matches && node.matches('input[type="number"]')) {
-                            shouldProcess = true;
-                        }
-                        if (node.querySelectorAll && node.querySelectorAll('input[type="number"]').length) {
-                            shouldProcess = true;
-                        }
-                    }
-                });
-            }
-        });
-        
-        if (shouldProcess) {
-            setTimeout(processNumberInputs, 100);
-        }
-    });
-    
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
-    
-    // Exponer API global
     window.NumberFormatter = {
         format: formatNumber,
-        parse: parseFormattedValue,
-        refresh: processNumberInputs,
-        enable: function() { config.enabled = true; processNumberInputs(); },
-        disable: function() { config.enabled = false; },
-        setConfig: function(newConfig) { Object.assign(config, newConfig); },
-        setMode: function(mode) { helptext = mode; this.refresh(); },
-        getMode: function() { return helptext; }
-    };
-    
-    log('NumberFormatter inicializado con helptext =', helptext);
-    
-    // ==============================================
-    // PARCHE PARA LA FUNCIÓN calcularMontos
-    // ==============================================
-    
-    // Guardar referencia a la función original si existe
-    const originalCalcularMontos = window.calcularMontos;
-    
-    // Crear nueva función que maneje el formato
-    window.calcularMontos = function() {
-        log('Ejecutando calcularMontos con soporte de formato');
-        
-        // Obtener valores de los inputs
-        const subtotalInput = document.getElementById('subtotal');
-        const porcentajeIvaInput = document.getElementById('porcentaje_iva');
-        
-        if (subtotalInput && porcentajeIvaInput) {
-            // Extraer valores numéricos
-            let subtotal = subtotalInput.value;
-            let porcentajeIva = porcentajeIvaInput.value;
-            
-            // Si los inputs tienen formato, extraer solo números
-            if (subtotalInput.dataset.numberFormatted === 'true') {
-                subtotal = subtotal.replace(/[$,]/g, '');
-            }
-            if (porcentajeIvaInput.dataset.numberFormatted === 'true') {
-                porcentajeIva = porcentajeIvaInput.value.replace(/[$,]/g, '');
-            }
-            
-            // Convertir a números
-            subtotal = parseFloat(subtotal) || 0;
-            porcentajeIva = parseFloat(porcentajeIva) || 0;
-            
-            // Calcular
-            const ivaCalculado = (subtotal * porcentajeIva) / 100;
-            const totalCalculado = subtotal + ivaCalculado;
-            
-            // Actualizar campos
-            const ivaInput = document.getElementById('iva');
-            const totalInput = document.getElementById('total');
-            
-            if (ivaInput) {
-                ivaInput.value = ivaCalculado.toFixed(2);
-                // Actualizar display según modo
-                if (ivaInput.dataset.numberFormatted === 'true') {
-                    ivaInput.dispatchEvent(new Event('input'));
-                }
-            }
-            
-            if (totalInput) {
-                totalInput.value = totalCalculado.toFixed(2);
-                if (totalInput.dataset.numberFormatted === 'true') {
-                    totalInput.dispatchEvent(new Event('input'));
-                }
-            }
-            
-            log('Cálculo completado:', { subtotal, porcentajeIva, ivaCalculado, totalCalculado });
-        }
-        
-        // Llamar a la función original si existe
-        if (typeof originalCalcularMontos === 'function') {
-            originalCalcularMontos();
+        refresh: window.refreshNumberFormats,
+        setMode: function(mode) {
+            window.helptext = mode === 0 ? 0 : 1;
+            location.reload();
         }
     };
+    
+    // ==============================================
+    // INICIALIZACIÓN
+    // ==============================================
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+    
+    // Detectar inputs nuevos
+    document.addEventListener('focusin', function(e) {
+        if (e.target.matches && e.target.matches('input[type="number"]:not([data-number-formatted])')) {
+            new NumberFormatter(e.target);
+        }
+    });
+    
+    log('NumberFormatter inicializado - Con padding dinámico');
     
 })();
 
