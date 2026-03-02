@@ -280,7 +280,7 @@
                                                 IVA
                                             </label>
                                             <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
+                                                <span class="input-group-text">%</span>
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="iva" 
@@ -829,71 +829,50 @@
     </div>
 
     @include('footer')
+    
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Campos de DEDUCCIÓN (sanciones/retrociones)
-        const deduccionFields = [
-            'retenciones_o_sanciones',
-            'cargos_adicionales_3_5',
-            'retencion_5_al_millar',
-            'sancion_atrazo_presentacion_estimacion',
-            'sancion_atraso_de_obra',
-            'sancion_por_obra_mal_ejecutada',
-            'retencion_por_atraso_en_programa_obra'
-            // NOTA: amortizacion_anticipo y amortizacion_con_iva NO se incluyen
-            // porque no son deducciones por incumplimiento
-        ];
+       // Función para calcular el total de la estimación (Importe + IVA)
+function calcularTotalEstimacion() {
+    // Obtener valores numéricos reales
+    const importeEstimacion = parseFloat($('#importe_estimacion').val()) || 0;
+    const iva = parseFloat($('#iva').val()) || 0;
+    
+    // Calcular total = importe + (importe * iva / 100)
+    const totalCalculado = importeEstimacion + (importeEstimacion * iva / 100);
+    
+    // Asignar el valor numérico
+    $('#total_estimacion_con_iva').val(totalCalculado.toFixed(2));
+    
+    // FORZAR ACTUALIZACIÓN DEL FORMATO - DISPARAR EVENTOS QUE USA EL FORMATTEADOR
+    const input = document.getElementById('total_estimacion_con_iva');
+    if (input) {
+        // Disparar los eventos que el formateador está escuchando
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('keyup', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+}
 
-        // Campos de AMORTIZACIÓN (parte del pago normal)
-        const amortizacionFields = [
-            'amortizacion_anticipo',
-            'amortizacion_con_iva'
-        ];
-
-        // Campo total de deducciones (bloqueado)
-        const totalDeduccionesInput = document.getElementById('total_deducciones');
-        
-        // Hacer el campo de total de deducciones de solo lectura
-        if (totalDeduccionesInput) {
-            totalDeduccionesInput.readOnly = true;
-            totalDeduccionesInput.style.backgroundColor = '#f8f9fa';
-            totalDeduccionesInput.style.cursor = 'not-allowed';
-        }
-
-        // Función para calcular el total de DEDUCCIONES (solo sanciones/retrociones)
-        function calcularTotalDeducciones() {
-            let total = 0;
-            
-            deduccionFields.forEach(fieldName => {
-                const field = document.getElementById(fieldName);
-                if (field && field.value) {
-                    total += parseFloat(field.value) || 0;
-                }
+        $(document).ready(function() {
+            // Calcular cuando cambien los campos
+            $('#importe_estimacion, #iva').on('input', function() {
+                calcularTotalEstimacion();
             });
             
-            if (totalDeduccionesInput) {
-                // Formatear a 2 decimales
-                totalDeduccionesInput.value = total.toFixed(2);
-            }
-        }
-
-        // Agregar event listeners a los campos de DEDUCCIÓN
-        deduccionFields.forEach(fieldName => {
-            const field = document.getElementById(fieldName);
-            if (field) {
-                field.addEventListener('input', calcularTotalDeducciones);
-                field.addEventListener('blur', function() {
-                    if (this.value) {
-                        this.value = parseFloat(this.value).toFixed(2);
-                    }
-                    calcularTotalDeducciones();
-                });
-            }
+            // Validar que el IVA esté entre 0 y 100
+            $('#iva').on('change', function() {
+                let valor = parseFloat($(this).val()) || 0;
+                if (valor < 0) $(this).val(0);
+                if (valor > 100) $(this).val(100);
+                calcularTotalEstimacion();
+            });
+            
+            // Calcular valores iniciales
+            setTimeout(function() {
+                calcularTotalEstimacion();
+            }, 200);
         });
-
-        // Calcular inicialmente si hay valores precargados
-        calcularTotalDeducciones();
-    });
-</script>
+    </script>
+   
 </body>
 </html>
