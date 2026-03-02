@@ -25,18 +25,17 @@ class ContratoController extends Controller
         // Aplicar búsqueda si existe
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('obra', 'like', "%{$search}%")
-                  ->orWhere('contrato_no', 'like', "%{$search}%")
-                  ->orWhere('cliente', 'like', "%{$search}%")
-                  ->orWhere('lugar', 'like', "%{$search}%")
-                  ->orWhere('empresa', 'like', "%{$search}%");
+                $q->where('consecutivo', 'like', "%{$search}%")  // <--- AGREGADO
+                ->orWhere('obra', 'like', "%{$search}%")
+                ->orWhere('contrato_no', 'like', "%{$search}%")
+                ->orWhere('cliente', 'like', "%{$search}%")
+                ->orWhere('lugar', 'like', "%{$search}%")
+                ->orWhere('empresa', 'like', "%{$search}%");
             });
         }
         
-      
-        
         // Obtener los contratos con paginación (15 por página)
-        $contratos = $query->orderBy('created_at', 'desc')->paginate();
+        $contratos = $query->orderBy('created_at', 'desc')->paginate(15); // Especificamos 15
         
         return view('aingresos.contratos.index', compact('contratos'));
     }

@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     @include('header')
-    <title>{{Empresa()}} | Reporte de Ingresos</title>
+    <title>{{Empresa()}} | Reporte de Contratos</title>
     
     <!-- Estilos personalizados -->
     <style>
@@ -36,7 +36,7 @@
         }
         
         .btn-exportar {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
+             background: linear-gradient(135deg, #2ecc71, #27ae60);
             color: white;
             border: none;
             padding: 12px 30px;
@@ -52,7 +52,7 @@
         }
         
         .btn-exportar:hover {
-            background: linear-gradient(135deg, #27ae60, #219653);
+           background: linear-gradient(135deg, #27ae60, #219653);
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
         }
@@ -79,12 +79,6 @@
             opacity: 0.7;
             cursor: not-allowed;
         }
-        
-        /* Botón a la izquierda */
-        .button-container {
-            display: flex;
-            justify-content: flex-start;
-        }
     </style>
 </head>
 <body>
@@ -99,39 +93,23 @@
             <!-- Área de contenido -->
             <div class="content-area">
                 <div class="page-header">
-                    <h1 class="page-title">Reporte de Ingresos</h1>
-                    <p class="page-subtitle">Exportar ingresos a Excel por contrato y período</p>
+                    <h1 class="page-title">Reporte de Contratos</h1>
+                    <p class="page-subtitle">Exportar contratos a Excel por periodo de fechas</p>
                 </div>
 
                 <div class="card">
                     <div class="info-box">
-                        <p><strong>Nota:</strong> Seleccione un contrato y período de fechas para exportar los ingresos a Excel. El archivo se abrirá en una nueva pestaña.</p>
+                        <p><strong>Nota:</strong> Seleccione un periodo de fechas para exportar los contratos. Puede filtrar por contrato específico o exportar todos los contratos del periodo. El archivo incluirá el total de ingresos, anticipos y el total general (Total + Anticipo).</p>
                     </div>
 
-                    <form action="{{ route('reportes.ingresos.exportar.excel') }}" method="POST" id="exportForm" target="_blank">
+                    <form action="{{ route('reportes.contratos.generar') }}" method="POST" id="exportForm" target="_blank">
                         @csrf
                         
                         <div class="row mb-4">
                             <div class="col-md-6">
-                                <label class="form-label">Contrato *</label>
-                                <select name="id_contrato" id="id_contrato" class="form-select" required>
-                                    <option value="todos">-- Todos los contratos --</option>
-                                    @foreach($contratos as $contrato)
-                                        <option value="{{ $contrato->id }}">
-                                            {{ $contrato->contrato_no }} - {{ $contrato->obra }} ({{ $contrato->cliente }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <small class="text-muted">Selecciona "Todos los contratos" para reporte general</small>
-                            </div>
-                        </div>
-
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label">Fecha Desde *</label>
+                                <label class="form-label">Fecha de Inicio *</label>
                                 <input type="date" 
-                                       name="fecha_desde" 
-                                       id="fecha_desde"
+                                       name="fecha_inicio" 
                                        class="form-control" 
                                        required 
                                        value="{{ date('Y-m-01') }}"
@@ -139,10 +117,9 @@
                             </div>
                             
                             <div class="col-md-6">
-                                <label class="form-label">Fecha Hasta *</label>
+                                <label class="form-label">Fecha de Fin *</label>
                                 <input type="date" 
-                                       name="fecha_hasta" 
-                                       id="fecha_hasta"
+                                       name="fecha_fin" 
                                        class="form-control" 
                                        required 
                                        value="{{ date('Y-m-d') }}"
@@ -150,38 +127,36 @@
                             </div>
                         </div>
 
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <label class="form-label">Contrato (Opcional)</label>
+                                <select name="contrato_id" class="form-select">
+                                    <option value="">-- Todos los contratos --</option>
+                                    @foreach($contratos as $contrato)
+                                        <option value="{{ $contrato->id }}">
+                                            {{ $contrato->refinterna }} - {{ $contrato->obra }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <small class="text-muted">Deje en blanco para exportar todos los contratos del periodo</small>
+                            </div>
+                        </div>
+
                         <div class="row">
                             <div class="col-md-12">
-                                <div class="button-container">
-                                    <button type="submit" class="btn-exportar" id="btnExportar">
-                                        <i class="fas fa-file-excel"></i> Exportar a Excel
-                                    </button>
-                                </div>
+                                <button type="submit" class="btn-exportar" id="btnExportar">
+                                    <i class="fas fa-file-excel"></i> Exportar a Excel
+                                </button>
                                 
                                 <div class="mt-3">
                                     <small class="text-muted">
                                         <i class="fas fa-info-circle"></i> 
-                                        El archivo se generará y se abrirá en una nueva pestaña
+                                        El archivo incluirá el detalle de ingresos por contrato y se abrirá en nueva pestaña
                                     </small>
                                 </div>
                             </div>
                         </div>
                     </form>
-                </div>
-
-                <!-- Información adicional -->
-                <div class="card mt-4">
-                    <div class="info-box" style="border-left-color: #2ecc71;">
-                        <h6 class="mb-2" style="color: #27ae60; font-weight: 600;">
-                            <i class="fas fa-info-circle me-2"></i>Instrucciones
-                        </h6>
-                        <ul class="mb-0" style="color: #555; font-size: 14px;">
-                            <li>Selecciona un contrato específico o "Todos los contratos" para el reporte general</li>
-                            <li>Define el período de fechas para filtrar los ingresos</li>
-                            <li>El archivo Excel incluirá todos los ingresos registrados en el período seleccionado</li>
-                            <li>El reporte se abrirá automáticamente en una nueva pestaña</li>
-                        </ul>
-                    </div>
                 </div>
             </div>
         </main>
@@ -191,44 +166,37 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const hoy = new Date().toISOString().split('T')[0];
-            document.getElementById('fecha_hasta').max = hoy;
-            document.getElementById('fecha_desde').max = hoy;
-            
             const form = document.getElementById('exportForm');
             const btnExportar = document.getElementById('btnExportar');
             
-            // Validación de fechas en tiempo real
-            document.getElementById('fecha_desde').addEventListener('change', function() {
-                document.getElementById('fecha_hasta').min = this.value;
-            });
-            
             form.addEventListener('submit', function(e) {
-                const fechaDesde = document.getElementById('fecha_desde').value;
-                const fechaHasta = document.getElementById('fecha_hasta').value;
+                const fechaInicio = document.querySelector('input[name="fecha_inicio"]').value;
+                const fechaFin = document.querySelector('input[name="fecha_fin"]').value;
                 
-                if (!fechaDesde || !fechaHasta) {
+                if (fechaInicio > fechaFin) {
                     e.preventDefault();
-                    alert('Por favor, selecciona ambas fechas.');
+                    alert('La fecha de inicio no puede ser mayor a la fecha de fin');
                     return false;
                 }
                 
-                if (new Date(fechaHasta) < new Date(fechaDesde)) {
-                    e.preventDefault();
-                    alert('La fecha "Hasta" no puede ser anterior a la fecha "Desde".');
-                    return false;
-                }
-                
-                // Mostrar indicador de carga
+                // Solo mostrar indicador de carga sin deshabilitar el botón
                 btnExportar.classList.add('loading');
                 const originalText = btnExportar.innerHTML;
-                btnExportar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando Excel...';
+                btnExportar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando reporte...';
                 
-                // Restaurar el botón después de 3 segundos
+                // Restaurar el botón después de 3 segundos por si algo falla
                 setTimeout(() => {
                     btnExportar.classList.remove('loading');
                     btnExportar.innerHTML = originalText;
                 }, 3000);
+                
+                // El botón no se deshabilita, solo cambia temporalmente de apariencia
+            });
+            
+            // Restaurar botón si el usuario cancela o hay error
+            form.addEventListener('reset', function() {
+                btnExportar.classList.remove('loading');
+                btnExportar.innerHTML = '<i class="fas fa-file-excel"></i> Exportar a Excel';
             });
         });
     </script>

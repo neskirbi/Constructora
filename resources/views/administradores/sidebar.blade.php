@@ -71,19 +71,24 @@
             </a>
 
             <div class="expandable-submenu">
+                 <a href="{{url('reportes/contratos')}}" class="submenu-item">
+                    <i class="fas fa-file-alt submenu-icon"></i>
+                    <span class="submenu-text">Reporte Contratos</span>
+                </a>
+
                 <a href="{{url('reportes/ingresos')}}" class="submenu-item">
                     <i class="fas fa-file-alt submenu-icon"></i>
-                    <span class="submenu-text">Reporte de Ingresos</span>
+                    <span class="submenu-text">Reporte Ingresos</span>
                 </a>
 
                 <a href="{{url('reportes/compra')}}" class="submenu-item">
                     <i class="fas fa-file-alt submenu-icon"></i>
-                    <span class="submenu-text">Reporte de Compras</span>
+                    <span class="submenu-text">Reporte Compras</span>
                 </a>
 
                 <a href="{{url('reportes/destajo')}}" class="submenu-item">
                     <i class="fas fa-file-alt submenu-icon"></i>
-                    <span class="submenu-text">Reporte de Destajo</span>
+                    <span class="submenu-text">Reporte Destajo</span>
                 </a>
 
                 

@@ -130,6 +130,14 @@ Route::resource('ingresos', 'App\Http\Controllers\Aingresos\IngresoController')
  */
 Route::prefix('reportes')->middleware(['auth:administradores'])->group(function () {
     
+
+// Reporte de Ingresos
+    Route::get('/contratos', [App\Http\Controllers\Reportes\ReporteContratoController::class, 'index'])
+        ->name('reportes.contratos');
+    
+    Route::post('/contratos/generar', [App\Http\Controllers\Reportes\ReporteContratoController::class, 'generar'])
+        ->name('reportes.contratos.generar');
+
     // Reporte de Ingresos
     Route::get('/ingresos', [App\Http\Controllers\Reportes\ReporteIngresosController::class, 'index'])
         ->name('reportes.ingresos');
