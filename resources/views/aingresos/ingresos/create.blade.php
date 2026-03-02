@@ -314,19 +314,41 @@
                                     </div>
                                 </div>
 
+                                <!-- Separador 1 -->
+                                <hr class="my-4">
+
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="cargos_adicionales_3_5" class="form-label-custom">
-                                                3.5% Cargos Adicionales
+                                            <label for="sicv_cop" class="form-label-custom">
+                                                2.0% SICV - COP (servicio de inspección, control y vigilancia)
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input" 
-                                                       id="cargos_adicionales_3_5" 
-                                                       name="cargos_adicionales_3_5" 
-                                                       value="{{ old('cargos_adicionales_3_5') }}"
+                                                       id="sicv_cop" 
+                                                       name="sicv_cop" 
+                                                       value="{{ old('sicv_cop') }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="srcop_cdmx" class="form-label-custom">
+                                                1.5% SRCOP - CDMX (supervisión y revisión a contratos de obra pública)
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input" 
+                                                       id="srcop_cdmx" 
+                                                       name="srcop_cdmx" 
+                                                       value="{{ old('srcop_cdmx') }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -352,7 +374,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
+                                </div>
+                                
+                                <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
                                             <label for="sancion_atrazo_presentacion_estimacion" class="form-label-custom">
@@ -371,9 +395,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                
-                                <div class="row">
+                                    
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
                                             <label for="sancion_atraso_de_obra" class="form-label-custom">
@@ -411,7 +433,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                    
+                                </div>
+                                
+                                <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
                                             <label for="retencion_por_atraso_en_programa_obra" class="form-label-custom">
@@ -430,7 +454,34 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <div class="col-md-4">
+                                        
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group-custom">
+                                            <label for="retenciones_o_sanciones" class="form-label-custom">
+                                                Retenciones o Sanciones
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input" 
+                                                       id="retenciones_o_sanciones" 
+                                                       name="retenciones_o_sanciones" 
+                                                       value="{{ old('retenciones_o_sanciones') }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0"
+                                                       readonly>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+
+                                <!-- Separador 2 -->
+                                <hr class="my-4">
                                 
                                 <div class="row">
                                     <div class="col-md-4">
@@ -454,35 +505,35 @@
                                     
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="amortizacion_con_iva" class="form-label-custom">
-                                                Amortización con I.V.A.
+                                            <label for="amortizacion_iva" class="form-label-custom">
+                                                Amortización I.V.A.
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input" 
-                                                       id="amortizacion_con_iva" 
-                                                       name="amortizacion_con_iva" 
-                                                       value="{{ old('amortizacion_con_iva') }}"
+                                                       id="amortizacion_iva" 
+                                                       name="amortizacion_iva" 
+                                                       value="{{ old('amortizacion_iva') }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="total_deducciones" class="form-label-custom">
-                                                Total Deducciones
+                                            <label for="total_amortizacion" class="form-label-custom">
+                                                Total Amortización
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input" 
-                                                       id="total_deducciones" 
-                                                       name="total_deducciones" 
-                                                       value="{{ old('total_deducciones') }}"
+                                                       id="total_amortizacion" 
+                                                       name="total_amortizacion" 
+                                                       value="{{ old('total_amortizacion') }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0"
@@ -491,26 +542,19 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Separador 3 -->
+                                <hr class="my-4">
                                 
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="retenciones_o_sanciones" class="form-label-custom">
-                                                Retenciones o Sanciones
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="retenciones_o_sanciones" 
-                                                       name="retenciones_o_sanciones" 
-                                                       value="{{ old('retenciones_o_sanciones') }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
-                                            </div>
-                                        </div>
+                                        
                                     </div>
+                                    
+                                    <div class="col-md-4">
+                                       
+                                    </div>
+                                   
                                     
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
@@ -525,7 +569,8 @@
                                                        name="estimado_menos_deducciones" 
                                                        value="{{ old('estimado_menos_deducciones') }}"
                                                        step="0.01"
-                                                       placeholder="0.00">
+                                                       placeholder="0.00"
+                                                       readonly>
                                             </div>
                                         </div>
                                     </div>
@@ -605,8 +650,6 @@
                                     <i class="fas fa-minus-circle me-2"></i>
                                     Deducciones Específicas
                                 </h5>
-                                
-                                
                             </div>
                             
                             <!-- Sección 5: Facturación -->
@@ -835,52 +878,136 @@
     @include('footer')
     
     <script>
-       // Función para calcular el total de la estimación (Importe + IVA)
-        function calcularTotalEstimacion() {
-            // Obtener valores numéricos reales
-            const importeEstimacion = parseFloat($('#importe_estimacion').val()) || 0;
-            const iva = parseFloat($('#iva').val()) || 0;
-            
-            // Calcular total = importe + (importe * iva / 100)
-            const totalCalculado = importeEstimacion + (importeEstimacion * iva / 100);
-            
-            // Asignar el valor numérico
-            $('#total_estimacion_con_iva').val(totalCalculado.toFixed(2));
-            
-            // FORZAR ACTUALIZACIÓN DEL FORMATO - DISPARAR EVENTOS QUE USA EL FORMATTEADOR
-            const input = document.getElementById('total_estimacion_con_iva');
-            if (input) {
-                // Disparar los eventos que el formateador está escuchando
-                input.dispatchEvent(new Event('input', { bubbles: true }));
-                input.dispatchEvent(new Event('keyup', { bubbles: true }));
-                input.dispatchEvent(new Event('change', { bubbles: true }));
-            }
-        }
+// Función para calcular el total de la estimación (Importe + IVA)
+function calcularTotalEstimacion() {
+    // Obtener valores numéricos reales
+    const importeEstimacion = parseFloat($('#importe_estimacion').val()) || 0;
+    const iva = parseFloat($('#iva').val()) || 0;
+    
+    // Calcular total = importe + (importe * iva / 100)
+    const totalCalculado = importeEstimacion + (importeEstimacion * iva / 100);
+    
+    // Asignar el valor numérico
+    $('#total_estimacion_con_iva').val(totalCalculado.toFixed(2));
+    
+    // Disparar eventos para el formateador
+    const input = document.getElementById('total_estimacion_con_iva');
+    if (input) {
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('keyup', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    
+    // Calcular estimado menos deducciones después de actualizar
+    calcularEstimadoMenosDeducciones();
+}
 
-        $(document).ready(function() {
-            // Calcular cuando cambien los campos
-            $('#importe_estimacion, #iva').on('input', function() {
-                calcularTotalEstimacion();
-            });
-            
-            // Validar que el IVA esté entre 0 y 100
-            $('#iva').on('change', function() {
-                let valor = parseFloat($(this).val()) || 0;
-                if (valor < 0) $(this).val(0);
-                if (valor > 100) $(this).val(100);
-                calcularTotalEstimacion();
-            });
-            
-            // Calcular valores iniciales
-            setTimeout(function() {
-                calcularTotalEstimacion();
-            }, 200);
-        });
+// Función para calcular Retenciones o Sanciones
+function calcularRetencionesSanciones() {
+    // Lista de IDs de los campos a sumar para retenciones o sanciones
+    var camposRetenciones = [
+        'sicv_cop',                                      // 2.0% SICV - COP
+        'srcop_cdmx',                                    // 1.5% SRCOP - CDMX
+        'retencion_5_al_millar',                         // Retención 5 al Millar
+        'sancion_atrazo_presentacion_estimacion',        // Sanción Atraso Presentación Estimación
+        'sancion_atraso_de_obra',                        // Sanción Atraso de Obra
+        'sancion_por_obra_mal_ejecutada',                // Sanción por Obra Mal Ejecutada
+        'retencion_por_atraso_en_programa_obra'          // Retención por Atraso en Programa de Obra
+    ];
+    
+    var total = 0;
+    
+    // Sumar todos los valores
+    $.each(camposRetenciones, function(index, id) {
+        var valor = parseFloat($('#' + id).val()) || 0;
+        total += valor;
+    });
+    
+    // Actualizar el campo de retenciones o sanciones
+    var $retencionesInput = $('#retenciones_o_sanciones');
+    $retencionesInput.val(total.toFixed(2));
+    
+    // Disparar eventos para el formateador
+    var inputElement = $retencionesInput[0];
+    if (inputElement) {
+        inputElement.dispatchEvent(new Event('input', { bubbles: true }));
+        inputElement.dispatchEvent(new Event('keyup', { bubbles: true }));
+        inputElement.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    
+    // Calcular estimado menos deducciones después de actualizar
+    calcularEstimadoMenosDeducciones();
+    
+    return total;
+}
 
-        function calcularTotalDeducciones() {
-    // Lista de IDs de los campos a sumar (excluyendo amortizacion_anticipo)
-    var camposDeducciones = [
-        'cargos_adicionales_3_5',
+// Función para calcular Total Amortización
+function calcularTotalAmortizacion() {
+    var amortizacionAnticipo = parseFloat($('#amortizacion_anticipo').val()) || 0;
+    var amortizacionConIva = parseFloat($('#amortizacion_iva').val()) || 0;
+    
+    var total = amortizacionAnticipo + amortizacionConIva;
+    
+    // Actualizar el campo de total amortización
+    var $amortizacionInput = $('#total_amortizacion');
+    $amortizacionInput.val(total.toFixed(2));
+    
+    // Disparar eventos para el formateador
+    var inputElement = $amortizacionInput[0];
+    if (inputElement) {
+        inputElement.dispatchEvent(new Event('input', { bubbles: true }));
+        inputElement.dispatchEvent(new Event('keyup', { bubbles: true }));
+        inputElement.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    
+    // Calcular estimado menos deducciones después de actualizar
+    calcularEstimadoMenosDeducciones();
+    
+    return total;
+}
+
+// Función para calcular Estimado menos Deducciones
+function calcularEstimadoMenosDeducciones() {
+    var totalEstimacionConIva = parseFloat($('#total_estimacion_con_iva').val()) || 0;
+    var retencionesSanciones = parseFloat($('#retenciones_o_sanciones').val()) || 0;
+    var totalAmortizacion = parseFloat($('#total_amortizacion').val()) || 0;
+    
+    var resultado = totalEstimacionConIva - retencionesSanciones - totalAmortizacion;
+    
+    // Actualizar el campo
+    var $estimadoMenosInput = $('#estimado_menos_deducciones');
+    $estimadoMenosInput.val(resultado.toFixed(2));
+    
+    // Disparar eventos para el formateador
+    var inputElement = $estimadoMenosInput[0];
+    if (inputElement) {
+        inputElement.dispatchEvent(new Event('input', { bubbles: true }));
+        inputElement.dispatchEvent(new Event('keyup', { bubbles: true }));
+        inputElement.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    
+    return resultado;
+}
+
+// Función para inicializar todos los event listeners
+function inicializarCalculos() {
+    // Campos para calcular total estimación
+    $('#importe_estimacion, #iva').on('input', function() {
+        calcularTotalEstimacion();
+    });
+    
+    // Validar que el IVA esté entre 0 y 100
+    $('#iva').on('change', function() {
+        let valor = parseFloat($(this).val()) || 0;
+        if (valor < 0) $(this).val(0);
+        if (valor > 100) $(this).val(100);
+        calcularTotalEstimacion();
+    });
+    
+    // Campos para calcular retenciones o sanciones
+    var camposRetenciones = [
+        'sicv_cop',
+        'srcop_cdmx',
         'retencion_5_al_millar',
         'sancion_atrazo_presentacion_estimacion',
         'sancion_atraso_de_obra',
@@ -888,60 +1015,31 @@
         'retencion_por_atraso_en_programa_obra'
     ];
     
-    var total = 0;
-    
-    // Sumar todos los valores positivos
-    $.each(camposDeducciones, function(index, id) {
-        var valor = parseFloat($('#' + id).val()) || 0;
-        total += valor;
+    $.each(camposRetenciones, function(index, id) {
+        $('#' + id).on('input', function() {
+            calcularRetencionesSanciones();
+        });
     });
     
-    // INCLUIR amortizacion_con_iva pero como NEGATIVO para que se reste
-    var amortizacionConIva = parseFloat($('#amortizacion_con_iva').val()) || 0;
-    total += (amortizacionConIva * -1); // o también: total -= amortizacionConIva;
-    
-    // Actualizar el campo de total y disparar TODOS los eventos
-    var $totalInput = $('#total_deducciones');
-    $totalInput.val(total.toFixed(2));
-    
-    // Disparar los eventos que el formateador está escuchando
-    var inputElement = $totalInput[0];
-    if (inputElement) {
-        inputElement.dispatchEvent(new Event('input', { bubbles: true }));
-        inputElement.dispatchEvent(new Event('keyup', { bubbles: true }));
-        inputElement.dispatchEvent(new Event('change', { bubbles: true }));
-    }
-    
-    return total;
-}
-
-// Función para inicializar los event listeners
-function inicializarCalculoDeducciones() {
-    var camposDeducciones = [
-        'cargos_adicionales_3_5',
-        'retencion_5_al_millar',
-        'sancion_atrazo_presentacion_estimacion',
-        'sancion_atraso_de_obra',
-        'sancion_por_obra_mal_ejecutada',
-        'retencion_por_atraso_en_programa_obra',
-        'amortizacion_con_iva'  // Agregado para escuchar cambios en este campo
-    ];
-    
-    // Agregar event listener a cada campo
-    $.each(camposDeducciones, function(index, id) {
-        $('#' + id).on('input', function() {
-            calcularTotalDeducciones();
-        });
+    // Campos para calcular total amortización
+    $('#amortizacion_anticipo, #amortizacion_iva').on('input', function() {
+        calcularTotalAmortizacion();
     });
 }
 
 // Document ready con jQuery
 $(document).ready(function() {
-    inicializarCalculoDeducciones();
-    // Calcular total inicial por si hay valores precargados
-    calcularTotalDeducciones();
+    inicializarCalculos();
+    
+    // Calcular valores iniciales por si hay valores precargados
+    setTimeout(function() {
+        calcularTotalEstimacion();
+        calcularRetencionesSanciones();
+        calcularTotalAmortizacion();
+        calcularEstimadoMenosDeducciones();
+    }, 200);
 });
-    </script>
+</script>
    
 </body>
 </html>
