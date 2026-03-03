@@ -1060,3 +1060,9 @@
     </script>
 </body>
 </html>
+
+<!-- 
+1.- Poder agregar convenios ya que este validado el contrato
+
+
+-->

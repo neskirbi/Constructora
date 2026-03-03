@@ -250,3 +250,6 @@
     </script>
 </body>
 </html>
+
+<!-- mostrar todo en lista y sin opciones de crear o borrar 
+-->

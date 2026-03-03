@@ -312,3 +312,11 @@
     </script>
 </body>
 </html>
+
+<!-- 
+1.- Quitar los iconos de los montos 
+2.- Agregar el desglose de los convenios
+3.- Reflejar los montos que se agregaron en los convenios
+4.- reflejar la fecha y la duracion dependiendo el convenio
+5.- 
+-->

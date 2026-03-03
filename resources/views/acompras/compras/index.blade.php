@@ -473,3 +473,7 @@
     </script>
 </body>
 </html>
+
+<!-- Al seleccionar un servicio o producto aqui se mete el el costo o lo que se va a pagar , no se captura en el catalogo 
+ poner el agregar nuevo producto o servicio dentro de la misma pantalla donde se agregan 
+-->

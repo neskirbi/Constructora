@@ -234,3 +234,7 @@
     </script>
 </body>
 </html>
+
+<!--
+solo admin puede borrar 
+-->

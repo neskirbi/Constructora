@@ -541,3 +541,11 @@
     </script>
 </body>
 </html>
+
+<!--
+Poner importe de descuento por material 
+consecutivo cambiar a orden de compra
+poner el frente para seleccionar la compra 
+
+ mejorar la vista de la clave del producto
+-->

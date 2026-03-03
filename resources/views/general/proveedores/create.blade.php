@@ -204,3 +204,9 @@
     </script>
 </body>
 </html>
+
+<!--
+La clave se qunere un cosecutivo 
+campo clasificacion sea un select (ADMON,COMOPRAS,DESTAJO,MATERIALES y SERVICIOS)
+la especialidad que de la opcion de una nueva o una que ya esta capturada 
+-->

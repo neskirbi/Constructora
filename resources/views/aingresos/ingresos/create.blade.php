@@ -577,80 +577,9 @@
                                 </div>
                             </div>
                             
-                            <!-- Sección 3: Avance de Obra -->
-                            <div class="form-section">
-                                <h5 class="section-title">
-                                    <i class="fas fa-chart-line me-2"></i>
-                                    Avance de Obra
-                                </h5>
-                                
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="avance_obra_estimacion" class="form-label-custom">
-                                                Avance Obra Estimación (%)
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="avance_obra_estimacion" 
-                                                       name="avance_obra_estimacion" 
-                                                       value="{{ old('avance_obra_estimacion') }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
-                                                <span class="input-group-text">%</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="avance_obra_real" class="form-label-custom">
-                                                Avance Obra Real (%)
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="avance_obra_real" 
-                                                       name="avance_obra_real" 
-                                                       value="{{ old('avance_obra_real') }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
-                                                <span class="input-group-text">%</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="porcentaje_avance_financiero" class="form-label-custom">
-                                                % Avance Financiero
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="porcentaje_avance_financiero" 
-                                                       name="porcentaje_avance_financiero" 
-                                                       value="{{ old('porcentaje_avance_financiero') }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
-                                                <span class="input-group-text">%</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                             
-                            <!-- Sección 4: Deducciones Específicas -->
-                            <div class="form-section">
-                                <h5 class="section-title">
-                                    <i class="fas fa-minus-circle me-2"></i>
-                                    Deducciones Específicas
-                                </h5>
-                            </div>
+                            
+                            
                             
                             <!-- Sección 5: Facturación -->
                             <div class="form-section">
@@ -1043,3 +972,18 @@ $(document).ready(function() {
    
 </body>
 </html>
+
+<!--
+1.-Se captura el Importe y que se selecciones el % de iva ej. 16% y obtener el importe del iva
+2.-1.5% y 2 % se deben de poder seleccionar y calcularse en automatico el monto y las operaciones estan bien 
+3.- poder guardar sin los datos de factura y despues poder editar y agregar los datos de la factura 
+
+Se quitan por que se calcularia 
+POR COBRAR(Del total del contrato - lo cobrado )
+
+POR FACTURAR es el importe del contrato menos el importe de la factura mas iva (sin deducciones)
+quitar por estimar
+
+
+si seleccionamos un contrato que se cargue la informacion de la ultima factura y que se pueda editar 
+-->

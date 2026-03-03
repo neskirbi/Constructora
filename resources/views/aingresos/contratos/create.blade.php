@@ -1071,3 +1071,13 @@ function calcularMontosContrato() {
     </script>
 </body>
 </html>
+
+<!-- 
+1.- Agregar la seccion para agregar convenios 
+    a)Serian de tiempo y monto (revisa la hoja para el diesenio )
+
+2.-Poder agregar varios Frentes con la direccion y el mapa , bajar el campo de frente donde esta el mapa (Nuevo desarrollor)
+3.- Agregar catalogo de cliente (Nuevo desarrollo)
+
+
+-->
