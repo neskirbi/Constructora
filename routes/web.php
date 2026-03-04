@@ -120,8 +120,15 @@ Route::put('destajos/{id}/rechazar', [App\Http\Controllers\Administradores\Desta
 Route::resource('contratos', 'App\Http\Controllers\Aingresos\ContratoController')
     ->middleware(['auth:aingresos']);
 
+Route::post('acontratos/{id}/ampliacion-tiempo', [App\Http\Controllers\Aingresos\ContratoController::class, 'storeAmpliacionTiempo'])->name('acontratos.ampliacion-tiempo');
+Route::post('acontratos/{id}/ampliacion-monto', [App\Http\Controllers\Aingresos\ContratoController::class, 'storeAmpliacionMonto'])->name('acontratos.ampliacion-monto');
+Route::delete('acontratos/ampliacion-tiempo/{id}', [App\Http\Controllers\Aingresos\ContratoController::class, 'destroyAmpliacionTiempo'])->name('acontratos.ampliacion-tiempo.destroy');
+Route::delete('acontratos/ampliacion-monto/{id}', [App\Http\Controllers\Aingresos\ContratoController::class, 'destroyAmpliacionMonto'])->name('acontratos.ampliacion-monto.destroy');
+
 Route::resource('ingresos', 'App\Http\Controllers\Aingresos\IngresoController')
     ->middleware(['auth:aingresos']);
+
+    
 
 
 /**

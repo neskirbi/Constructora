@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Aingresos;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB; 
 use App\Models\Contrato;
+use App\Models\AmpliacionMonto;
+use App\Models\AmpliacionFecha;
 use Illuminate\Http\Request;
 
 class ContratoController extends Controller
@@ -15,30 +17,50 @@ class ContratoController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
-    {
-        // Obtener parámetros de búsqueda
-        $search = $request->input('search');
-        
-        // Construir consulta base
-        $query = Contrato::query();
-        
-        // Aplicar búsqueda si existe
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('consecutivo', 'like', "%{$search}%")  // <--- AGREGADO
-                ->orWhere('obra', 'like', "%{$search}%")
-                ->orWhere('contrato_no', 'like', "%{$search}%")
-                ->orWhere('cliente', 'like', "%{$search}%")
-                ->orWhere('lugar', 'like', "%{$search}%")
-                ->orWhere('empresa', 'like', "%{$search}%");
-            });
-        }
-        
-        // Obtener los contratos con paginación (15 por página)
-        $contratos = $query->orderBy('created_at', 'desc')->paginate(15); // Especificamos 15
-        
-        return view('aingresos.contratos.index', compact('contratos'));
+{
+    // Obtener parámetros de búsqueda
+    $search = $request->input('search');
+    
+    // Construir consulta base
+    $query = Contrato::query();
+    
+    // Aplicar búsqueda si existe
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('consecutivo', 'like', "%{$search}%")
+            ->orWhere('obra', 'like', "%{$search}%")
+            ->orWhere('contrato_no', 'like', "%{$search}%")
+            ->orWhere('cliente', 'like', "%{$search}%")
+            ->orWhere('lugar', 'like', "%{$search}%")
+            ->orWhere('empresa', 'like', "%{$search}%");
+        });
     }
+    
+    // Obtener los contratos con paginación
+    $contratos = $query->orderBy('created_at', 'desc')->paginate(15);
+    
+    // Cargar ampliaciones para cada contrato
+    foreach ($contratos as $contrato) {
+        $contrato->ampliacionesTiempo = AmpliacionFecha::where('id_contrato', $contrato->id)
+            ->orderBy('created_at', 'asc')
+            ->get();
+            
+        $contrato->ampliacionesMonto = AmpliacionMonto::where('id_contrato', $contrato->id)
+            ->orderBy('created_at', 'asc')
+            ->get();
+            
+        // Calcular totales acumulados
+        $contrato->totalSubtotalAmpliaciones = $contrato->ampliacionesMonto->sum('subtotal');
+        $contrato->totalIvaAmpliaciones = $contrato->ampliacionesMonto->sum('iva');
+        $contrato->totalTotalAmpliaciones = $contrato->ampliacionesMonto->sum('total');
+        
+        // Obtener última fecha de ampliación si existe
+        $ultimaAmpliacionTiempo = $contrato->ampliacionesTiempo->last();
+        $contrato->fecha_ampliada = $ultimaAmpliacionTiempo ? $ultimaAmpliacionTiempo->fecha_terminacion_obra : $contrato->fecha_terminacion_obra;
+    }
+    
+    return view('aingresos.contratos.index', compact('contratos'));
+}
 
     function create(){
         $maxConsecutivo = DB::table('contratos')->count();
@@ -219,13 +241,26 @@ class ContratoController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-    {
-        // Buscar el contrato
-        $contrato = Contrato::findOrFail($id);
-        
-        // Cargar la vista de edición (reutilizamos el formulario CREATE)
-        return view('aingresos.contratos.show', compact('contrato'));
-    }
+{
+    // Buscar el contrato
+    $contrato = Contrato::findOrFail($id);
+    
+    // Obtener las ampliaciones usando los modelos
+    $ampliacionesTiempo = AmpliacionFecha::where('id_contrato', $contrato->id)
+        ->orderBy('created_at', 'desc')
+        ->get();
+    
+    $ampliacionesMonto = AmpliacionMonto::where('id_contrato', $contrato->id)
+        ->orderBy('created_at', 'desc')
+        ->get();
+    
+    // Cargar la vista con todos los datos
+    return view('aingresos.contratos.show', compact(
+        'contrato', 
+        'ampliacionesTiempo', 
+        'ampliacionesMonto'
+    ));
+}
 
 
     /**
@@ -441,4 +476,167 @@ class ContratoController extends Controller
                 ->with('error', 'Error al eliminar el contrato: ' . $e->getMessage());
         }
     }
+
+
+    /**
+ * Almacena una nueva ampliación de tiempo
+ */
+/**
+ * Almacena una nueva ampliación de tiempo
+ */
+public function storeAmpliacionTiempo(Request $request, $id)
+{
+    try {
+        DB::beginTransaction();
+        
+        $contrato = Contrato::findOrFail($id);
+        
+        $request->validate([
+            'fecha_terminacion_obra' => 'required|date|after:' . $contrato->fecha_terminacion_obra
+        ]);
+        
+        // Usando el modelo AmpliacionFecha
+        $ampliacion = new AmpliacionFecha();
+        $ampliacion->id = GetUuid();
+        $ampliacion->id_contrato = $contrato->id;
+        $ampliacion->fecha_terminacion_obra = $request->fecha_terminacion_obra;
+        $ampliacion->save();
+        
+      
+        
+        DB::commit();
+        
+        return redirect()->route('contratos.show', $id)
+            ->with('success', 'Ampliación de tiempo registrada exitosamente');
+        
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()
+            ->with('error', 'Error al registrar ampliación: ' . $e->getMessage())
+            ->withInput();
+    }
+}
+
+/**
+ * Almacena una nueva ampliación de monto
+ */
+public function storeAmpliacionMonto(Request $request, $id)
+{
+    try {
+        DB::beginTransaction();
+        
+        $contrato = Contrato::findOrFail($id);
+        
+        $request->validate([
+            'subtotal' => 'required|numeric|min:0',
+            'iva' => 'required|numeric|min:0',
+            'total' => 'required|numeric|min:0'
+        ]);
+        
+        // Usando el modelo AmpliacionMonto
+        $ampliacion = new AmpliacionMonto();
+        $ampliacion->id = GetUuid();
+        $ampliacion->id_contrato = $contrato->id;
+        $ampliacion->subtotal = $request->subtotal;
+        $ampliacion->iva = $request->iva;
+        $ampliacion->total = $request->total;
+        $ampliacion->save();
+        
+        // Actualizar montos del contrato
+        $contrato->subtotal = $contrato->subtotal + $request->subtotal;
+        $contrato->iva = $contrato->iva + $request->iva;
+        $contrato->total = $contrato->total + $request->total;
+        $contrato->save();
+        
+        DB::commit();
+        
+        return redirect()->route('contratos.show', $id)
+            ->with('success', 'Ampliación de monto registrada exitosamente');
+        
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()
+            ->with('error', 'Error al registrar ampliación: ' . $e->getMessage())
+            ->withInput();
+    }
+}
+
+/**
+ * Elimina una ampliación de tiempo
+ */
+public function destroyAmpliacionTiempo($id)
+{
+    try {
+        DB::beginTransaction();
+        
+        // Usando el modelo AmpliacionFecha
+        $ampliacion = AmpliacionFecha::find($id);
+        
+        if (!$ampliacion) {
+            return redirect()->back()->with('error', 'Ampliación no encontrada');
+        }
+        
+        $contrato = Contrato::find($ampliacion->id_contrato);
+        
+        // Buscar la ampliación anterior para restaurar la fecha
+        $anterior = AmpliacionFecha::where('id_contrato', $ampliacion->id_contrato)
+            ->where('created_at', '<', $ampliacion->created_at)
+            ->orderBy('created_at', 'desc')
+            ->first();
+        
+        if ($anterior) {
+            $contrato->fecha_terminacion_obra = $anterior->fecha_terminacion_obra;
+        } else {
+            // Si no hay ampliaciones anteriores, podrías tener un campo fecha_original en contrato
+            // Por ahora, podrías dejarla igual o establecerla como null
+            $contrato->fecha_terminacion_obra = null;
+        }
+        
+        $ampliacion->delete();
+        $contrato->save();
+        
+        DB::commit();
+        
+        return redirect()->back()->with('success', 'Ampliación de tiempo eliminada');
+        
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()->with('error', 'Error al eliminar: ' . $e->getMessage());
+    }
+}
+
+/**
+ * Elimina una ampliación de monto
+ */
+public function destroyAmpliacionMonto($id)
+{
+    try {
+        DB::beginTransaction();
+        
+        // Usando el modelo AmpliacionMonto
+        $ampliacion = AmpliacionMonto::find($id);
+        
+        if (!$ampliacion) {
+            return redirect()->back()->with('error', 'Ampliación no encontrada');
+        }
+        
+        $contrato = Contrato::find($ampliacion->id_contrato);
+        
+        // Restar los montos
+        $contrato->subtotal = $contrato->subtotal - $ampliacion->subtotal;
+        $contrato->iva = $contrato->iva - $ampliacion->iva;
+        $contrato->total = $contrato->total - $ampliacion->total;
+        
+        $ampliacion->delete();
+        $contrato->save();
+        
+        DB::commit();
+        
+        return redirect()->back()->with('success', 'Ampliación de monto eliminada');
+        
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()->with('error', 'Error al eliminar: ' . $e->getMessage());
+    }
+}
 }

@@ -544,7 +544,7 @@
                                 <div class="row">
                                     <!-- Columna Izquierda -->
                                     <div class="col-md-6">
-                                        <div class="form-group-custom">
+                                        <!--<div class="form-group-custom">
                                             <label for="concepto" class="form-label-custom">
                                                 Concepto
                                             </label>
@@ -555,7 +555,7 @@
                                                 <option value="TOTAL CONTRATO" {{ old('concepto', $contrato->concepto) == 'TOTAL CONTRATO' ? 'selected' : '' }}>TOTAL CONTRATO</option>
                                                 <option value="CONVENIO APLIACION" {{ old('concepto', $contrato->concepto) == 'CONVENIO APLIACION' ? 'selected' : '' }}>CONVENIO APLIACION</option>
                                             </select>
-                                        </div>
+                                        </div>-->
                                         
                                         <div class="form-group-custom">
                                             <label for="porcentaje_anticipo" class="form-label-custom">
@@ -871,8 +871,244 @@
                                 </div>
                             </div>
                         </form>
+                        <!-- SECCIÓN DE AMPLIACIONES (FUERA del formulario principal) -->
+                        <div class="form-section mt-4">
+                            <h5 class="section-title">
+                                <i class="fas fa-file-contract me-2"></i>
+                                Ampliaciones y Convenios
+                            </h5>
+                            
+                            <!-- Pestañas -->
+                            <ul class="nav nav-tabs mb-4" id="ampliacionesTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="monto-tab" data-bs-toggle="tab" data-bs-target="#monto" type="button" role="tab">
+                                        <i class="fas fa-dollar-sign me-2"></i>Ampliaciones de Monto
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="tiempo-tab" data-bs-toggle="tab" data-bs-target="#tiempo" type="button" role="tab">
+                                        <i class="fas fa-clock me-2"></i>Ampliaciones de Tiempo
+                                    </button>
+                                </li>
+                            
+                            </ul>
+                            
+                            <div class="tab-content">
+                                <!-- TIEMPO -->
+                                <div class="tab-pane" id="tiempo" role="tabpanel">
+                                    
+                                    <!-- FORMULARIO DE TIEMPO (independiente) -->
+                                    <div class="card mb-4 border-primary">
+                                        <div class="card-header bg-primary text-white">
+                                            <h6 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Nueva Ampliación de Tiempo</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <form action="{{ route('acontratos.ampliacion-tiempo', $contrato->id) }}" method="POST">
+                                                @csrf
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group-custom">
+                                                            <label class="form-label-custom">Fecha Actual</label>
+                                                            <input type="text" class="form-control bg-light" 
+                                                                value="{{ $contrato->fecha_terminacion_obra ? $contrato->fecha_terminacion_obra->format('d/m/Y') : 'No definida' }}" readonly>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group-custom">
+                                                            <label for="fecha_terminacion_obra" class="form-label-custom required-label">Nueva Fecha</label>
+                                                            <input type="date" class="form-control" id="fecha_terminacion_obra" 
+                                                                name="fecha_terminacion_obra" required
+                                                                min="{{ $contrato->fecha_terminacion_obra ? $contrato->fecha_terminacion_obra->format('Y-m-d') : now()->format('Y-m-d') }}">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary mt-3">
+                                                    <i class="fas fa-save me-1"></i> Registrar Ampliación de Tiempo
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Tabla de historial de tiempo -->
+                                    <div class="card">
+                                        <div class="card-header bg-secondary text-white">
+                                            <h6 class="mb-0"><i class="fas fa-history me-2"></i>Historial de Ampliaciones de Tiempo</h6>
+                                        </div>
+                                        <div class="card-body">
+                                         
+                                            
+                                            @if($ampliacionesTiempo->count() > 0)
+                                                <div class="table-responsive">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>#</th>
+                                                                <th>Fecha Registro</th>
+                                                                <th>Nueva Fecha</th>
+                                                                <th>Acciones</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach($ampliacionesTiempo as $index => $amp)
+                                                                <tr>
+                                                                    <td>{{ $index + 1 }}</td>
+                                                                    <td>{{ \Carbon\Carbon::parse($amp->created_at)->format('d/m/Y H:i') }}</td>
+                                                                    <td>{{ \Carbon\Carbon::parse($amp->fecha_terminacion_obra)->format('d/m/Y') }}</td>
+                                                                    <td>
+                                                                        <form action="{{ route('acontratos.ampliacion-tiempo.destroy', $amp->id) }}" 
+                                                                            method="POST" class="d-inline"
+                                                                            onsubmit="return confirm('¿Eliminar esta ampliación?');">
+                                                                            @csrf
+                                                                            @method('DELETE')
+                                                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                                                <i class="fas fa-trash"></i>
+                                                                            </button>
+                                                                        </form>
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            @else
+                                                <div class="alert alert-info mb-0">No hay ampliaciones de tiempo registradas.</div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- MONTO -->
+                                <div class="tab-pane fade show active" id="monto" role="tabpanel">
+                                    
+                                    <!-- FORMULARIO DE MONTO (independiente) -->
+                                    <div class="card mb-4 border-success">
+                                        <div class="card-header bg-success text-white">
+                                            <h6 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Nueva Ampliación de Monto</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <form action="{{ route('acontratos.ampliacion-monto', $contrato->id) }}" method="POST" id="formAmpliacionMonto">
+                                                @csrf
+                                                <div class="row">
+                                                    <div class="row">
+                                                        <div class="col-md-4">
+                                                            <div class="form-group-custom">
+                                                                <label for="amp_subtotal" class="form-label-custom required-label">Subtotal</label>
+                                                                <div class="input-group input-group-custom">
+                                                                    <span class="input-group-text">$</span>
+                                                                    <input type="number" class="form-control form-control-custom numeric-input" 
+                                                                        id="amp_subtotal" name="subtotal" step="0.01" placeholder="0.00" required>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group-custom">
+                                                                <label for="amp_iva" class="form-label-custom required-label">IVA</label>
+                                                                <div class="input-group input-group-custom">
+                                                                    <span class="input-group-text">$</span>
+                                                                    <input type="number" class="form-control form-control-custom numeric-input" 
+                                                                        id="amp_iva" name="iva" step="0.01" min="0" placeholder="0.00" required>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group-custom">
+                                                                <label for="amp_total" class="form-label-custom required-label">Total</label>
+                                                                <div class="input-group input-group-custom">
+                                                                    <span class="input-group-text">$</span>
+                                                                    <input type="number" class="form-control form-control-custom numeric-input bg-light" 
+                                                                        id="amp_total" name="total" step="0.01" placeholder="0.00" readonly>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Resumen de totales -->
+                                                <div class="alert alert-info mt-3">
+                                                    <div class="row">
+                                                        <div class="col-md-4">
+                                                            <small>Subtotal Actual: ${{ number_format($contrato->subtotal, 2) }}</small><br>
+                                                            <strong>Nuevo: $<span id="nuevo_subtotal">{{ number_format($contrato->subtotal, 2) }}</span></strong>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <small>IVA Actual: ${{ number_format($contrato->iva, 2) }}</small><br>
+                                                            <strong>Nuevo: $<span id="nuevo_iva">{{ number_format($contrato->iva, 2) }}</span></strong>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <small>Total Actual: ${{ number_format($contrato->total, 2) }}</small><br>
+                                                            <strong>Nuevo: $<span id="nuevo_total">{{ number_format($contrato->total, 2) }}</span></strong>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <button type="submit" class="btn btn-success">
+                                                    <i class="fas fa-save me-1"></i> Registrar Ampliación de Monto
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Tabla de historial de montos -->
+                                    <div class="card">
+                                        <div class="card-header bg-secondary text-white">
+                                            <h6 class="mb-0"><i class="fas fa-list me-2"></i>Historial de Ampliaciones de Monto</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            @php
+                                                $ampliacionesMonto = DB::table('ampliacionesmonto')
+                                                    ->where('id_contrato', $contrato->id)
+                                                    ->orderBy('created_at', 'desc')
+                                                    ->get();
+                                            @endphp
+                                            
+                                            @if($ampliacionesMonto->count() > 0)
+                                                <div class="table-responsive">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>#</th>
+                                                                <th>Fecha</th>
+                                                                <th>Subtotal</th>
+                                                                <th>IVA</th>
+                                                                <th>Total</th>
+                                                                <th>Acciones</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach($ampliacionesMonto as $index => $amp)
+                                                                <tr>
+                                                                    <td>{{ $index + 1 }}</td>
+                                                                    <td>{{ \Carbon\Carbon::parse($amp->created_at)->format('d/m/Y H:i') }}</td>
+                                                                    <td class="text-end">${{ number_format($amp->subtotal, 2) }}</td>
+                                                                    <td class="text-end">${{ number_format($amp->iva, 2) }}</td>
+                                                                    <td class="text-end">${{ number_format($amp->total, 2) }}</td>
+                                                                    <td>
+                                                                        <form action="{{ route('acontratos.ampliacion-monto.destroy', $amp->id) }}" 
+                                                                            method="POST" class="d-inline"
+                                                                            onsubmit="return confirm('¿Eliminar esta ampliación?');">
+                                                                            @csrf
+                                                                            @method('DELETE')
+                                                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                                                <i class="fas fa-trash"></i>
+                                                                            </button>
+                                                                        </form>
+                                                                    </td>
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            @else
+                                                <div class="alert alert-info mb-0">No hay ampliaciones de monto registradas.</div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                
             </div>
         </main>
     </div>
@@ -1058,6 +1294,55 @@
             }
         });
     </script>
+
+   <script>
+// Script para cálculos automáticos
+document.addEventListener('DOMContentLoaded', function() {
+    const subtotal = document.getElementById('amp_subtotal');
+    const iva = document.getElementById('amp_iva');
+    const total = document.getElementById('amp_total');
+    
+    const nuevoSubtotal = document.getElementById('nuevo_subtotal');
+    const nuevoIva = document.getElementById('nuevo_iva');
+    const nuevoTotal = document.getElementById('nuevo_total');
+    
+    const subtotalActual = {{ $contrato->subtotal }};
+    const ivaActual = {{ $contrato->iva }};
+    const totalActual = {{ $contrato->total }};
+    
+    function actualizar() {
+        const s = parseFloat(subtotal.value) || 0;
+        const i = parseFloat(iva.value) || 0;
+        const t = s + i;
+        
+        // Actualizar campo total
+        total.value = t.toFixed(2);
+        
+        // Disparar eventos input y change para el formateador
+        total.dispatchEvent(new Event('input', { bubbles: true }));
+        if (typeof $ !== 'undefined') {
+            $(total).trigger('change');
+        }
+        
+        // Actualizar textos de resumen
+        nuevoSubtotal.textContent = (subtotalActual + s).toFixed(2);
+        nuevoIva.textContent = (ivaActual + i).toFixed(2);
+        nuevoTotal.textContent = (totalActual + t).toFixed(2);
+    }
+    
+    if (subtotal && iva && total) {
+        subtotal.addEventListener('input', actualizar);
+        iva.addEventListener('input', actualizar);
+        
+        // También disparar eventos cuando cambien por otras razones
+        subtotal.addEventListener('change', actualizar);
+        iva.addEventListener('change', actualizar);
+        
+        // Calcular valores iniciales si hay datos
+        setTimeout(actualizar, 100);
+    }
+});
+</script>
 </body>
 </html>
 
