@@ -26,7 +26,6 @@ class CreateContratos extends Migration
             $table->string('gerencia')->nullable();
             $table->string('cliente')->nullable();
             $table->string('lugar')->nullable();
-            $table->string('concepto',50)->nullable();
             $table->decimal('subtotal', 15, 2)->nullable();
             $table->decimal('iva', 15, 2)->nullable();
             $table->decimal('total', 15, 2)->nullable();

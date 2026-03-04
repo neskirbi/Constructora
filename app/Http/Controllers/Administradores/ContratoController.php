@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Administradores;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB; 
 use App\Models\Contrato;
+use App\Models\AmpliacionMonto;
+use App\Models\AmpliacionFecha;
 use Illuminate\Http\Request;
 
 class ContratoController extends Controller
@@ -17,25 +19,45 @@ class ContratoController extends Controller
     public function index(Request $request)
     {
         // Obtener parámetros de búsqueda
-        $search = $request->input('search');
+    $search = $request->input('search');
+    
+    // Construir consulta base
+    $query = Contrato::query();
+    
+    // Aplicar búsqueda si existe
+    if ($search) {
+        $query->where(function ($q) use ($search) {
+            $q->where('consecutivo', 'like', "%{$search}%")
+            ->orWhere('obra', 'like', "%{$search}%")
+            ->orWhere('contrato_no', 'like', "%{$search}%")
+            ->orWhere('cliente', 'like', "%{$search}%")
+            ->orWhere('lugar', 'like', "%{$search}%")
+            ->orWhere('empresa', 'like', "%{$search}%");
+        });
+    }
+    
+    // Obtener los contratos con paginación
+    $contratos = $query->orderBy('created_at', 'desc')->paginate(15);
+    
+    // Cargar ampliaciones para cada contrato
+    foreach ($contratos as $contrato) {
+        $contrato->ampliacionesTiempo = AmpliacionFecha::where('id_contrato', $contrato->id)
+            ->orderBy('created_at', 'asc')
+            ->get();
+            
+        $contrato->ampliacionesMonto = AmpliacionMonto::where('id_contrato', $contrato->id)
+            ->orderBy('created_at', 'asc')
+            ->get();
+            
+        // Calcular totales acumulados
+        $contrato->totalSubtotalAmpliaciones = $contrato->ampliacionesMonto->sum('subtotal');
+        $contrato->totalIvaAmpliaciones = $contrato->ampliacionesMonto->sum('iva');
+        $contrato->totalTotalAmpliaciones = $contrato->ampliacionesMonto->sum('total');
         
-        // Construir consulta base
-        $query = Contrato::query();
-        
-        // Aplicar búsqueda si existe
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('consecutivo', 'like', "%{$search}%")  // <--- AGREGADO
-                ->orWhere('obra', 'like', "%{$search}%")
-                ->orWhere('contrato_no', 'like', "%{$search}%")
-                ->orWhere('cliente', 'like', "%{$search}%")
-                ->orWhere('lugar', 'like', "%{$search}%")
-                ->orWhere('empresa', 'like', "%{$search}%");
-            });
-        }
-        
-        // Obtener los contratos con paginación (15 por página)
-        $contratos = $query->orderBy('created_at', 'desc')->paginate(15); // Especificamos 15
+        // Obtener última fecha de ampliación si existe
+        $ultimaAmpliacionTiempo = $contrato->ampliacionesTiempo->last();
+        $contrato->fecha_ampliada = $ultimaAmpliacionTiempo ? $ultimaAmpliacionTiempo->fecha_terminacion_obra : $contrato->fecha_terminacion_obra;
+    }
         
         return view('administradores.contratos.index', compact('contratos'));
     }
@@ -62,20 +84,35 @@ class ContratoController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-    {
-        try {
-            // Buscar el contrato
-            $contrato = Contrato::findOrFail($id);
+{
+    try {
+        // Buscar el contrato
+        $contrato = Contrato::findOrFail($id);
+        
+        // Cargar las ampliaciones desde la base de datos
+        // Nota: Aquí puedes usar DB::table directamente si no tienes modelos en admin
+        // O si ya creaste los modelos en admin, usa:
+        // $ampliacionesMonto = AmpliacionMonto::where('id_contrato', $id)->orderBy('created_at', 'desc')->get();
+        
+        $ampliacionesMonto = DB::table('ampliacionesmonto')
+            ->where('id_contrato', $id)
+            ->orderBy('created_at', 'desc')
+            ->get();
             
-            // Cargar la vista de edición (reutilizamos el formulario CREATE)
-            return view('administradores.contratos.show', compact('contrato'));
-            
-        } catch (\Exception $e) {
-            // Si no se encuentra el contrato
-            return redirect()->route('acontratos.index')
-                ->with('error', 'Contrato no encontrado: ' . $e->getMessage());
-        }
+        $ampliacionesTiempo = DB::table('ampliacionestiempo')
+            ->where('id_contrato', $id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        // Cargar la vista con todas las variables necesarias
+        return view('administradores.contratos.show', compact('contrato', 'ampliacionesMonto', 'ampliacionesTiempo'));
+        
+    } catch (\Exception $e) {
+        // Si no se encuentra el contrato
+        return redirect()->route('acontratos.index')
+            ->with('error', 'Contrato no encontrado: ' . $e->getMessage());
     }
+}
 
 
     /**

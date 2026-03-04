@@ -551,18 +551,7 @@
     <div class="row">
         <!-- Columna Izquierda -->
         <div class="col-md-6">
-            <div class="form-group-custom">
-                <label for="concepto" class="form-label-custom">
-                    Concepto
-                </label>
-                <select class="form-control form-control-custom" 
-                        id="concepto" 
-                        name="concepto">
-                    <option value="">Seleccionar concepto...</option>
-                    <option value="TOTAL CONTRATO" {{ old('concepto') == 'TOTAL CONTRATO' ? 'selected' : '' }}>TOTAL CONTRATO</option>
-                    <option value="CONVENIO APLIACION" {{ old('concepto') == 'CONVENIO APLIACION' ? 'selected' : '' }}>CONVENIO APLIACION</option>
-                </select>
-            </div>
+          
             
             <div class="form-group-custom">
                 <label for="porcentaje_anticipo" class="form-label-custom">

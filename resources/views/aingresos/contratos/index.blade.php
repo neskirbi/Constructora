@@ -205,7 +205,7 @@
                                     <div class="col-md-3">
                                         <div class="card border-0 bg-light">
                                             <div class="card-body text-center">
-                                                <h6 class="text-muted mb-2">Total + Convenios</h6>
+                                                <h6 class="text-muted mb-2">Total + Ampliaciones</h6>
                                                 <h5 class="fw-bold mb-0">
                                                     ${{ number_format(($contrato->total ?? 0) + ($contrato->totalTotalAmpliaciones ?? 0), 2) }}
                                                 </h5>
@@ -310,12 +310,12 @@
                                 <!-- Botones de acción -->
                                 <div class="d-flex justify-content-end gap-2 mt-4">
                                     <a href="{{ route('contratos.show', $contrato->id) }}" 
-                                    class="btn btn-primary btn-sm"
+                                    class="btn btn-primary "
                                     title="Ver detalles">
                                         <i class="fas fa-eye me-1"></i> Ver
                                     </a>
                                     <button onclick="confirmDelete('{{ $contrato->id }}', '{{ addslashes($contrato->obra ?? 'Contrato') }}')" 
-                                            class="btn btn-danger btn-sm"
+                                            class="btn btn-danger"
                                             title="Eliminar contrato">
                                         <i class="fas fa-trash me-1"></i> Eliminar
                                     </button>

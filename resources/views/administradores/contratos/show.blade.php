@@ -457,14 +457,7 @@
                             <div class="row">
                                 <!-- Columna Izquierda -->
                                 <div class="col-md-6">
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Concepto
-                                        </label>
-                                        <div class="info-value @if(empty($contrato->concepto)) info-value-empty @endif">
-                                            {{ $contrato->concepto ?: 'No especificado' }}
-                                        </div>
-                                    </div>
+                                   
                                     
                                     <div class="form-group-custom">
                                         <label class="form-label-custom">
@@ -684,7 +677,193 @@
                             </div>
                         </div>
                         
-                        
+                        <!-- SECCIÓN 7: AMPLIACIONES DE MONTO -->
+                        <div class="form-section">
+                            <h5 class="section-title">
+                                <i class="fas fa-dollar-sign me-2"></i>
+                                Ampliaciones de Monto
+                            </h5>
+                            
+                            <div class="card">
+                                <div class="card-header bg-success text-white">
+                                    <h6 class="mb-0"><i class="fas fa-list me-2"></i>Historial de Ampliaciones de Monto</h6>
+                                </div>
+                                <div class="card-body">
+                                    @if($ampliacionesMonto->count() > 0)
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Fecha de Registro</th>
+                                                        <th>Subtotal</th>
+                                                        <th>IVA</th>
+                                                        <th>Total</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($ampliacionesMonto as $index => $amp)
+                                                        <tr>
+                                                            <td>{{ $index + 1 }}</td>
+                                                            <td>{{ \Carbon\Carbon::parse($amp->created_at)->format('d/m/Y H:i') }}</td>
+                                                            <td class="text-end">${{ number_format($amp->subtotal, 2) }}</td>
+                                                            <td class="text-end">${{ number_format($amp->iva, 2) }}</td>
+                                                            <td class="text-end">${{ number_format($amp->total, 2) }}</td>
+                                                        </tr>
+                                                    @endforeach
+                                                    
+                                                    <!-- Totales acumulados -->
+                                                    @php
+                                                        $totalSubtotal = $ampliacionesMonto->sum('subtotal');
+                                                        $totalIva = $ampliacionesMonto->sum('iva');
+                                                        $totalTotal = $ampliacionesMonto->sum('total');
+                                                    @endphp
+                                                    @if($ampliacionesMonto->count() > 0)
+                                                    <tr class="table-info fw-bold">
+                                                        <td colspan="2" class="text-end">TOTAL ACUMULADO:</td>
+                                                        <td class="text-end">${{ number_format($totalSubtotal, 2) }}</td>
+                                                        <td class="text-end">${{ number_format($totalIva, 2) }}</td>
+                                                        <td class="text-end">${{ number_format($totalTotal, 2) }}</td>
+                                                    </tr>
+                                                    @endif
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        
+                                        <!-- Resumen de montos actuales del contrato -->
+                                        <div class="alert alert-info mt-3 mb-0">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <small>Subtotal actual del contrato:</small><br>
+                                                    <strong>${{ number_format($contrato->subtotal ?? 0, 2) }}</strong>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <small>IVA actual del contrato:</small><br>
+                                                    <strong>${{ number_format($contrato->iva ?? 0, 2) }}</strong>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <small>Total actual del contrato:</small><br>
+                                                    <strong>${{ number_format($contrato->total ?? 0, 2) }}</strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div class="alert alert-info mb-0">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            No hay ampliaciones de monto registradas para este contrato.
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECCIÓN 8: AMPLIACIONES DE TIEMPO -->
+                        <div class="form-section">
+                            <h5 class="section-title">
+                                <i class="fas fa-clock me-2"></i>
+                                Ampliaciones de Tiempo
+                            </h5>
+                            
+                            <div class="card">
+                                <div class="card-header bg-warning text-dark">
+                                    <h6 class="mb-0"><i class="fas fa-history me-2"></i>Historial de Ampliaciones de Tiempo</h6>
+                                </div>
+                                <div class="card-body">
+                                    @if($ampliacionesTiempo->count() > 0)
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Fecha de Registro</th>
+                                                        <th>Fecha Anterior</th>
+                                                        <th>Nueva Fecha de Terminación</th>
+                                                        <th>Días Ampliados</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($ampliacionesTiempo as $index => $amp)
+                                                        @php
+                                                            // Calcular fecha anterior (si existe)
+                                                            $fechaAnterior = $loop->last 
+                                                                ? $contrato->fecha_terminacion_obra 
+                                                                : $ampliacionesTiempo[$index + 1]->fecha_terminacion_obra ?? $contrato->fecha_terminacion_obra;
+                                                            
+                                                            // Calcular días de diferencia
+                                                            $diasAmpliados = 0;
+                                                            if ($fechaAnterior && $amp->fecha_terminacion_obra) {
+                                                                $fechaAnt = \Carbon\Carbon::parse($fechaAnterior);
+                                                                $fechaNueva = \Carbon\Carbon::parse($amp->fecha_terminacion_obra);
+                                                                $diasAmpliados = $fechaAnt->diffInDays($fechaNueva);
+                                                            }
+                                                        @endphp
+                                                        <tr>
+                                                            <td>{{ $index + 1 }}</td>
+                                                            <td>{{ \Carbon\Carbon::parse($amp->created_at)->format('d/m/Y H:i') }}</td>
+                                                            <td>{{ $fechaAnterior ? \Carbon\Carbon::parse($fechaAnterior)->format('d/m/Y') : 'No definida' }}</td>
+                                                            <td>{{ \Carbon\Carbon::parse($amp->fecha_terminacion_obra)->format('d/m/Y') }}</td>
+                                                            <td class="text-center">
+                                                                @if($diasAmpliados > 0)
+                                                                    <span class="badge bg-success">{{ $diasAmpliados }} días</span>
+                                                                @else
+                                                                    <span class="badge bg-secondary">0 días</span>
+                                                                @endif
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        
+                                        <!-- Información de fechas actuales -->
+                                        <div class="alert alert-warning mt-3 mb-0">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <i class="fas fa-calendar-alt me-2"></i>
+                                                    <strong>Fecha original de terminación:</strong><br>
+                                                    {{ $contrato->fecha_terminacion_obra ? \Carbon\Carbon::parse($contrato->fecha_terminacion_obra)->format('d/m/Y') : 'No definida' }}
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <i class="fas fa-calendar-check me-2"></i>
+                                                    <strong>Fecha actual de terminación:</strong><br>
+                                                    @if($ampliacionesTiempo->isNotEmpty())
+                                                        {{ \Carbon\Carbon::parse($ampliacionesTiempo->first()->fecha_terminacion_obra)->format('d/m/Y') }}
+                                                        <small class="text-muted">(Última ampliación)</small>
+                                                    @else
+                                                        {{ $contrato->fecha_terminacion_obra ? \Carbon\Carbon::parse($contrato->fecha_terminacion_obra)->format('d/m/Y') : 'No definida' }}
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            
+                                            @if($ampliacionesTiempo->count() > 0)
+                                                @php
+                                                    $totalDiasAmpliados = 0;
+                                                    $fechaOriginal = $contrato->fecha_terminacion_obra 
+                                                        ? \Carbon\Carbon::parse($contrato->fecha_terminacion_obra) 
+                                                        : null;
+                                                    $fechaActual = $ampliacionesTiempo->first()->fecha_terminacion_obra 
+                                                        ? \Carbon\Carbon::parse($ampliacionesTiempo->first()->fecha_terminacion_obra) 
+                                                        : null;
+                                                    
+                                                    if ($fechaOriginal && $fechaActual) {
+                                                        $totalDiasAmpliados = $fechaOriginal->diffInDays($fechaActual);
+                                                    }
+                                                @endphp
+                                                <div class="mt-2">
+                                                    <strong>Total de días ampliados:</strong> 
+                                                    <span class="badge bg-primary">{{ $totalDiasAmpliados }} días</span>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @else
+                                        <div class="alert alert-info mb-0">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            No hay ampliaciones de tiempo registradas para este contrato.
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

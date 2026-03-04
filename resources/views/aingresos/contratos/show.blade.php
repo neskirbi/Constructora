@@ -875,7 +875,7 @@
                         <div class="form-section mt-4">
                             <h5 class="section-title">
                                 <i class="fas fa-file-contract me-2"></i>
-                                Ampliaciones y Convenios
+                                Ampliaciones
                             </h5>
                             
                             <!-- Pestañas -->

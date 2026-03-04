@@ -91,7 +91,6 @@ class ContratoController extends Controller
             'lugar' => 'nullable|string|max:255',
             
             // Montos del contrato (nueva estructura)
-            'concepto' => 'nullable|string|max:50',
             'subtotal' => 'nullable|numeric|min:0',
             'iva' => 'nullable|numeric|min:0',
             'total' => 'nullable|numeric|min:0',
@@ -159,7 +158,6 @@ class ContratoController extends Controller
             'lugar' => $validatedData['lugar'] ?? null,
             
             // Montos del contrato (nueva estructura)
-            'concepto' => $validatedData['concepto'] ?? null,
             'subtotal' => $validatedData['subtotal'] ?? null,
             'iva' => $validatedData['iva'] ?? null,
             'total' => $validatedData['total'] ?? null,
@@ -289,7 +287,6 @@ class ContratoController extends Controller
             'lugar' => 'nullable|string|max:255',
             
             // Montos del contrato (nueva estructura)
-            'concepto' => 'nullable|string|max:50',
             'subtotal' => 'nullable|numeric|min:0',
             'iva' => 'nullable|numeric|min:0',
             'total' => 'nullable|numeric|min:0',
@@ -353,7 +350,6 @@ class ContratoController extends Controller
             'lugar' => $validatedData['lugar'] ?? null,
             
             // Montos del contrato (nueva estructura)
-            'concepto' => $validatedData['concepto'] ?? null,
             'subtotal' => $validatedData['subtotal'] ?? null,
             'iva' => $validatedData['iva'] ?? null,
             'total' => $validatedData['total'] ?? null,

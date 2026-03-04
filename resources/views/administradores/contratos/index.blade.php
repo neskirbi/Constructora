@@ -22,11 +22,7 @@
                             <h1 class="h3 mb-1 text-gray-800"><i class="fas fa-file-contract me-2"></i> Contratos</h1>
                             <p class="text-muted mb-0">Gestión de contratos de obra</p>
                         </div>
-                        <div>
-                            <!--<button class="btn btn-primary" onclick="window.location.href='{{ route('acontratos.create') }}'">
-                                <i class="fas fa-plus me-1"></i> Agregar Contrato
-                            </button>-->
-                        </div>
+                        
                     </div>
                     
                     <!-- Filtros -->
@@ -95,7 +91,7 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Segunda fila: Cliente (solo, para texto largo) -->
+                                <!-- Segunda fila: Cliente -->
                                 <div class="row mb-3">
                                     <div class="col-12">
                                         <small class="text-muted d-block">Cliente</small>
@@ -105,7 +101,7 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Tercera fila: Obra (solo, para texto largo) -->
+                                <!-- Tercera fila: Obra -->
                                 <div class="row mb-3">
                                     <div class="col-12">
                                         <small class="text-muted d-block">Obra</small>
@@ -115,21 +111,17 @@
                                     </div>
                                 </div>
                                 
-                                <!-- Cuarta fila: Datos adicionales (Frente, Duración) -->
+                                <!-- Cuarta fila: Frente -->
                                 <div class="row mb-3">
-                                    <div class="col-md-6 mb-2 mb-md-0">
+                                    <div class="col-md-6">
                                         <small class="text-muted d-block">Frente</small>
-                                        <span title="{{ $contrato->frente ?? 'No especificado' }}">
-                                            {{ $contrato->frente ?? 'No especificado' }}
-                                        </span>
+                                        <span>{{ $contrato->frente ?? 'No especificado' }}</span>
                                     </div>
-                                   
                                 </div>
                                 
-                                
-                                <!-- Quinta fila: Fechas y Duración -->
+                                <!-- Fechas con duración total -->
                                 <div class="row mb-4">
-                                    <div class="col-md-4 mb-2 mb-md-0">
+                                    <div class="col-md-3 mb-2 mb-md-0">
                                         <small class="text-muted d-block">Fecha Contrato</small>
                                         <span>
                                             @if($contrato->fecha_contrato)
@@ -152,72 +144,173 @@
                                     <div class="col-md-3 mb-2 mb-md-0">
                                         <small class="text-muted d-block">Fin Obra</small>
                                         <span>
-                                            @if($contrato->fecha_terminacion_obra)
-                                                {{ date('d/m/Y', strtotime($contrato->fecha_terminacion_obra)) }}
+                                            @if($contrato->fecha_ampliada ?? $contrato->fecha_terminacion_obra)
+                                                {{ date('d/m/Y', strtotime($contrato->fecha_ampliada ?? $contrato->fecha_terminacion_obra)) }}
                                             @else
                                                 No definida
                                             @endif
                                         </span>
                                     </div>
-                                    <div class="col-md-2">
-                                        <small class="text-muted d-block">Duración</small>
-                                        <span>{{ $contrato->duracion ?? 'No especificada' }}</span>
+                                    <div class="col-md-3">
+                                        <small class="text-muted d-block">Duración Total</small>
+                                        <span class="fw-bold">
+                                            @php
+                                                $fechaInicio = $contrato->fecha_inicio_obra;
+                                                $fechaFin = $contrato->fecha_ampliada ?? $contrato->fecha_terminacion_obra;
+                                                
+                                                if ($fechaInicio && $fechaFin) {
+                                                    $diasDuracion = \Carbon\Carbon::parse($fechaInicio)->diffInDays(\Carbon\Carbon::parse($fechaFin));
+                                                    echo $diasDuracion . ' días';
+                                                } else {
+                                                    echo $contrato->duracion ?? 'No especificada';
+                                                }
+                                            @endphp
+                                        </span>
                                     </div>
                                 </div>
                                 
-                                <!-- Montos en tarjetas -->
+                                <!-- Montos sin iconos -->
                                 <div class="row g-3 mb-4">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <div class="card border-0 bg-light">
                                             <div class="card-body text-center">
-                                                <div class="mb-2">
-                                                    <i class="fas fa-file-invoice-dollar fa-2x text-secondary"></i>
-                                                </div>
                                                 <h6 class="text-muted mb-2">Subtotal</h6>
                                                 <h5 class="fw-bold mb-0">${{ number_format($contrato->subtotal ?? 0, 2) }}</h5>
                                             </div>
                                         </div>
                                     </div>
                                     
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <div class="card border-0 bg-light">
                                             <div class="card-body text-center">
-                                                <div class="mb-2">
-                                                    <i class="fas fa-hand-holding-usd fa-2x text-secondary"></i>
-                                                </div>
                                                 <h6 class="text-muted mb-2">IVA</h6>
                                                 <h5 class="fw-bold mb-0">${{ number_format($contrato->iva ?? 0, 2) }}</h5>
                                             </div>
                                         </div>
                                     </div>
                                     
-                                    @if($contrato->total)
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <div class="card border-0 bg-light">
                                             <div class="card-body text-center">
-                                                <div class="mb-2">
-                                                    <i class="fas fa-chart-line fa-2x text-secondary"></i>
-                                                </div>
                                                 <h6 class="text-muted mb-2">Total</h6>
                                                 <h5 class="fw-bold mb-0">${{ number_format($contrato->total ?? 0, 2) }}</h5>
                                             </div>
                                         </div>
                                     </div>
-                                    @endif
+
+                                    <div class="col-md-3">
+                                        <div class="card border-0 bg-light">
+                                            <div class="card-body text-center">
+                                                <h6 class="text-muted mb-2">Total + Ampliaciones</h6>
+                                                <h5 class="fw-bold mb-0">
+                                                    ${{ number_format(($contrato->total ?? 0) + ($contrato->totalTotalAmpliaciones ?? 0), 2) }}
+                                                </h5>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 
+                                <!-- DESGLOSE DE CONVENIOS (AMPLIACIONES) -->
+                                @if($contrato->ampliacionesTiempo->count() > 0 || $contrato->ampliacionesMonto->count() > 0)
+                                <div class="mt-4 pt-3 border-top">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="fas fa-file-contract me-2"></i>Convenios / Ampliaciones
+                                    </h6>
+                                    
+                                    <div class="row">
+                                        <!-- Ampliaciones de Tiempo -->
+                                        @if($contrato->ampliacionesTiempo->count() > 0)
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card border-0 bg-light">
+                                                <div class="card-header bg-transparent border-0 pt-3">
+                                                    <h6 class="mb-0"><i class="fas fa-clock me-2 text-warning"></i>Ampliaciones de Tiempo</h6>
+                                                </div>
+                                                <div class="card-body pt-0">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-sm">
+                                                            <thead>
+                                                                <tr>
+                                                                   
+                                                                    <th>Nueva Fecha</th>
+                                                                    <th>Días</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach($contrato->ampliacionesTiempo as $amp)
+                                                                @php
+                                                                    $fechaAnterior = $loop->first ? $contrato->fecha_terminacion_obra : $contrato->ampliacionesTiempo[$loop->index - 1]->fecha_terminacion_obra;
+                                                                    $dias = \Carbon\Carbon::parse($fechaAnterior)->diffInDays(\Carbon\Carbon::parse($amp->fecha_terminacion_obra));
+                                                                @endphp
+                                                                <tr>
+                                                                    
+                                                                    <td>{{ \Carbon\Carbon::parse($amp->fecha_terminacion_obra)->format('d/m/Y') }}</td>
+                                                                    <td><span class="badge bg-info">{{ $dias }} días</span></td>
+                                                                </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endif
+                                        
+                                        <!-- Ampliaciones de Monto -->
+                                        @if($contrato->ampliacionesMonto->count() > 0)
+                                        <div class="col-md-6 mb-3">
+                                            <div class="card border-0 bg-light">
+                                                <div class="card-header bg-transparent border-0 pt-3">
+                                                    <h6 class="mb-0"><i class="fas fa-dollar-sign me-2 text-success"></i>Ampliaciones de Monto</h6>
+                                                </div>
+                                                <div class="card-body pt-0">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-sm">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Fecha</th>
+                                                                    <th>Subtotal</th>
+                                                                    <th>IVA</th>
+                                                                    <th>Total</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach($contrato->ampliacionesMonto as $amp)
+                                                                <tr>
+                                                                    <td>{{ \Carbon\Carbon::parse($amp->created_at)->format('d/m/Y') }}</td>
+                                                                    <td class="text-end">${{ number_format($amp->subtotal, 2) }}</td>
+                                                                    <td class="text-end">${{ number_format($amp->iva, 2) }}</td>
+                                                                    <td class="text-end">${{ number_format($amp->total, 2) }}</td>
+                                                                </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                            <tfoot class="table-group-divider">
+                                                                <tr>
+                                                                    <th class="text-end">Totales:</th>
+                                                                    <th class="text-end">${{ number_format($contrato->totalSubtotalAmpliaciones, 2) }}</th>
+                                                                    <th class="text-end">${{ number_format($contrato->totalIvaAmpliaciones, 2) }}</th>
+                                                                    <th class="text-end">${{ number_format($contrato->totalTotalAmpliaciones, 2) }}</th>
+                                                                </tr>
+                                                            </tfoot>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endif
+                                    </div>
+                                    
+                                    
+                                </div>
+                                @endif
+                                
                                 <!-- Botones de acción -->
-                                <div class="d-flex justify-content-end gap-2">
+                                <div class="d-flex justify-content-end gap-2 mt-4">
                                     <a href="{{ route('acontratos.show', $contrato->id) }}" 
-                                    class="btn btn-primary"
+                                    class="btn btn-primary "
                                     title="Ver detalles">
                                         <i class="fas fa-eye me-1"></i> Ver
                                     </a>
-                                    <button onclick="confirmDelete('{{ $contrato->id }}', '{{ addslashes($contrato->obra ?? 'Contrato') }}')" 
-                                            class="btn btn-danger"
-                                            title="Eliminar contrato">
-                                        <i class="fas fa-trash me-1"></i> Eliminar
-                                    </button>
+                                 
                                 </div>
                             </div>
                         </div>
@@ -253,9 +346,7 @@
                                 <i class="fas fa-times me-1"></i> Limpiar búsqueda
                             </a>
                             @endif
-                            <button class="btn btn-primary" onclick="window.location.href='{{ route('acontratos.create') }}'">
-                                <i class="fas fa-plus me-1"></i> Agregar primer contrato
-                            </button>
+                           
                         </div>
                     @endif
                 </div>
@@ -291,24 +382,14 @@
         </div>
     </div>
     
-    <script>
-        // Función para confirmar eliminación
-        function confirmDelete(id, nombre) {
-            document.getElementById('obraNombre').textContent = nombre;
-            
-            const form = document.getElementById('deleteForm');
-            form.action = '{{url("/contratos")}}/'+id;
-            
-            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
-            modal.show();
-        }
-        
-        // Auto-focus en campo de búsqueda si hay parámetros
-        document.addEventListener('DOMContentLoaded', function() {
-            @if(request()->has('search'))
-            document.querySelector('input[name="search"]').focus();
-            @endif
-        });
-    </script>
+    
 </body>
 </html>
+
+<!-- 
+1.- Quitar los iconos de los montos 
+2.- Agregar el desglose de los convenios
+3.- Reflejar los montos que se agregaron en los convenios
+4.- reflejar la fecha y la duracion dependiendo el convenio
+5.- 
+-->
