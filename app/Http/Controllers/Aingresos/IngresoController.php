@@ -106,7 +106,7 @@ class IngresoController extends Controller
         $ingreso->save();
         
         
-        return redirect('ingresos.index')
+        return redirect('ingresos')
             ->with('success', 'Ingreso creado exitosamente.');
     }
 
@@ -231,13 +231,13 @@ public function updateFacturacion(Request $request, $id)
         
         // Solo eliminar si está verificado (verificado = 1)
         if ($ingreso->verificado != 1) {
-            return redirect()->route('ingresos.index')
+            return redirect()->route('ingresos')
                 ->with('error', 'No se puede eliminar el ingreso porque ya está verificado.');
         }
         
         $ingreso->delete();
         
-        return redirect()->route('ingresos.index')
+        return redirect()->route('ingresos')
             ->with('success', 'Ingreso eliminado exitosamente.');
     }
     

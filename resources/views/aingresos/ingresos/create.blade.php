@@ -940,7 +940,7 @@ $(document).ready(function() {
     // Función para cargar datos del ingreso en el formulario
     function cargarDatosIngreso(data) {
         // Información básica
-        $('#no_estimacion').val(data.no_estimacion || '');
+        
         $('#periodo_del').val(data.periodo_del || '');
         $('#periodo_al').val(data.periodo_al || '');
         
@@ -1001,14 +1001,13 @@ $(document).ready(function() {
         // Estimado menos deducciones
         $('#estimado_menos_deducciones').val(data.estimado_menos_deducciones || 0);
         
-        // Status
-        $('#status').val(data.status || 'en_tramite');
+     
     }
     
     // Función para limpiar el formulario
     function limpiarFormulario() {
         // Información básica
-        $('#no_estimacion').val('');
+      
         $('#periodo_del').val('');
         $('#periodo_al').val('');
         
@@ -1058,9 +1057,7 @@ $(document).ready(function() {
         
         // Estimado menos deducciones
         $('#estimado_menos_deducciones').val(0);
-        
-        // Status
-        $('#status').val('en_tramite');
+       
     }
     
     // Si hay un contrato preseleccionado (por ejemplo desde la URL), cargar sus datos
