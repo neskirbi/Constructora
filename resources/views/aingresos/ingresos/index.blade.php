@@ -238,7 +238,7 @@
             <!-- Área de contenido -->
             <div class="content-area">
                 <div class="container-fluid py-4">
-                    <!-- Título y botón (estilo original) -->
+                    <!-- Título y botón -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div>
                             <h1 class="h3 mb-1 text-gray-800"><i class="fas fa-money-bill-wave me-2"></i>Ingresos</h1>
@@ -249,7 +249,7 @@
                         </a>
                     </div>
 
-                    <!-- Barra de búsqueda (estilo original) -->
+                    <!-- Barra de búsqueda -->
                     <div class="search-container">
                         <form action="{{ route('ingresos.index') }}" method="GET" class="row">
                             <div class="col-md-10">
@@ -292,6 +292,26 @@
                         </div>
                         @endif
                     </div>
+
+                    <!-- Badge de verificación global -->
+                    @if(isset($ingreso))
+                    <div class="alert alert-info d-flex justify-content-between align-items-center mb-4">
+                        <span>
+                            <i class="fas fa-info-circle me-2"></i>
+                            Estado de verificación:
+                        </span>
+                        @php
+                            $verificado = $ingreso->verificado ?? 1;
+                            if($verificado == 1) {
+                                echo '<span class="badge-status badge-pendiente">Pendiente (1)</span>';
+                            } elseif($verificado == 0) {
+                                echo '<span class="badge-status badge-rechazado">Rechazado (0)</span>';
+                            } elseif($verificado == 2) {
+                                echo '<span class="badge-status badge-verificado">Aprobado (2)</span>';
+                            }
+                        @endphp
+                    </div>
+                    @endif
 
                     <!-- Lista de ingresos -->
                     @if($ingresos->count() > 0)
@@ -411,17 +431,15 @@
                                         <div class="info-item">
                                             <div class="info-label">Importe Facturado</div>
                                             <div class="info-value">
-                                                ${{ number_format($ingreso->importe_facturado ?? 0, 2) }}
+                                                ${{ number_format($ingreso->estimado_menos_deducciones ?? 0, 2) }}
                                             </div>
                                         </div>
                                     </div>
 
-
-
                                     <!-- Botones -->
                                     <div class="d-flex justify-content-end gap-2 mt-3 pt-3 border-top">
                                         <a href="{{ route('ingresos.show', $ingreso->id) }}" 
-                                        class="btn btn-primary ">
+                                        class="btn btn-primary">
                                             <i class="fas fa-eye me-1"></i> Ver
                                         </a>
                                         @if($ingreso->verificado == 1)

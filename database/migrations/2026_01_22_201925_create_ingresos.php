@@ -46,7 +46,6 @@ class CreateIngresos extends Migration
         $table->decimal('liquido_cobrado', 15, 2)->default(0);
         $table->date('fecha_cobro')->nullable();
         $table->decimal('por_cobrar', 15, 2)->default(0);
-        $table->decimal('por_facturar', 15, 2)->default(0);
         $table->decimal('por_estimar', 15, 2)->default(0);
         $table->string('status')->nullable();
         $table->decimal('estimado_menos_deducciones', 15, 2)->default(0);

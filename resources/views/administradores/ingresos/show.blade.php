@@ -40,52 +40,23 @@
             font-size: 0.95rem;
         }
         
-        .form-control-custom {
-            border-radius: 6px;
-            border: 1px solid #ced4da;
-            padding: 0.5rem 0.75rem;
-            font-size: 0.95rem;
+        .info-display {
             background-color: #f8f9fa;
-            opacity: 1;
-        }
-        
-        .help-text {
-            font-size: 0.85rem;
-            color: #6c757d;
-            margin-top: 0.25rem;
-        }
-        
-        .input-group-custom {
+            border: 1px solid #dee2e6;
             border-radius: 6px;
+            padding: 0.75rem 1rem;
+            min-height: 38px;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
         }
         
-        .input-group-custom .input-group-text {
-            background-color: #e9ecef;
-            border: 1px solid #ced4da;
-            color: #495057;
-        }
-        
-        .numeric-input {
-            text-align: right;
-        }
-        
-        .contrato-info {
-            background-color: #e7f1ff;
-            border: 1px solid #b6d4fe;
+        .form-section {
+            background-color: #f8f9fa;
             border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-        }
-        
-        .contrato-info-item {
-            margin-bottom: 0.5rem;
-        }
-        
-        .contrato-info-label {
-            font-weight: 600;
-            color: #0d6efd;
-            min-width: 120px;
-            display: inline-block;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #426ec1;
         }
         
         .status-badge {
@@ -100,7 +71,7 @@
             color: #856404;
         }
         
-        .status-verificado {
+        .status-aprobado {
             background-color: #d4edda;
             color: #155724;
         }
@@ -110,77 +81,27 @@
             color: #721c24;
         }
         
-        .info-display {
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 6px;
-            padding: 0.75rem 1rem;
-            min-height: 38px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .info-display-text {
-            margin: 0;
-            color: #212529;
-        }
-        
-        /* Estilos de secciones que me pediste */
-        .form-section {
-            background-color: #f8f9fa;
+        .resumen-montos {
+            background-color: #f0f4f8;
             border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            border-left: 4px solid #426ec1;
-        }
-        
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
+            padding: 1rem;
             margin-top: 1rem;
+            border: 1px dashed #426ec1;
         }
         
-        .info-item {
-            padding: 0.75rem 0;
+        .info-row {
+            display: flex;
+            margin-bottom: 0.75rem;
         }
         
-        .info-item .info-label {
-            font-size: 0.8rem;
-            color: #6c757d;
-            font-weight: 500;
-            margin-bottom: 0.25rem;
-        }
-        
-        .info-text {
-            font-size: 0.95rem;
-            color: #212529;
-            margin: 0;
-            padding: 0.5rem 0;
+        .info-label {
+            font-weight: 600;
+            min-width: 180px;
+            color: #495057;
         }
         
         .info-value {
-            font-weight: 500;
             color: #212529;
-        }
-        
-        .info-value.monto {
-            color: #198754;
-            font-weight: 600;
-        }
-        
-        @media (max-width: 768px) {
-            .form-section {
-                padding: 1rem;
-            }
-            
-            .card-header-form {
-                padding: 1rem;
-            }
-            
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
@@ -198,51 +119,50 @@
                 <!-- Título y botón -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                        <h1 class="h3 mb-1 text-gray-800">Ver Ingreso</h1>
-                        <p class="text-muted mb-0">ID: {{ $ingreso->id }}</p>
+                        <h1 class="h3 mb-1 text-gray-800">Ingreso</h1>
                     </div>
                     <div>
-                        <a href="{{ route('aingresos.index') }}" class="btn btn-outline-secondary">
+                        <a href="{{ url('ingresos') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left me-1"></i> Regresar
                         </a>
                     </div>
                 </div>
                 
-                <!-- Información del estado -->
+                <!-- Información del estado y botones de acción -->
                 <div class="alert alert-info mb-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <i class="fas fa-info-circle me-2"></i>
-                            Estado de verificación: 
-                            @php
-                                $verificado = $ingreso->verificado ?? 1;
-                                if($verificado == 1) {
-                                    echo '<span class="status-badge status-pendiente ms-2">Pendiente (1)</span>';
-                                } elseif($verificado == 0) {
-                                    echo '<span class="status-badge status-rechazado ms-2">Rechazado (0)</span>';
-                                } elseif($verificado == 2) {
-                                    echo '<span class="status-badge status-verificado ms-2">Verificado (2)</span>';
-                                }
-                            @endphp
+                            Estado de verificación:
                         </div>
-                        <div>
-                            <span class="text-muted">
-                                <i class="fas fa-eye me-1"></i> Modo solo lectura
-                            </span>
+                        <div class="d-flex align-items-center">
+                            <div class="me-3">
+                                @php
+                                    $verificado = $ingreso->verificado ?? 1;
+                                    if($verificado == 1) {
+                                        echo '<span class="status-badge status-pendiente">Pendiente</span>';
+                                    } elseif($verificado == 0) {
+                                        echo '<span class="status-badge status-rechazado">Rechazado</span>';
+                                    } elseif($verificado == 2) {
+                                        echo '<span class="status-badge status-aprobado">Aprobado</span>';
+                                    }
+                                @endphp
+                            </div>
+                            
+                            
                         </div>
                     </div>
                 </div>
                 
-                <!-- Formulario de solo lectura -->
+                <!-- Formulario de visualización -->
                 <div class="card card-formulario">
                     <div class="card-header card-header-form">
                         <h5 class="mb-0">
                             <i class="fas fa-eye me-2 text-primary"></i>
-                            Información del Ingreso
+                            Detalle del Ingreso
                         </h5>
                     </div>
                     <div class="card-body">
-                        
                         <!-- Sección 1: Información del Contrato -->
                         <div class="form-section">
                             <h5 class="section-title">
@@ -250,51 +170,52 @@
                                 Información del Contrato
                             </h5>
                             
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <div class="info-label">Contrato</div>
-                                    <p class="info-text">
-                                        @if($contrato)
-                                            <strong>{{ $contrato->contrato_no ?? 'N/A' }}</strong>
-                                            <br>
-                                            <span class="text-muted" style="font-size: 0.9rem;">
-                                                {{ $contrato->obra ?? '' }}
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Contrato</label>
+                                        <div class="info-display">
+                                            @if($contrato)
+                                                <strong>{{ $contrato->contrato_no ?? 'N/A' }}</strong> - {{ $contrato->obra ?? '' }}
                                                 <br>
-                                                Cliente: {{ $contrato->cliente ?? 'Sin cliente' }}
-                                            </span>
-                                        @else
-                                            <span class="text-danger">Contrato no encontrado</span>
-                                        @endif
-                                    </p>
+                                                <small class="text-muted">Cliente: {{ $contrato->cliente ?? 'Sin cliente' }}</small>
+                                            @else
+                                                <span class="text-danger">Contrato no encontrado</span>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Sección 2: Información Básica -->
+                        <!-- Sección 2: Información Básica del Ingreso -->
                         <div class="form-section">
                             <h5 class="section-title">
                                 <i class="fas fa-info-circle me-2"></i>
                                 Información Básica
                             </h5>
-                            
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <div class="info-label">Estimación No.</div>
-                                    <p class="info-text info-value">{{ $ingreso->no_estimacion ?? 'N/A' }}</p>
+                          
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Estimación No.</label>
+                                        <div class="info-display">
+                                            {{ $ingreso->no_estimacion ?? 'No especificado' }}
+                                        </div>
+                                    </div>
                                 </div>
                                 
-                                <div class="info-item">
-                                    <div class="info-label">Periodo Del</div>
-                                    <p class="info-text info-value">
-                                        {{ $ingreso->periodo_del ? date('d/m/Y', strtotime($ingreso->periodo_del)) : 'No especificado' }}
-                                    </p>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-label">Periodo Al</div>
-                                    <p class="info-text info-value">
-                                        {{ $ingreso->periodo_al ? date('d/m/Y', strtotime($ingreso->periodo_al)) : 'No especificado' }}
-                                    </p>
+                                <div class="col-md-6">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Periodo</label>
+                                        <div class="info-display">
+                                            @if($ingreso->periodo_del && $ingreso->periodo_al)
+                                                Del {{ $ingreso->periodo_del->format('d/m/Y') }} al {{ $ingreso->periodo_al->format('d/m/Y') }}
+                                            @else
+                                                No especificado
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -306,213 +227,356 @@
                                 Montos de la Estimación
                             </h5>
                             
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <div class="info-label">Importe de Estimación</div>
-                                    <p class="info-text info-value monto">${{ number_format($ingreso->importe_estimacion ?? 0, 2) }}</p>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Importe de Estimación</label>
+                                        <div class="info-display">
+                                            ${{ number_format($ingreso->importe_estimacion ?? 0, 2) }}
+                                        </div>
+                                    </div>
                                 </div>
                                 
-                                <div class="info-item">
-                                    <div class="info-label">IVA</div>
-                                    <p class="info-text info-value monto">${{ number_format($ingreso->iva ?? 0, 2) }}</p>
+                                <div class="col-md-2">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">IVA</label>
+                                        <div class="info-display">
+                                            {{ number_format($ingreso->iva ?? 0, 2) }}%
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Importe IVA</label>
+                                        <div class="info-display">
+                                            ${{ number_format($ingreso->importe_iva ?? 0, 2) }}
+                                        </div>
+                                    </div>
                                 </div>
                                 
-                                <div class="info-item">
-                                    <div class="info-label">Total con IVA</div>
-                                    <p class="info-text info-value monto">${{ number_format($ingreso->total_estimacion_con_iva ?? 0, 2) }}</p>
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Total Estimación con IVA</label>
+                                        <div class="info-display">
+                                            ${{ number_format($ingreso->total_estimacion_con_iva ?? 0, 2) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">2.0% SICV - COP</label>
+                                        <div class="info-display">
+                                            ${{ number_format($ingreso->sicv_cop ?? 0, 2) }}
+                                        </div>
+                                    </div>
                                 </div>
                                 
-                                <div class="info-item">
-                                    <div class="info-label">Retenciones/Sanciones</div>
-                                    <p class="info-text info-value">${{ number_format($ingreso->retenciones_o_sanciones ?? 0, 2) }}</p>
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">1.5% SRCOP - CDMX</label>
+                                        <div class="info-display">
+                                            ${{ number_format($ingreso->srcop_cdmx ?? 0, 2) }}
+                                        </div>
+                                    </div>
                                 </div>
                                 
-                                <div class="info-item">
-                                    <div class="info-label">Estimado - Deducciones</div>
-                                    <p class="info-text info-value monto">${{ number_format($ingreso->estimado_menos_deducciones ?? 0, 2) }}</p>
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Retención 5 al Millar</label>
+                                        <div class="info-display">
+                                            ${{ number_format($ingreso->retencion_5_al_millar ?? 0, 2) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Sanción Atraso Presentación</label>
+                                        <div class="info-display">
+                                            ${{ number_format($ingreso->sancion_atrazo_presentacion_estimacion ?? 0, 2) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Sanción Atraso de Obra</label>
+                                        <div class="info-display">
+                                            ${{ number_format($ingreso->sancion_atraso_de_obra ?? 0, 2) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Sanción por Obra Mal Ejecutada</label>
+                                        <div class="info-display">
+                                            ${{ number_format($ingreso->sancion_por_obra_mal_ejecutada ?? 0, 2) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Retención por Atraso</label>
+                                        <div class="info-display">
+                                            ${{ number_format($ingreso->retencion_por_atraso_en_programa_obra ?? 0, 2) }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <!-- Vacío -->
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Total Retenciones/Sanciones</label>
+                                        <div class="info-display">
+                                            ${{ number_format($ingreso->retenciones_o_sanciones ?? 0, 2) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+                            
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Amortización Anticipo</label>
+                                        <div class="info-display">
+                                            ${{ number_format($ingreso->amortizacion_anticipo ?? 0, 2) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Amortización I.V.A.</label>
+                                        <div class="info-display">
+                                            ${{ number_format($ingreso->amortizacion_iva ?? 0, 2) }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Total Amortización</label>
+                                        <div class="info-display">
+                                            ${{ number_format($ingreso->total_amortizacion ?? 0, 2) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+                            
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <!-- Vacío -->
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <!-- Vacío -->
+                                </div>
+                               
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Líquido a Cobrar</label>
+                                        <div class="info-display fw-bold text-primary">
+                                            ${{ number_format($ingreso->estimado_menos_deducciones ?? 0, 2) }}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Sección 4: Facturación -->
+                        <!-- SECCIÓN 4: FACTURACIÓN -->
                         <div class="form-section">
                             <h5 class="section-title">
                                 <i class="fas fa-file-invoice-dollar me-2"></i>
                                 Facturación
                             </h5>
+                                
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Factura</label>
+                                        <div class="info-display">
+                                            {{ $ingreso->factura ?? 'No facturado' }}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Fecha Factura</label>
+                                        <div class="info-display">
+                                            {{ $ingreso->fecha_factura ? $ingreso->fecha_factura->format('d/m/Y') : 'No especificada' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <div class="info-label">Factura</div>
-                                    <p class="info-text info-value">{{ $ingreso->factura ?? 'No especificado' }}</p>
+                            <!-- RESUMEN DE MONTOS DE LA ESTIMACIÓN -->
+                            <div class="resumen-montos mt-3">
+                                <h6 class="fw-bold mb-3"><i class="fas fa-calculator me-2"></i>Montos de la Estimación</h6>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <small class="text-muted d-block">Importe Estimación</small>
+                                        <strong>${{ number_format($ingreso->importe_estimacion ?? 0, 2) }}</strong>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <small class="text-muted d-block">IVA %</small>
+                                        <strong>{{ number_format($ingreso->iva ?? 0, 2) }}%</strong>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <small class="text-muted d-block">Importe IVA</small>
+                                        <strong>${{ number_format($ingreso->importe_iva ?? 0, 2) }}</strong>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <small class="text-muted d-block">Total con IVA</small>
+                                        <strong>${{ number_format($ingreso->total_estimacion_con_iva ?? 0, 2) }}</strong>
+                                    </div>
                                 </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-label">Fecha Factura</div>
-                                    <p class="info-text info-value">
-                                        {{ $ingreso->fecha_factura ? date('d/m/Y', strtotime($ingreso->fecha_factura)) : 'No especificado' }}
-                                    </p>
+                                <hr class="my-2">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <small class="text-muted d-block">SICV - COP (2%)</small>
+                                        <strong>${{ number_format($ingreso->sicv_cop ?? 0, 2) }}</strong>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <small class="text-muted d-block">SRCOP - CDMX (1.5%)</small>
+                                        <strong>${{ number_format($ingreso->srcop_cdmx ?? 0, 2) }}</strong>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <small class="text-muted d-block">Ret. 5 al Millar</small>
+                                        <strong>${{ number_format($ingreso->retencion_5_al_millar ?? 0, 2) }}</strong>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <small class="text-muted d-block">Total Ret/Sanc</small>
+                                        <strong>${{ number_format($ingreso->retenciones_o_sanciones ?? 0, 2) }}</strong>
+                                    </div>
                                 </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-label">Importe Facturado</div>
-                                    <p class="info-text info-value monto">${{ number_format($ingreso->importe_facturado ?? 0, 2) }}</p>
+                                <div class="row mt-2">
+                                    <div class="col-md-3">
+                                        <small class="text-muted d-block">Amort. Anticipo</small>
+                                        <strong>${{ number_format($ingreso->amortizacion_anticipo ?? 0, 2) }}</strong>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <small class="text-muted d-block">Amort. IVA</small>
+                                        <strong>${{ number_format($ingreso->amortizacion_iva ?? 0, 2) }}</strong>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <small class="text-muted d-block">Total Amort.</small>
+                                        <strong>${{ number_format($ingreso->total_amortizacion ?? 0, 2) }}</strong>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <small class="text-muted d-block">Líquido a Cobrar</small>
+                                        <strong class="text-primary">${{ number_format($ingreso->estimado_menos_deducciones ?? 0, 2) }}</strong>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Sección 5: Deducciones Específicas -->
-                        <div class="form-section">
-                            <h5 class="section-title">
-                                <i class="fas fa-minus-circle me-2"></i>
-                                Deducciones Específicas
-                            </h5>
-                            
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <div class="info-label">3.5% Cargos Adicionales</div>
-                                    <p class="info-text info-value">${{ number_format($ingreso->cargos_adicionales_3_5 ?? 0, 2) }}</p>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-label">Retención 5 al Millar</div>
-                                    <p class="info-text info-value">${{ number_format($ingreso->retencion_5_al_millar ?? 0, 2) }}</p>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-label">Sanción Atraso Presentación</div>
-                                    <p class="info-text info-value">${{ number_format($ingreso->sancion_atrazo_presentacion_estimacion ?? 0, 2) }}</p>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-label">Sanción Atraso de Obra</div>
-                                    <p class="info-text info-value">${{ number_format($ingreso->sancion_atraso_de_obra ?? 0, 2) }}</p>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-label">Sanción Obra Mal Ejecutada</div>
-                                    <p class="info-text info-value">${{ number_format($ingreso->sancion_por_obra_mal_ejecutada ?? 0, 2) }}</p>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-label">Retención Atraso Programa</div>
-                                    <p class="info-text info-value">${{ number_format($ingreso->retencion_por_atraso_en_programa_obra ?? 0, 2) }}</p>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-label">Amortización Anticipo</div>
-                                    <p class="info-text info-value">${{ number_format($ingreso->amortizacion_anticipo ?? 0, 2) }}</p>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-label">Amortización con IVA</div>
-                                    <p class="info-text info-value">${{ number_format($ingreso->amortizacion_con_iva ?? 0, 2) }}</p>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-label">Total Deducciones</div>
-                                    <p class="info-text info-value monto">${{ number_format($ingreso->total_deducciones ?? 0, 2) }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Sección 6: Cobros -->
+                        <!-- SECCIÓN 5: COBROS -->
                         <div class="form-section">
                             <h5 class="section-title">
                                 <i class="fas fa-money-bill-wave me-2"></i>
                                 Cobros
                             </h5>
                             
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <div class="info-label">Líquido a Cobrar</div>
-                                    <p class="info-text info-value monto">${{ number_format($ingreso->liquido_a_cobrar ?? 0, 2) }}</p>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Líquido a Cobrar</label>
+                                        <div class="info-display">
+                                            ${{ number_format($ingreso->estimado_menos_deducciones ?? 0, 2) }}
+                                        </div>
+                                    </div>
                                 </div>
                                 
-                                <div class="info-item">
-                                    <div class="info-label">Líquido Cobrado</div>
-                                    <p class="info-text info-value monto">${{ number_format($ingreso->liquido_cobrado ?? 0, 2) }}</p>
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Líquido Cobrado</label>
+                                        <div class="info-display">
+                                            ${{ number_format($ingreso->liquido_cobrado ?? 0, 2) }}
+                                        </div>
+                                    </div>
                                 </div>
                                 
-                                <div class="info-item">
-                                    <div class="info-label">Fecha Cobro</div>
-                                    <p class="info-text info-value">
-                                        {{ $ingreso->fecha_cobro ? date('d/m/Y', strtotime($ingreso->fecha_cobro)) : 'No especificado' }}
-                                    </p>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-label">POR COBRAR</div>
-                                    <p class="info-text info-value">${{ number_format($ingreso->por_cobrar ?? 0, 2) }}</p>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-label">POR FACTURAR</div>
-                                    <p class="info-text info-value">${{ number_format($ingreso->por_facturar ?? 0, 2) }}</p>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-label">Por Estimar</div>
-                                    <p class="info-text info-value">${{ number_format($ingreso->por_estimar ?? 0, 2) }}</p>
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Fecha Cobro</label>
+                                        <div class="info-display">
+                                            {{ $ingreso->fecha_cobro ? $ingreso->fecha_cobro->format('d/m/Y') : 'No cobrado' }}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <!-- Sección 7: Avance de Obra -->
-                        <div class="form-section">
-                            <h5 class="section-title">
-                                <i class="fas fa-chart-line me-2"></i>
-                                Avance de Obra
-                            </h5>
                             
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <div class="info-label">Avance Obra Estimación (%)</div>
-                                    <p class="info-text info-value">{{ number_format($ingreso->avance_obra_estimacion ?? 0, 2) }}%</p>
+                            <div class="row mt-3">
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">POR COBRAR</label>
+                                        <div class="info-display bg-light fw-bold text-danger">
+                                            ${{ number_format($ingreso->por_cobrar ?? 0, 2) }}
+                                        </div>
+                                        <small class="help-text">Líquido a cobrar - Líquido cobrado</small>
+                                    </div>
                                 </div>
                                 
-                                <div class="info-item">
-                                    <div class="info-label">Avance Obra Real (%)</div>
-                                    <p class="info-text info-value">{{ number_format($ingreso->avance_obra_real ?? 0, 2) }}%</p>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-label">% Avance Financiero</div>
-                                    <p class="info-text info-value">{{ number_format($ingreso->porcentaje_avance_financiero ?? 0, 2) }}%</p>
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">POR FACTURAR</label>
+                                        <div class="info-display bg-light fw-bold text-info">
+                                            ${{ number_format($ingreso->por_facturar ?? 0, 2) }}
+                                        </div>
+                                        <small class="help-text">Del monto total del contrato menos lo facturado</small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         
-                        <!-- Sección 8: Estado -->
+                        <!-- Sección 6: Estado -->
                         <div class="form-section">
                             <h5 class="section-title">
                                 <i class="fas fa-info-circle me-2"></i>
                                 Estado
                             </h5>
                             
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <div class="info-label">Status</div>
-                                    <p class="info-text info-value">{{ ucfirst($ingreso->status ?? 'No especificado') }}</p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Status</label>
+                                        <div class="info-display">
+                                            @if($ingreso->status == 'pagado')
+                                                <span class=" ">Pagado</span>
+                                            @elseif($ingreso->status == 'en_tramite')
+                                                <span class=" ">En Trámite</span>
+                                            @else
+                                                No especificado
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-label">Fecha Creación</div>
-                                    <p class="info-text info-value">
-                                        {{ $ingreso->created_at ? date('d/m/Y H:i', strtotime($ingreso->created_at)) : 'No especificado' }}
-                                    </p>
-                                </div>
-                            </div>
+                            </div>                            
                         </div>
-                        
-                        <!-- Botones de acción -->
-                        <div class="d-flex justify-content-between pt-3 border-top">
-                            <a href="{{ route('aingresos.index') }}" class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-left me-1"></i> Volver al listado
-                            </a>
-                            
+
+                        <div class="row justify-content-end"> 
                             @if($ingreso->verificado == 1)
-                            <div>
+                            <div class="col-auto">
                                 <!-- Botón Rechazar -->
                                 <button type="button" class="btn btn-outline-danger me-2" 
                                         data-bs-toggle="modal" 
@@ -520,23 +584,40 @@
                                     <i class="fas fa-times me-1"></i> Rechazar
                                 </button>
                                 
-                                <!-- Botón Verificar -->
+                                <!-- Botón Aprobar -->
                                 <button type="button" class="btn btn-success" 
                                         data-bs-toggle="modal" 
-                                        data-bs-target="#verificarModal">
-                                    <i class="fas fa-check me-1"></i> Verificar
+                                        data-bs-target="#aprobarModal">
+                                    <i class="fas fa-check me-1"></i> Aprobar
+                                </button>
+                            </div>
+
+                            @elseif($ingreso->verificado == 0 )
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-success" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#aprobarModal">
+                                    <i class="fas fa-check me-1"></i> Aprobar
+                                </button>
+                            </div>
+
+                            @elseif($ingreso->verificado == 2)
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-outline-danger" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#rechazarModal">
+                                    <i class="fas fa-times me-1"></i> Rechazar
                                 </button>
                             </div>
                             @endif
                         </div>
-
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-   <!-- Modal Rechazar -->
+    <!-- Modal Rechazar -->
     <div class="modal fade" id="rechazarModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
@@ -577,27 +658,27 @@
         </div>
     </div>
 
-    <!-- Modal Verificar -->
-    <div class="modal fade" id="verificarModal" tabindex="-1" aria-hidden="true">
+    <!-- Modal Aprobar -->
+    <div class="modal fade" id="aprobarModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header border-0 bg-light">
                     <h5 class="modal-title text-success">
                         <i class="fas fa-check-circle me-2"></i>
-                        Confirmar Verificación
+                        Confirmar Aprobación
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body text-center py-4">
                     <div class="mb-3">
                         <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-                        <h5 class="mb-2">¿Verificar este ingreso?</h5>
+                        <h5 class="mb-2">¿Aprobar este ingreso?</h5>
                         <p class="text-muted mb-0">
                             Estimación: <strong>{{ $ingreso->no_estimacion ?? 'N/A' }}</strong>
                         </p>
                         <p class="text-success small mt-2">
                             <i class="fas fa-info-circle me-1"></i>
-                            El estado cambiará a "Verificado"
+                            El estado cambiará a "Aprobado"
                         </p>
                     </div>
                 </div>
@@ -610,7 +691,7 @@
                         @method('PUT')
                         <input type="hidden" name="verificado" value="2">
                         <button type="submit" class="btn btn-success">
-                            <i class="fas fa-check me-1"></i> Sí, Verificar
+                            <i class="fas fa-check me-1"></i> Sí, Aprobar
                         </button>
                     </form>
                 </div>

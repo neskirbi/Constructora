@@ -411,7 +411,7 @@
                                         <div class="info-item">
                                             <div class="info-label">Importe Facturado</div>
                                             <div class="info-value">
-                                                ${{ number_format($ingreso->importe_facturado ?? 0, 2) }}
+                                                ${{ number_format($ingreso->estimado_menos_deducciones ?? 0, 2) }}
                                             </div>
                                         </div>
                                     </div>

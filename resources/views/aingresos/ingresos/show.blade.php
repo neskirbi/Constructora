@@ -206,26 +206,28 @@
                         <h1 class="h3 mb-1 text-gray-800">Ingreso</h1>
                     </div>
                     <div>
-                        <a href="{{ url('ingresos.index') }}" class="btn btn-outline-secondary">
+                        <a href="{{ url('ingresos') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left me-1"></i> Regresar
                         </a>
                     </div>
                 </div>
                 
                 <!-- Información del estado -->
-                <div class="alert alert-info mb-4">
+               <div class="alert alert-info mb-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <i class="fas fa-info-circle me-2"></i>
-                            Estado de verificación: 
+                            Estado de verificación:
+                        </div>
+                        <div>
                             @php
                                 $verificado = $ingreso->verificado ?? 1;
                                 if($verificado == 1) {
-                                    echo '<span class="status-badge status-pendiente ms-2">Pendiente (1)</span>';
+                                    echo '<span class="status-badge status-pendiente">Pendiente</span>';
                                 } elseif($verificado == 0) {
-                                    echo '<span class="status-badge status-rechazado ms-2">Rechazado (0)</span>';
+                                    echo '<span class="status-badge status-rechazado">Rechazado</span>';
                                 } elseif($verificado == 2) {
-                                    echo '<span class="status-badge status-aprobado ms-2">Aprobado (2)</span>';
+                                    echo '<span class="status-badge status-aprobado">Aprobado</span>';
                                 }
                             @endphp
                         </div>
@@ -390,7 +392,8 @@
                                                    value="{{ old('importe_iva', $ingreso->importe_iva) }}"
                                                    step="0.01"
                                                    placeholder="0.00"
-                                                   min="0">
+                                                   min="0"
+                                                   readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -698,7 +701,7 @@
                              <!-- Botón guardar facturación -->
                             <div class="text-end mt-3">
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save me-1"></i> Guardar Informacion
+                                    <i class="fas fa-save me-1"></i> Actualizar Información
                                 </button>
                             </div>
                             
@@ -825,11 +828,11 @@
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
-                                                <input type="text" 
-                                                       class="form-control form-control-custom bg-light fw-bold" 
-                                                       id="liquido_a_cobrar_display" 
-                                                       value="${{ number_format($ingreso->estimado_menos_deducciones ?? $ingreso->estimado_menos_deducciones ?? 0, 2) }}"
-                                                       readonly>
+                                                <input type="number" 
+                                                    class="form-control form-control-custom numeric-input" 
+                                                    id="liquido_a_cobrar_display" 
+                                                   value="{{ old('estimado_menos_deducciones', $ingreso->estimado_menos_deducciones) }}"
+                                                    readonly>
                                             </div>
                                         </div>
                                     </div>
@@ -937,7 +940,7 @@
                             <!-- Botón guardar cobros -->
                             <div class="text-end mt-3">
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save me-1"></i> Guardar Cobros
+                                    <i class="fas fa-save me-1"></i> Actualizar Facturación
                                 </button>
                                 
                             </div>
@@ -945,20 +948,7 @@
                         </div>
                          </form>
                         <!-- Botones de acción generales (opcional) -->
-                        <div class="form-actions">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <small class="text-muted">
-                                       Los campos marcados con <span class="text-danger">*</span> son obligatorios
-                                    </small>
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <a href="{{ url('ingresos.index') }}" class="btn btn-cancel btn-outline-secondary">
-                                        <i class="fas fa-times me-1"></i> Cancelar
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                        
                     </div>
                 </div>
             </div>

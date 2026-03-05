@@ -73,38 +73,38 @@ class IngresoController extends Controller
     function store(Request $request)
     {
         // Validación de campos
-        $validated = $request->validate([
-            'id_contrato' => 'required|exists:contratos,id',
-            'no_estimacion' => 'required|string|max:255',
-            'periodo_del' => 'nullable|date',
-            'periodo_al' => 'nullable|date|after_or_equal:periodo_del',
-            'factura' => 'nullable|string|max:255',
-            'fecha_factura' => 'nullable|date',
-            'importe_estimacion' => 'nullable|numeric',
-            'iva' => 'nullable|numeric|max:100',
-            'importe_iva' => 'nullable|numeric',
-            'total_estimacion_con_iva' => 'nullable|numeric',
-            'sicv_cop' => 'nullable|numeric',
-            'srcop_cdmx' => 'nullable|numeric',
-            'retencion_5_al_millar' => 'nullable|numeric',
-            'sancion_atrazo_presentacion_estimacion' => 'nullable|numeric',
-            'sancion_atraso_de_obra' => 'nullable|numeric',
-            'sancion_por_obra_mal_ejecutada' => 'nullable|numeric',
-            'retencion_por_atraso_en_programa_obra' => 'nullable|numeric',
-            'retenciones_o_sanciones' => 'nullable|numeric',
-            'amortizacion_anticipo' => 'nullable|numeric',
-            'amortizacion_iva' => 'nullable|numeric',
-            'total_amortizacion' => 'nullable|numeric',
-            'estimado_menos_deducciones' => 'nullable|numeric',
-            'status' => 'nullable|string|in:pagado,en_tramite',
-        ]);
+        $ingreso = new Ingreso(); // o el modelo que corresponda
+        $ingreso->id = GetUuid();
+        $ingreso->id_usuario = GetId();
+
+        $ingreso->id_contrato = $request->id_contrato;
+        $ingreso->no_estimacion = $request->no_estimacion;
+        $ingreso->periodo_del = $request->periodo_del;
+        $ingreso->periodo_al = $request->periodo_al;
+        $ingreso->factura = $request->factura;
+        $ingreso->fecha_factura = $request->fecha_factura;
+        $ingreso->importe_estimacion = $request->importe_estimacion ?? 0;
+        $ingreso->iva = $request->iva ?? 0;
+        $ingreso->importe_iva = $request->importe_iva ?? 0;
+        $ingreso->total_estimacion_con_iva = $request->total_estimacion_con_iva ?? 0;
         
-        // Generar ID único usando la función helper GetUuid()
-        $validated['id'] = GetUuid();
-        $validated['id_usuario'] = GetId();
+        $ingreso->sicv_cop = $request->sicv_cop ?? 0;
+        $ingreso->srcop_cdmx = $request->srcop_cdmx ?? 0;
+        $ingreso->retencion_5_al_millar = $request->retencion_5_al_millar ?? 0;
+        $ingreso->sancion_atrazo_presentacion_estimacion = $request->sancion_atrazo_presentacion_estimacion ?? 0;
+        $ingreso->sancion_atraso_de_obra = $request->sancion_atraso_de_obra ?? 0;
+        $ingreso->sancion_por_obra_mal_ejecutada = $request->sancion_por_obra_mal_ejecutada ?? 0;
+        $ingreso->retencion_por_atraso_en_programa_obra = $request->retencion_por_atraso_en_programa_obra ?? 0;
+        $ingreso->retenciones_o_sanciones = $request->retenciones_o_sanciones ?? 0;
+        $ingreso->amortizacion_anticipo = $request->amortizacion_anticipo ?? 0;
+        $ingreso->amortizacion_iva = $request->amortizacion_iva ?? 0;
+        $ingreso->total_amortizacion = $request->total_amortizacion ?? 0;
+        $ingreso->estimado_menos_deducciones = $request->estimado_menos_deducciones ?? 0;
+        $ingreso->liquido_a_cobrar = $request->estimado_menos_deducciones ?? 0;
+        $ingreso->status = $request->status ?? 'en_tramite';
+
+        $ingreso->save();
         
-        // Crear el ingreso
-        $ingreso = Ingreso::create($validated);
         
         return redirect('ingresos.index')
             ->with('success', 'Ingreso creado exitosamente.');
@@ -154,7 +154,10 @@ public function update(Request $request, $id)
         $ingreso->importe_estimacion = $request->importe_estimacion ?? 0;
         $ingreso->iva = $request->iva ?? 0;
         $ingreso->importe_iva = $request->importe_iva ?? 0;
-        $ingreso->total_estimacion_con_iva = $request->total_estimacion_con_iva ?? 0;
+        
+        $ingreso->total_estimacion_con_iva = $request->total_estimacion_con_iva ?? 0;        
+        
+
         $ingreso->sicv_cop = $request->sicv_cop ?? 0;
         $ingreso->srcop_cdmx = $request->srcop_cdmx ?? 0;
         $ingreso->retencion_5_al_millar = $request->retencion_5_al_millar ?? 0;
@@ -167,6 +170,7 @@ public function update(Request $request, $id)
         $ingreso->amortizacion_iva = $request->amortizacion_iva ?? 0;
         $ingreso->total_amortizacion = $request->total_amortizacion ?? 0;
         $ingreso->estimado_menos_deducciones = $request->estimado_menos_deducciones ?? 0;
+        $ingreso->liquido_a_cobrar = $request->estimado_menos_deducciones ?? 0;
         
         // Guardar
         $ingreso->save();
@@ -199,7 +203,6 @@ public function updateFacturacion(Request $request, $id)
         'liquido_cobrado' => 'nullable|numeric|min:0',
         'fecha_cobro' => 'nullable|date',
         'por_cobrar' => 'nullable|numeric',
-        'por_facturar' => 'nullable|numeric',
     ]);
     
     // Recalcular por_cobrar si viene líquido_cobrado
