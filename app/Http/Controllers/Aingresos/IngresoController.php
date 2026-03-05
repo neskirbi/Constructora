@@ -56,13 +56,13 @@ class IngresoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    function create()
-    {
-        // Obtener contratos para el select
-        $contratos = Contrato::orderBy('contrato_no', 'asc')->get();
-        
-        return view('aingresos.ingresos.create', compact('contratos'));
-    }
+   function create()
+{
+    // Obtener contratos para el select
+    $contratos = Contrato::orderBy('contrato_no', 'asc')->get();
+    
+    return view('aingresos.ingresos.create', compact('contratos'));
+}
 
     /**
      * Store a newly created resource in storage.
@@ -263,6 +263,32 @@ public function updateFacturacion(Request $request, $id)
             ]
         ]);
     }
+
+
+    /**
+ * Obtener el último ingreso de un contrato para AJAX.
+ *
+ * @param  string  $id
+ * @return \Illuminate\Http\Response
+ */
+public function getUltimoIngreso($id)
+{
+    $ultimoIngreso = Ingreso::where('id_contrato', $id)
+                            ->orderBy('created_at', 'desc')
+                            ->first();
+    
+    if ($ultimoIngreso) {
+        return response()->json([
+            'success' => true,
+            'data' => $ultimoIngreso
+        ]);
+    }
+    
+    return response()->json([
+        'success' => false,
+        'message' => 'No hay ingresos previos para este contrato'
+    ]);
+}
 
     
 }

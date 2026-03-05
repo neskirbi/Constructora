@@ -129,6 +129,8 @@ Route::resource('ingresos', 'App\Http\Controllers\Aingresos\IngresoController')
     ->middleware(['auth:aingresos']);
 Route::put('/ingresos/{id}/facturacion', [App\Http\Controllers\Aingresos\IngresoController::class, 'updateFacturacion'])
     ->name('ingresos.update.facturacion') ->middleware(['auth:aingresos']);
+    Route::get('/ingresos/ultimo/{id}', [App\Http\Controllers\Aingresos\IngresoController::class, 'getUltimoIngreso'])
+    ->name('ingresos.ultimo');
     
 
 

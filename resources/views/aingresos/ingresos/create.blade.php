@@ -128,6 +128,15 @@
                 padding: 1rem;
             }
         }
+        
+        .ultimo-ingreso-badge {
+            background-color: #fff3cd;
+            border: 1px solid #ffe69c;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            color: #856404;
+        }
     </style>
 </head>
 <body>
@@ -153,6 +162,8 @@
                         </a>
                     </div>
                 </div>
+                
+                
                 
                 <!-- Formulario de creación -->
                 <div class="card card-formulario">
@@ -186,7 +197,8 @@
                                                     required>
                                                 <option value="">Seleccionar contrato...</option>
                                                 @foreach($contratos as $contrato)
-                                                <option value="{{ $contrato->id }}" {{ old('id_contrato') == $contrato->id ? 'selected' : '' }}>
+                                                <option value="{{ $contrato->id }}" 
+                                                    {{ old('id_contrato', $ultimoIngreso->id_contrato ?? '') == $contrato->id ? 'selected' : '' }}>
                                                     {{ $contrato->contrato_no }} - {{ Str::limit($contrato->obra, 50) }}
                                                 </option>
                                                 @endforeach
@@ -208,7 +220,7 @@
                                                    class="form-control form-control-custom" 
                                                    id="no_estimacion" 
                                                    name="no_estimacion" 
-                                                   value="{{ old('no_estimacion') }}"
+                                                   value="{{ old('no_estimacion', $ultimoIngreso->no_estimacion ?? '') }}"
                                                    placeholder="Ej: EST-001"
                                                    required>
                                             @error('no_estimacion')
@@ -226,7 +238,7 @@
                                                    class="form-control form-control-custom" 
                                                    id="periodo_del" 
                                                    name="periodo_del" 
-                                                   value="{{ old('periodo_del') }}">
+                                                   value="{{ old('periodo_del', $ultimoIngreso->periodo_del ?? '') }}">
                                         </div>
                                     </div>
                                 </div>
@@ -241,7 +253,7 @@
                                                    class="form-control form-control-custom" 
                                                    id="periodo_al" 
                                                    name="periodo_al" 
-                                                   value="{{ old('periodo_al') }}">
+                                                   value="{{ old('periodo_al', $ultimoIngreso->periodo_al ?? '') }}">
                                         </div>
                                     </div>
                                 </div>
@@ -266,7 +278,7 @@
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="importe_estimacion" 
                                                        name="importe_estimacion" 
-                                                       value="{{ old('importe_estimacion') }}"
+                                                       value="{{ old('importe_estimacion', $ultimoIngreso->importe_estimacion ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -285,7 +297,7 @@
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="iva" 
                                                        name="iva" 
-                                                       value="{{ old('iva') }}"
+                                                       value="{{ old('iva', $ultimoIngreso->iva ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0"
@@ -296,7 +308,7 @@
 
                                     <div class="col-md-3">
                                         <div class="form-group-custom">
-                                            <label for="importe_estimacion" class="form-label-custom">
+                                            <label for="importe_iva" class="form-label-custom">
                                                 Importe IVA
                                             </label>
                                             <div class="input-group input-group-custom">
@@ -305,7 +317,7 @@
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="importe_iva" 
                                                        name="importe_iva" 
-                                                       value="{{ old('importe_iva') }}"
+                                                       value="{{ old('importe_iva', $ultimoIngreso->importe_iva ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -324,7 +336,7 @@
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="total_estimacion_con_iva" 
                                                        name="total_estimacion_con_iva" 
-                                                       value="{{ old('total_estimacion_con_iva') }}"
+                                                       value="{{ old('total_estimacion_con_iva', $ultimoIngreso->total_estimacion_con_iva ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0"
@@ -337,7 +349,7 @@
                                 <!-- Separador 1 -->
                                 <hr class="my-4">
 
-                                 <div class="row">
+                                <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
                                             <div class="d-flex justify-content-between align-items-center">
@@ -345,7 +357,8 @@
                                                     2.0% SICV - COP
                                                 </label>
                                                 <div class="form-check mb-0">
-                                                    <input class="form-check-input" type="checkbox" id="aplicar_sicv">
+                                                    <input class="form-check-input" type="checkbox" id="aplicar_sicv" 
+                                                        {{ ($ultimoIngreso->sicv_cop ?? 0) > 0 ? 'checked' : '' }}>
                                                     <label class="form-check-label small" for="aplicar_sicv">
                                                         Aplicar
                                                     </label>
@@ -357,7 +370,7 @@
                                                     class="form-control form-control-custom numeric-input" 
                                                     id="sicv_cop" 
                                                     name="sicv_cop" 
-                                                    value="{{ old('sicv_cop') }}"
+                                                    value="{{ old('sicv_cop', $ultimoIngreso->sicv_cop ?? 0) }}"
                                                     step="0.01"
                                                     placeholder="0.00"
                                                     min="0" readonly>
@@ -372,7 +385,8 @@
                                                     1.5% SRCOP - CDMX
                                                 </label>
                                                 <div class="form-check mb-0">
-                                                    <input class="form-check-input" type="checkbox" id="aplicar_srcop">
+                                                    <input class="form-check-input" type="checkbox" id="aplicar_srcop"
+                                                        {{ ($ultimoIngreso->srcop_cdmx ?? 0) > 0 ? 'checked' : '' }}>
                                                     <label class="form-check-label small" for="aplicar_srcop">
                                                         Aplicar
                                                     </label>
@@ -384,7 +398,7 @@
                                                     class="form-control form-control-custom numeric-input" 
                                                     id="srcop_cdmx" 
                                                     name="srcop_cdmx" 
-                                                    value="{{ old('srcop_cdmx') }}"
+                                                    value="{{ old('srcop_cdmx', $ultimoIngreso->srcop_cdmx ?? 0) }}"
                                                     step="0.01"
                                                     placeholder="0.00"
                                                     min="0" readonly>
@@ -405,7 +419,7 @@
                                                     class="form-control form-control-custom numeric-input" 
                                                     id="retencion_5_al_millar" 
                                                     name="retencion_5_al_millar" 
-                                                    value="{{ old('retencion_5_al_millar') }}"
+                                                    value="{{ old('retencion_5_al_millar', $ultimoIngreso->retencion_5_al_millar ?? 0) }}"
                                                     step="0.01"
                                                     placeholder="0.00"
                                                     min="0">
@@ -426,7 +440,7 @@
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="sancion_atrazo_presentacion_estimacion" 
                                                        name="sancion_atrazo_presentacion_estimacion" 
-                                                       value="{{ old('sancion_atrazo_presentacion_estimacion') }}"
+                                                       value="{{ old('sancion_atrazo_presentacion_estimacion', $ultimoIngreso->sancion_atrazo_presentacion_estimacion ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -445,7 +459,7 @@
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="sancion_atraso_de_obra" 
                                                        name="sancion_atraso_de_obra" 
-                                                       value="{{ old('sancion_atraso_de_obra') }}"
+                                                       value="{{ old('sancion_atraso_de_obra', $ultimoIngreso->sancion_atraso_de_obra ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -464,7 +478,7 @@
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="sancion_por_obra_mal_ejecutada" 
                                                        name="sancion_por_obra_mal_ejecutada" 
-                                                       value="{{ old('sancion_por_obra_mal_ejecutada') }}"
+                                                       value="{{ old('sancion_por_obra_mal_ejecutada', $ultimoIngreso->sancion_por_obra_mal_ejecutada ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -485,7 +499,7 @@
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="retencion_por_atraso_en_programa_obra" 
                                                        name="retencion_por_atraso_en_programa_obra" 
-                                                       value="{{ old('retencion_por_atraso_en_programa_obra') }}"
+                                                       value="{{ old('retencion_por_atraso_en_programa_obra', $ultimoIngreso->retencion_por_atraso_en_programa_obra ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -508,7 +522,7 @@
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="retenciones_o_sanciones" 
                                                        name="retenciones_o_sanciones" 
-                                                       value="{{ old('retenciones_o_sanciones') }}"
+                                                       value="{{ old('retenciones_o_sanciones', $ultimoIngreso->retenciones_o_sanciones ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0"
@@ -533,7 +547,7 @@
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="amortizacion_anticipo" 
                                                        name="amortizacion_anticipo" 
-                                                       value="{{ old('amortizacion_anticipo') }}"
+                                                       value="{{ old('amortizacion_anticipo', $ultimoIngreso->amortizacion_anticipo ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -552,7 +566,7 @@
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="amortizacion_iva" 
                                                        name="amortizacion_iva" 
-                                                       value="{{ old('amortizacion_iva') }}"
+                                                       value="{{ old('amortizacion_iva', $ultimoIngreso->amortizacion_iva ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -571,7 +585,7 @@
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="total_amortizacion" 
                                                        name="total_amortizacion" 
-                                                       value="{{ old('total_amortizacion') }}"
+                                                       value="{{ old('total_amortizacion', $ultimoIngreso->total_amortizacion ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0"
@@ -605,7 +619,7 @@
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="estimado_menos_deducciones" 
                                                        name="estimado_menos_deducciones" 
-                                                       value="{{ old('estimado_menos_deducciones') }}"
+                                                       value="{{ old('estimado_menos_deducciones', $ultimoIngreso->estimado_menos_deducciones ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        readonly>
@@ -614,8 +628,6 @@
                                     </div>
                                 </div>
                             </div>
-                            
-                            
                             
                             <!-- Sección 7: Estado -->
                             <div class="form-section">
@@ -635,8 +647,8 @@
                                                     name="status" 
                                                     readonly>
                                                 <option value="">Seleccionar status...</option>
-                                                <option value="pagado" {{ old('status') == 'pagado' ? 'selected' : '' }}>Pagado</option>
-                                                <option value="en_tramite" {{ old('status') == 'en_tramite' ? 'selected' : 'selected' }}>En Trámite</option>
+                                                <option value="pagado" {{ old('status', $ultimoIngreso->status ?? 'en_tramite') == 'pagado' ? 'selected' : '' }}>Pagado</option>
+                                                <option value="en_tramite" {{ old('status', $ultimoIngreso->status ?? 'en_tramite') == 'en_tramite' ? 'selected' : '' }}>En Trámite</option>
                                             </select>
                                         </div>
                                     </div>
@@ -849,6 +861,215 @@ $(document).ready(function() {
         calcularTotalAmortizacion();
         calcularEstimadoMenosDeducciones();
     }, 200);
+});
+</script>
+
+<script>
+$(document).ready(function() {
+    
+    // Variable para controlar si ya se cargaron datos iniciales
+    var datosCargados = false;
+    
+    // Evento change del select de contrato
+    $('#id_contrato').on('change', function() {
+        var contratoId = $(this).val();
+        
+        if (contratoId) {
+            // Mostrar indicador de carga
+            Swal.fire({
+                title: 'Cargando...',
+                text: 'Buscando último ingreso del contrato',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            // Petición AJAX
+            $.ajax({
+                url: '{{ route("ingresos.ultimo", "") }}/' + contratoId,
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    Swal.close();
+                    
+                    if (response.success && response.data) {
+                        // Mostrar notificación
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Datos cargados',
+                            text: 'Se cargó la información del último ingreso',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        
+                        // Cargar los datos en el formulario
+                        cargarDatosIngreso(response.data);
+                        datosCargados = true;
+                    } else {
+                        // No hay datos previos, limpiar formulario
+                        limpiarFormulario();
+                        
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Sin datos previos',
+                            text: 'No hay ingresos anteriores para este contrato',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.close();
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudo cargar la información del contrato',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        } else {
+            // Si no hay contrato seleccionado, limpiar formulario
+            limpiarFormulario();
+        }
+    });
+    
+    // Función para cargar datos del ingreso en el formulario
+    function cargarDatosIngreso(data) {
+        // Información básica
+        $('#no_estimacion').val(data.no_estimacion || '');
+        $('#periodo_del').val(data.periodo_del || '');
+        $('#periodo_al').val(data.periodo_al || '');
+        
+        // Montos de estimación
+        $('#importe_estimacion').val(data.importe_estimacion || 0);
+        dispararEventos('#importe_estimacion');
+        
+        $('#iva').val(data.iva || 0);
+        dispararEventos('#iva');
+        
+        $('#importe_iva').val(data.importe_iva || 0);
+        $('#total_estimacion_con_iva').val(data.total_estimacion_con_iva || 0);
+        
+        // SICV y SRCOP (valores y checkboxes)
+        $('#sicv_cop').val(data.sicv_cop || 0);
+        if (parseFloat(data.sicv_cop) > 0) {
+            $('#aplicar_sicv').prop('checked', true);
+            dispararEventos('#aplicar_sicv');
+        } else {
+            $('#aplicar_sicv').prop('checked', false);
+        }
+        
+        $('#srcop_cdmx').val(data.srcop_cdmx || 0);
+        if (parseFloat(data.srcop_cdmx) > 0) {
+            $('#aplicar_srcop').prop('checked', true);
+            dispararEventos('#aplicar_srcop');
+        } else {
+            $('#aplicar_srcop').prop('checked', false);
+        }
+        
+        // Retenciones y sanciones
+        $('#retencion_5_al_millar').val(data.retencion_5_al_millar || 0);
+        dispararEventos('#retencion_5_al_millar');
+        
+        $('#sancion_atrazo_presentacion_estimacion').val(data.sancion_atrazo_presentacion_estimacion || 0);
+        dispararEventos('#sancion_atrazo_presentacion_estimacion');
+        
+        $('#sancion_atraso_de_obra').val(data.sancion_atraso_de_obra || 0);
+        dispararEventos('#sancion_atraso_de_obra');
+        
+        $('#sancion_por_obra_mal_ejecutada').val(data.sancion_por_obra_mal_ejecutada || 0);
+        dispararEventos('#sancion_por_obra_mal_ejecutada');
+        
+        $('#retencion_por_atraso_en_programa_obra').val(data.retencion_por_atraso_en_programa_obra || 0);
+        dispararEventos('#retencion_por_atraso_en_programa_obra');
+        
+        $('#retenciones_o_sanciones').val(data.retenciones_o_sanciones || 0);
+        
+        // Amortizaciones
+        $('#amortizacion_anticipo').val(data.amortizacion_anticipo || 0);
+        dispararEventos('#amortizacion_anticipo');
+        
+        $('#amortizacion_iva').val(data.amortizacion_iva || 0);
+        dispararEventos('#amortizacion_iva');
+        
+        $('#total_amortizacion').val(data.total_amortizacion || 0);
+        
+        // Estimado menos deducciones
+        $('#estimado_menos_deducciones').val(data.estimado_menos_deducciones || 0);
+        
+        // Status
+        $('#status').val(data.status || 'en_tramite');
+    }
+    
+    // Función para limpiar el formulario
+    function limpiarFormulario() {
+        // Información básica
+        $('#no_estimacion').val('');
+        $('#periodo_del').val('');
+        $('#periodo_al').val('');
+        
+        // Montos de estimación
+        $('#importe_estimacion').val(0);
+        dispararEventos('#importe_estimacion');
+        
+        $('#iva').val(0);
+        dispararEventos('#iva');
+        
+        $('#importe_iva').val(0);
+        $('#total_estimacion_con_iva').val(0);
+        
+        // SICV y SRCOP
+        $('#sicv_cop').val(0);
+        $('#aplicar_sicv').prop('checked', false);
+        
+        $('#srcop_cdmx').val(0);
+        $('#aplicar_srcop').prop('checked', false);
+        
+        // Retenciones y sanciones
+        $('#retencion_5_al_millar').val(0);
+        dispararEventos('#retencion_5_al_millar');
+        
+        $('#sancion_atrazo_presentacion_estimacion').val(0);
+        dispararEventos('#sancion_atrazo_presentacion_estimacion');
+        
+        $('#sancion_atraso_de_obra').val(0);
+        dispararEventos('#sancion_atraso_de_obra');
+        
+        $('#sancion_por_obra_mal_ejecutada').val(0);
+        dispararEventos('#sancion_por_obra_mal_ejecutada');
+        
+        $('#retencion_por_atraso_en_programa_obra').val(0);
+        dispararEventos('#retencion_por_atraso_en_programa_obra');
+        
+        $('#retenciones_o_sanciones').val(0);
+        
+        // Amortizaciones
+        $('#amortizacion_anticipo').val(0);
+        dispararEventos('#amortizacion_anticipo');
+        
+        $('#amortizacion_iva').val(0);
+        dispararEventos('#amortizacion_iva');
+        
+        $('#total_amortizacion').val(0);
+        
+        // Estimado menos deducciones
+        $('#estimado_menos_deducciones').val(0);
+        
+        // Status
+        $('#status').val('en_tramite');
+    }
+    
+    // Si hay un contrato preseleccionado (por ejemplo desde la URL), cargar sus datos
+    @if(request()->has('contrato_id'))
+        setTimeout(function() {
+            $('#id_contrato').trigger('change');
+        }, 500);
+    @endif
+    
 });
 </script>
    
