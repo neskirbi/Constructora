@@ -1004,7 +1004,7 @@
                                                             <div class="form-group-custom">
                                                                 <label for="amp_iva" class="form-label-custom required-label">IVA</label>
                                                                 <div class="input-group input-group-custom">
-                                                                    <span class="input-group-text">$</span>
+                                                                    <span class="input-group-text">%</span>
                                                                     <input type="number" class="form-control form-control-custom numeric-input" 
                                                                         id="amp_iva" name="iva" step="0.01" min="0" placeholder="0.00" required>
                                                                 </div>
@@ -1311,23 +1311,33 @@ document.addEventListener('DOMContentLoaded', function() {
     const totalActual = {{ $contrato->total }};
     
     function actualizar() {
-        const s = parseFloat(subtotal.value) || 0;
-        const i = parseFloat(iva.value) || 0;
-        const t = s + i;
+        // Obtener valores (permitir negativos en subtotal)
+        const s = parseFloat(document.getElementById('amp_subtotal').value) || 0;
+        const i = parseFloat(document.getElementById('amp_iva').value) || 0;
+        
+        // Calcular importe del IVA (porcentaje sobre el subtotal)
+        const importeIva = s * (i / 100);
+        
+        // Calcular total = subtotal + importe IVA
+        const t = s + importeIva;
         
         // Actualizar campo total
-        total.value = t.toFixed(2);
+        document.getElementById('amp_total').value = t.toFixed(2);
         
-        // Disparar eventos input y change para el formateador
+        // Disparar eventos
+        const total = document.getElementById('amp_total');
         total.dispatchEvent(new Event('input', { bubbles: true }));
-        if (typeof $ !== 'undefined') {
-            $(total).trigger('change');
-        }
+        total.dispatchEvent(new Event('change', { bubbles: true }));
         
-        // Actualizar textos de resumen
-        nuevoSubtotal.textContent = (subtotalActual + s).toFixed(2);
-        nuevoIva.textContent = (ivaActual + i).toFixed(2);
-        nuevoTotal.textContent = (totalActual + t).toFixed(2);
+        // Obtener valores actuales del contrato
+        const subtotalActual = {{ $contrato->subtotal ?? 0 }};
+        const ivaActual = {{ $contrato->iva ?? 0 }};
+        const totalActual = {{ $contrato->total ?? 0 }};
+        
+        // Actualizar textos de resumen (sumando los nuevos montos)
+        document.getElementById('nuevo_subtotal').textContent = (subtotalActual + s).toFixed(2);
+        document.getElementById('nuevo_iva').textContent = (ivaActual + importeIva).toFixed(2);
+        document.getElementById('nuevo_total').textContent = (totalActual + t).toFixed(2);
     }
     
     if (subtotal && iva && total) {

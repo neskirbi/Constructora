@@ -201,7 +201,7 @@
                                     <div class="col-md-3">
                                         <div class="card border-0 bg-light">
                                             <div class="card-body text-center">
-                                                <h6 class="text-muted mb-2">Total + Ampliaciones</h6>
+                                                <h6 class="text-muted mb-2">Total con Convenio</h6>
                                                 <h5 class="fw-bold mb-0">
                                                     ${{ number_format(($contrato->total ?? 0) + ($contrato->totalTotalAmpliaciones ?? 0), 2) }}
                                                 </h5>

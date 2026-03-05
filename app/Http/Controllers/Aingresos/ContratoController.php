@@ -524,9 +524,9 @@ public function storeAmpliacionMonto(Request $request, $id)
         $contrato = Contrato::findOrFail($id);
         
         $request->validate([
-            'subtotal' => 'required|numeric|min:0',
+            'subtotal' => 'required|numeric',
             'iva' => 'required|numeric|min:0',
-            'total' => 'required|numeric|min:0'
+            'total' => 'required|numeric'
         ]);
         
         // Usando el modelo AmpliacionMonto
