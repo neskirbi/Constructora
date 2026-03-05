@@ -255,7 +255,7 @@
                                 </h5>
                                 
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <div class="form-group-custom">
                                             <label for="importe_estimacion" class="form-label-custom">
                                                 Importe de Estimación
@@ -274,7 +274,7 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="col-md-4">
+                                    <div class="col-md-2">
                                         <div class="form-group-custom">
                                             <label for="iva" class="form-label-custom">
                                                 IVA
@@ -286,6 +286,26 @@
                                                        id="iva" 
                                                        name="iva" 
                                                        value="{{ old('iva') }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0"
+                                                       noformat>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="form-group-custom">
+                                            <label for="importe_estimacion" class="form-label-custom">
+                                                Importe IVA
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input" 
+                                                       id="importe_iva" 
+                                                       name="importe_iva" 
+                                                       value="{{ old('importe_iva') }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        min="0">
@@ -317,60 +337,78 @@
                                 <!-- Separador 1 -->
                                 <hr class="my-4">
 
-                                <div class="row">
+                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="sicv_cop" class="form-label-custom">
-                                                2.0% SICV - COP (servicio de inspección, control y vigilancia)
-                                            </label>
-                                            <div class="input-group input-group-custom">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <label for="sicv_cop" class="form-label-custom mb-0">
+                                                    2.0% SICV - COP
+                                                </label>
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input" type="checkbox" id="aplicar_sicv">
+                                                    <label class="form-check-label small" for="aplicar_sicv">
+                                                        Aplicar
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="input-group input-group-custom mt-1">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="sicv_cop" 
-                                                       name="sicv_cop" 
-                                                       value="{{ old('sicv_cop') }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
+                                                    class="form-control form-control-custom numeric-input" 
+                                                    id="sicv_cop" 
+                                                    name="sicv_cop" 
+                                                    value="{{ old('sicv_cop') }}"
+                                                    step="0.01"
+                                                    placeholder="0.00"
+                                                    min="0" readonly>
                                             </div>
                                         </div>
                                     </div>
                                     
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="srcop_cdmx" class="form-label-custom">
-                                                1.5% SRCOP - CDMX (supervisión y revisión a contratos de obra pública)
-                                            </label>
-                                            <div class="input-group input-group-custom">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <label for="srcop_cdmx" class="form-label-custom mb-0">
+                                                    1.5% SRCOP - CDMX
+                                                </label>
+                                                <div class="form-check mb-0">
+                                                    <input class="form-check-input" type="checkbox" id="aplicar_srcop">
+                                                    <label class="form-check-label small" for="aplicar_srcop">
+                                                        Aplicar
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="input-group input-group-custom mt-1">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="srcop_cdmx" 
-                                                       name="srcop_cdmx" 
-                                                       value="{{ old('srcop_cdmx') }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
+                                                    class="form-control form-control-custom numeric-input" 
+                                                    id="srcop_cdmx" 
+                                                    name="srcop_cdmx" 
+                                                    value="{{ old('srcop_cdmx') }}"
+                                                    step="0.01"
+                                                    placeholder="0.00"
+                                                    min="0" readonly>
                                             </div>
                                         </div>
                                     </div>
                                     
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
-                                            <label for="retencion_5_al_millar" class="form-label-custom">
-                                                Retención 5 al Millar
-                                            </label>
-                                            <div class="input-group input-group-custom">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <label for="retencion_5_al_millar" class="form-label-custom mb-0">
+                                                    Retención 5 al Millar
+                                                </label>
+                                            </div>
+                                            <div class="input-group input-group-custom mt-1">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="retencion_5_al_millar" 
-                                                       name="retencion_5_al_millar" 
-                                                       value="{{ old('retencion_5_al_millar') }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
+                                                    class="form-control form-control-custom numeric-input" 
+                                                    id="retencion_5_al_millar" 
+                                                    name="retencion_5_al_millar" 
+                                                    value="{{ old('retencion_5_al_millar') }}"
+                                                    step="0.01"
+                                                    placeholder="0.00"
+                                                    min="0">
                                             </div>
                                         </div>
                                     </div>
@@ -509,7 +547,7 @@
                                                 Amortización I.V.A.
                                             </label>
                                             <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
+                                                <span class="input-group-text">%</span>
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input" 
                                                        id="amortizacion_iva" 
@@ -579,183 +617,6 @@
                             
                             
                             
-                            
-                            
-                            <!-- Sección 5: Facturación -->
-                            <div class="form-section">
-                                <h5 class="section-title">
-                                    <i class="fas fa-file-invoice-dollar me-2"></i>
-                                    Facturación
-                                </h5>
-                                
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group-custom">
-                                            <label for="factura" class="form-label-custom">
-                                                Factura
-                                            </label>
-                                            <input type="text" 
-                                                   class="form-control form-control-custom" 
-                                                   id="factura" 
-                                                   name="factura" 
-                                                   value="{{ old('factura') }}"
-                                                   placeholder="Ej: FAC-001">
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-6">
-                                        <div class="form-group-custom">
-                                            <label for="fecha_factura" class="form-label-custom">
-                                                Fecha Factura
-                                            </label>
-                                            <input type="date" 
-                                                   class="form-control form-control-custom" 
-                                                   id="fecha_factura" 
-                                                   name="fecha_factura" 
-                                                   value="{{ old('fecha_factura') }}">
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group-custom">
-                                            <label for="importe_facturado" class="form-label-custom">
-                                                Importe Facturado
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="importe_facturado" 
-                                                       name="importe_facturado" 
-                                                       value="{{ old('importe_facturado') }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Sección 6: Cobros -->
-                            <div class="form-section">
-                                <h5 class="section-title">
-                                    <i class="fas fa-money-bill-wave me-2"></i>
-                                    Cobros
-                                </h5>
-                                
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="liquido_a_cobrar" class="form-label-custom">
-                                                Líquido a Cobrar
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="liquido_a_cobrar" 
-                                                       name="liquido_a_cobrar" 
-                                                       value="{{ old('liquido_a_cobrar') }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="liquido_cobrado" class="form-label-custom">
-                                                Líquido Cobrado
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="liquido_cobrado" 
-                                                       name="liquido_cobrado" 
-                                                       value="{{ old('liquido_cobrado') }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="fecha_cobro" class="form-label-custom">
-                                                Fecha Cobro
-                                            </label>
-                                            <input type="date" 
-                                                   class="form-control form-control-custom" 
-                                                   id="fecha_cobro" 
-                                                   name="fecha_cobro" 
-                                                   value="{{ old('fecha_cobro') }}">
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="por_cobrar" class="form-label-custom">
-                                                POR COBRAR
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="por_cobrar" 
-                                                       name="por_cobrar" 
-                                                       value="{{ old('por_cobrar') }}"
-                                                       step="0.01"
-                                                       placeholder="0.00">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="por_facturar" class="form-label-custom">
-                                                POR FACTURAR
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="por_facturar" 
-                                                       name="por_facturar" 
-                                                       value="{{ old('por_facturar') }}"
-                                                       step="0.01"
-                                                       placeholder="0.00">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-4">
-                                        <div class="form-group-custom">
-                                            <label for="por_estimar" class="form-label-custom">
-                                                Por Estimar
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="por_estimar" 
-                                                       name="por_estimar" 
-                                                       value="{{ old('por_estimar') }}"
-                                                       step="0.01"
-                                                       placeholder="0.00">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
                             <!-- Sección 7: Estado -->
                             <div class="form-section">
                                 <h5 class="section-title">
@@ -771,10 +632,11 @@
                                             </label>
                                             <select class="form-control form-control-custom" 
                                                     id="status" 
-                                                    name="status">
+                                                    name="status" 
+                                                    readonly>
                                                 <option value="">Seleccionar status...</option>
                                                 <option value="pagado" {{ old('status') == 'pagado' ? 'selected' : '' }}>Pagado</option>
-                                                <option value="en_tramite" {{ old('status') == 'en_tramite' ? 'selected' : '' }}>En Trámite</option>
+                                                <option value="en_tramite" {{ old('status') == 'en_tramite' ? 'selected' : 'selected' }}>En Trámite</option>
                                             </select>
                                         </div>
                                     </div>
@@ -807,41 +669,69 @@
     @include('footer')
     
     <script>
-// Función para calcular el total de la estimación (Importe + IVA)
-function calcularTotalEstimacion() {
+// Función para calcular importe del IVA y total de estimación
+function calcularImporteIVAYTotal() {
     // Obtener valores numéricos reales
     const importeEstimacion = parseFloat($('#importe_estimacion').val()) || 0;
     const iva = parseFloat($('#iva').val()) || 0;
     
-    // Calcular total = importe + (importe * iva / 100)
-    const totalCalculado = importeEstimacion + (importeEstimacion * iva / 100);
+    // Calcular importe del IVA
+    const importeIVACalculado = importeEstimacion * (iva / 100);
     
-    // Asignar el valor numérico
+    // Calcular total = importe + importe IVA
+    const totalCalculado = importeEstimacion + importeIVACalculado;
+    
+    // Asignar valores
+    $('#importe_iva').val(importeIVACalculado.toFixed(2));
     $('#total_estimacion_con_iva').val(totalCalculado.toFixed(2));
     
-    // Disparar eventos para el formateador
-    const input = document.getElementById('total_estimacion_con_iva');
-    if (input) {
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-        input.dispatchEvent(new Event('keyup', { bubbles: true }));
-        input.dispatchEvent(new Event('change', { bubbles: true }));
-    }
+    // Disparar eventos
+    dispararEventos('#importe_iva');
+    dispararEventos('#total_estimacion_con_iva');
     
-    // Calcular estimado menos deducciones después de actualizar
-    calcularEstimadoMenosDeducciones();
+    // Recalcular porcentajes si los checkboxes están activos
+    if ($('#aplicar_sicv').is(':checked')) {
+        calcularSICV();
+    }
+    if ($('#aplicar_srcop').is(':checked')) {
+        calcularSRCOP();
+    } else {
+        calcularRetencionesSanciones();
+    }
 }
+
+// Función para calcular 2% SICV
+function calcularSICV() {
+    const totalEstimacion = parseFloat($('#total_estimacion_con_iva').val()) || 0;
+    const resultado = totalEstimacion * 0.02; // 2%
+    
+    $('#sicv_cop').val(resultado.toFixed(2));
+    
+    calcularRetencionesSanciones();
+}
+
+// Función para calcular 1.5% SRCOP
+function calcularSRCOP() {
+    const totalEstimacion = parseFloat($('#total_estimacion_con_iva').val()) || 0;
+    const resultado = totalEstimacion * 0.015; // 1.5%
+    
+    $('#srcop_cdmx').val(resultado.toFixed(2));
+    
+    calcularRetencionesSanciones();
+}
+
 
 // Función para calcular Retenciones o Sanciones
 function calcularRetencionesSanciones() {
-    // Lista de IDs de los campos a sumar para retenciones o sanciones
+    // Lista de IDs de los campos a sumar
     var camposRetenciones = [
-        'sicv_cop',                                      // 2.0% SICV - COP
-        'srcop_cdmx',                                    // 1.5% SRCOP - CDMX
-        'retencion_5_al_millar',                         // Retención 5 al Millar
-        'sancion_atrazo_presentacion_estimacion',        // Sanción Atraso Presentación Estimación
-        'sancion_atraso_de_obra',                        // Sanción Atraso de Obra
-        'sancion_por_obra_mal_ejecutada',                // Sanción por Obra Mal Ejecutada
-        'retencion_por_atraso_en_programa_obra'          // Retención por Atraso en Programa de Obra
+        'sicv_cop',
+        'srcop_cdmx',
+        'retencion_5_al_millar',
+        'sancion_atrazo_presentacion_estimacion',
+        'sancion_atraso_de_obra',
+        'sancion_por_obra_mal_ejecutada',
+        'retencion_por_atraso_en_programa_obra'
     ];
     
     var total = 0;
@@ -853,21 +743,11 @@ function calcularRetencionesSanciones() {
     });
     
     // Actualizar el campo de retenciones o sanciones
-    var $retencionesInput = $('#retenciones_o_sanciones');
-    $retencionesInput.val(total.toFixed(2));
+    $('#retenciones_o_sanciones').val(total.toFixed(2));
+    dispararEventos('#retenciones_o_sanciones');
     
-    // Disparar eventos para el formateador
-    var inputElement = $retencionesInput[0];
-    if (inputElement) {
-        inputElement.dispatchEvent(new Event('input', { bubbles: true }));
-        inputElement.dispatchEvent(new Event('keyup', { bubbles: true }));
-        inputElement.dispatchEvent(new Event('change', { bubbles: true }));
-    }
-    
-    // Calcular estimado menos deducciones después de actualizar
+    // Calcular estimado menos deducciones
     calcularEstimadoMenosDeducciones();
-    
-    return total;
 }
 
 // Función para calcular Total Amortización
@@ -877,22 +757,9 @@ function calcularTotalAmortizacion() {
     
     var total = amortizacionAnticipo + amortizacionConIva;
     
-    // Actualizar el campo de total amortización
-    var $amortizacionInput = $('#total_amortizacion');
-    $amortizacionInput.val(total.toFixed(2));
-    
-    // Disparar eventos para el formateador
-    var inputElement = $amortizacionInput[0];
-    if (inputElement) {
-        inputElement.dispatchEvent(new Event('input', { bubbles: true }));
-        inputElement.dispatchEvent(new Event('keyup', { bubbles: true }));
-        inputElement.dispatchEvent(new Event('change', { bubbles: true }));
-    }
-    
-    // Calcular estimado menos deducciones después de actualizar
+    $('#total_amortizacion').val(total.toFixed(2));
+    dispararEventos('#total_amortizacion');
     calcularEstimadoMenosDeducciones();
-    
-    return total;
 }
 
 // Función para calcular Estimado menos Deducciones
@@ -903,40 +770,53 @@ function calcularEstimadoMenosDeducciones() {
     
     var resultado = totalEstimacionConIva - retencionesSanciones - totalAmortizacion;
     
-    // Actualizar el campo
-    var $estimadoMenosInput = $('#estimado_menos_deducciones');
-    $estimadoMenosInput.val(resultado.toFixed(2));
-    
-    // Disparar eventos para el formateador
-    var inputElement = $estimadoMenosInput[0];
-    if (inputElement) {
-        inputElement.dispatchEvent(new Event('input', { bubbles: true }));
-        inputElement.dispatchEvent(new Event('keyup', { bubbles: true }));
-        inputElement.dispatchEvent(new Event('change', { bubbles: true }));
-    }
-    
-    return resultado;
+    $('#estimado_menos_deducciones').val(resultado.toFixed(2));
+    dispararEventos('#estimado_menos_deducciones');
 }
 
-// Función para inicializar todos los event listeners
-function inicializarCalculos() {
-    // Campos para calcular total estimación
+// Función para disparar eventos
+function dispararEventos(selector) {
+    var input = document.querySelector(selector);
+    if (input) {
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('keyup', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+}
+
+// Inicializar eventos
+$(document).ready(function() {
+    // Evento para importe estimación e IVA
     $('#importe_estimacion, #iva').on('input', function() {
-        calcularTotalEstimacion();
+        calcularImporteIVAYTotal();
     });
     
-    // Validar que el IVA esté entre 0 y 100
-    $('#iva').on('change', function() {
-        let valor = parseFloat($(this).val()) || 0;
-        if (valor < 0) $(this).val(0);
-        if (valor > 100) $(this).val(100);
-        calcularTotalEstimacion();
+    // Eventos para checkboxes (dentro del document ready)
+    $('#aplicar_sicv').on('change', function() {
+        if ($(this).is(':checked')) {
+            calcularSICV();
+        } else {
+            $('#sicv_cop').val('0.00');
+            calcularRetencionesSanciones();
+        }
+        dispararEventos('#sicv_cop');// Si los pongo se dispara el evento pero el checkbox no se queda checked
+    });
+
+    $('#aplicar_srcop').on('change', function() {
+        if ($(this).is(':checked')) {
+            calcularSRCOP();
+        } else {
+            $('#srcop_cdmx').val('0.00');
+            calcularRetencionesSanciones();
+        }
+        dispararEventos('#srcop_cdmx');// Si los pongo se dispara el evento pero el checkbox no se queda checked
     });
     
-    // Campos para calcular retenciones o sanciones
+  
+   
+    
+    // Campos para calcular retenciones
     var camposRetenciones = [
-        'sicv_cop',
-        'srcop_cdmx',
         'retencion_5_al_millar',
         'sancion_atrazo_presentacion_estimacion',
         'sancion_atraso_de_obra',
@@ -950,19 +830,21 @@ function inicializarCalculos() {
         });
     });
     
-    // Campos para calcular total amortización
+    // Campos para amortización
     $('#amortizacion_anticipo, #amortizacion_iva').on('input', function() {
         calcularTotalAmortizacion();
     });
-}
-
-// Document ready con jQuery
-$(document).ready(function() {
-    inicializarCalculos();
     
-    // Calcular valores iniciales por si hay valores precargados
+    // Validar IVA
+    $('#iva').on('change', function() {
+        let valor = parseFloat($(this).val()) || 0;
+        if (valor < 0) $(this).val(0);
+        if (valor > 100) $(this).val(100);
+    });
+    
+    // Calcular valores iniciales
     setTimeout(function() {
-        calcularTotalEstimacion();
+        calcularImporteIVAYTotal();
         calcularRetencionesSanciones();
         calcularTotalAmortizacion();
         calcularEstimadoMenosDeducciones();

@@ -80,43 +80,33 @@ class IngresoController extends Controller
             'periodo_al' => 'nullable|date|after_or_equal:periodo_del',
             'factura' => 'nullable|string|max:255',
             'fecha_factura' => 'nullable|date',
-            'importe_estimacion' => 'nullable|numeric|min:0',
-            'iva' => 'nullable|numeric|min:0',
-            'retenciones_o_sanciones' => 'nullable|numeric|min:0',
-            'total_estimacion_con_iva' => 'nullable|numeric|min:0',
-            'avance_obra_estimacion' => 'nullable|numeric|min:0|max:100',
-            'avance_obra_real' => 'nullable|numeric|min:0|max:100',
-            'porcentaje_avance_financiero' => 'nullable|numeric|min:0|max:100',
-            'cargos_adicionales_3_5' => 'nullable|numeric|min:0',
-            'retencion_5_al_millar' => 'nullable|numeric|min:0',
-            'sancion_atrazo_presentacion_estimacion' => 'nullable|numeric|min:0',
-            'sancion_atraso_de_obra' => 'nullable|numeric|min:0',
-            'sancion_por_obra_mal_ejecutada' => 'nullable|numeric|min:0',
-            'retencion_por_atraso_en_programa_obra' => 'nullable|numeric|min:0',
-            'amortizacion_anticipo' => 'nullable|numeric|min:0',
-            'amortizacion_con_iva' => 'nullable|numeric|min:0',
-            'total_deducciones' => 'nullable|numeric|min:0',
-            'importe_facturado' => 'nullable|numeric|min:0',
-            'liquido_a_cobrar' => 'nullable|numeric|min:0',
-            'liquido_cobrado' => 'nullable|numeric|min:0',
-            'fecha_cobro' => 'nullable|date',
-            'por_cobrar' => 'nullable|numeric|min:0',
-            'por_facturar' => 'nullable|numeric|min:0',
-            'por_estimar' => 'nullable|numeric|min:0',
-            'status' => 'nullable|string|in:pagado,en_tramite',
+            'importe_estimacion' => 'nullable|numeric',
+            'iva' => 'nullable|numeric|max:100',
+            'importe_iva' => 'nullable|numeric',
+            'total_estimacion_con_iva' => 'nullable|numeric',
+            'sicv_cop' => 'nullable|numeric',
+            'srcop_cdmx' => 'nullable|numeric',
+            'retencion_5_al_millar' => 'nullable|numeric',
+            'sancion_atrazo_presentacion_estimacion' => 'nullable|numeric',
+            'sancion_atraso_de_obra' => 'nullable|numeric',
+            'sancion_por_obra_mal_ejecutada' => 'nullable|numeric',
+            'retencion_por_atraso_en_programa_obra' => 'nullable|numeric',
+            'retenciones_o_sanciones' => 'nullable|numeric',
+            'amortizacion_anticipo' => 'nullable|numeric',
+            'amortizacion_iva' => 'nullable|numeric',
+            'total_amortizacion' => 'nullable|numeric',
             'estimado_menos_deducciones' => 'nullable|numeric',
-            'verificado' => 'nullable|integer',
+            'status' => 'nullable|string|in:pagado,en_tramite',
         ]);
         
         // Generar ID único usando la función helper GetUuid()
         $validated['id'] = GetUuid();
-
         $validated['id_usuario'] = GetId();
         
         // Crear el ingreso
         $ingreso = Ingreso::create($validated);
         
-        return redirect()->route('ingresos.show', $ingreso->id)
+        return redirect('ingresos.index')
             ->with('success', 'Ingreso creado exitosamente.');
     }
 
@@ -146,59 +136,84 @@ class IngresoController extends Controller
      * @param  string  $id
      * @return \Illuminate\Http\Response
      */
-    function update(Request $request, $id)
-    {
-        // Buscar el ingreso
+    /**
+ * Update - Guarda Información Básica y Montos de Estimación (PRIMER FORM)
+ */
+public function update(Request $request, $id)
+{
+    try {
         $ingreso = Ingreso::findOrFail($id);
         
-        // Validación de campos (similar a store)
-        $validated = $request->validate([
-            'id_contrato' => 'required|exists:contratos,id',
-            'no_estimacion' => 'required|string|max:255',
-            'periodo_del' => 'nullable|date',
-            'periodo_al' => 'nullable|date|after_or_equal:periodo_del',
-            'factura' => 'nullable|string|max:255',
-            'fecha_factura' => 'nullable|date',
-            'importe_estimacion' => 'nullable|numeric|min:0',
-            'iva' => 'nullable|numeric|min:0',
-            'retenciones_o_sanciones' => 'nullable|numeric|min:0',
-            'total_estimacion_con_iva' => 'nullable|numeric|min:0',
-            'avance_obra_estimacion' => 'nullable|numeric|min:0|max:100',
-            'avance_obra_real' => 'nullable|numeric|min:0|max:100',
-            'porcentaje_avance_financiero' => 'nullable|numeric|min:0|max:100',
-            'cargos_adicionales_3_5' => 'nullable|numeric|min:0',
-            'retencion_5_al_millar' => 'nullable|numeric|min:0',
-            'sancion_atrazo_presentacion_estimacion' => 'nullable|numeric|min:0',
-            'sancion_atraso_de_obra' => 'nullable|numeric|min:0',
-            'sancion_por_obra_mal_ejecutada' => 'nullable|numeric|min:0',
-            'retencion_por_atraso_en_programa_obra' => 'nullable|numeric|min:0',
-            'amortizacion_anticipo' => 'nullable|numeric|min:0',
-            'amortizacion_con_iva' => 'nullable|numeric|min:0',
-            'total_deducciones' => 'nullable|numeric|min:0',
-            'importe_facturado' => 'nullable|numeric|min:0',
-            'liquido_a_cobrar' => 'nullable|numeric|min:0',
-            'liquido_cobrado' => 'nullable|numeric|min:0',
-            'fecha_cobro' => 'nullable|date',
-            'por_cobrar' => 'nullable|numeric|min:0',
-            'por_facturar' => 'nullable|numeric|min:0',
-            'por_estimar' => 'nullable|numeric|min:0',
-            'status' => 'nullable|string|in:pagado,en_tramite',
-            'estimado_menos_deducciones' => 'nullable|numeric',
-            'verificado' => 'nullable|integer',
-        ]);
+        // Validación de campos del primer formulario
         
-        // Recalcular campos derivados si es necesario
-        if (isset($validated['liquido_a_cobrar']) || isset($validated['liquido_cobrado'])) {
-            $validated['por_cobrar'] = ($validated['liquido_a_cobrar'] ?? $ingreso->liquido_a_cobrar) 
-                - ($validated['liquido_cobrado'] ?? $ingreso->liquido_cobrado);
-        }
         
-        // Actualizar el ingreso
-        $ingreso->update($validated);
+        // Asignar manualmente cada campo para depurar
+        $ingreso->no_estimacion = $request->no_estimacion;
+        $ingreso->periodo_del = $request->periodo_del;
+        $ingreso->periodo_al = $request->periodo_al;
+        $ingreso->importe_estimacion = $request->importe_estimacion ?? 0;
+        $ingreso->iva = $request->iva ?? 0;
+        $ingreso->importe_iva = $request->importe_iva ?? 0;
+        $ingreso->total_estimacion_con_iva = $request->total_estimacion_con_iva ?? 0;
+        $ingreso->sicv_cop = $request->sicv_cop ?? 0;
+        $ingreso->srcop_cdmx = $request->srcop_cdmx ?? 0;
+        $ingreso->retencion_5_al_millar = $request->retencion_5_al_millar ?? 0;
+        $ingreso->sancion_atrazo_presentacion_estimacion = $request->sancion_atrazo_presentacion_estimacion ?? 0;
+        $ingreso->sancion_atraso_de_obra = $request->sancion_atraso_de_obra ?? 0;
+        $ingreso->sancion_por_obra_mal_ejecutada = $request->sancion_por_obra_mal_ejecutada ?? 0;
+        $ingreso->retencion_por_atraso_en_programa_obra = $request->retencion_por_atraso_en_programa_obra ?? 0;
+        $ingreso->retenciones_o_sanciones = $request->retenciones_o_sanciones ?? 0;
+        $ingreso->amortizacion_anticipo = $request->amortizacion_anticipo ?? 0;
+        $ingreso->amortizacion_iva = $request->amortizacion_iva ?? 0;
+        $ingreso->total_amortizacion = $request->total_amortizacion ?? 0;
+        $ingreso->estimado_menos_deducciones = $request->estimado_menos_deducciones ?? 0;
+        
+        // Guardar
+        $ingreso->save();
         
         return redirect()->route('ingresos.show', $ingreso->id)
-            ->with('success', 'Ingreso actualizado exitosamente.');
+            ->with('success', 'Información actualizada exitosamente.');
+            
+    } catch (\Exception $e) {
+        // Si hay error, lo mostramos
+        return back()->withErrors(['error' => 'Error: ' . $e->getMessage()])->withInput();
     }
+}
+
+/**
+ * updateFacturacion - Guarda solo datos de facturación (SEGUNDO FORM)
+ */
+public function updateFacturacion(Request $request, $id)
+{
+    // Buscar el ingreso
+    $ingreso = Ingreso::findOrFail($id);
+    
+    // Validación de campos de facturación Y COBROS
+    $validated = $request->validate([
+        // Facturación
+        'factura' => 'nullable|string|max:255',
+        'fecha_factura' => 'nullable|date',
+        'status' => 'nullable|string|in:pagado,en_tramite',
+        
+        // Cobros
+        'liquido_cobrado' => 'nullable|numeric|min:0',
+        'fecha_cobro' => 'nullable|date',
+        'por_cobrar' => 'nullable|numeric',
+        'por_facturar' => 'nullable|numeric',
+    ]);
+    
+    // Recalcular por_cobrar si viene líquido_cobrado
+    if (isset($validated['liquido_cobrado'])) {
+        $liquidoACobrar = $ingreso->estimado_menos_deducciones ?? 0;
+        $validated['por_cobrar'] = $liquidoACobrar - $validated['liquido_cobrado'];
+    }
+    
+    // Actualizar todos los campos (facturación + cobros)
+    $ingreso->update($validated);
+    
+    return redirect()->route('ingresos.show', $ingreso->id)
+        ->with('success', 'Datos guardados exitosamente.');
+}
 
     /**
      * Remove the specified resource from storage.
@@ -245,4 +260,6 @@ class IngresoController extends Controller
             ]
         ]);
     }
+
+    
 }

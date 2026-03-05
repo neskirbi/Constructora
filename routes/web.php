@@ -127,7 +127,8 @@ Route::delete('acontratos/ampliacion-monto/{id}', [App\Http\Controllers\Aingreso
 
 Route::resource('ingresos', 'App\Http\Controllers\Aingresos\IngresoController')
     ->middleware(['auth:aingresos']);
-
+Route::put('/ingresos/{id}/facturacion', [App\Http\Controllers\Aingresos\IngresoController::class, 'updateFacturacion'])
+    ->name('ingresos.update.facturacion') ->middleware(['auth:aingresos']);
     
 
 
