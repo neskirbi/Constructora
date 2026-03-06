@@ -272,27 +272,39 @@
                                                             <thead>
                                                                 <tr>
                                                                     <th>Fecha</th>
-                                                                    <th>Subtotal</th>
-                                                                    <th>IVA</th>
-                                                                    <th>Total</th>
+                                                                    <th class="text-end">Subtotal</th>
+                                                                    <th class="text-center">IVA %</th>
+                                                                    <th class="text-end">IVA Monto</th>
+                                                                    <th class="text-end">Total</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
                                                                 @foreach($contrato->ampliacionesMonto as $amp)
+                                                                @php
+                                                                    // Calcular el monto del IVA basado en el porcentaje
+                                                                    $montoIVA = $amp->subtotal * ($amp->iva / 100);
+                                                                    $totalConIVA = $amp->subtotal + $montoIVA;
+                                                                @endphp
                                                                 <tr>
                                                                     <td>{{ \Carbon\Carbon::parse($amp->created_at)->format('d/m/Y') }}</td>
                                                                     <td class="text-end">${{ number_format($amp->subtotal, 2) }}</td>
-                                                                    <td class="text-end">${{ number_format($amp->iva, 2) }}</td>
-                                                                    <td class="text-end">${{ number_format($amp->total, 2) }}</td>
+                                                                    <td class="text-center">{{ number_format($amp->iva, 2) }}%</td>
+                                                                    <td class="text-end">${{ number_format($montoIVA, 2) }}</td>
+                                                                    <td class="text-end">${{ number_format($totalConIVA, 2) }}</td>
                                                                 </tr>
                                                                 @endforeach
                                                             </tbody>
-                                                            <tfoot class="table-group-divider">
+                                                            <tfoot class="table-group-divider fw-bold">
                                                                 <tr>
                                                                     <th class="text-end">Totales:</th>
-                                                                    <th class="text-end">${{ number_format($contrato->totalSubtotalAmpliaciones, 2) }}</th>
-                                                                    <th class="text-end">${{ number_format($contrato->totalIvaAmpliaciones, 2) }}</th>
-                                                                    <th class="text-end">${{ number_format($contrato->totalTotalAmpliaciones, 2) }}</th>
+                                                                    <th class="text-end">${{ number_format($contrato->ampliacionesMonto->sum('subtotal'), 2) }}</th>
+                                                                    <th class="text-center">-</th>
+                                                                    <th class="text-end">${{ number_format($contrato->ampliacionesMonto->sum(function($amp) {
+                                                                        return $amp->subtotal * ($amp->iva / 100);
+                                                                    }), 2) }}</th>
+                                                                    <th class="text-end">${{ number_format($contrato->ampliacionesMonto->sum(function($amp) {
+                                                                        return $amp->subtotal + ($amp->subtotal * ($amp->iva / 100));
+                                                                    }), 2) }}</th>
                                                                 </tr>
                                                             </tfoot>
                                                         </table>

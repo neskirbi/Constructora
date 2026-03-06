@@ -1062,45 +1062,66 @@
                                             @endphp
                                             
                                             @if($ampliacionesMonto->count() > 0)
-                                                <div class="table-responsive">
-                                                    <table class="table table-hover">
-                                                        <thead>
+                                            <div class="table-responsive">
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th width="50">#</th>
+                                                            <th>Fecha</th>
+                                                            <th class="text-end">Subtotal</th>
+                                                            <th class="text-center">IVA %</th>
+                                                            <th class="text-end">IVA Monto</th>
+                                                            <th class="text-end">Total</th>
+                                                            <th width="80" class="text-center">Acciones</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach($ampliacionesMonto as $index => $amp)
+                                                            @php
+                                                                // Calcular el monto del IVA basado en el porcentaje
+                                                                $montoIVA = $amp->subtotal * ($amp->iva / 100);
+                                                                $totalConIVA = $amp->subtotal + $montoIVA;
+                                                            @endphp
                                                             <tr>
-                                                                <th>#</th>
-                                                                <th>Fecha</th>
-                                                                <th>Subtotal</th>
-                                                                <th>IVA</th>
-                                                                <th>Total</th>
-                                                                <th>Acciones</th>
+                                                                <td>{{ $index + 1 }}</td>
+                                                                <td>{{ \Carbon\Carbon::parse($amp->created_at)->format('d/m/Y H:i') }}</td>
+                                                                <td class="text-end">${{ number_format($amp->subtotal, 2) }}</td>
+                                                                <td class="text-center">{{ number_format($amp->iva, 2) }}%</td>
+                                                                <td class="text-end">${{ number_format($montoIVA, 2) }}</td>
+                                                                <td class="text-end">${{ number_format($totalConIVA, 2) }}</td>
+                                                                <td class="text-center">
+                                                                    <form action="{{ route('acontratos.ampliacion-monto.destroy', $amp->id) }}" 
+                                                                        method="POST" class="d-inline"
+                                                                        onsubmit="return confirm('¿Eliminar esta ampliación?');">
+                                                                        @csrf
+                                                                        @method('DELETE')
+                                                                        <button type="submit" class="btn btn-sm btn-danger">
+                                                                            <i class="fas fa-trash"></i>
+                                                                        </button>
+                                                                    </form>
+                                                                </td>
                                                             </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach($ampliacionesMonto as $index => $amp)
-                                                                <tr>
-                                                                    <td>{{ $index + 1 }}</td>
-                                                                    <td>{{ \Carbon\Carbon::parse($amp->created_at)->format('d/m/Y H:i') }}</td>
-                                                                    <td class="text-end">${{ number_format($amp->subtotal, 2) }}</td>
-                                                                    <td class="text-end">${{ number_format($amp->iva, 2) }}</td>
-                                                                    <td class="text-end">${{ number_format($amp->total, 2) }}</td>
-                                                                    <td>
-                                                                        <form action="{{ route('acontratos.ampliacion-monto.destroy', $amp->id) }}" 
-                                                                            method="POST" class="d-inline"
-                                                                            onsubmit="return confirm('¿Eliminar esta ampliación?');">
-                                                                            @csrf
-                                                                            @method('DELETE')
-                                                                            <button type="submit" class="btn btn-sm btn-danger">
-                                                                                <i class="fas fa-trash"></i>
-                                                                            </button>
-                                                                        </form>
-                                                                    </td>
-                                                                </tr>
-                                                            @endforeach
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            @else
-                                                <div class="alert alert-info mb-0">No hay ampliaciones de monto registradas.</div>
-                                            @endif
+                                                        @endforeach
+                                                    </tbody>
+                                                    <tfoot class="table-info">
+                                                        <tr>
+                                                            <th colspan="2" class="text-end">Totales:</th>
+                                                            <th class="text-end">${{ number_format($ampliacionesMonto->sum('subtotal'), 2) }}</th>
+                                                            <th class="text-center">-</th>
+                                                            <th class="text-end">${{ number_format($ampliacionesMonto->sum(function($amp) {
+                                                                return $amp->subtotal * ($amp->iva / 100);
+                                                            }), 2) }}</th>
+                                                            <th class="text-end">${{ number_format($ampliacionesMonto->sum(function($amp) {
+                                                                return $amp->subtotal + ($amp->subtotal * ($amp->iva / 100));
+                                                            }), 2) }}</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                        @else
+                                            <div class="alert alert-info mb-0">No hay ampliaciones de monto registradas.</div>
+                                        @endif
                                         </div>
                                     </div>
                                 </div>

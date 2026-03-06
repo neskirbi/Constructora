@@ -679,83 +679,95 @@
                         
                         <!-- SECCIÓN 7: AMPLIACIONES DE MONTO -->
                         <div class="form-section">
-                            <h5 class="section-title">
-                                <i class="fas fa-dollar-sign me-2"></i>
-                                Ampliaciones de Monto
-                            </h5>
-                            
-                            <div class="card">
-                                <div class="card-header bg-success text-white">
-                                    <h6 class="mb-0"><i class="fas fa-list me-2"></i>Historial de Ampliaciones de Monto</h6>
-                                </div>
-                                <div class="card-body">
-                                    @if($ampliacionesMonto->count() > 0)
-                                        <div class="table-responsive">
-                                            <table class="table table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th>#</th>
-                                                        <th>Fecha de Registro</th>
-                                                        <th>Subtotal</th>
-                                                        <th>IVA</th>
-                                                        <th>Total</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach($ampliacionesMonto as $index => $amp)
-                                                        <tr>
-                                                            <td>{{ $index + 1 }}</td>
-                                                            <td>{{ \Carbon\Carbon::parse($amp->created_at)->format('d/m/Y H:i') }}</td>
-                                                            <td class="text-end">${{ number_format($amp->subtotal, 2) }}</td>
-                                                            <td class="text-end">${{ number_format($amp->iva, 2) }}</td>
-                                                            <td class="text-end">${{ number_format($amp->total, 2) }}</td>
-                                                        </tr>
-                                                    @endforeach
-                                                    
-                                                    <!-- Totales acumulados -->
+                        <h5 class="section-title">
+                            <i class="fas fa-dollar-sign me-2"></i>
+                            Ampliaciones de Monto
+                        </h5>
+                        
+                        <div class="card">
+                            <div class="card-header bg-success text-white">
+                                <h6 class="mb-0"><i class="fas fa-list me-2"></i>Historial de Ampliaciones de Monto</h6>
+                            </div>
+                            <div class="card-body">
+                                @if($ampliacionesMonto->count() > 0)
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Fecha de Registro</th>
+                                                    <th class="text-end">Subtotal</th>
+                                                    <th class="text-center">IVA %</th>
+                                                    <th class="text-end">IVA Monto</th>
+                                                    <th class="text-end">Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($ampliacionesMonto as $index => $amp)
                                                     @php
-                                                        $totalSubtotal = $ampliacionesMonto->sum('subtotal');
-                                                        $totalIva = $ampliacionesMonto->sum('iva');
-                                                        $totalTotal = $ampliacionesMonto->sum('total');
+                                                        // Calcular el monto del IVA basado en el porcentaje
+                                                        $montoIVA = $amp->subtotal * ($amp->iva / 100);
+                                                        $totalConIVA = $amp->subtotal + $montoIVA;
                                                     @endphp
-                                                    @if($ampliacionesMonto->count() > 0)
-                                                    <tr class="table-info fw-bold">
-                                                        <td colspan="2" class="text-end">TOTAL ACUMULADO:</td>
-                                                        <td class="text-end">${{ number_format($totalSubtotal, 2) }}</td>
-                                                        <td class="text-end">${{ number_format($totalIva, 2) }}</td>
-                                                        <td class="text-end">${{ number_format($totalTotal, 2) }}</td>
+                                                    <tr>
+                                                        <td>{{ $index + 1 }}</td>
+                                                        <td>{{ \Carbon\Carbon::parse($amp->created_at)->format('d/m/Y H:i') }}</td>
+                                                        <td class="text-end">${{ number_format($amp->subtotal, 2) }}</td>
+                                                        <td class="text-center">{{ number_format($amp->iva, 2) }}%</td>
+                                                        <td class="text-end">${{ number_format($montoIVA, 2) }}</td>
+                                                        <td class="text-end">${{ number_format($totalConIVA, 2) }}</td>
                                                     </tr>
-                                                    @endif
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        
-                                        <!-- Resumen de montos actuales del contrato -->
-                                        <div class="alert alert-info mt-3 mb-0">
-                                            <div class="row">
-                                                <div class="col-md-4">
-                                                    <small>Subtotal actual del contrato:</small><br>
-                                                    <strong>${{ number_format($contrato->subtotal ?? 0, 2) }}</strong>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <small>IVA actual del contrato:</small><br>
-                                                    <strong>${{ number_format($contrato->iva ?? 0, 2) }}</strong>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <small>Total actual del contrato:</small><br>
-                                                    <strong>${{ number_format($contrato->total ?? 0, 2) }}</strong>
-                                                </div>
+                                                @endforeach
+                                                
+                                                <!-- Totales acumulados -->
+                                                @php
+                                                    $totalSubtotal = $ampliacionesMonto->sum('subtotal');
+                                                    $totalMontoIVA = $ampliacionesMonto->sum(function($amp) {
+                                                        return $amp->subtotal * ($amp->iva / 100);
+                                                    });
+                                                    $totalTotal = $ampliacionesMonto->sum(function($amp) {
+                                                        return $amp->subtotal + ($amp->subtotal * ($amp->iva / 100));
+                                                    });
+                                                @endphp
+                                                @if($ampliacionesMonto->count() > 0)
+                                                <tr class="table-info fw-bold">
+                                                    <td colspan="2" class="text-end">TOTAL ACUMULADO:</td>
+                                                    <td class="text-end">${{ number_format($totalSubtotal, 2) }}</td>
+                                                    <td class="text-center">-</td>
+                                                    <td class="text-end">${{ number_format($totalMontoIVA, 2) }}</td>
+                                                    <td class="text-end">${{ number_format($totalTotal, 2) }}</td>
+                                                </tr>
+                                                @endif
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <!-- Resumen de montos actuales del contrato -->
+                                    <div class="alert alert-info mt-3 mb-0">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <small>Subtotal actual del contrato:</small><br>
+                                                <strong>${{ number_format($contrato->subtotal ?? 0, 2) }}</strong>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <small>IVA actual del contrato (Monto):</small><br>
+                                                <strong>${{ number_format($contrato->iva ?? 0, 2) }}</strong>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <small>Total actual del contrato:</small><br>
+                                                <strong>${{ number_format($contrato->total ?? 0, 2) }}</strong>
                                             </div>
                                         </div>
-                                    @else
-                                        <div class="alert alert-info mb-0">
-                                            <i class="fas fa-info-circle me-2"></i>
-                                            No hay ampliaciones de monto registradas para este contrato.
-                                        </div>
-                                    @endif
-                                </div>
+                                    </div>
+                                @else
+                                    <div class="alert alert-info mb-0">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        No hay ampliaciones de monto registradas para este contrato.
+                                    </div>
+                                @endif
                             </div>
                         </div>
+                    </div>
 
                         <!-- SECCIÓN 8: AMPLIACIONES DE TIEMPO -->
                         <div class="form-section">
