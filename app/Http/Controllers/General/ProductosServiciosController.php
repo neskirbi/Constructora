@@ -178,4 +178,51 @@ class ProductosServiciosController extends Controller
                 ->with('error', 'Error al eliminar el producto: ' . $e->getMessage());
         }
     }
+
+
+    /**
+     * Api para guardar Productos y servicios
+     */
+
+    function NuevoPS(Request $request)
+{
+    try {
+        $request->validate([
+            'clave' => 'required|string|max:32|unique:productosyservicios,clave',
+            'descripcion' => 'required|string',
+            'unidades' => 'required|string|max:10',
+        ]);
+        
+        $id = GetUuid();
+        
+        DB::table('productosyservicios')->insert([
+            'id' => $id,
+            'clave' => $request->clave,
+            'descripcion' => $request->descripcion,
+            'unidades' => $request->unidades,
+            'ult_costo' => 0, // Se guarda en 0 por defecto
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+        
+        $producto = DB::table('productosyservicios')->where('id', $id)->first();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Producto creado exitosamente',
+            'producto' => $producto
+        ]);
+        
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'errors' => $e->errors()
+        ], 422);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error al crear el producto: ' . $e->getMessage()
+        ], 500);
+    }
+}
 }

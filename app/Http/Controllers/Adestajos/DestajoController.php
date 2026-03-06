@@ -99,87 +99,94 @@ class DestajoController extends Controller
     }
 
     public function store(Request $request)
-    {
-
-        $request->validate([
-            'consecutivo' => 'required|integer|min:1',
-            'id_contrato' => 'required|string|exists:contratos,id',
-            'id_proveedor' => 'required|string|exists:proveedores_servicios,id',
-            'referencia' => 'required|string|max:1500',
-            'iva' => 'nullable|numeric|min:0',
-            'productos' => 'required|array|min:1',
-            'productos.*.id_producto' => 'required|string|exists:productosyservicios,id',
-            'productos.*.cantidad' => 'required|numeric',
-            'productos.*.precio' => 'required|numeric',
+{
+    $request->validate([
+        'consecutivo' => 'required|integer|min:1',
+        'id_contrato' => 'required|string|exists:contratos,id',
+        'id_proveedor' => 'required|string|exists:proveedores_servicios,id',
+        'referencia' => 'required|string|max:1500',
+        'iva' => 'nullable|numeric|min:0',
+        'productos' => 'required|array|min:1',
+        'productos.*.id_producto' => 'required|string|exists:productosyservicios,id',
+        'productos.*.cantidad' => 'required|numeric',
+        'productos.*.precio' => 'required|numeric',
+    ]);
+    
+    // Obtener el ID del usuario autenticado
+    $id_usuario = auth('adestajos')->id();
+    
+    // Calcular el total de los productos
+    $costo_operado = 0;
+    foreach ($request->productos as $producto) {
+        $costo_operado += $producto['cantidad'] * $producto['precio'];
+    }
+    
+    $iva_porcentaje = $request->iva ?? 0;
+    $iva_calculado = $costo_operado * ($iva_porcentaje / 100);
+    $total = $costo_operado + $iva_calculado;
+    
+    DB::beginTransaction();
+    
+    try {
+        // Crear el destajo principal
+        $destajo_id = GetUuid();
+        
+        DB::table('destajos')->insert([
+            'id' => $destajo_id,
+            'id_contrato' => $request->id_contrato,
+            'id_usuario' => $id_usuario,
+            'id_proveedor' => $request->id_proveedor,
+            'consecutivo' => $request->consecutivo,
+            'referencia' => $request->referencia,
+            'costo_operado' => $costo_operado,
+            'iva' => $iva_calculado,
+            'total' => $total,
+            'verificado' => 1,
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
         
-        // Obtener el ID del usuario autenticado
-        $id_usuario = auth('adestajos')->id();
-        
-        // Calcular el total de los productos
-        $costo_operado = 0;
+        // Guardar los detalles y actualizar último costo
         foreach ($request->productos as $producto) {
-            $costo_operado += $producto['cantidad'] * $producto['precio'];
-        }
-        
-        $iva_porcentaje = $request->iva ?? 0;
-        $iva_calculado = $costo_operado * ($iva_porcentaje / 100);
-        $total = $costo_operado + $iva_calculado;
-        
-        DB::beginTransaction();
-        
-        try {
-            // Crear el destajo principal
-            $destajo_id = GetUuid();
+            $productoData = DB::table('productosyservicios')
+                ->where('id', $producto['id_producto'])
+                ->first();
             
-            DB::table('destajos')->insert([
-                'id' => $destajo_id,
-                'id_contrato' => $request->id_contrato,
-                'id_usuario' => $id_usuario,
-                'id_proveedor' => $request->id_proveedor,
-                'consecutivo' => $request->consecutivo,
-                'referencia' => $request->referencia,
-                'costo_operado' => $costo_operado,
-                'iva' => $iva_calculado,
-                'total' => $total,
-                'verificado' => 1,
+            DB::table('destajodetalles')->insert([
+                'id' => GetUuid(),
+                'id_destajo' => $destajo_id,
+                'id_productoservicio' => $producto['id_producto'],
+                'clave' => $productoData->clave,
+                'descripcion' => $productoData->descripcion,
+                'unidades' => $productoData->unidades,
+                'cantidad' => $producto['cantidad'],
+                'ult_costo' => $producto['precio'],
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
             
-            // Guardar los detalles
-            foreach ($request->productos as $producto) {
-                $productoData = DB::table('productosyservicios')
-                    ->where('id', $producto['id_producto'])
-                    ->first();
-                
-                DB::table('destajodetalles')->insert([
-                    'id' => GetUuid(),
-                    'id_destajo' => $destajo_id,
-                    'id_productoservicio' => $producto['id_producto'],
-                    'clave' => $productoData->clave,
-                    'descripcion' => $productoData->descripcion,
-                    'unidades' => $productoData->unidades,
-                    'cantidad' => $producto['cantidad'],
+            // Actualizar el último costo en la tabla productosyservicios
+            DB::table('productosyservicios')
+                ->where('id', $producto['id_producto'])
+                ->update([
                     'ult_costo' => $producto['precio'],
-                    'created_at' => now(),
                     'updated_at' => now()
                 ]);
-            }
-            
-            DB::commit();
-            
-            return redirect()->route('destajos.index')
-                ->with('success', 'Destajo creado exitosamente');
-                
-        } catch (\Exception $e) {
-            DB::rollBack();
-            
-            return redirect()->back()
-                ->with('error', 'Error al crear el destajo: ' . $e->getMessage())
-                ->withInput();
         }
+        
+        DB::commit();
+        
+        return redirect()->route('destajos.index')
+            ->with('success', 'Destajo creado exitosamente');
+            
+    } catch (\Exception $e) {
+        DB::rollBack();
+        
+        return redirect()->back()
+            ->with('error', 'Error al crear el destajo: ' . $e->getMessage())
+            ->withInput();
     }
+}
 
     /**
      * Display the specified resource.
@@ -358,6 +365,13 @@ class DestajoController extends Controller
                     'cantidad' => $producto['cantidad'],
                     'ult_costo' => $producto['precio'],
                     'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+
+                 DB::table('productosyservicios')
+                ->where('id', $producto['id_producto'])
+                ->update([
+                    'ult_costo' => $producto['precio'],
                     'updated_at' => now()
                 ]);
             }

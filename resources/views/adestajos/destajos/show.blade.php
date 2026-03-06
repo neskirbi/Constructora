@@ -36,16 +36,25 @@
             border-radius: 8px;
             padding: 15px;
         }
+        /* Ajustar altura del select2 */
         .select2-container--default .select2-selection--single {
-            height: 38px;
+            height: 38px !important;
             border: 1px solid #ced4da;
             border-radius: 4px;
         }
         .select2-container--default .select2-selection--single .select2-selection__rendered {
-            line-height: 36px;
+            line-height: 36px !important;
+            padding-left: 12px;
         }
         .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 36px;
+            height: 36px !important;
+        }
+        /* Estilos para los inputs */
+        .form-control-sm, .input-group-sm .form-control {
+            height: 38px;
+        }
+        .input-group-text {
+            height: 38px;
         }
         .readonly-field {
             background-color: #f8f9fa;
@@ -64,20 +73,6 @@
             font-weight: 700;
             color: #0d6efd;
             margin: 0;
-        }
-        .destajo-proveedor {
-            font-size: 1.1rem;
-            color: #495057;
-            font-weight: 500;
-            margin-bottom: 20px;
-            padding: 10px 15px;
-            background: #e7f1ff;
-            border-radius: 8px;
-            border-left: 4px solid #0d6efd;
-        }
-        .destajo-proveedor i {
-            color: #0d6efd;
-            margin-right: 8px;
         }
         .destajo-estado {
             padding: 6px 15px;
@@ -102,35 +97,6 @@
             color: #155724;
             border: 1px solid #c3e6cb;
         }
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-        .info-item {
-            display: flex;
-            flex-direction: column;
-        }
-        .info-label {
-            font-size: 0.8rem;
-            color: #6c757d;
-            margin-bottom: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .info-value {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #495057;
-        }
-        .moneda {
-            color: #198754;
-            font-weight: 600;
-        }
     </style>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
@@ -146,10 +112,11 @@
                 <div class="container-fluid py-4">
                     <div class="card shadow-sm form-card">
                         <div class="destajo-header">
-                            <div class="destajo-consecutivo">
-                                <i class="fas fa-hashtag me-2"></i>
-                                Editar Destajo #{{ $destajo->consecutivo }}
-                            </div>
+                           
+                             <h5 class="mb-0">
+                                    <i class="fas fa-plus-circle me-2 text-success"></i>
+                                    Editar Destajo
+                                </h5>
                             
                             @php
                                 $estadoClase = '';
@@ -186,16 +153,7 @@
                                 @csrf
                                 @method('PUT')
                                 
-                                <!-- Proveedor (solo visual, no editable en formulario) -->
-                                <div class="destajo-proveedor">
-                                    <i class="fas fa-building"></i>
-                                    <strong>Proveedor:</strong> {{ $destajo->proveedor_nombre ?? 'Proveedor no encontrado' }}
-                                    @if(isset($destajo->proveedor_clave))
-                                    <span class="text-muted ms-2">({{ $destajo->proveedor_clave }})</span>
-                                    @endif
-                                </div>
-                                
-                                <!-- Información General editable -->
+                                <!-- Información General -->
                                 <div class="row mb-4">
                                     <div class="col-md-3">
                                         <div class="mb-3">
@@ -208,7 +166,8 @@
                                                    min="1"
                                                    required
                                                    readonly
-                                                   noformat>
+                                                   noformat
+                                                   style="height: 38px;">
                                             @error('consecutivo')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -224,7 +183,8 @@
                                                    name="referencia" 
                                                    value="{{ old('referencia', $destajo->referencia) }}"
                                                    maxlength="1500"
-                                                   placeholder="Folio, contrato, etc.">
+                                                   placeholder="Folio, contrato, etc."
+                                                   style="height: 38px;">
                                             @error('referencia')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -237,7 +197,8 @@
                                             <select class="form-select form-select-sm @error('id_contrato') is-invalid @enderror" 
                                                     id="id_contrato" 
                                                     name="id_contrato"
-                                                    required>
+                                                    required
+                                                    style="height: 38px;">
                                                 <option value="">Seleccione un contrato</option>
                                                 @foreach($contratos as $contrato)
                                                     <option value="{{ $contrato->id }}" {{ old('id_contrato', $destajo->id_contrato) == $contrato->id ? 'selected' : '' }}>
@@ -253,11 +214,12 @@
                                     
                                     <div class="col-md-3">
                                         <div class="mb-3">
-                                            <label for="id_proveedor" class="form-label required-label">Proveedor (ID)</label>
+                                            <label for="id_proveedor" class="form-label required-label">Proveedor</label>
                                             <select class="form-select form-select-sm @error('id_proveedor') is-invalid @enderror" 
                                                     id="id_proveedor" 
                                                     name="id_proveedor"
-                                                    required>
+                                                    required
+                                                    style="height: 38px;">
                                                 <option value="">Seleccione un proveedor</option>
                                                 @foreach($proveedores as $proveedor)
                                                     <option value="{{ $proveedor->id }}" {{ old('id_proveedor', $destajo->id_proveedor) == $proveedor->id ? 'selected' : '' }}>
@@ -272,11 +234,7 @@
                                     </div>
                                 </div>
 
-                                
-
-                               
-
-                                <!-- Sección de Productos/Servicios editable -->
+                                <!-- Sección de Productos/Servicios -->
                                 <div class="row mb-3">
                                     <div class="col-12">
                                         <h6 class="fw-bold mb-3">
@@ -306,6 +264,7 @@
                                                     <select class="form-select form-select-sm producto-select" 
                                                             name="productos[{{ $index }}][id_producto]" 
                                                             data-index="{{ $index }}"
+                                                            style="width: 100%; height: 38px;"
                                                             required>
                                                         <option value="">Seleccionar</option>
                                                         @foreach($productos as $producto)
@@ -325,14 +284,16 @@
                                                            class="form-control form-control-sm descripcion-input" 
                                                            value="{{ $detalle->descripcion }}"
                                                            readonly
-                                                           placeholder="Descripción">
+                                                           placeholder="Descripción"
+                                                           style="height: 38px;">
                                                 </td>
                                                 <td>
                                                     <input type="text" 
                                                            class="form-control form-control-sm unidad-input" 
                                                            value="{{ $detalle->unidades }}"
                                                            readonly
-                                                           placeholder="Unidad">
+                                                           placeholder="Unidad"
+                                                           style="height: 38px;">
                                                 </td>
                                                 <td>
                                                     <input type="number" 
@@ -341,34 +302,35 @@
                                                            value="{{ $detalle->cantidad }}"
                                                            step="0.01" 
                                                            min="0.01"
+                                                           noformat
+                                                           style="height: 38px;"
                                                            required>
                                                 </td>
                                                 <td>
                                                     <div class="input-group input-group-sm">
-                                                        <span class="input-group-text">$</span>
+                                                        <span class="input-group-text" style="height: 38px;">$</span>
                                                         <input type="number" 
                                                                class="form-control precio-input" 
                                                                name="productos[{{ $index }}][precio]" 
                                                                value="{{ $detalle->ult_costo }}"
-                                                               step="0.01" 
+                                                               step="0.01"
+                                                               noformat
+                                                               style="height: 38px;"
                                                                required>
                                                     </div>
                                                 </td>
                                                 <td>
                                                     <div class="input-group input-group-sm">
-                                                        <span class="input-group-text">$</span>
+                                                        <span class="input-group-text" style="height: 38px;">$</span>
                                                         <input type="text" 
                                                                class="form-control subtotal-text" 
                                                                value="${{ number_format($detalle->cantidad * $detalle->ult_costo, 2) }}"
-                                                               readonly>
+                                                               readonly
+                                                               style="height: 38px; background-color: #f8f9fa;">
                                                     </div>
                                                 </td>
-                                                <td class="text-center">
-                                                    @if($loop->first && count($detalles) == 1)
-                                                    <i class="fas fa-trash-alt btn-remove-row" style="display: none;"></i>
-                                                    @else
-                                                    <i class="fas fa-trash-alt btn-remove-row"></i>
-                                                    @endif
+                                                <td class="text-center align-middle">
+                                                    <i class="fas fa-trash-alt btn-remove-row" style="{{ $loop->first && count($detalles) == 1 ? 'display: none;' : '' }} font-size: 1.2rem;"></i>
                                                 </td>
                                             </tr>
                                             @endforeach
@@ -376,9 +338,14 @@
                                         <tfoot>
                                             <tr>
                                                 <td colspan="7">
-                                                    <button type="button" class="btn btn-sm btn-outline-primary" id="agregarProducto">
-                                                        <i class="fas fa-plus me-1"></i> Agregar Producto/Servicio
-                                                    </button>
+                                                    <div class="d-flex gap-2">
+                                                        <button type="button" class="btn btn-sm btn-outline-primary" id="agregarProducto">
+                                                            <i class="fas fa-plus me-1"></i> Agregar Producto/Servicio
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#nuevoProductoModal">
+                                                            <i class="fas fa-plus-circle me-1"></i> Nuevo Producto
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         </tfoot>
@@ -409,8 +376,10 @@
                                                                name="iva" 
                                                                value="{{ old('iva', $destajo->iva ? round(($destajo->iva / $destajo->costo_operado) * 100, 2) : 16) }}"
                                                                step="0.01"
-                                                               min="0">
-                                                        <span class="input-group-text">%</span>
+                                                               min="0"
+                                                               noformat
+                                                               style="height: 38px;">
+                                                        <span class="input-group-text" style="height: 38px;">%</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -438,24 +407,7 @@
                                 <input type="hidden" name="costo_operado" id="costo_operado_hidden" value="{{ $destajo->costo_operado }}">
                                 <input type="hidden" name="total" id="total_hidden" value="{{ $destajo->total }}">
 
-                                <!-- Estado (editable) -->
-                                <div class="row mb-4">
-                                    <div class="col-md-4">
-                                        <div class="mb-3">
-                                            <label for="verificado" class="form-label">Estado</label>
-                                            <select class="form-select form-select-sm @error('verificado') is-invalid @enderror" 
-                                                    id="verificado" 
-                                                    name="verificado">
-                                                <option value="1" {{ old('verificado', $destajo->verificado ?? 1) == 1 ? 'selected' : '' }}>Pendiente</option>
-                                                <option value="2" {{ old('verificado', $destajo->verificado ?? 1) == 2 ? 'selected' : '' }}>Aprobado</option>
-                                                <option value="0" {{ old('verificado', $destajo->verificado ?? 1) == 0 ? 'selected' : '' }}>Rechazado</option>
-                                            </select>
-                                            @error('verificado')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                </div>
+                               
 
                                 <div class="row mt-4">
                                     <div class="col-12">
@@ -477,217 +429,346 @@
         </main>
     </div>
 
+    <!-- Modal para agregar nuevo producto/servicio -->
+    <div class="modal fade" id="nuevoProductoModal" tabindex="-1" aria-labelledby="nuevoProductoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="nuevoProductoModalLabel">
+                        <i class="fas fa-plus-circle text-success me-2"></i>
+                        Nuevo Producto/Servicio
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="nuevoProductoForm">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="nuevo_clave" class="form-label required-label">Clave</label>
+                            <input type="text" 
+                                   class="form-control form-control-sm" 
+                                   id="nuevo_clave" 
+                                   name="clave" 
+                                   maxlength="32"
+                                   required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="nuevo_descripcion" class="form-label required-label">Descripción</label>
+                            <textarea class="form-control form-control-sm" 
+                                      id="nuevo_descripcion" 
+                                      name="descripcion" 
+                                      rows="2"
+                                      required></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="nuevo_unidades" class="form-label required-label">Unidades</label>
+                            <input type="text" 
+                                   class="form-control form-control-sm" 
+                                   id="nuevo_unidades" 
+                                   name="unidades" 
+                                   maxlength="10"
+                                   placeholder="PZA, M2, etc."
+                                   required>
+                        </div>
+                        
+                        <div class="alert alert-danger d-none" id="productoError"></div>
+                        <div class="alert alert-success d-none" id="productoSuccess"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-success btn-sm" id="guardarProductoBtn">
+                            <i class="fas fa-save me-1"></i> Guardar Producto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     @include('footer')
     
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let productCount = {{ count($detalles) }};
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    let productCount = {{ count($detalles) }};
+    let productosData = @json($productos);
+    
+    // Inicializar los data-subtotal de las filas existentes
+    $('.producto-row').each(function() {
+        const cantidad = parseFloat($(this).find('.cantidad-input').val()) || 0;
+        const precio = parseFloat($(this).find('.precio-input').val()) || 0;
+        const subtotal = cantidad * precio;
+        $(this).attr('data-subtotal', subtotal);
+    });
+    
+    calcularTotalesGlobales();
+
+    // Función para actualizar subtotal de una fila
+    function actualizarSubtotalFila(row) {
+        const cantidad = parseFloat($(row).find('.cantidad-input').val()) || 0;
+        const precio = parseFloat($(row).find('.precio-input').val()) || 0;
+        const subtotal = cantidad * precio;
+        $(row).find('.subtotal-text').val('$' + subtotal.toFixed(2));
+        $(row).attr('data-subtotal', subtotal);
+        calcularTotalesGlobales();
+    }
+
+    // Función para calcular todos los totales
+    function calcularTotalesGlobales() {
+        let subtotalGlobal = 0;
+        $('.producto-row').each(function() {
+            const subtotal = parseFloat($(this).attr('data-subtotal')) || 0;
+            subtotalGlobal += subtotal;
+        });
+
+        const ivaPorcentaje = parseFloat($('#iva').val()) || 0;
+        const ivaCalculado = subtotalGlobal * (ivaPorcentaje / 100);
+        const totalGlobal = subtotalGlobal + ivaCalculado;
+
+        $('#subtotalGlobal').text('$' + subtotalGlobal.toFixed(2));
+        $('#ivaCalculado').text('$' + ivaCalculado.toFixed(2));
+        $('#totalGlobal').text('$' + totalGlobal.toFixed(2));
+        
+        // Actualizar campos ocultos
+        $('#costo_operado_hidden').val(subtotalGlobal.toFixed(2));
+        $('#total_hidden').val(totalGlobal.toFixed(2));
+    }
+
+    // Evento cuando se selecciona un producto
+    $(document).on('change', 'select[name^="productos"][name$="[id_producto]"]', function() {
+        const row = $(this).closest('tr');
+        const selectedOption = $(this).find('option:selected');
+        
+        if (selectedOption.val()) {
+            const descripcion = selectedOption.data('descripcion');
+            const unidad = selectedOption.data('unidad');
+            const precio = selectedOption.data('precio');
             
-            // Inicializar Select2
-            $('.producto-select').select2({
-                placeholder: 'Seleccionar producto/servicio',
-                allowClear: true,
-                width: '100%',
-                templateResult: formatOption,
-                templateSelection: formatOption
-            });
-
-            function formatOption(option) {
-                if (!option.id) return option.text;
-                return $('<span>' + option.text + '</span>');
-            }
-
-            // Función para actualizar subtotal de una fila
-            function actualizarSubtotalFila(row) {
-                const cantidad = parseFloat(row.querySelector('.cantidad-input').value) || 0;
-                const precio = parseFloat(row.querySelector('.precio-input').value) || 0;
-                const subtotal = cantidad * precio;
-                row.querySelector('.subtotal-text').value = '$' + subtotal.toFixed(2);
-                row.setAttribute('data-subtotal', subtotal);
-                calcularTotalesGlobales();
-            }
-
-            // Función para calcular todos los totales
-            function calcularTotalesGlobales() {
-                let subtotalGlobal = 0;
-                document.querySelectorAll('.producto-row').forEach(row => {
-                    subtotalGlobal += parseFloat(row.getAttribute('data-subtotal') || 0);
-                });
-
-                const ivaPorcentaje = parseFloat(document.getElementById('iva').value) || 0;
-                const ivaCalculado = subtotalGlobal * (ivaPorcentaje / 100);
-                const totalGlobal = subtotalGlobal + ivaCalculado;
-
-                document.getElementById('subtotalGlobal').textContent = '$' + subtotalGlobal.toFixed(2);
-                document.getElementById('ivaCalculado').textContent = '$' + ivaCalculado.toFixed(2);
-                document.getElementById('totalGlobal').textContent = '$' + totalGlobal.toFixed(2);
-                
-                // Actualizar campos ocultos
-                document.getElementById('costo_operado_hidden').value = subtotalGlobal.toFixed(2);
-                document.getElementById('total_hidden').value = totalGlobal.toFixed(2);
-            }
-
-            // Evento cuando se selecciona un producto
-            $(document).on('select2:select', '.producto-select', function(e) {
-                const row = $(this).closest('tr')[0];
-                const selectedOption = e.params.data.element;
-                
-                if (selectedOption) {
-                    const descripcion = selectedOption.getAttribute('data-descripcion');
-                    const unidad = selectedOption.getAttribute('data-unidad');
-                    const precio = selectedOption.getAttribute('data-precio');
-                    
-                    row.querySelector('.descripcion-input').value = descripcion || '';
-                    row.querySelector('.unidad-input').value = unidad || '';
-                    row.querySelector('.precio-input').value = precio || 0;
-                    
-                    actualizarSubtotalFila(row);
-                }
-            });
-
-            // Eventos para cambios en cantidad y precio
-            document.addEventListener('input', function(e) {
-                if (e.target.classList.contains('cantidad-input') || 
-                    e.target.classList.contains('precio-input')) {
-                    const row = e.target.closest('tr');
-                    actualizarSubtotalFila(row);
-                }
-            });
-
-            // Evento para cambio en porcentaje de IVA
-            document.getElementById('iva').addEventListener('input', calcularTotalesGlobales);
-
-            // Agregar nueva fila
-            document.getElementById('agregarProducto').addEventListener('click', function() {
-                const tbody = document.getElementById('productosBody');
-                const newRow = document.createElement('tr');
-                newRow.className = 'producto-row';
-                
-                const index = productCount;
-                
-                newRow.innerHTML = `
-                    <td>
-                        <select class="form-select form-select-sm producto-select" 
-                                name="productos[${index}][id_producto]" 
-                                data-index="${index}"
-                                required>
-                            <option value="">Seleccionar</option>
-                            @foreach($productos as $producto)
-                                <option value="{{ $producto->id }}" 
-                                        data-clave="{{ $producto->clave }}"
-                                        data-descripcion="{{ $producto->descripcion }}"
-                                        data-unidad="{{ $producto->unidades }}"
-                                        data-precio="{{ $producto->ult_costo }}">
-                                    {{ $producto->clave }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td>
-                        <input type="text" class="form-control form-control-sm descripcion-input" readonly placeholder="Descripción">
-                    </td>
-                    <td>
-                        <input type="text" class="form-control form-control-sm unidad-input" readonly placeholder="Unidad">
-                    </td>
-                    <td>
-                        <input type="number" class="form-control form-control-sm cantidad-input" name="productos[${index}][cantidad]" step="0.01" min="0.01" value="1" required>
-                    </td>
-                    <td>
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text">$</span>
-                            <input type="number" class="form-control precio-input" name="productos[${index}][precio]" step="0.01" required>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text">$</span>
-                            <input type="text" class="form-control subtotal-text" readonly>
-                        </div>
-                    </td>
-                    <td class="text-center">
-                        <i class="fas fa-trash-alt btn-remove-row"></i>
-                    </td>
-                `;
-                
-                tbody.appendChild(newRow);
-                
-                // Inicializar Select2 en la nueva fila
-                $(newRow).find('.producto-select').select2({
-                    placeholder: 'Seleccionar producto/servicio',
-                    allowClear: true,
-                    width: '100%',
-                    templateResult: formatOption,
-                    templateSelection: formatOption
-                });
-                
-                productCount++;
-                
-                actualizarBotonesEliminar();
-                calcularTotalesGlobales();
-            });
-
-            // Eliminar fila
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('btn-remove-row')) {
-                    const row = e.target.closest('tr');
-                    if (document.querySelectorAll('.producto-row').length > 1) {
-                        row.remove();
-                        calcularTotalesGlobales();
-                        actualizarBotonesEliminar();
-                    }
-                }
-            });
-
-            // Función para actualizar visibilidad de botones eliminar
-            function actualizarBotonesEliminar() {
-                const rows = document.querySelectorAll('.producto-row');
-                rows.forEach((row, index) => {
-                    const btnRemove = row.querySelector('.btn-remove-row');
-                    if (btnRemove) {
-                        btnRemove.style.display = rows.length > 1 ? 'inline-block' : 'none';
-                    }
-                });
-            }
-
-            // Calcular subtotales iniciales para cada fila
-            document.querySelectorAll('.producto-row').forEach(row => {
-                const cantidad = parseFloat(row.querySelector('.cantidad-input').value) || 0;
-                const precio = parseFloat(row.querySelector('.precio-input').value) || 0;
-                const subtotal = cantidad * precio;
-                row.setAttribute('data-subtotal', subtotal);
-            });
+            row.find('.descripcion-input').val(descripcion || '');
+            row.find('.unidad-input').val(unidad || '');
+            row.find('.precio-input').val(precio || 0);
             
+            actualizarSubtotalFila(row);
+        } else {
+            // Si selecciona la opción vacía, limpiar campos
+            row.find('.descripcion-input').val('');
+            row.find('.unidad-input').val('');
+            row.find('.precio-input').val('');
+            row.find('.subtotal-text').val('$0.00');
+            row.attr('data-subtotal', 0);
+            calcularTotalesGlobales();
+        }
+    });
+
+    // Eventos para cambios en cantidad y precio
+    $(document).on('input', '.cantidad-input, .precio-input', function() {
+        const row = $(this).closest('tr');
+        actualizarSubtotalFila(row);
+    });
+
+    // Evento para cambio en porcentaje de IVA
+    $('#iva').on('input', calcularTotalesGlobales);
+
+    // Agregar nueva fila
+    $('#agregarProducto').on('click', function() {
+        const tbody = $('#productosBody');
+        const index = productCount;
+        
+        const newRow = $('<tr>').addClass('producto-row');
+        
+        newRow.html(`
+            <td>
+                <select class="form-select form-select-sm" 
+                        name="productos[${index}][id_producto]" 
+                        data-index="${index}"
+                        style="width: 100%; height: 38px;"
+                        required>
+                    <option value="">Seleccionar</option>
+                    @foreach($productos as $producto)
+                        <option value="{{ $producto->id }}" 
+                                data-clave="{{ $producto->clave }}"
+                                data-descripcion="{{ $producto->descripcion }}"
+                                data-unidad="{{ $producto->unidades }}"
+                                data-precio="{{ $producto->ult_costo }}">
+                            {{ $producto->clave }}
+                        </option>
+                    @endforeach
+                </select>
+            </td>
+            <td>
+                <input type="text" class="form-control form-control-sm descripcion-input" readonly placeholder="Descripción" style="height: 38px;">
+            </td>
+            <td>
+                <input type="text" class="form-control form-control-sm unidad-input" readonly placeholder="Unidad" style="height: 38px;">
+            </td>
+            <td>
+                <input type="number" class="form-control form-control-sm cantidad-input" name="productos[${index}][cantidad]" step="0.01" min="0.01" value="1" noformat style="height: 38px;" required>
+            </td>
+            <td>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text" style="height: 38px;">$</span>
+                    <input type="number" class="form-control precio-input" name="productos[${index}][precio]" step="0.01" noformat style="height: 38px;" required>
+                </div>
+            </td>
+            <td>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text" style="height: 38px;">$</span>
+                    <input type="text" class="form-control subtotal-text" readonly style="height: 38px; background-color: #f8f9fa;">
+                </div>
+            </td>
+            <td class="text-center align-middle">
+                <i class="fas fa-trash-alt btn-remove-row" style="font-size: 1.2rem;"></i>
+            </td>
+        `);
+        
+        tbody.append(newRow);
+        productCount++;
+        
+        // Inicializar la nueva fila con subtotal en 0
+        newRow.attr('data-subtotal', 0);
+        
+        // Mostrar botones de eliminar
+        actualizarBotonesEliminar();
+        calcularTotalesGlobales();
+    });
+
+    // Eliminar fila
+    $(document).on('click', '.btn-remove-row', function() {
+        if ($('.producto-row').length > 1) {
+            $(this).closest('tr').remove();
             calcularTotalesGlobales();
             actualizarBotonesEliminar();
+        }
+    });
 
-            // Validación del formulario
-            const form = document.getElementById('destajoForm');
-            form.addEventListener('submit', function(event) {
-                const rows = document.querySelectorAll('.producto-row');
-                let hasProducts = false;
-                
-                rows.forEach(row => {
-                    const select = row.querySelector('.producto-select');
-                    if (select && select.value) {
-                        hasProducts = true;
-                    }
-                });
-                
-                if (!hasProducts) {
-                    event.preventDefault();
-                    alert('Debe agregar al menos un producto o servicio');
-                    return false;
-                }
-                
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                
-                form.classList.add('was-validated');
-            });
+    // Función para actualizar visibilidad de botones eliminar
+    function actualizarBotonesEliminar() {
+        const rows = $('.producto-row');
+        rows.each(function(index) {
+            const btnRemove = $(this).find('.btn-remove-row');
+            if (btnRemove.length) {
+                btnRemove.css('display', rows.length > 1 ? 'inline-block' : 'none');
+            }
         });
-    </script>
+    }
+
+    // Validación del formulario
+    $('#destajoForm').on('submit', function(event) {
+        let hasProducts = false;
+        
+        $('.producto-row').each(function() {
+            const select = $(this).find('select[name^="productos"][name$="[id_producto]"]');
+            if (select.val()) {
+                hasProducts = true;
+            }
+        });
+        
+        if (!hasProducts) {
+            event.preventDefault();
+            alert('Debe agregar al menos un producto o servicio');
+            return false;
+        }
+        
+        if (!this.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        
+        $(this).addClass('was-validated');
+    });
+
+    // Manejar envío del formulario para nuevo producto
+    $('#nuevoProductoForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        const form = $(this);
+        const formData = new FormData(this);
+        const submitBtn = $('#guardarProductoBtn');
+        const errorAlert = $('#productoError');
+        const successAlert = $('#productoSuccess');
+        
+        // Ocultar alerts previos
+        errorAlert.addClass('d-none');
+        successAlert.addClass('d-none');
+        
+        // Deshabilitar botón
+        submitBtn.prop('disabled', true);
+        submitBtn.html('<span class="spinner-border spinner-border-sm me-1"></span> Guardando...');
+        
+        // Enviar petición AJAX
+        $.ajax({
+            url: '{{ route("NuevoPS") }}',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            success: function(data) {
+                if (data.success) {
+                    // Mostrar mensaje de éxito
+                    successAlert.text(data.message).removeClass('d-none');
+                    
+                    // Crear nueva opción
+                    const newOption = $('<option>', {
+                        value: data.producto.id,
+                        text: data.producto.clave + ' - ' + data.producto.descripcion.substring(0, 30),
+                        'data-clave': data.producto.clave,
+                        'data-descripcion': data.producto.descripcion,
+                        'data-unidad': data.producto.unidades,
+                        'data-precio': data.producto.ult_costo
+                    });
+                    
+                    // Agregar a todos los selects
+                    $('select[name^="productos"][name$="[id_producto]"]').append(newOption.clone());
+                    
+                    // Limpiar formulario
+                    form[0].reset();
+                    
+                    // Cerrar modal después de 1 segundo
+                    setTimeout(function() {
+                        $('#nuevoProductoModal').modal('hide');
+                        successAlert.addClass('d-none');
+                    }, 1000);
+                }
+            },
+            error: function(xhr) {
+                if (xhr.status === 422) {
+                    // Errores de validación
+                    const errors = xhr.responseJSON.errors;
+                    let errorHtml = '';
+                    $.each(errors, function(key, value) {
+                        errorHtml += value.join('<br>') + '<br>';
+                    });
+                    errorAlert.html(errorHtml).removeClass('d-none');
+                } else {
+                    // Otros errores
+                    errorAlert.text(xhr.responseJSON.message || 'Error al guardar el producto').removeClass('d-none');
+                }
+            },
+            complete: function() {
+                // Restaurar botón
+                submitBtn.prop('disabled', false);
+                submitBtn.html('<i class="fas fa-save me-1"></i> Guardar Producto');
+            }
+        });
+    });
+
+    // Limpiar alerts cuando se cierra el modal
+    $('#nuevoProductoModal').on('hidden.bs.modal', function() {
+        $('#productoError').addClass('d-none');
+        $('#productoSuccess').addClass('d-none');
+        $('#nuevoProductoForm')[0].reset();
+    });
+
+    // Inicializar primera fila
+    actualizarBotonesEliminar();
+});
+</script>
 </body>
 </html>

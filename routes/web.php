@@ -210,3 +210,5 @@ Route::resource('proveedoresds', 'App\Http\Controllers\General\ProveedorControll
 Route::resource('productosyservicios', 'App\Http\Controllers\General\ProductosServiciosController')
     ->middleware(['auth:adestajos,acompras']);
 
+Route::post('NuevoPS', [App\Http\Controllers\General\ProductosServiciosController::class, 'NuevoPS'])
+->name('NuevoPS');
