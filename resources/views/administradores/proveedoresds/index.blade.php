@@ -53,78 +53,62 @@
                             </div>
 
                             @if($proveedores->count() > 0)
-                                <div class="row">
-                                    @foreach($proveedores as $proveedor)
-                                    <div class="col-md-6">
-                                        <!-- Tarjeta usando solo Bootstrap -->
-                                        <div class="card shadow-sm mb-3 h-100">
-                                            <!-- Header -->
-                                            <div class="card-header bg-light d-flex align-items-center p-3">
-                                                <!-- Icono con Bootstrap -->
-                                                <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                                                    <i class="fas fa-user text-white fs-4"></i>
-                                                </div>
-                                                
-                                                <!-- Información -->
-                                                <div class="flex-grow-1">
-                                                    <div class="d-flex justify-content-between align-items-start">
-                                                        <!-- Clave -->
-                                                        <span class="badge bg-secondary">{{ $proveedor->clave }}</span>
+                                <!-- Vista de LISTA (tabla) en lugar de tarjetas -->
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-sm">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Clave</th>
+                                                <th>Nombre</th>
+                                                <th>Teléfono</th>
+                                                <th>Dirección</th>
+                                                <th>Clasificación</th>
+                                                <th>Especialidad</th>
+                                                <th>Estatus</th>
+                                                <th class="text-center">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($proveedores as $proveedor)
+                                            <tr>
+                                                <td><span class="fw-semibold">{{ $proveedor->clave }}</span></td>
+                                                <td>{{ $proveedor->nombre }}</td>
+                                                <td>{{ $proveedor->telefono }}</td>
+                                                <td>{{ Str::limit($proveedor->calle, 30) }}</td>
+                                                <td>{{ $proveedor->clasificacion }}</td>
+                                                <td>{{ $proveedor->especialidad }}</td>
+                                                <td>
+                                                    @if($proveedor->estatus == 'Activo')
+                                                        <span class="badge bg-success">{{ $proveedor->estatus }}</span>
+                                                    @elseif($proveedor->estatus == 'Inactivo')
+                                                        <span class="badge bg-danger">{{ $proveedor->estatus }}</span>
+                                                    @elseif($proveedor->estatus == 'Suspendido')
+                                                        <span class="badge bg-warning text-dark">{{ $proveedor->estatus }}</span>
+                                                    @endif
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="d-flex justify-content-center gap-1">
+                                                        <a href="{{ route('aproveedoresds.show', $proveedor->id) }}" 
+                                                           class="btn btn-outline-info btn-xs" title="Ver detalles">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
                                                         
-                                                        <!-- Estatus con badges de Bootstrap -->
-                                                        @if($proveedor->estatus == 'Activo')
-                                                            <span class="badge bg-success">{{ $proveedor->estatus }}</span>
-                                                        @elseif($proveedor->estatus == 'Inactivo')
-                                                            <span class="badge bg-danger">{{ $proveedor->estatus }}</span>
-                                                        @else
-                                                            <span class="badge bg-warning text-dark">{{ $proveedor->estatus }}</span>
-                                                        @endif
                                                     </div>
-                                                    <!-- Nombre -->
-                                                    <h6 class="card-title mb-0 mt-1 fw-bold">{{ $proveedor->nombre }}</h6>
-                                                </div>
-                                            </div>
-                                            
-                                            <!-- Body -->
-                                            <div class="card-body p-3">
-                                                <!-- Dirección -->
-                                                <p class="card-text text-muted mb-2">
-                                                    <i class="fas fa-map-marker-alt me-2"></i>
-                                                    {{ Str::limit($proveedor->calle, 50) }}
-                                                </p>
-                                                
-                                                <!-- Teléfono -->
-                                                <p class="card-text text-muted mb-3">
-                                                    <i class="fas fa-phone me-2"></i>
-                                                    {{ $proveedor->telefono }}
-                                                </p>
-                                                
-                                                <!-- Etiquetas -->
-                                                <div class="d-flex flex-wrap gap-2">
-                                                    <span class="badge bg-light text-dark">
-                                                        {{ $proveedor->clasificacion }}
-                                                    </span>
-                                                    <span class="badge bg-info text-white">
-                                                        {{ $proveedor->especialidad }}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            
-                                            <!-- Footer -->
-                                            <div class="card-footer bg-light py-2">
-                                                <div class="text-end">
-                                                    <a href="{{ route('aproveedoresds.show', $proveedor->id) }}" 
-                                                       class="btn btn-outline-info btn-sm">
-                                                        <i class="fas fa-eye me-1"></i> Revisar
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @endforeach
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Totales compactos (opcional) -->
+                                <div class="mt-2 small text-muted">
+                                    <i class="fas fa-check-circle text-success me-1"></i> Activos: {{ $proveedores->where('estatus', 'Activo')->count() }} |
+                                    <i class="fas fa-exclamation-circle text-warning me-1"></i> Suspendidos: {{ $proveedores->where('estatus', 'Suspendido')->count() }} |
+                                    <i class="fas fa-times-circle text-danger me-1"></i> Inactivos: {{ $proveedores->where('estatus', 'Inactivo')->count() }}
                                 </div>
                             @else
-                                <!-- Estado vacío con Bootstrap -->
+                                <!-- Estado vacío -->
                                 <div class="text-center py-5">
                                     <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
                                     <h5 class="text-muted mb-3">No se encontraron proveedores</h5>

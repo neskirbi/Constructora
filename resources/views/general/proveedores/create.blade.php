@@ -21,8 +21,6 @@
             @include('adestajos.sidebar')
         @elseif(Guard() == 'acompras')
             @include('acompras.sidebar')
-        @else
-            <!-- Opcional: sidebar por defecto o nada -->
         @endif
         
         <main class="main-content" id="mainContent">
@@ -30,8 +28,6 @@
                 @include('adestajos.navbar')
             @elseif(Guard() == 'acompras')
                 @include('acompras.navbar')
-            @else
-                <!-- Opcional: sidebar por defecto o nada -->
             @endif
 
             <div class="content-area">
@@ -57,17 +53,19 @@
                                     <div class="col-md-6">
                                         <div class="mb-3">
                                             <label for="clave" class="form-label required-label">Clave</label>
-                                            <input type="text" 
+                                            <input type="number" 
                                                    class="form-control form-control-sm @error('clave') is-invalid @enderror" 
                                                    id="clave" 
                                                    name="clave" 
-                                                   value="{{ old('clave') }}"
-                                                   maxlength="50"
-                                                   required>
+                                                   value="{{ old('clave', $siguienteClave) }}"
+                                                   min="1"
+                                                   step="1"
+                                                   required
+                                                   noformat>
                                             @error('clave')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
-                                            <small class="text-muted">Identificador único del proveedor</small>
+                                            <small class="text-muted">Identificador único del proveedor. Clave sugerida: <strong>{{ $siguienteClave }}</strong></small>
                                         </div>
                                         
                                         <div class="mb-3">
@@ -116,13 +114,17 @@
                                         
                                         <div class="mb-3">
                                             <label for="clasificacion" class="form-label required-label">Clasificación</label>
-                                            <input type="text" 
-                                                   class="form-control form-control-sm @error('clasificacion') is-invalid @enderror" 
-                                                   id="clasificacion" 
-                                                   name="clasificacion" 
-                                                   value="{{ old('clasificacion') }}"
-                                                   maxlength="100"
-                                                   required>
+                                            <select class="form-select form-select-sm @error('clasificacion') is-invalid @enderror" 
+                                                    id="clasificacion" 
+                                                    name="clasificacion"
+                                                    required>
+                                                <option value="">Seleccione una clasificación</option>
+                                                @foreach($clasificacionOptions as $option)
+                                                    <option value="{{ $option }}" {{ old('clasificacion') == $option ? 'selected' : '' }}>
+                                                        {{ $option }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
                                             @error('clasificacion')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -148,20 +150,28 @@
                                         
                                         <div class="mb-3">
                                             <label for="especialidad" class="form-label required-label">Especialidad</label>
-                                            <select class="form-select form-select-sm @error('especialidad') is-invalid @enderror" 
-                                                    id="especialidad" 
-                                                    name="especialidad"
-                                                    required>
-                                                <option value="">Seleccione una especialidad</option>
-                                                @foreach($especialidadOptions as $option)
-                                                    <option value="{{ $option }}" {{ old('especialidad') == $option ? 'selected' : '' }}>
-                                                        {{ $option }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
+                                            <div class="input-group input-group-sm">
+                                                <select class="form-select form-select-sm @error('especialidad') is-invalid @enderror" 
+                                                        id="especialidad" 
+                                                        name="especialidad"
+                                                        required>
+                                                    <option value="">Seleccione una especialidad</option>
+                                                    @if(!empty($especialidadOptions) && count($especialidadOptions) > 0)
+                                                        @foreach($especialidadOptions as $option)
+                                                            <option value="{{ $option }}" {{ old('especialidad') == $option ? 'selected' : '' }}>
+                                                                {{ $option }}
+                                                            </option>
+                                                        @endforeach
+                                                    @endif
+                                                </select>
+                                                <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#nuevaEspecialidadModal">
+                                                    <i class="fas fa-plus"></i> Nueva
+                                                </button>
+                                            </div>
                                             @error('especialidad')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
+                                            <small class="text-muted">Puede seleccionar una existente o agregar una nueva</small>
                                         </div>
                                     </div>
                                 </div>
@@ -186,12 +196,48 @@
         </main>
     </div>
 
+    <!-- Modal para agregar nueva especialidad -->
+    <div class="modal fade" id="nuevaEspecialidadModal" tabindex="-1" aria-labelledby="nuevaEspecialidadModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="nuevaEspecialidadModalLabel">
+                        <i class="fas fa-plus-circle text-success me-2"></i>
+                        Nueva Especialidad
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nuevaEspecialidad" class="form-label required-label">Nombre de la especialidad</label>
+                        <input type="text" 
+                               class="form-control form-control-sm" 
+                               id="nuevaEspecialidad" 
+                               maxlength="100"
+                               placeholder="Ingrese la nueva especialidad">
+                        <small class="text-muted">La especialidad se agregará a las opciones disponibles</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Cancelar
+                    </button>
+                    <button type="button" class="btn btn-success btn-sm" id="guardarNuevaEspecialidad">
+                        <i class="fas fa-save me-1"></i> Agregar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @include('footer')
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Enfocar el campo clave automáticamente
             document.getElementById('clave').focus();
             
+            // Validación del formulario
             const form = document.getElementById('proveedorForm');
             form.addEventListener('submit', function(event) {
                 if (!form.checkValidity()) {
@@ -200,13 +246,51 @@
                 }
                 form.classList.add('was-validated');
             }, false);
+            
+            // Manejar nueva especialidad
+            document.getElementById('guardarNuevaEspecialidad').addEventListener('click', function() {
+                const nuevaEspecialidad = document.getElementById('nuevaEspecialidad').value.trim();
+                
+                if (nuevaEspecialidad === '') {
+                    alert('Por favor ingrese un nombre para la especialidad');
+                    return;
+                }
+                
+                // Verificar si ya existe
+                const select = document.getElementById('especialidad');
+                let existe = false;
+                
+                for (let i = 0; i < select.options.length; i++) {
+                    if (select.options[i].value.toUpperCase() === nuevaEspecialidad.toUpperCase()) {
+                        existe = true;
+                        break;
+                    }
+                }
+                
+                if (existe) {
+                    alert('Esta especialidad ya existe en la lista');
+                    return;
+                }
+                
+                // Agregar la nueva opción al select
+                const option = document.createElement('option');
+                option.value = nuevaEspecialidad;
+                option.text = nuevaEspecialidad;
+                option.selected = true;
+                select.add(option);
+                
+                // Cerrar modal y limpiar
+                const modal = bootstrap.Modal.getInstance(document.getElementById('nuevaEspecialidadModal'));
+                modal.hide();
+                document.getElementById('nuevaEspecialidad').value = '';
+            });
+            
+            // Limpiar campo al cerrar el modal
+            const modal = document.getElementById('nuevaEspecialidadModal');
+            modal.addEventListener('hidden.bs.modal', function() {
+                document.getElementById('nuevaEspecialidad').value = '';
+            });
         });
     </script>
 </body>
 </html>
-
-<!--
-La clave se qunere un cosecutivo 
-campo clasificacion sea un select (ADMON,COMOPRAS,DESTAJO,MATERIALES y SERVICIOS)
-la especialidad que de la opcion de una nueva o una que ya esta capturada 
--->

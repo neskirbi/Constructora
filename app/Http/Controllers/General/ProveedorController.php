@@ -4,6 +4,7 @@ namespace App\Http\Controllers\General;
 
 use App\Models\ProveedorSer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 
 class ProveedorController extends Controller
@@ -34,55 +35,35 @@ class ProveedorController extends Controller
      */
     public function create()
     {
+        // Obtener la clave más grande (como es varchar, convertir a número)
+        $maxClave = DB::table('proveedores_servicios')
+            ->select(DB::raw('MAX(CAST(clave AS UNSIGNED)) as max_clave'))
+            ->value('max_clave');
+        
+        $siguienteClave = $maxClave ? $maxClave + 1 : 1;
+        
+        // Obtener especialidades únicas de la base de datos
+        $especialidadOptions = DB::table('proveedores_servicios')
+            ->select('especialidad')
+            ->distinct()
+            ->whereNotNull('especialidad')
+            ->where('especialidad', '!=', '')
+            ->orderBy('especialidad')
+            ->pluck('especialidad')
+            ->toArray();
+        
         $estatusOptions = ['Activo', 'Inactivo', 'Suspendido'];
-        $especialidadOptions = [
-            'Cimentación',
-            'Estructuras',
-            'Albañilería',
-            'Aplanados',
-            'Yeso',
-            'Tablaroca',
-            'Pintura',
-            'Impermeabilización',
-            'Azulejo',
-            'Mármol y Granito',
-            'Carpintería',
-            'Herrería',
-            'Cristalería',
-            'Plomería',
-            'Electricidad',
-            'Instalaciones Sanitarias',
-            'Instalaciones Hidráulicas',
-            'Instalaciones Eléctricas',
-            'Instalaciones de Gas',
-            'Aire Acondicionado',
-            'Ventilación',
-            'Instalaciones Especiales',
-            'Acabados',
-            'Pisos y Recubrimientos',
-            'Fachadas',
-            'Techados',
-            'Demoliciones',
-            'Excavaciones',
-            'Movimientos de Tierra',
-            'Compactación',
-            'Andamios',
-            'Encofrados',
-            'Cimbras',
-            'Instalación de Cancelaría',
-            'Jardinería',
-            'Urbanización',
-            'Pavimentos',
-            'Drenajes',
-            'Instalaciones Deportivas',
-            'Otros'
-        ];
+        
+        $clasificacionOptions = ['ADMON', 'COMPRAS', 'DESTAJO', 'MATERIALES', 'SERVICIOS'];
         
         return view('general.proveedores.create', compact(
+            'siguienteClave',
             'estatusOptions', 
-            'especialidadOptions'
+            'especialidadOptions',
+            'clasificacionOptions'
         ));
     }
+    
 
     public function store(Request $request)
     {
@@ -112,59 +93,30 @@ class ProveedorController extends Controller
     }
 
     public function show($id)
-    {
-        $proveedor = ProveedorSer::findOrFail($id);
-        
-        $estatusOptions = ['Activo', 'Inactivo', 'Suspendido'];
-        $especialidadOptions = [
-            'Cimentación',
-            'Estructuras',
-            'Albañilería',
-            'Aplanados',
-            'Yeso',
-            'Tablaroca',
-            'Pintura',
-            'Impermeabilización',
-            'Azulejo',
-            'Mármol y Granito',
-            'Carpintería',
-            'Herrería',
-            'Cristalería',
-            'Plomería',
-            'Electricidad',
-            'Instalaciones Sanitarias',
-            'Instalaciones Hidráulicas',
-            'Instalaciones Eléctricas',
-            'Instalaciones de Gas',
-            'Aire Acondicionado',
-            'Ventilación',
-            'Instalaciones Especiales',
-            'Acabados',
-            'Pisos y Recubrimientos',
-            'Fachadas',
-            'Techados',
-            'Demoliciones',
-            'Excavaciones',
-            'Movimientos de Tierra',
-            'Compactación',
-            'Andamios',
-            'Encofrados',
-            'Cimbras',
-            'Instalación de Cancelaría',
-            'Jardinería',
-            'Urbanización',
-            'Pavimentos',
-            'Drenajes',
-            'Instalaciones Deportivas',
-            'Otros'
-        ];
-        
-        return view('general.proveedores.show', compact(
-            'estatusOptions', 
-            'especialidadOptions',
-            'proveedor'
-        ));
-    }
+{
+    $proveedor = ProveedorSer::findOrFail($id);
+    
+    // Obtener especialidades únicas de la base de datos
+    $especialidadOptions = DB::table('proveedores_servicios')
+        ->select('especialidad')
+        ->distinct()
+        ->whereNotNull('especialidad')
+        ->where('especialidad', '!=', '')
+        ->orderBy('especialidad')
+        ->pluck('especialidad')
+        ->toArray();
+    
+    $estatusOptions = ['Activo', 'Inactivo', 'Suspendido'];
+    
+    $clasificacionOptions = ['ADMON', 'COMPRAS', 'DESTAJO', 'MATERIALES', 'SERVICIOS'];
+    
+    return view('general.proveedores.show', compact(
+        'proveedor',
+        'estatusOptions', 
+        'especialidadOptions',
+        'clasificacionOptions'
+    ));
+}
 
     public function update(Request $request, $id)
     {
