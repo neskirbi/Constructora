@@ -459,27 +459,7 @@
                                 <div class="col-md-6">
                                    
                                     
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            % Anticipo
-                                        </label>
-                                        <div class="info-value @if(is_null($contrato->porcentaje_anticipo)) info-value-empty @endif">
-                                            @if(!is_null($contrato->porcentaje_anticipo))
-                                                {{ number_format($contrato->porcentaje_anticipo, 2) }}%
-                                            @else
-                                                No especificado
-                                            @endif
-                                        </div>
-                                    </div>
                                     
-                                    <div class="form-group-custom">
-                                        <label class="form-label-custom">
-                                            Anticipo
-                                        </label>
-                                        <div class="info-value @if(empty($contrato->monto_anticipo)) info-value-empty @endif">
-                                            ${{ number_format($contrato->monto_anticipo ?? 0, 2) }}
-                                        </div>
-                                    </div>
                                 </div>
                                 
                                 <!-- Columna Derecha -->
@@ -525,15 +505,30 @@
                                             ${{ number_format($contrato->total ?? 0, 2) }}
                                         </div>
                                     </div>
+
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">
+                                            % Anticipo
+                                        </label>
+                                        <div class="info-value @if(is_null($contrato->porcentaje_anticipo)) info-value-empty @endif">
+                                            @if(!is_null($contrato->porcentaje_anticipo))
+                                                {{ number_format($contrato->porcentaje_anticipo, 2) }}%
+                                            @else
+                                                No especificado
+                                            @endif
+                                        </div>
+                                    </div>
                                     
                                     <div class="form-group-custom">
                                         <label class="form-label-custom">
-                                            Total + Anticipo
+                                            Anticipo
                                         </label>
-                                        <div class="info-value">
-                                            ${{ number_format(($contrato->total ?? 0) + ($contrato->monto_anticipo ?? 0), 2) }}
+                                        <div class="info-value @if(empty($contrato->monto_anticipo)) info-value-empty @endif">
+                                            ${{ number_format($contrato->monto_anticipo ?? 0, 2) }}
                                         </div>
                                     </div>
+                                    
+                                    
                                 </div>
                             </div>
                         </div>
@@ -793,26 +788,16 @@
                                                         <th>Días Ampliados</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody>
+                                                <tbody><?php $frechaAtn = $contrato->fecha_terminacion_obra?>
                                                     @foreach($ampliacionesTiempo as $index => $amp)
-                                                        @php
-                                                            // Calcular fecha anterior (si existe)
-                                                            $fechaAnterior = $loop->last 
-                                                                ? $contrato->fecha_terminacion_obra 
-                                                                : $ampliacionesTiempo[$index + 1]->fecha_terminacion_obra ?? $contrato->fecha_terminacion_obra;
-                                                            
-                                                            // Calcular días de diferencia
-                                                            $diasAmpliados = 0;
-                                                            if ($fechaAnterior && $amp->fecha_terminacion_obra) {
-                                                                $fechaAnt = \Carbon\Carbon::parse($fechaAnterior);
-                                                                $fechaNueva = \Carbon\Carbon::parse($amp->fecha_terminacion_obra);
-                                                                $diasAmpliados = $fechaAnt->diffInDays($fechaNueva);
-                                                            }
-                                                        @endphp
+                                                        <?php 
+                                                            $fechaAmpliacion = \Carbon\Carbon::parse($amp->fecha_terminacion_obra);
+                                                            $diasAmpliados = \Carbon\Carbon::parse($frechaAtn)->diffInDays($fechaAmpliacion);
+                                                        ?>
                                                         <tr>
                                                             <td>{{ $index + 1 }}</td>
                                                             <td>{{ \Carbon\Carbon::parse($amp->created_at)->format('d/m/Y H:i') }}</td>
-                                                            <td>{{ $fechaAnterior ? \Carbon\Carbon::parse($fechaAnterior)->format('d/m/Y') : 'No definida' }}</td>
+                                                            <td>{{ \Carbon\Carbon::parse($frechaAtn)->format('d/m/Y') }}</td>
                                                             <td>{{ \Carbon\Carbon::parse($amp->fecha_terminacion_obra)->format('d/m/Y') }}</td>
                                                             <td class="text-center">
                                                                 @if($diasAmpliados > 0)
@@ -822,6 +807,7 @@
                                                                 @endif
                                                             </td>
                                                         </tr>
+                                                        <?php $frechaAtn = $amp->fecha_terminacion_obra?>
                                                     @endforeach
                                                 </tbody>
                                             </table>
@@ -839,7 +825,7 @@
                                                     <i class="fas fa-calendar-check me-2"></i>
                                                     <strong>Fecha actual de terminación:</strong><br>
                                                     @if($ampliacionesTiempo->isNotEmpty())
-                                                        {{ \Carbon\Carbon::parse($ampliacionesTiempo->first()->fecha_terminacion_obra)->format('d/m/Y') }}
+                                                        {{ \Carbon\Carbon::parse($ult_fecha->fecha_terminacion_obra)->format('d/m/Y') }}
                                                         <small class="text-muted">(Última ampliación)</small>
                                                     @else
                                                         {{ $contrato->fecha_terminacion_obra ? \Carbon\Carbon::parse($contrato->fecha_terminacion_obra)->format('d/m/Y') : 'No definida' }}
@@ -854,7 +840,7 @@
                                                         ? \Carbon\Carbon::parse($contrato->fecha_terminacion_obra) 
                                                         : null;
                                                     $fechaActual = $ampliacionesTiempo->first()->fecha_terminacion_obra 
-                                                        ? \Carbon\Carbon::parse($ampliacionesTiempo->first()->fecha_terminacion_obra) 
+                                                        ? \Carbon\Carbon::parse($ult_fecha->fecha_terminacion_obra) 
                                                         : null;
                                                     
                                                     if ($fechaOriginal && $fechaActual) {

@@ -662,20 +662,7 @@
                 </div>
             </div>
             
-            <div class="form-group-custom">
-                <label for="total_mas_anticipo" class="form-label-custom">
-                    Total + Anticipo
-                </label>
-                <div class="input-group input-group-custom">
-                    <span class="input-group-text">$</span>
-                    <input type="number" 
-                           class="form-control form-control-custom numeric-input bg-light" 
-                           id="total_mas_anticipo" 
-                           step="0.01"
-                           placeholder="0.00"
-                           readonly>
-                </div>
-            </div>
+           
         </div>
     </div>
 </div>
@@ -953,10 +940,10 @@ function calcularMontosContrato() {
     document.getElementById('iva').value = ivaCalculado.toFixed(2);
     document.getElementById('total').value = totalCalculado.toFixed(2);
     document.getElementById('monto_anticipo').value = anticipoCalculado.toFixed(2);
-    document.getElementById('total_mas_anticipo').value = totalMasAnticipo.toFixed(2);
+    
     
     // Disparar eventos change para jQuery y el formateador
-    ['iva', 'total', 'monto_anticipo', 'total_mas_anticipo'].forEach(id => {
+    ['iva', 'total', 'monto_anticipo'].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             // Para el formateador

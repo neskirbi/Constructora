@@ -239,26 +239,31 @@ class ContratoController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-{
-    // Buscar el contrato
-    $contrato = Contrato::findOrFail($id);
-    
-    // Obtener las ampliaciones usando los modelos
-    $ampliacionesTiempo = AmpliacionFecha::where('id_contrato', $contrato->id)
-        ->orderBy('created_at', 'desc')
-        ->get();
-    
-    $ampliacionesMonto = AmpliacionMonto::where('id_contrato', $contrato->id)
-        ->orderBy('created_at', 'desc')
-        ->get();
-    
-    // Cargar la vista con todos los datos
-    return view('aingresos.contratos.show', compact(
-        'contrato', 
-        'ampliacionesTiempo', 
-        'ampliacionesMonto'
-    ));
-}
+    {
+        // Buscar el contrato
+        $contrato = Contrato::findOrFail($id);
+        
+        // Obtener las ampliaciones usando los modelos
+        $ampliacionesTiempo = AmpliacionFecha::where('id_contrato', $contrato->id)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $ult_fecha = AmpliacionFecha::where('id_contrato', $contrato->id)
+            ->orderBy('created_at', 'desc')
+            ->first();
+        
+        $ampliacionesMonto = AmpliacionMonto::where('id_contrato', $contrato->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        // Cargar la vista con todos los datos
+        return view('aingresos.contratos.show', compact(
+            'contrato', 
+            'ampliacionesTiempo', 
+            'ampliacionesMonto',
+            'ult_fecha'
+        ));
+    }
 
 
     /**
@@ -523,26 +528,16 @@ public function storeAmpliacionMonto(Request $request, $id)
         
         $contrato = Contrato::findOrFail($id);
         
-        $request->validate([
-            'subtotal' => 'required|numeric',
-            'iva' => 'required|numeric|min:0',
-            'total' => 'required|numeric'
-        ]);
-        
         // Usando el modelo AmpliacionMonto
         $ampliacion = new AmpliacionMonto();
         $ampliacion->id = GetUuid();
         $ampliacion->id_contrato = $contrato->id;
-        $ampliacion->subtotal = $request->subtotal;
-        $ampliacion->iva = $request->iva;
-        $ampliacion->total = $request->total;
+        $ampliacion->subtotal = $request->subtotal ?? 0.0;
+        $ampliacion->iva = $request->iva ?? 0.0;
+        $ampliacion->total = $request->total ?? 0.0;
         $ampliacion->save();
         
-        // Actualizar montos del contrato
-        $contrato->subtotal = $contrato->subtotal + $request->subtotal;
-        $contrato->iva = $contrato->iva + $request->iva;
-        $contrato->total = $contrato->total + $request->total;
-        $contrato->save();
+      
         
         DB::commit();
         
@@ -589,7 +584,7 @@ public function destroyAmpliacionTiempo($id)
         }
         
         $ampliacion->delete();
-        $contrato->save();
+        //$contrato->save();
         
         DB::commit();
         
@@ -624,7 +619,7 @@ public function destroyAmpliacionMonto($id)
         $contrato->total = $contrato->total - $ampliacion->total;
         
         $ampliacion->delete();
-        $contrato->save();
+        //$contrato->save();
         
         DB::commit();
         

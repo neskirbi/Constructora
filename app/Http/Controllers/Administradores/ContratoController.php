@@ -101,11 +101,15 @@ class ContratoController extends Controller
             
         $ampliacionesTiempo = DB::table('ampliacionestiempo')
             ->where('id_contrato', $id)
-            ->orderBy('created_at', 'desc')
+            ->orderBy('created_at', 'asc')
             ->get();
+
+        $ult_fecha = AmpliacionFecha::where('id_contrato', $contrato->id)
+            ->orderBy('created_at', 'desc')
+            ->first();
         
         // Cargar la vista con todas las variables necesarias
-        return view('administradores.contratos.show', compact('contrato', 'ampliacionesMonto', 'ampliacionesTiempo'));
+        return view('administradores.contratos.show', compact('contrato', 'ampliacionesMonto', 'ampliacionesTiempo','ult_fecha'));
         
     } catch (\Exception $e) {
         // Si no se encuentra el contrato

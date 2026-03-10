@@ -544,53 +544,9 @@
                                 <div class="row">
                                     <!-- Columna Izquierda -->
                                     <div class="col-md-6">
-                                        <!--<div class="form-group-custom">
-                                            <label for="concepto" class="form-label-custom">
-                                                Concepto
-                                            </label>
-                                            <select class="form-control form-control-custom" 
-                                                    id="concepto" 
-                                                    name="concepto">
-                                                <option value="">Seleccionar concepto...</option>
-                                                <option value="TOTAL CONTRATO" {{ old('concepto', $contrato->concepto) == 'TOTAL CONTRATO' ? 'selected' : '' }}>TOTAL CONTRATO</option>
-                                                <option value="CONVENIO APLIACION" {{ old('concepto', $contrato->concepto) == 'CONVENIO APLIACION' ? 'selected' : '' }}>CONVENIO APLIACION</option>
-                                            </select>
-                                        </div>-->
                                         
-                                        <div class="form-group-custom">
-                                            <label for="porcentaje_anticipo" class="form-label-custom">
-                                                % Anticipo
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input" 
-                                                       id="porcentaje_anticipo" 
-                                                       name="porcentaje_anticipo"
-                                                       value="{{ old('porcentaje_anticipo', $contrato->porcentaje_anticipo) }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       min="0"
-                                                       max="100">
-                                                <span class="input-group-text">%</span>
-                                            </div>
-                                        </div>
                                         
-                                        <div class="form-group-custom">
-                                            <label for="monto_anticipo" class="form-label-custom">
-                                                Anticipo
-                                            </label>
-                                            <div class="input-group input-group-custom">
-                                                <span class="input-group-text">$</span>
-                                                <input type="number" 
-                                                       class="form-control form-control-custom numeric-input bg-light" 
-                                                       id="monto_anticipo" 
-                                                       name="monto_anticipo"
-                                                       value="{{ old('monto_anticipo', $contrato->monto_anticipo) }}"
-                                                       step="0.01"
-                                                       placeholder="0.00"
-                                                       readonly>
-                                            </div>
-                                        </div>
+                                        
                                     </div>
                                     
                                     <!-- Columna Derecha -->
@@ -667,23 +623,43 @@
                                                        style="background-color: #f8f9fa;">
                                             </div>
                                         </div>
+
+                                        <div class="form-group-custom">
+                                            <label for="porcentaje_anticipo" class="form-label-custom">
+                                                % Anticipo
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input" 
+                                                       id="porcentaje_anticipo" 
+                                                       name="porcentaje_anticipo"
+                                                       value="{{ old('porcentaje_anticipo', $contrato->porcentaje_anticipo) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0"
+                                                       max="100">
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </div>
                                         
                                         <div class="form-group-custom">
-                                            <label for="total_mas_anticipo" class="form-label-custom">
-                                                Total + Anticipo
+                                            <label for="monto_anticipo" class="form-label-custom">
+                                                Anticipo
                                             </label>
                                             <div class="input-group input-group-custom">
                                                 <span class="input-group-text">$</span>
                                                 <input type="number" 
                                                        class="form-control form-control-custom numeric-input bg-light" 
-                                                       id="total_mas_anticipo" 
-                                                       name="total_mas_anticipo"
-                                                       value="{{ old('total_mas_anticipo', $contrato->total_mas_anticipo ?? ($contrato->total + $contrato->monto_anticipo)) }}"
+                                                       id="monto_anticipo" 
+                                                       name="monto_anticipo"
+                                                       value="{{ old('monto_anticipo', $contrato->monto_anticipo) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
                                                        readonly>
                                             </div>
                                         </div>
+                                        
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -910,7 +886,7 @@
                                                         <div class="form-group-custom">
                                                             <label class="form-label-custom">Fecha Actual</label>
                                                             <input type="text" class="form-control bg-light" 
-                                                                value="{{ $contrato->fecha_terminacion_obra ? $contrato->fecha_terminacion_obra->format('d/m/Y') : 'No definida' }}" readonly>
+                                                                value="{{ $contrato->fecha_terminacion_obra ? $ult_fecha->fecha_terminacion_obra->format('d/m/Y') : 'No definida' }}" readonly>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
@@ -918,7 +894,8 @@
                                                             <label for="fecha_terminacion_obra" class="form-label-custom required-label">Nueva Fecha</label>
                                                             <input type="date" class="form-control" id="fecha_terminacion_obra" 
                                                                 name="fecha_terminacion_obra" required
-                                                                min="{{ $contrato->fecha_terminacion_obra ? $contrato->fecha_terminacion_obra->format('Y-m-d') : now()->format('Y-m-d') }}">
+                                                                value="{{ $ult_fecha->fecha_terminacion_obra ? $ult_fecha->fecha_terminacion_obra->format('Y-m-d') : '' }}"
+                                                                placeholder="{{ $contrato->fecha_terminacion_obra ? '' : 'No definida' }}">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -944,15 +921,18 @@
                                                             <tr>
                                                                 <th>#</th>
                                                                 <th>Fecha Registro</th>
+                                                                <th>Fecha Anterior</th>
                                                                 <th>Nueva Fecha</th>
                                                                 <th>Acciones</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
+                                                            <?php $frechaAtn = $contrato->fecha_terminacion_obra?>
                                                             @foreach($ampliacionesTiempo as $index => $amp)
                                                                 <tr>
                                                                     <td>{{ $index + 1 }}</td>
-                                                                    <td>{{ \Carbon\Carbon::parse($amp->created_at)->format('d/m/Y H:i') }}</td>
+                                                                    <td>{{ \Carbon\Carbon::parse($amp->created_at)->format('d/m/Y') }}</td>
+                                                                    <td>{{ \Carbon\Carbon::parse($frechaAtn)->format('d/m/Y') }}</td>
                                                                     <td>{{ \Carbon\Carbon::parse($amp->fecha_terminacion_obra)->format('d/m/Y') }}</td>
                                                                     <td>
                                                                         <form action="{{ route('acontratos.ampliacion-tiempo.destroy', $amp->id) }}" 
@@ -966,6 +946,7 @@
                                                                         </form>
                                                                     </td>
                                                                 </tr>
+                                                                <?php $frechaAtn = $amp->fecha_terminacion_obra?>
                                                             @endforeach
                                                         </tbody>
                                                     </table>
@@ -1002,13 +983,31 @@
                                                         </div>
                                                         <div class="col-md-4">
                                                             <div class="form-group-custom">
-                                                                <label for="amp_iva" class="form-label-custom required-label">IVA</label>
+                                                                <label for="amp_iva" class="form-label-customs">% IVA</label>
                                                                 <div class="input-group input-group-custom">
                                                                     <span class="input-group-text">%</span>
                                                                     <input type="number" class="form-control form-control-custom numeric-input" 
-                                                                        id="amp_iva" name="iva" step="0.01" min="0" placeholder="0.00" required>
+                                                                        id="amp_iva" name="iva" step="0.01" min="0" placeholder="0.00">
                                                                 </div>
                                                             </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <div class="form-group-custom">
+                                                                <label for="amp_iva_t" class="form-label-custom">IVA</label>
+                                                                <div class="input-group input-group-custom">
+                                                                    <span class="input-group-text">$</span>
+                                                                    <input type="number" class="form-control form-control-custom numeric-input bg-light" 
+                                                                        id="amp_iva_t" name="amp_iva_t" step="0.01" placeholder="0.00" readonly>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-4">
+                                                           
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                           
                                                         </div>
                                                         <div class="col-md-4">
                                                             <div class="form-group-custom">
@@ -1234,10 +1233,10 @@
             document.getElementById('iva').value = ivaCalculado.toFixed(2);
             document.getElementById('total').value = totalCalculado.toFixed(2);
             document.getElementById('monto_anticipo').value = anticipoCalculado.toFixed(2);
-            document.getElementById('total_mas_anticipo').value = totalMasAnticipo.toFixed(2);
+            
             
             // Disparar eventos para el formateador
-            ['iva', 'total', 'monto_anticipo', 'total_mas_anticipo'].forEach(id => {
+            ['iva', 'total', 'monto_anticipo'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) {
                     el.dispatchEvent(new Event('input', { bubbles: true }));
@@ -1321,6 +1320,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const subtotal = document.getElementById('amp_subtotal');
     const iva = document.getElementById('amp_iva');
+    const ivat = document.getElementById('amp_iva_t');
     const total = document.getElementById('amp_total');
     
     const nuevoSubtotal = document.getElementById('nuevo_subtotal');
@@ -1343,9 +1343,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const t = s + importeIva;
         
         // Actualizar campo total
+        document.getElementById('amp_iva_t').value = importeIva.toFixed(2);
         document.getElementById('amp_total').value = t.toFixed(2);
         
         // Disparar eventos
+        const it = document.getElementById('amp_iva_t');
+        it.dispatchEvent(new Event('input', { bubbles: true }));
+        it.dispatchEvent(new Event('change', { bubbles: true }));
+
         const total = document.getElementById('amp_total');
         total.dispatchEvent(new Event('input', { bubbles: true }));
         total.dispatchEvent(new Event('change', { bubbles: true }));

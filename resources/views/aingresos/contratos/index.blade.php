@@ -215,7 +215,7 @@
                                 </div>
                                 
                                 <!-- DESGLOSE DE CONVENIOS (AMPLIACIONES) -->
-                                @if($contrato->ampliacionesTiempo->count() > 0 || $contrato->ampliacionesMonto->count() > 0)
+                                
                                 <div class="mt-4 pt-3 border-top">
                                     <h6 class="text-primary mb-3">
                                         <i class="fas fa-file-contract me-2"></i>Convenios / Ampliaciones
@@ -223,7 +223,6 @@
                                     
                                     <div class="row">
                                         <!-- Ampliaciones de Tiempo -->
-                                        @if($contrato->ampliacionesTiempo->count() > 0)
                                         <div class="col-md-6 mb-3">
                                             <div class="card border-0 bg-light">
                                                 <div class="card-header bg-transparent border-0 pt-3">
@@ -257,10 +256,8 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        @endif
                                         
                                         <!-- Ampliaciones de Monto -->
-                                        @if($contrato->ampliacionesMonto->count() > 0)
                                         <div class="col-md-6 mb-3">
                                             <div class="card border-0 bg-light">
                                                 <div class="card-header bg-transparent border-0 pt-3">
@@ -312,12 +309,11 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        @endif
                                     </div>
                                     
                                     
                                 </div>
-                                @endif
+                                
                                 
                                 <!-- Botones de acción -->
                                 <div class="d-flex justify-content-end gap-2 mt-4">
