@@ -29,7 +29,7 @@ class Contrato extends Model
         'subtotal',
         'iva',
         'total',
-        'porcentaje_anticipo', // <--- AGREGADO
+        'porcentaje_anticipo',
         'monto_anticipo',
         'duracion',
         'fecha_contrato',
@@ -52,6 +52,7 @@ class Contrato extends Model
         'clabe_interbancaria',
         'mail_facturas',
         'representante_legal',
+        'puesto_representante_legal',
         'created_at',
         'updated_at'
     ];
@@ -66,7 +67,7 @@ class Contrato extends Model
         'subtotal' => 'decimal:2',
         'iva' => 'decimal:2',
         'total' => 'decimal:2',
-        'porcentaje_anticipo' => 'decimal:2', // <--- AGREGADO (opcional pero recomendado)
+        'porcentaje_anticipo' => 'decimal:2', 
         'monto_anticipo' => 'decimal:2',
         'latitud' => 'decimal:8',
         'longitud' => 'decimal:8',

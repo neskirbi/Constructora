@@ -390,6 +390,19 @@
                                                    placeholder="Nombre del representante legal">
                                         </div>
                                     </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label for="puesto_representante_legal" class="form-label-custom">
+                                                Puesto Representante Legal
+                                            </label>
+                                            <input type="text" 
+                                                   class="form-control form-control-custom" 
+                                                   id="puesto_representante_legal" 
+                                                   name="puesto_representante_legal" 
+                                                   value="{{ old('puesto_representante_legal', $contrato->puesto_representante_legal) }}"
+                                                   placeholder="Puesto Representante Legal">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             

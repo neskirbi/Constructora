@@ -52,6 +52,7 @@ class CreateContratos extends Migration
             $table->string('clabe_interbancaria')->nullable();
             $table->string('mail_facturas')->nullable();
             $table->string('representante_legal')->nullable();
+            $table->string('puesto_representante_legal')->nullable();
 
             $table->timestamps();
         });

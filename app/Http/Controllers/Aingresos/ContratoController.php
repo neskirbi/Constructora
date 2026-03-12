@@ -135,6 +135,7 @@ class ContratoController extends Controller
             
             // Representante legal
             'representante_legal' => 'nullable|string|max:255',
+            'puesto_representante_legal' => 'nullable|string|max:255',
         ], [
             'contrato_no.required' => 'El número de contrato es obligatorio',
             'contrato_no.unique' => 'Este número de contrato ya existe',
@@ -202,6 +203,7 @@ class ContratoController extends Controller
             
             // Representante
             'representante_legal' => $validatedData['representante_legal'] ?? null,
+            'puesto_representante_legal' => $validatedData['puesto_representante_legal'] ?? null,
             
             // Timestamps
             'created_at' => now(),
@@ -336,6 +338,7 @@ class ContratoController extends Controller
             
             // Representante legal
             'representante_legal' => 'nullable|string|max:255',
+            'puesto_representante_legal' => 'nullable|string|max:255',
         ], [
             'contrato_no.required' => 'El número de contrato es obligatorio',
             'contrato_no.unique' => 'Este número de contrato ya existe',
@@ -399,6 +402,7 @@ class ContratoController extends Controller
             
             // Representante
             'representante_legal' => $validatedData['representante_legal'] ?? null,
+            'puesto_representante_legal' => $validatedData['puesto_representante_legal'] ?? null,
             
             // Actualizar timestamp
             'updated_at' => now(),

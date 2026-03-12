@@ -396,6 +396,19 @@
                                                    placeholder="Nombre del representante legal">
                                         </div>
                                     </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label for="puesto_representante_legal" class="form-label-custom">
+                                                Puesto Representante Legal
+                                            </label>
+                                            <input type="text" 
+                                                   class="form-control form-control-custom" 
+                                                   id="puesto_representante_legal" 
+                                                   name="representante_legal" 
+                                                   value="{{ old('puesto_representante_legal') }}"
+                                                   placeholder="Puesto Representante Legal">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -542,130 +555,130 @@
                             
                             
                            <!-- Sección 4: Montos del Contrato -->
-<div class="form-section">
-    <h5 class="section-title">
-        <i class="fas fa-dollar-sign me-2"></i>
-        Montos del Contrato
-    </h5>
-    
-    <div class="row">
-        <!-- Columna Izquierda -->
-        <div class="col-md-6">
-          
-            
-            <div class="form-group-custom">
-                <label for="porcentaje_anticipo" class="form-label-custom">
-                    % Anticipo
-                </label>
-                <div class="input-group input-group-custom">
-                    <input type="number" 
-                           class="form-control form-control-custom numeric-input" 
-                           id="porcentaje_anticipo" 
-                           name="porcentaje_anticipo"
-                           value="{{ old('porcentaje_anticipo') }}"
-                           step="0.01"
-                           placeholder="0.00"
-                           min="0"
-                           max="100">
-                    <span class="input-group-text">%</span>
-                </div>
-            </div>
-            
-            <div class="form-group-custom">
-                <label for="monto_anticipo" class="form-label-custom">
-                    Anticipo
-                </label>
-                <div class="input-group input-group-custom">
-                    <span class="input-group-text">$</span>
-                    <input type="number" 
-                           class="form-control form-control-custom numeric-input bg-light" 
-                           id="monto_anticipo" 
-                           step="0.01"
-                           placeholder="0.00"
-                           readonly>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Columna Derecha -->
-        <div class="col-md-6">
-            <div class="form-group-custom">
-                <label for="subtotal" class="form-label-custom">
-                    Subtotal
-                </label>
-                <div class="input-group input-group-custom">
-                    <span class="input-group-text">$</span>
-                    <input type="number" 
-                           class="form-control form-control-custom numeric-input" 
-                           id="subtotal" 
-                           name="subtotal" 
-                           value="{{ old('subtotal') }}"
-                           step="0.01"
-                           placeholder="0.00"
-                           min="0">
-                </div>
-            </div>
-            
-            <div class="form-group-custom">
-                <label for="porcentaje_iva" class="form-label-custom">
-                    % IVA
-                </label>
-                <div class="input-group input-group-custom">
-                    <input type="number" 
-                           class="form-control form-control-custom numeric-input" 
-                           id="porcentaje_iva" 
-                           name="porcentaje_iva" 
-                           value="{{ old('porcentaje_iva', '16') }}"
-                           step="0.01"
-                           placeholder="16.00"
-                           min="0"
-                           max="100">
-                    <span class="input-group-text">%</span>
-                </div>
-            </div>
-            
-            <div class="form-group-custom">
-                <label for="iva" class="form-label-custom">
-                    IVA
-                </label>
-                <div class="input-group input-group-custom">
-                    <span class="input-group-text">$</span>
-                    <input type="number" 
-                           class="form-control form-control-custom numeric-input" 
-                           id="iva" 
-                           name="iva" 
-                           value="{{ old('iva') }}"
-                           step="0.01"
-                           placeholder="0.00"
-                           min="0"
-                           readonly
-                           style="background-color: #f8f9fa;">
-                </div>
-            </div>
-            
-            <div class="form-group-custom">
-                <label for="total" class="form-label-custom">
-                    Total
-                </label>
-                <div class="input-group input-group-custom">
-                    <span class="input-group-text">$</span>
-                    <input type="number" 
-                           class="form-control form-control-custom numeric-input" 
-                           id="total" 
-                           name="total" 
-                           value="{{ old('total') }}"
-                           step="0.01"
-                           placeholder="0.00"
-                           min="0"
-                           readonly
-                           style="background-color: #f8f9fa;">
-                </div>
-            </div>
-            
-           
-        </div>
-    </div>
-</div>
+                            <div class="form-section">
+                                <h5 class="section-title">
+                                    <i class="fas fa-dollar-sign me-2"></i>
+                                    Montos del Contrato
+                                </h5>
+                                
+                                <div class="row">
+                                    <!-- Columna Izquierda -->
+                                    <div class="col-md-6">
+                                    
+                                        
+                                        <div class="form-group-custom">
+                                            <label for="porcentaje_anticipo" class="form-label-custom">
+                                                % Anticipo
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <input type="number" 
+                                                    class="form-control form-control-custom numeric-input" 
+                                                    id="porcentaje_anticipo" 
+                                                    name="porcentaje_anticipo"
+                                                    value="{{ old('porcentaje_anticipo') }}"
+                                                    step="0.01"
+                                                    placeholder="0.00"
+                                                    min="0"
+                                                    max="100">
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group-custom">
+                                            <label for="monto_anticipo" class="form-label-custom">
+                                                Anticipo
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                    class="form-control form-control-custom numeric-input bg-light" 
+                                                    id="monto_anticipo" 
+                                                    step="0.01"
+                                                    placeholder="0.00"
+                                                    readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Columna Derecha -->
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label for="subtotal" class="form-label-custom">
+                                                Subtotal
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                    class="form-control form-control-custom numeric-input" 
+                                                    id="subtotal" 
+                                                    name="subtotal" 
+                                                    value="{{ old('subtotal') }}"
+                                                    step="0.01"
+                                                    placeholder="0.00"
+                                                    min="0">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group-custom">
+                                            <label for="porcentaje_iva" class="form-label-custom">
+                                                % IVA
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <input type="number" 
+                                                    class="form-control form-control-custom numeric-input" 
+                                                    id="porcentaje_iva" 
+                                                    name="porcentaje_iva" 
+                                                    value="{{ old('porcentaje_iva', '16') }}"
+                                                    step="0.01"
+                                                    placeholder="16.00"
+                                                    min="0"
+                                                    max="100">
+                                                <span class="input-group-text">%</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group-custom">
+                                            <label for="iva" class="form-label-custom">
+                                                IVA
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                    class="form-control form-control-custom numeric-input" 
+                                                    id="iva" 
+                                                    name="iva" 
+                                                    value="{{ old('iva') }}"
+                                                    step="0.01"
+                                                    placeholder="0.00"
+                                                    min="0"
+                                                    readonly
+                                                    style="background-color: #f8f9fa;">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-group-custom">
+                                            <label for="total" class="form-label-custom">
+                                                Total
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                    class="form-control form-control-custom numeric-input" 
+                                                    id="total" 
+                                                    name="total" 
+                                                    value="{{ old('total') }}"
+                                                    step="0.01"
+                                                    placeholder="0.00"
+                                                    min="0"
+                                                    readonly
+                                                    style="background-color: #f8f9fa;">
+                                            </div>
+                                        </div>
+                                        
+                                    
+                                    </div>
+                                </div>
+                            </div>
 
 
                             

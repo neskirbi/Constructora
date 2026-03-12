@@ -327,6 +327,16 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-md-6">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">
+                                            Puesto Representante Legal
+                                        </label>
+                                        <div class="info-value @if(empty($contrato->puesto_representante_legal)) info-value-empty @endif">
+                                            {{ $contrato->puesto_representante_legal ?: 'No especificado' }}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         
