@@ -140,7 +140,7 @@
                                                 <option value="">Seleccione un contrato</option>
                                                 @foreach($contratos as $contrato)
                                                     <option value="{{ $contrato->id }}" {{ old('id_contrato') == $contrato->id ? 'selected' : '' }}>
-                                                        {{ $contrato->contrato_no }} - {{ $contrato->obra ?? '' }}
+                                                        {{ $contrato->consecutivo }} - {{ $contrato->obra ?? '' }}
                                                     </option>
                                                 @endforeach
                                             </select>
@@ -160,7 +160,7 @@
                                                 <option value="">Seleccione un proveedor</option>
                                                 @foreach($proveedores as $proveedor)
                                                     <option value="{{ $proveedor->id }}" {{ old('id_proveedor') == $proveedor->id ? 'selected' : '' }}>
-                                                        {{ $proveedor->clave }} - {{ $proveedor->nombre }}
+                                                        {{ $proveedor->clave }}
                                                     </option>
                                                 @endforeach
                                             </select>

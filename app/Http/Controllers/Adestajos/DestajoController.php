@@ -82,7 +82,7 @@ class DestajoController extends Controller
         
         // Obtener contratos activos para select
         $contratos = DB::table('contratos')
-            ->orderBy('contrato_no')
+            ->orderBy('consecutivo')
             ->get();
         
         // Obtener productos/servicios
