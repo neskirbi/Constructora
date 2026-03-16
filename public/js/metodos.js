@@ -72,7 +72,7 @@ function GenerarPass(element){
         decimalPlaces: 2,
         thousandSeparator: ',',
         decimalSeparator: '.',
-        currencySymbol: '$',
+        currencySymbol: '',
         debug: true,
         
         defaultMode: 0,
@@ -381,5 +381,9 @@ function GenerarPass(element){
     log('NumberFormatter inicializado - Con padding dinámico');
     
 })();
+
+
+
+
 
 

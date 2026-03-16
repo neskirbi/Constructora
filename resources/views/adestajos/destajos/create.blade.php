@@ -9,34 +9,17 @@
             color: #dc3545;
         }
         .form-card {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
         .input-group-text {
             background-color: #f8f9fa;
-        }
-        .table-productos {
-            font-size: 0.9rem;
-        }
-        .table-productos th {
-            background-color: #f8f9fa;
-            font-weight: 600;
-        }
-        .btn-remove-row {
-            color: #dc3545;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-remove-row:hover {
-            color: #a71d2a;
-            transform: scale(1.1);
         }
         .total-card {
             background-color: #e9ecef;
             border-radius: 8px;
             padding: 15px;
         }
-        /* Ajustar altura del select2 */
         .select2-container--default .select2-selection--single {
             height: 38px !important;
             border: 1px solid #ced4da;
@@ -49,16 +32,66 @@
         .select2-container--default .select2-selection--single .select2-selection__arrow {
             height: 36px !important;
         }
-        /* Altura específica para la clave de producto */
-        .clave-producto-select .select2-selection--single {
-            height: 38px !important;
-        }
-        /* Estilos para los inputs */
         .form-control-sm, .input-group-sm .form-control {
             height: 38px;
         }
         .input-group-text {
             height: 38px;
+        }
+        .producto-card {
+            border: 1px solid #dee2e6;
+            box-shadow: 0 2px 4px rgba(0,0,0,.05);
+            margin-bottom: 15px;
+            height: 100%;
+        }
+        .producto-card .card-header {
+            background-color: #f8f9fa;
+            padding: 10px 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .producto-card .card-header h6 {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #495057;
+        }
+        .producto-card .card-body {
+            padding: 15px;
+        }
+        @media (max-width: 768px) {
+            .producto-card .row > div {
+                margin-bottom: 10px;
+            }
+        }
+        .btn-remove-row {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            background-color: #fff;
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            font-size: 0.9rem;
+            text-decoration: none;
+            cursor: pointer;
+            height: 35px;
+            margin: 0;
+            line-height: 1;
+        }
+        .btn-remove-row:hover {
+            background-color: #dc3545;
+            color: #fff;
+        }
+        .btn-remove-row i {
+            font-size: 0.9rem;
+        }
+        .form-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+        .text-end {
+            text-align: right;
         }
     </style>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -110,7 +143,6 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- Campo Referencia después de consecutivo -->
                                     <div class="col-md-3">
                                         <div class="mb-3">
                                             <label for="referencia" class="form-label required-label">Referencia</label>
@@ -160,13 +192,17 @@
                                                 <option value="">Seleccione un proveedor</option>
                                                 @foreach($proveedores as $proveedor)
                                                     <option value="{{ $proveedor->id }}" {{ old('id_proveedor') == $proveedor->id ? 'selected' : '' }}>
-                                                        {{ $proveedor->clave }}
-                                                    </option>
+                                                        {{ $proveedor->clave}} - {{$proveedor->nombre}}
+                                                     </option>
                                                 @endforeach
                                             </select>
                                             @error('id_proveedor')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
+                                            <button type="button" class="btn btn-success btn-block btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#nuevoProveedorModal">
+                                                <i class="fas fa-plus-circle me-2"></i>
+                                                Nuevo Proveedor
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -181,102 +217,20 @@
                                     </div>
                                 </div>
 
-                                <div class="table-responsive mb-3">
-                                    <table class="table table-bordered table-productos" id="productosTable">
-                                        <thead>
-                                            <tr>
-                                                <th width="15%">Clave</th>
-                                                <th width="30%">Descripción</th>
-                                                <th width="10%">Unidad</th>
-                                                <th width="10%">Cantidad</th>
-                                                <th width="12%">Precio Unitario</th>
-                                                <th width="12%">Subtotal</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="productosBody">
-                                            <tr class="producto-row">
-                                                <td>
-                                                    <select class="form-select" 
-                                                            name="productos[0][id_producto]" 
-                                                            data-index="0"
-                                                            style="width: 100%; height: 38px;"
-                                                            required>
-                                                        <option value="">Seleccionar</option>
-                                                        @foreach($productos as $producto)
-                                                            <option value="{{ $producto->id }}" 
-                                                                    data-clave="{{ $producto->clave }}"
-                                                                    data-descripcion="{{ $producto->descripcion }}"
-                                                                    data-unidad="{{ $producto->unidades }}"
-                                                                    data-precio="{{ $producto->ult_costo }}">
-                                                                {{ $producto->clave }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    <input type="text" 
-                                                           class="form-control form-control-sm descripcion-input" 
-                                                           readonly
-                                                           placeholder="Descripción"
-                                                           style="height: 38px;">
-                                                </td>
-                                                <td>
-                                                    <input type="text" 
-                                                           class="form-control form-control-sm unidad-input" 
-                                                           readonly
-                                                           placeholder="Unidad"
-                                                           style="height: 38px;">
-                                                </td>
-                                                <td>
-                                                    <input type="number" 
-                                                           class="form-control form-control-sm cantidad-input" 
-                                                           name="productos[0][cantidad]" 
-                                                           step="0.01" 
-                                                           min="0.01"
-                                                           value="1"
-                                                           noformat
-                                                           style="height: 38px;"
-                                                           required>
-                                                </td>
-                                                <td>
-                                                    <div class="input-group input-group-sm">
-                                                        <span class="input-group-text" style="height: 38px;">$</span>
-                                                        <input type="number" 
-                                                               class="form-control precio-input" 
-                                                               name="productos[0][precio]" 
-                                                               step="0.01" 
-                                                               noformat
-                                                               style="height: 38px;"
-                                                               required>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="input-group input-group-sm">
-                                                        <span class="input-group-text" style="height: 38px;">$</span>
-                                                        <input type="text" 
-                                                               class="form-control subtotal-text" 
-                                                               readonly
-                                                               style="height: 38px; background-color: #f8f9fa;">
-                                                    </div>
-                                                </td>
-                                                <td class="text-center align-middle">
-                                                    <i class="fas fa-trash-alt btn-remove-row" style="display: none; font-size: 1.2rem;"></i>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                        <tfoot>
-                                            <tr>
-                                                <td colspan="7">
-                                                    <button type="button" class="btn btn-sm btn-outline-primary" id="agregarProducto">
-                                                        <i class="fas fa-plus me-1"></i> Agregar Producto/Servicio
-                                                    </button>
-                                                    <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#nuevoProductoModal">
-                                                        <i class="fas fa-plus-circle me-1"></i> Nuevo Producto
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
+                                <!-- Contenedor de tarjetas de productos -->
+                                <div id="productosContainer">
+                                    <!-- Las tarjetas se generarán dinámicamente aquí -->
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" id="agregarProducto">
+                                            <i class="fas fa-plus me-1"></i> Agregar Producto/Servicio
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#nuevoProductoModal">
+                                            <i class="fas fa-plus-circle me-1"></i> Nuevo Producto
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <!-- Resumen de Totales -->
@@ -353,256 +307,278 @@
             </div>
         </main>
     </div>
+
     <!-- Modal para agregar nuevo producto/servicio -->
-<div class="modal fade" id="nuevoProductoModal" tabindex="-1" aria-labelledby="nuevoProductoModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="nuevoProductoModalLabel">
-                    <i class="fas fa-plus-circle text-success me-2"></i>
-                    Nuevo Producto/Servicio
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal fade" id="nuevoProductoModal" tabindex="-1" aria-labelledby="nuevoProductoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="nuevoProductoModalLabel">
+                        <i class="fas fa-plus-circle text-success me-2"></i>
+                        Nuevo Producto/Servicio
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="nuevoProductoForm">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="nuevo_clave" class="form-label required-label">Clave</label>
+                            <input type="text" 
+                                class="form-control form-control-sm" 
+                                id="nuevo_clave" 
+                                name="clave" 
+                                maxlength="32"
+                                required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="nuevo_descripcion" class="form-label required-label">Descripción</label>
+                            <textarea class="form-control form-control-sm" 
+                                    id="nuevo_descripcion" 
+                                    name="descripcion" 
+                                    rows="2"
+                                    required></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="nuevo_unidades" class="form-label required-label">Unidades</label>
+                            <input type="text" 
+                                class="form-control form-control-sm" 
+                                id="nuevo_unidades" 
+                                name="unidades" 
+                                maxlength="10"
+                                placeholder="PZA, M2, etc."
+                                required>
+                        </div>
+                        
+                        <div class="alert alert-danger d-none" id="productoError"></div>
+                        <div class="alert alert-success d-none" id="productoSuccess"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-success btn-sm" id="guardarProductoBtn">
+                            <i class="fas fa-save me-1"></i> Guardar Producto
+                        </button>
+                    </div>
+                </form>
             </div>
-            <form id="nuevoProductoForm">
-                @csrf
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="nuevo_clave" class="form-label required-label">Clave</label>
-                        <input type="text" 
-                               class="form-control form-control-sm" 
-                               id="nuevo_clave" 
-                               name="clave" 
-                               maxlength="32"
-                               required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="nuevo_descripcion" class="form-label required-label">Descripción</label>
-                        <textarea class="form-control form-control-sm" 
-                                  id="nuevo_descripcion" 
-                                  name="descripcion" 
-                                  rows="2"
-                                  required></textarea>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="nuevo_unidades" class="form-label required-label">Unidades</label>
-                        <input type="text" 
-                               class="form-control form-control-sm" 
-                               id="nuevo_unidades" 
-                               name="unidades" 
-                               maxlength="10"
-                               placeholder="PZA, M2, etc."
-                               required>
-                    </div>
-                    
-                    <div class="alert alert-danger d-none" id="productoError"></div>
-                    <div class="alert alert-success d-none" id="productoSuccess"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
-                        <i class="fas fa-times me-1"></i> Cancelar
-                    </button>
-                    <button type="submit" class="btn btn-success btn-sm" id="guardarProductoBtn">
-                        <i class="fas fa-save me-1"></i> Guardar Producto
-                    </button>
-                </div>
-            </form>
         </div>
     </div>
-</div>
+
+    <!-- Modal Nuevo Proveedor -->
+    <div class="modal fade" id="nuevoProveedorModal" tabindex="-1" aria-labelledby="nuevoProveedorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-white py-3">
+                    <div class="d-flex justify-content-between align-items-center w-100">
+                        <h5 class="modal-title" id="nuevoProveedorModalLabel">
+                            <i class="fas fa-plus-circle me-2 text-success"></i>
+                            Nuevo Proveedor
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+                
+                <div class="modal-body">
+                    @include('general.forms.form_proveedor')
+                </div>
+                
+                <div class="modal-footer bg-white"></div>
+            </div>
+        </div>
+    </div>
+
     @include('footer')
     
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <!-- INCLUIR SCRIPT COMÚN -->
+    @include('adestajos.destajos.scripts')
+    
     <script>
-$(document).ready(function() {
-    let productCount = 1;
-    let productosData = @json($productos);
-    
-    // Función para actualizar subtotal de una fila
-    function actualizarSubtotalFila(row) {
-        const cantidad = parseFloat($(row).find('.cantidad-input').val()) || 0;
-        const precio = parseFloat($(row).find('.precio-input').val()) || 0;
-        const subtotal = cantidad * precio;
-        $(row).find('.subtotal-text').val('$' + subtotal.toFixed(2));
-        $(row).attr('data-subtotal', subtotal);
-        calcularTotalesGlobales();
-    }
-
-    // Función para calcular todos los totales
-    function calcularTotalesGlobales() {
-        let subtotalGlobal = 0;
-        $('.producto-row').each(function() {
-            subtotalGlobal += parseFloat($(this).attr('data-subtotal') || 0);
-        });
-
-        const ivaPorcentaje = parseFloat($('#iva').val()) || 0;
-        const ivaCalculado = subtotalGlobal * (ivaPorcentaje / 100);
-        const totalGlobal = subtotalGlobal + ivaCalculado;
-
-        $('#subtotalGlobal').text('$' + subtotalGlobal.toFixed(2));
-        $('#ivaCalculado').text('$' + ivaCalculado.toFixed(2));
-        $('#totalGlobal').text('$' + totalGlobal.toFixed(2));
+    $(document).ready(function() {
+        let productCount = 0;
+        let productosData = @json($productos);
         
-        // Actualizar campos ocultos
-        $('#costo_operado_hidden').val(subtotalGlobal.toFixed(2));
-        $('#total_hidden').val(totalGlobal.toFixed(2));
-    }
+        // Función para crear una nueva tarjeta de producto
+        function crearTarjetaProducto(index) {
+            let options = '<option value="">Seleccionar</option>';
+            productosData.forEach(function(producto) {
+                options += `<option value="${producto.id}" 
+                                data-clave="${producto.clave}"
+                                data-descripcion="${producto.descripcion}"
+                                data-unidad="${producto.unidades}"
+                                data-precio="${producto.ult_costo}">
+                                ${producto.clave}
+                            </option>`;
+            });
 
-    // Evento cuando se selecciona un producto
-    $(document).on('change', 'select[name^="productos"][name$="[id_producto]"]', function() {
-        const row = $(this).closest('tr');
-        const selectedOption = $(this).find('option:selected');
-        
-        if (selectedOption.val()) {
-            const descripcion = selectedOption.data('descripcion');
-            const unidad = selectedOption.data('unidad');
-            const precio = selectedOption.data('precio');
-            
-            row.find('.descripcion-input').val(descripcion || '');
-            row.find('.unidad-input').val(unidad || '');
-            row.find('.precio-input').val(precio || 0);
-            
-            actualizarSubtotalFila(row);
-        } else {
-            // Si selecciona la opción vacía, limpiar campos
-            row.find('.descripcion-input').val('');
-            row.find('.unidad-input').val('');
-            row.find('.precio-input').val('');
-            row.find('.subtotal-text').val('$0.00');
-            row.attr('data-subtotal', 0);
-            calcularTotalesGlobales();
+            return `
+                <div class="producto-card-wrapper mb-3" data-index="${index}">
+                    <div class="card producto-card">
+                        <div class="card-header">
+                            <h6 class="mb-0 float-start"><i class="fas fa-box me-2"></i>Producto #${index + 1}</h6>
+                            <div class="card-tools float-end">
+                                <button type="button" class="btn-remove-row">
+                                    <i class="fas fa-trash-alt me-1"></i>Eliminar
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3 mb-2">
+                                    <label class="form-label">Clave</label>
+                                    <select class="form-select form-select-sm producto-select" 
+                                            name="productos[${index}][id_producto]" 
+                                            style="width: 100%; height: 38px;"
+                                            required>
+                                        ${options}
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-4 mb-2">
+                                    <label class="form-label">Descripción</label>
+                                    <input type="text" 
+                                           class="form-control form-control-sm descripcion-input" 
+                                           readonly
+                                           placeholder="Descripción"
+                                           style="height: 38px; background-color: #f8f9fa;">
+                                </div>
+                                
+                                <div class="col-md-2 mb-2">
+                                    <label class="form-label">Unidad</label>
+                                    <input type="text" 
+                                           class="form-control form-control-sm unidad-input" 
+                                           readonly
+                                           placeholder="Unidad"
+                                           style="height: 38px; background-color: #f8f9fa;">
+                                </div>
+                                
+                                <div class="col-md-3 mb-2">
+                                    <label class="form-label">Cantidad</label>
+                                    <input type="number" 
+                                           class="form-control form-control-sm cantidad-input text-end" 
+                                           name="productos[${index}][cantidad]" 
+                                           step="0.01" 
+                                           min="0.01"
+                                           value="1"
+                                           style="height: 38px;"
+                                           required>
+                                </div>
+                            </div>
+                            
+                            <div class="row mt-2">
+                                <div class="col-md-3">
+                                    <!-- Espacio vacío -->
+                                </div>
+                                <div class="col-md-3">
+                                    <!-- Espacio vacío -->
+                                </div>
+                                <div class="col-md-3">
+                                    <!-- Espacio vacío -->
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Precio Unitario</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text" style="height: 38px;">$</span>
+                                        <input type="number" 
+                                               class="form-control precio-input text-end" 
+                                               name="productos[${index}][precio]" 
+                                               step="0.01" 
+                                               style="height: 38px;"
+                                               required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mt-2">
+                                <div class="col-md-3">
+                                    <!-- Espacio vacío -->
+                                </div>
+                                <div class="col-md-3">
+                                    <!-- Espacio vacío -->
+                                </div>
+                                <div class="col-md-3">
+                                    <!-- Espacio vacío -->
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Subtotal</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text" style="height: 38px;">$</span>
+                                        <input type="text" 
+                                               class="form-control subtotal-text text-end" 
+                                               readonly
+                                               style="height: 38px; background-color: #f8f9fa;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
-    });
 
-    // Eventos para cambios en cantidad y precio
-    $(document).on('input', '.cantidad-input, .precio-input', function() {
-        const row = $(this).closest('tr');
-        actualizarSubtotalFila(row);
-    });
-
-    // Evento para cambio en porcentaje de IVA
-    $('#iva').on('input', calcularTotalesGlobales);
-
-    // Agregar nueva fila
-    $('#agregarProducto').on('click', function() {
-        const tbody = $('#productosBody');
-        const index = productCount;
-        
-        const newRow = $('<tr>').addClass('producto-row');
-        
-        newRow.html(`
-            <td>
-                <select class="form-select form-select-sm" 
-                        name="productos[${index}][id_producto]" 
-                        data-index="${index}"
-                        style="width: 100%; height: 38px;"
-                        required>
-                    <option value="">Seleccionar</option>
-                    @foreach($productos as $producto)
-                        <option value="{{ $producto->id }}" 
-                                data-clave="{{ $producto->clave }}"
-                                data-descripcion="{{ $producto->descripcion }}"
-                                data-unidad="{{ $producto->unidades }}"
-                                data-precio="{{ $producto->ult_costo }}">
-                            {{ $producto->clave }}
-                        </option>
-                    @endforeach
-                </select>
-            </td>
-            <td>
-                <input type="text" class="form-control form-control-sm descripcion-input" readonly placeholder="Descripción" style="height: 38px;">
-            </td>
-            <td>
-                <input type="text" class="form-control form-control-sm unidad-input" readonly placeholder="Unidad" style="height: 38px;">
-            </td>
-            <td>
-                <input type="number" class="form-control form-control-sm cantidad-input" name="productos[${index}][cantidad]" step="0.01" min="0.01" value="1" noformat style="height: 38px;" required>
-            </td>
-            <td>
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text" style="height: 38px;">$</span>
-                    <input type="number" class="form-control precio-input" name="productos[${index}][precio]" step="0.01" noformat style="height: 38px;" required>
-                </div>
-            </td>
-            <td>
-                <div class="input-group input-group-sm">
-                    <span class="input-group-text" style="height: 38px;">$</span>
-                    <input type="text" class="form-control subtotal-text" readonly style="height: 38px; background-color: #f8f9fa;">
-                </div>
-            </td>
-            <td class="text-center align-middle">
-                <i class="fas fa-trash-alt btn-remove-row" style="font-size: 1.2rem;"></i>
-            </td>
-        `);
-        
-        tbody.append(newRow);
+        // Inicializar con una tarjeta
+        $('#productosContainer').append(crearTarjetaProducto(productCount));
         productCount++;
-        
-        // Mostrar botones de eliminar en todas las filas excepto la primera si solo hay una
-        actualizarBotonesEliminar();
-    });
 
-    // Eliminar fila
-    $(document).on('click', '.btn-remove-row', function() {
-        if ($('.producto-row').length > 1) {
-            $(this).closest('tr').remove();
+        // Función para actualizar subtotal de una tarjeta
+        function actualizarSubtotalFila(card) {
+            const cantidad = parseFloat($(card).find('.cantidad-input').val()) || 0;
+            const precio = parseFloat($(card).find('.precio-input').val()) || 0;
+            const subtotal = cantidad * precio;
+            
+            // Formatear subtotal con separadores de miles
+            $(card).find('.subtotal-text').val(formatearMoneda(subtotal));
+            $(card).closest('.producto-card').attr('data-subtotal', subtotal);
             calcularTotalesGlobales();
-            actualizarBotonesEliminar();
         }
-    });
 
-    // Función para actualizar visibilidad de botones eliminar
-    function actualizarBotonesEliminar() {
-        const rows = $('.producto-row');
-        rows.each(function(index) {
-            const btnRemove = $(this).find('.btn-remove-row');
-            if (btnRemove.length) {
-                btnRemove.css('display', rows.length > 1 ? 'inline-block' : 'none');
+        // Agregar nueva tarjeta
+        $('#agregarProducto').on('click', function() {
+            $('#productosContainer').append(crearTarjetaProducto(productCount));
+            productCount++;
+        });
+
+        // Eliminar tarjeta
+        $(document).on('click', '.btn-remove-row', function() {
+            if ($('.producto-card').length > 1) {
+                $(this).closest('.producto-card-wrapper').remove();
+                calcularTotalesGlobales();
             }
         });
-    }
 
-    // Validación del formulario
-    $('#destajoForm').on('submit', function(event) {
-        let hasProducts = false;
-        
-        $('.producto-row').each(function() {
-            const select = $(this).find('select[name^="productos"][name$="[id_producto]"]');
-            if (select.val()) {
-                hasProducts = true;
+        // Validación del formulario
+        $('#destajoForm').on('submit', function(event) {
+            let hasProducts = false;
+            
+            $('.producto-select').each(function() {
+                if ($(this).val()) {
+                    hasProducts = true;
+                }
+            });
+            
+            if (!hasProducts) {
+                event.preventDefault();
+                alert('Debe agregar al menos un producto o servicio');
+                return false;
             }
+            
+            if (!this.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            $(this).addClass('was-validated');
         });
-        
-        if (!hasProducts) {
-            event.preventDefault();
-            alert('Debe agregar al menos un producto o servicio');
-            return false;
-        }
-        
-        if (!this.checkValidity()) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-        
-        $(this).addClass('was-validated');
+
+        // Inicializar cálculos
+        calcularTotalesGlobales();
     });
-
-    
-
-    // Inicializar primera fila
-    actualizarBotonesEliminar();
-    calcularTotalesGlobales();
-});
-</script>
-@include('adestajos.destajos.footer')
+    </script>
+    @include('adestajos.destajos.footer')
 </body>
 </html>
-
-<!-- Al seleccionar un servicio o producto aqui se mete el el costo o lo que se va a pagar , no se captura en el catalogo 
- poner el agregar nuevo producto o servicio dentro de la misma pantalla donde se agregan 
- pner el frente 
-
- mejorar la vista de la clave del servicio
--->

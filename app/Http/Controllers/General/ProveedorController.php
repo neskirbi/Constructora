@@ -35,33 +35,8 @@ class ProveedorController extends Controller
      */
     public function create()
     {
-        // Obtener la clave más grande (como es varchar, convertir a número)
-        $maxClave = DB::table('proveedores_servicios')
-            ->select(DB::raw('MAX(CAST(clave AS UNSIGNED)) as max_clave'))
-            ->value('max_clave');
         
-        $siguienteClave = $maxClave ? $maxClave + 1 : 1;
-        
-        // Obtener especialidades únicas de la base de datos
-        $especialidadOptions = DB::table('proveedores_servicios')
-            ->select('especialidad')
-            ->distinct()
-            ->whereNotNull('especialidad')
-            ->where('especialidad', '!=', '')
-            ->orderBy('especialidad')
-            ->pluck('especialidad')
-            ->toArray();
-        
-        $estatusOptions = ['Activo', 'Inactivo', 'Suspendido'];
-        
-        $clasificacionOptions = ['ADMON', 'COMPRAS', 'DESTAJO', 'MATERIALES', 'SERVICIOS'];
-        
-        return view('general.proveedores.create', compact(
-            'siguienteClave',
-            'estatusOptions', 
-            'especialidadOptions',
-            'clasificacionOptions'
-        ));
+        return view('general.proveedores.create');
     }
     
 
@@ -88,8 +63,7 @@ class ProveedorController extends Controller
         $proveedor->especialidad = $request->especialidad;
         $proveedor->save();
         
-        return redirect()->route('proveedoresds.index')
-            ->with('success', 'Proveedor creado exitosamente');
+        return redirect()->back()->with('success', 'Proveedor creado exitosamente');
     }
 
     public function show($id)

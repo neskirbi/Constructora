@@ -16,7 +16,7 @@ function Memoria(){
 }
 
 function Version(){
-    return 3;
+    return 4;
 }
 
 function GenerarPass(){  
@@ -181,6 +181,13 @@ function GetUuid(){
         return null; // o 'invitado' si prefieres
     }
 
+    function SiguienteClaveProveedor(){
+        // Obtener la clave más grande (como es varchar, convertir a número)
+        $maxClave = DB::table('proveedores_servicios')
+            ->select(DB::raw('MAX(CAST(clave AS UNSIGNED)) as max_clave'))
+            ->value('max_clave');
+        return $maxClave ? $maxClave + 1 : 1;
+    }
 
     function Comentarios(){
         //Escribir simpre arriba de esta funcion las nuevas funciones.
