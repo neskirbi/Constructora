@@ -650,7 +650,7 @@
                             <hr class="my-4">
                             
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group-custom">
                                         <label for="amortizacion_anticipo" class="form-label-custom">
                                             Amortización Anticipo
@@ -669,7 +669,7 @@
                                     </div>
                                 </div>
                                 
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group-custom">
                                         <label for="amortizacion_iva" class="form-label-custom">
                                             % I.V.A.
@@ -688,7 +688,26 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-4">
+                                <div class="col-md-3">
+                                        <div class="form-group-custom">
+                                            <label for="amor_iva" class="form-label-custom">
+                                                Amortización I.V.A.
+                                            </label>
+                                            <div class="input-group input-group-custom">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" 
+                                                       class="form-control form-control-custom numeric-input" 
+                                                       id="amor_iva" 
+                                                       name="amor_iva" 
+                                                       value="{{ old('amor_iva', $ultimoIngreso->amor_iva ?? 0) }}"
+                                                       step="0.01"
+                                                       placeholder="0.00"
+                                                       min="0">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                <div class="col-md-3">
                                     <div class="form-group-custom">
                                         <label for="total_amortizacion" class="form-label-custom">
                                             Total Amortización
@@ -1085,12 +1104,23 @@ function calcularRetencionesSanciones() {
 // Función para calcular Total Amortización
 function calcularTotalAmortizacion() {
     var amortizacionAnticipo = parseFloat($('#amortizacion_anticipo').val()) || 0;
-    var amortizacionConIva = parseFloat($('#amortizacion_iva').val()) || 0;
+    var amortizacionIva = parseFloat($('#amortizacion_iva').val()) || 0;
     
-    var total = amortizacionAnticipo + amortizacionConIva;
+    // Calcular el IVA de la amortización (amortizacion_anticipo * (amortizacion_iva/100))
+    var ivaCalculado = amortizacionAnticipo * (amortizacionIva / 100);
     
+    // Calcular el total (amortizacion_anticipo + ivaCalculado)
+    var total = amortizacionAnticipo + ivaCalculado;
+    
+    // Asignar valores
+    $('#amor_iva').val(ivaCalculado.toFixed(2));
     $('#total_amortizacion').val(total.toFixed(2));
+    
+    // Disparar eventos
+    dispararEventos('#amor_iva');
     dispararEventos('#total_amortizacion');
+    
+    // Calcular estimado menos deducciones
     calcularEstimadoMenosDeducciones();
 }
 
