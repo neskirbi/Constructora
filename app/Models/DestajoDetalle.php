@@ -29,8 +29,8 @@ class DestajoDetalle extends Model
     ];
 
     protected $casts = [
-        'cantidad' => 'decimal:2',
-        'ult_costo' => 'decimal:2'
+        'cantidad' => 'decimal:20',
+        'ult_costo' => 'decimal:20'
     ];
 
     protected static function boot()
