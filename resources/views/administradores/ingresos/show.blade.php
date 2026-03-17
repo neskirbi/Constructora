@@ -171,7 +171,7 @@
                             </h5>
                             
                             <div class="row">
-                                <div class="col-md-12">
+                                <div class="col-md-12" style="display:none;">
                                     <div class="form-group-custom">
                                         <label class="form-label-custom">Contrato</label>
                                         <div class="info-display">
@@ -183,6 +183,49 @@
                                                 <span class="text-danger">Contrato no encontrado</span>
                                             @endif
                                         </div>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-4 mb-2 mb-md-0">
+                                        <small class="text-muted d-block">Consecutivo</small>
+                                        <span class="fw-bold">{{ $contrato->consecutivo ?? 'N/A' }}</span>
+                                    </div>
+                                    <div class="col-md-4 mb-2 mb-md-0">
+                                        <small class="text-muted d-block">Ref. Interna</small>
+                                        <span>{{ $contrato->refinterna ?? 'N/A' }}</span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <small class="text-muted d-block">No. Contrato</small>
+                                        <span>{{ $contrato->contrato_no ?? 'N/A' }}</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Segunda fila: Cliente -->
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <small class="text-muted d-block">Cliente</small>
+                                        <span class="fw-bold" title="{{ $contrato->cliente ?? 'No especificado' }}">
+                                            {{ $contrato->cliente ?? 'No especificado' }}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Tercera fila: Obra -->
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <small class="text-muted d-block">Obra</small>
+                                        <span class="fw-bold" title="{{ $contrato->obra ?? 'Sin nombre de obra' }}">
+                                            {{ $contrato->obra ?? 'Sin nombre de obra' }}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Cuarta fila: Frente -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <small class="text-muted d-block">Frente</small>
+                                        <span>{{ $contrato->frente ?? 'No especificado' }}</span>
                                     </div>
                                 </div>
                             </div>
