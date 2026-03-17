@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <input type="number" 
                                        class="form-control form-control-sm cantidad-input text-end" 
                                        name="productos[${index}][cantidad]" 
-                                       step="0.01" 
+                                       step="0.0000000000000001" 
                                        min="0.01"
                                        value="1"
                                        style="height: 38px;"
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     <input type="number" 
                                            class="form-control precio-input text-end" 
                                            name="productos[${index}][precio]" 
-                                           step="0.01" 
+                                           step="0.0000000000000001" 
                                            style="height: 38px;"
                                            required>
                                 </div>

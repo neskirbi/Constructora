@@ -990,7 +990,7 @@
                                                                 <div class="input-group input-group-custom">
                                                                     <span class="input-group-text">$</span>
                                                                     <input type="number" class="form-control form-control-custom numeric-input" 
-                                                                        id="amp_subtotal" name="subtotal" step="0.01" placeholder="0.00" required>
+                                                                        id="amp_subtotal" name="subtotal" step="0.0000000000000001" placeholder="0.00" required>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1000,7 +1000,7 @@
                                                                 <div class="input-group input-group-custom">
                                                                     <span class="input-group-text">%</span>
                                                                     <input type="number" class="form-control form-control-custom numeric-input" 
-                                                                        id="amp_iva" name="iva" step="0.01" min="0" placeholder="0.00">
+                                                                        id="amp_iva" name="iva" step="0.0000000000000001" min="0" placeholder="0.00">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1010,7 +1010,7 @@
                                                                 <div class="input-group input-group-custom">
                                                                     <span class="input-group-text">$</span>
                                                                     <input type="number" class="form-control form-control-custom numeric-input bg-light" 
-                                                                        id="amp_iva_t" name="amp_iva_t" step="0.01" placeholder="0.00" readonly>
+                                                                        id="amp_iva_t" name="amp_iva_t" step="0.0000000000000001" placeholder="0.00" readonly>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1028,7 +1028,7 @@
                                                                 <div class="input-group input-group-custom">
                                                                     <span class="input-group-text">$</span>
                                                                     <input type="number" class="form-control form-control-custom numeric-input bg-light" 
-                                                                        id="amp_total" name="total" step="0.01" placeholder="0.00" readonly>
+                                                                        id="amp_total" name="total" step="0000000000000001" placeholder="0.00" readonly>
                                                                 </div>
                                                             </div>
                                                         </div>

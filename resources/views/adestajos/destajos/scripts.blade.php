@@ -148,7 +148,7 @@ function crearTarjetaProducto(index, productosData) {
                                 <input type="number" 
                                        class="form-control precio-input text-end" 
                                        name="productos[${index}][precio]" 
-                                       step="0.01" 
+                                       step="0.0000000000000001" 
                                        style="height: 38px;"
                                        required>
                             </div>

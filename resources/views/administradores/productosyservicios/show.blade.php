@@ -92,7 +92,7 @@
                                                            class="form-control @error('ult_costo') is-invalid @enderror" 
                                                            name="ult_costo" 
                                                            value="{{ old('ult_costo', $producto->ult_costo) }}"
-                                                           step="0.01" 
+                                                           step="0.0000000000000001" 
                                                            min="0"
                                                            required>
                                                     @error('ult_costo')

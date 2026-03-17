@@ -374,7 +374,7 @@
                                                                class="form-control form-control-sm cantidad-input text-end" 
                                                                name="productos[{{ $index }}][cantidad]" 
                                                                value="{{ $detalle->cantidad }}"
-                                                               step="0.01" 
+                                                               step="0.0000000000000001" 
                                                                min="0.01"
                                                                style="height: 38px;"
                                                                required>
@@ -399,7 +399,7 @@
                                                                    class="form-control precio-input text-end" 
                                                                    name="productos[{{ $index }}][precio]" 
                                                                    value="{{ $detalle->ult_costo }}"
-                                                                   step="0.01" 
+                                                                   step="0.0000000000000001" 
                                                                    style="height: 38px;"
                                                                    required>
                                                         </div>
