@@ -535,98 +535,21 @@
         </main>
     </div>
 
-    <!-- Modal para agregar nuevo producto/servicio -->
-    <div class="modal fade" id="nuevoProductoModal" tabindex="-1" aria-labelledby="nuevoProductoModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="nuevoProductoModalLabel">
-                        <i class="fas fa-plus-circle text-success me-2"></i>
-                        Nuevo Producto/Servicio
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="nuevoProductoForm">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="nuevo_clave" class="form-label required-label">Clave</label>
-                            <input type="text" 
-                                class="form-control form-control-sm" 
-                                id="nuevo_clave" 
-                                name="clave" 
-                                maxlength="32"
-                                required>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="nuevo_descripcion" class="form-label required-label">Descripción</label>
-                            <textarea class="form-control form-control-sm" 
-                                    id="nuevo_descripcion" 
-                                    name="descripcion" 
-                                    rows="2"
-                                    required></textarea>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="nuevo_unidades" class="form-label required-label">Unidades</label>
-                            <input type="text" 
-                                class="form-control form-control-sm" 
-                                id="nuevo_unidades" 
-                                name="unidades" 
-                                maxlength="10"
-                                placeholder="PZA, M2, etc."
-                                required>
-                        </div>
-                        
-                        <div class="alert alert-danger d-none" id="productoError"></div>
-                        <div class="alert alert-success d-none" id="productoSuccess"></div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
-                            <i class="fas fa-times me-1"></i> Cancelar
-                        </button>
-                        <button type="submit" class="btn btn-success btn-sm" id="guardarProductoBtn">
-                            <i class="fas fa-save me-1"></i> Guardar Producto
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+     @include('general.modals.modalPS')
+    @include('general.modals.modalProveedores')
 
-    <!-- Modal Nuevo Proveedor -->
-    <div class="modal fade" id="nuevoProveedorModal" tabindex="-1" aria-labelledby="nuevoProveedorModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-white py-3">
-                    <div class="d-flex justify-content-between align-items-center w-100">
-                        <h5 class="modal-title" id="nuevoProveedorModalLabel">
-                            <i class="fas fa-plus-circle me-2 text-success"></i>
-                            Nuevo Proveedor
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                </div>
-                
-                <div class="modal-body">
-                    @include('general.forms.form_proveedor')
-                </div>
-                
-                <div class="modal-footer bg-white"></div>
-            </div>
-        </div>
-    </div>
-
-    @include('footer')
+     @include('footer')
     
-    
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     
     <!-- Script común -->
     @include('adestajos.destajos.scripts')
     
     <script>
     $(document).ready(function() {
+        // Inicializar Select2
+        initSelect2();
+        
         // Inicializar subtotales en data attributes
         $('.producto-card').each(function() {
             const subtotalText = $(this).find('.subtotal-text').val().replace('$', '').replace(/,/g, '');
@@ -639,6 +562,18 @@
         // Agregar nueva tarjeta (para nuevas filas)
         $('#agregarProducto').on('click', function() {
             let index = $('.producto-card-wrapper').length;
+            let productosData = @json($productos);
+            
+            let options = '<option value="">Seleccionar</option>';
+            productosData.forEach(function(producto) {
+                options += `<option value="${producto.id}" 
+                                data-clave="${producto.clave}"
+                                data-descripcion="${producto.descripcion}"
+                                data-unidad="${producto.unidades}"
+                                data-precio="${producto.ult_costo}">
+                                ${producto.clave}
+                            </option>`;
+            });
             
             let newCard = `
             <div class="producto-card-wrapper mb-3" data-index="${index}">
@@ -655,22 +590,12 @@
                         <div class="row">
                             <div class="col-md-3 mb-2">
                                 <label class="form-label">Clave</label>
-                               <select class="form-select form-select-sm" 
-                                    name="productos[{{ $index }}][id_producto]" 
-                                    style="width: 100%; height: 38px;"
-                                    required>
-                                <option value="">Seleccionar</option>
-                                @foreach($productos as $producto)
-                                    <option value="{{ $producto->id }}" 
-                                            data-clave="{{ $producto->clave }}"
-                                            data-descripcion="{{ $producto->descripcion }}"
-                                            data-unidad="{{ $producto->unidades }}"
-                                            data-precio="{{ $producto->ult_costo }}"
-                                            {{ $detalle->id_productoservicio == $producto->id ? 'selected' : '' }}>
-                                        {{ $producto->clave }}
-                                    </option>
-                                @endforeach
-                            </select>
+                                <select class="form-select form-select-sm producto-select" 
+                                        name="productos[${index}][id_producto]" 
+                                        style="width: 100%; height: 38px;"
+                                        required>
+                                    ${options}
+                                </select>
                             </div>
                             
                             <div class="col-md-4 mb-2">
@@ -744,7 +669,10 @@
             `;
             
             $('#productosContainer').append(newCard);
-          
+            
+            // Reinicializar Select2 para los nuevos selects
+            $('.producto-select').select2('destroy');
+            initSelect2();
         });
 
         // Eliminar tarjeta
@@ -755,8 +683,8 @@
             }
         });
     });
-    </script>
+    </script>    
     
-    @include('adestajos.destajos.footer')
+    @include('general.modals.scripts')
 </body>
 </html>

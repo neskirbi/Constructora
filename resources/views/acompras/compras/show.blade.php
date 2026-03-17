@@ -9,27 +9,11 @@
             color: #dc3545;
         }
         .form-card {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
         .input-group-text {
             background-color: #f8f9fa;
-        }
-        .table-productos {
-            font-size: 0.9rem;
-        }
-        .table-productos th {
-            background-color: #f8f9fa;
-            font-weight: 600;
-        }
-        .btn-remove-row {
-            color: #dc3545;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .btn-remove-row:hover {
-            color: #a71d2a;
-            transform: scale(1.1);
         }
         .total-card {
             background-color: #e9ecef;
@@ -37,15 +21,77 @@
             padding: 15px;
         }
         .select2-container--default .select2-selection--single {
-            height: 38px;
+            height: 38px !important;
             border: 1px solid #ced4da;
             border-radius: 4px;
         }
         .select2-container--default .select2-selection--single .select2-selection__rendered {
-            line-height: 36px;
+            line-height: 36px !important;
+            padding-left: 12px;
         }
         .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 36px;
+            height: 36px !important;
+        }
+        .form-control-sm, .input-group-sm .form-control {
+            height: 38px;
+        }
+        .input-group-text {
+            height: 38px;
+        }
+        .producto-card {
+            border: 1px solid #dee2e6;
+            box-shadow: 0 2px 4px rgba(0,0,0,.05);
+            margin-bottom: 15px;
+            height: 100%;
+        }
+        .producto-card .card-header {
+            background-color: #f8f9fa;
+            padding: 10px 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .producto-card .card-header h6 {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #495057;
+        }
+        .producto-card .card-body {
+            padding: 15px;
+        }
+        @media (max-width: 768px) {
+            .producto-card .row > div {
+                margin-bottom: 10px;
+            }
+        }
+        .btn-remove-row {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            background-color: #fff;
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            font-size: 0.9rem;
+            text-decoration: none;
+            cursor: pointer;
+            height: 35px;
+            margin: 0;
+            line-height: 1;
+        }
+        .btn-remove-row:hover {
+            background-color: #dc3545;
+            color: #fff;
+        }
+        .btn-remove-row i {
+            font-size: 0.9rem;
+        }
+        .form-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+        }
+        .text-end {
+            text-align: right;
         }
         .readonly-field {
             background-color: #f8f9fa;
@@ -101,35 +147,6 @@
             background: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
-        }
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-        .info-item {
-            display: flex;
-            flex-direction: column;
-        }
-        .info-label {
-            font-size: 0.8rem;
-            color: #6c757d;
-            margin-bottom: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .info-value {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #495057;
-        }
-        .moneda {
-            color: #198754;
-            font-weight: 600;
         }
     </style>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -208,7 +225,8 @@
                                                    min="1"
                                                    required
                                                    readonly
-                                                   noformat>
+                                                   noformat
+                                                   style="height: 38px;">
                                             @error('consecutivo')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -224,7 +242,8 @@
                                                    name="referencia" 
                                                    value="{{ old('referencia', $compra->referencia) }}"
                                                    maxlength="1500"
-                                                   placeholder="Folio, contrato, etc.">
+                                                   placeholder="Folio, contrato, etc."
+                                                   style="height: 38px;">
                                             @error('referencia')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -237,7 +256,8 @@
                                             <select class="form-select form-select-sm @error('id_contrato') is-invalid @enderror" 
                                                     id="id_contrato" 
                                                     name="id_contrato"
-                                                    required>
+                                                    required
+                                                    style="height: 38px;">
                                                 <option value="">Seleccione un contrato</option>
                                                 @foreach($contratos as $contrato)
                                                     <option value="{{ $contrato->id }}" {{ old('id_contrato', $compra->id_contrato) == $contrato->id ? 'selected' : '' }}>
@@ -253,11 +273,12 @@
                                     
                                     <div class="col-md-3">
                                         <div class="mb-3">
-                                            <label for="id_proveedor" class="form-label required-label">Proveedor (ID)</label>
+                                            <label for="id_proveedor" class="form-label required-label">Proveedor</label>
                                             <select class="form-select form-select-sm @error('id_proveedor') is-invalid @enderror" 
                                                     id="id_proveedor" 
                                                     name="id_proveedor"
-                                                    required>
+                                                    required
+                                                    style="height: 38px;">
                                                 <option value="">Seleccione un proveedor</option>
                                                 @foreach($proveedores as $proveedor)
                                                     <option value="{{ $proveedor->id }}" {{ old('id_proveedor', $compra->id_proveedor) == $proveedor->id ? 'selected' : '' }}>
@@ -268,6 +289,10 @@
                                             @error('id_proveedor')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
+                                            <button type="button" class="btn btn-success btn-block btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#nuevoProveedorModal">
+                                                <i class="fas fa-plus-circle me-2"></i>
+                                                Nuevo Proveedor
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -282,103 +307,142 @@
                                     </div>
                                 </div>
 
-                                <div class="table-responsive mb-3">
-                                    <table class="table table-bordered table-productos" id="productosTable">
-                                        <thead>
-                                            <tr>
-                                                <th width="15%">Clave</th>
-                                                <th width="30%">Descripción</th>
-                                                <th width="10%">Unidad</th>
-                                                <th width="10%">Cantidad</th>
-                                                <th width="12%">Precio Unitario</th>
-                                                <th width="12%">Subtotal</th>
-                                                <th width="11%">Acción</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="productosBody">
-                                            @foreach($detalles as $index => $detalle)
-                                            <tr class="producto-row">
-                                                <td>
-                                                    <select class="form-select form-select-sm producto-select" 
-                                                            name="productos[{{ $index }}][id_producto]" 
-                                                            data-index="{{ $index }}"
-                                                            required>
-                                                        <option value="">Seleccionar</option>
-                                                        @foreach($productos as $producto)
-                                                            <option value="{{ $producto->id }}" 
-                                                                    data-clave="{{ $producto->clave }}"
-                                                                    data-descripcion="{{ $producto->descripcion }}"
-                                                                    data-unidad="{{ $producto->unidades }}"
-                                                                    data-precio="{{ $producto->ult_costo }}"
-                                                                    {{ $detalle->id_productoservicio == $producto->id ? 'selected' : '' }}>
-                                                                {{ $producto->clave }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    <input type="text" 
-                                                           class="form-control form-control-sm descripcion-input" 
-                                                           value="{{ $detalle->descripcion }}"
-                                                           readonly
-                                                           placeholder="Descripción">
-                                                </td>
-                                                <td>
-                                                    <input type="text" 
-                                                           class="form-control form-control-sm unidad-input" 
-                                                           value="{{ $detalle->unidades }}"
-                                                           readonly
-                                                           placeholder="Unidad">
-                                                </td>
-                                                <td>
-                                                    <input type="number" 
-                                                           class="form-control form-control-sm cantidad-input" 
-                                                           name="productos[{{ $index }}][cantidad]" 
-                                                           value="{{ $detalle->cantidad }}"
-                                                           step="0.01" 
-                                                           min="0.01"
-                                                           required>
-                                                </td>
-                                                <td>
-                                                    <div class="input-group input-group-sm">
-                                                        <span class="input-group-text">$</span>
+                                <!-- Contenedor de tarjetas de productos -->
+                                <div id="productosContainer">
+                                    @foreach($detalles as $index => $detalle)
+                                    <div class="producto-card-wrapper mb-3" data-index="{{ $index }}">
+                                        <div class="card producto-card">
+                                            <div class="card-header">
+                                                <h6 class="mb-0 float-start"><i class="fas fa-box me-2"></i>Producto #{{ $index + 1 }}</h6>
+                                                <div class="card-tools float-end">
+                                                    @if($loop->first && count($detalles) == 1)
+                                                    <button type="button" class="btn-remove-row" style="display: none;">
+                                                        <i class="fas fa-trash-alt me-1"></i>Eliminar
+                                                    </button>
+                                                    @else
+                                                    <button type="button" class="btn-remove-row">
+                                                        <i class="fas fa-trash-alt me-1"></i>Eliminar
+                                                    </button>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-3 mb-2">
+                                                        <label class="form-label">Clave</label>
+                                                        <select class="form-select form-select-sm producto-select" 
+                                                                name="productos[{{ $index }}][id_producto]" 
+                                                                style="width: 100%; height: 38px;"
+                                                                required>
+                                                            <option value="">Seleccionar</option>
+                                                            @foreach($productos as $producto)
+                                                                <option value="{{ $producto->id }}" 
+                                                                        data-clave="{{ $producto->clave }}"
+                                                                        data-descripcion="{{ $producto->descripcion }}"
+                                                                        data-unidad="{{ $producto->unidades }}"
+                                                                        data-precio="{{ $producto->ult_costo }}"
+                                                                        {{ $detalle->id_productoservicio == $producto->id ? 'selected' : '' }}>
+                                                                    {{ $producto->clave }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    
+                                                    <div class="col-md-4 mb-2">
+                                                        <label class="form-label">Descripción</label>
+                                                        <input type="text" 
+                                                               class="form-control form-control-sm descripcion-input" 
+                                                               value="{{ $detalle->descripcion }}"
+                                                               readonly
+                                                               placeholder="Descripción"
+                                                               style="height: 38px; background-color: #f8f9fa;">
+                                                    </div>
+                                                    
+                                                    <div class="col-md-2 mb-2">
+                                                        <label class="form-label">Unidad</label>
+                                                        <input type="text" 
+                                                               class="form-control form-control-sm unidad-input" 
+                                                               value="{{ $detalle->unidades }}"
+                                                               readonly
+                                                               placeholder="Unidad"
+                                                               style="height: 38px; background-color: #f8f9fa;">
+                                                    </div>
+                                                    
+                                                    <div class="col-md-3 mb-2">
+                                                        <label class="form-label">Cantidad</label>
                                                         <input type="number" 
-                                                               class="form-control precio-input" 
-                                                               name="productos[{{ $index }}][precio]" 
-                                                               value="{{ $detalle->ult_costo }}"
+                                                               class="form-control form-control-sm cantidad-input text-end" 
+                                                               name="productos[{{ $index }}][cantidad]" 
+                                                               value="{{ $detalle->cantidad }}"
                                                                step="0.01" 
+                                                               min="0.01"
+                                                               style="height: 38px;"
                                                                required>
                                                     </div>
-                                                </td>
-                                                <td>
-                                                    <div class="input-group input-group-sm">
-                                                        <span class="input-group-text">$</span>
-                                                        <input type="text" 
-                                                               class="form-control subtotal-text" 
-                                                               value="${{ number_format($detalle->cantidad * $detalle->ult_costo, 2) }}"
-                                                               readonly>
+                                                </div>
+                                                
+                                                <div class="row mt-2">
+                                                    <div class="col-md-3">
+                                                        <!-- Espacio vacío -->
                                                     </div>
-                                                </td>
-                                                <td class="text-center">
-                                                    @if($loop->first && count($detalles) == 1)
-                                                    <i class="fas fa-trash-alt btn-remove-row" style="display: none;"></i>
-                                                    @else
-                                                    <i class="fas fa-trash-alt btn-remove-row"></i>
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                            @endforeach
-                                        </tbody>
-                                        <tfoot>
-                                            <tr>
-                                                <td colspan="7">
-                                                    <button type="button" class="btn btn-sm btn-outline-primary" id="agregarProducto">
-                                                        <i class="fas fa-plus me-1"></i> Agregar Producto/Servicio
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
+                                                    <div class="col-md-3">
+                                                        <!-- Espacio vacío -->
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <!-- Espacio vacío -->
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Precio Unitario</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text" style="height: 38px;">$</span>
+                                                            <input type="number" 
+                                                                   class="form-control precio-input text-end" 
+                                                                   name="productos[{{ $index }}][precio]" 
+                                                                   value="{{ $detalle->ult_costo }}"
+                                                                   step="0.01" 
+                                                                   style="height: 38px;"
+                                                                   required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="row mt-2">
+                                                    <div class="col-md-3">
+                                                        <!-- Espacio vacío -->
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <!-- Espacio vacío -->
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <!-- Espacio vacío -->
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Subtotal</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text" style="height: 38px;">$</span>
+                                                            <input type="text" 
+                                                                   class="form-control subtotal-text text-end" 
+                                                                   value="${{ number_format($detalle->cantidad * $detalle->ult_costo, 2) }}"
+                                                                   readonly
+                                                                   style="height: 38px; background-color: #f8f9fa;">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" id="agregarProducto">
+                                            <i class="fas fa-plus me-1"></i> Agregar Producto/Servicio
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#nuevoProductoModal">
+                                            <i class="fas fa-plus-circle me-1"></i> Nuevo Producto
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <!-- Resumen de Totales -->
@@ -405,8 +469,9 @@
                                                                name="iva" 
                                                                value="{{ old('iva', $compra->iva ? round(($compra->iva / $compra->costo_operado) * 100, 2) : 16) }}"
                                                                step="0.01"
-                                                               min="0">
-                                                        <span class="input-group-text">%</span>
+                                                               min="0"
+                                                               style="height: 38px;">
+                                                        <span class="input-group-text" style="height: 38px;">%</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -434,24 +499,7 @@
                                 <input type="hidden" name="costo_operado" id="costo_operado_hidden" value="{{ $compra->costo_operado }}">
                                 <input type="hidden" name="total" id="total_hidden" value="{{ $compra->total }}">
 
-                                <!-- Estado (editable) -->
-                                <div class="row mb-4">
-                                    <div class="col-md-4">
-                                        <div class="mb-3">
-                                            <label for="verificado" class="form-label">Estado</label>
-                                            <select class="form-select form-select-sm @error('verificado') is-invalid @enderror" 
-                                                    id="verificado" 
-                                                    name="verificado">
-                                                <option value="1" {{ old('verificado', $compra->verificado ?? 1) == 1 ? 'selected' : '' }}>Pendiente</option>
-                                                <option value="2" {{ old('verificado', $compra->verificado ?? 1) == 2 ? 'selected' : '' }}>Aprobado</option>
-                                                <option value="0" {{ old('verificado', $compra->verificado ?? 1) == 0 ? 'selected' : '' }}>Rechazado</option>
-                                            </select>
-                                            @error('verificado')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                </div>
+                               
 
                                 <div class="row mt-4">
                                     <div class="col-12">
@@ -473,217 +521,51 @@
         </main>
     </div>
 
+    @include('general.modals.modalPS')
+    @include('general.modals.modalProveedores')
+    
     @include('footer')
     
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <!-- INCLUIR SCRIPT COMÚN -->
+    @include('acompras.compras.scripts')
+    
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            let productCount = {{ count($detalles) }};
-            
-            // Inicializar Select2
-            $('.producto-select').select2({
-                placeholder: 'Seleccionar producto/servicio',
-                allowClear: true,
-                width: '100%',
-                templateResult: formatOption,
-                templateSelection: formatOption
-            });
+    $(document).ready(function() {
+        // Actualizar contador de productos
+        window.productCount = {{ count($detalles) }};
 
-            function formatOption(option) {
-                if (!option.id) return option.text;
-                return $('<span>' + option.text + '</span>');
-            }
-
-            // Función para actualizar subtotal de una fila
-            function actualizarSubtotalFila(row) {
-                const cantidad = parseFloat(row.querySelector('.cantidad-input').value) || 0;
-                const precio = parseFloat(row.querySelector('.precio-input').value) || 0;
-                const subtotal = cantidad * precio;
-                row.querySelector('.subtotal-text').value = '$' + subtotal.toFixed(2);
-                row.setAttribute('data-subtotal', subtotal);
-                calcularTotalesGlobales();
-            }
-
-            // Función para calcular todos los totales
-            function calcularTotalesGlobales() {
-                let subtotalGlobal = 0;
-                document.querySelectorAll('.producto-row').forEach(row => {
-                    subtotalGlobal += parseFloat(row.getAttribute('data-subtotal') || 0);
-                });
-
-                const ivaPorcentaje = parseFloat(document.getElementById('iva').value) || 0;
-                const ivaCalculado = subtotalGlobal * (ivaPorcentaje / 100);
-                const totalGlobal = subtotalGlobal + ivaCalculado;
-
-                document.getElementById('subtotalGlobal').textContent = '$' + subtotalGlobal.toFixed(2);
-                document.getElementById('ivaCalculado').textContent = '$' + ivaCalculado.toFixed(2);
-                document.getElementById('totalGlobal').textContent = '$' + totalGlobal.toFixed(2);
-                
-                // Actualizar campos ocultos
-                document.getElementById('costo_operado_hidden').value = subtotalGlobal.toFixed(2);
-                document.getElementById('total_hidden').value = totalGlobal.toFixed(2);
-            }
-
-            // Evento cuando se selecciona un producto
-            $(document).on('select2:select', '.producto-select', function(e) {
-                const row = $(this).closest('tr')[0];
-                const selectedOption = e.params.data.element;
-                
-                if (selectedOption) {
-                    const descripcion = selectedOption.getAttribute('data-descripcion');
-                    const unidad = selectedOption.getAttribute('data-unidad');
-                    const precio = selectedOption.getAttribute('data-precio');
-                    
-                    row.querySelector('.descripcion-input').value = descripcion || '';
-                    row.querySelector('.unidad-input').value = unidad || '';
-                    row.querySelector('.precio-input').value = precio || 0;
-                    
-                    actualizarSubtotalFila(row);
-                }
-            });
-
-            // Eventos para cambios en cantidad y precio
-            document.addEventListener('input', function(e) {
-                if (e.target.classList.contains('cantidad-input') || 
-                    e.target.classList.contains('precio-input')) {
-                    const row = e.target.closest('tr');
-                    actualizarSubtotalFila(row);
-                }
-            });
-
-            // Evento para cambio en porcentaje de IVA
-            document.getElementById('iva').addEventListener('input', calcularTotalesGlobales);
-
-            // Agregar nueva fila
-            document.getElementById('agregarProducto').addEventListener('click', function() {
-                const tbody = document.getElementById('productosBody');
-                const newRow = document.createElement('tr');
-                newRow.className = 'producto-row';
-                
-                const index = productCount;
-                
-                newRow.innerHTML = `
-                    <td>
-                        <select class="form-select form-select-sm producto-select" 
-                                name="productos[${index}][id_producto]" 
-                                data-index="${index}"
-                                required>
-                            <option value="">Seleccionar</option>
-                            @foreach($productos as $producto)
-                                <option value="{{ $producto->id }}" 
-                                        data-clave="{{ $producto->clave }}"
-                                        data-descripcion="{{ $producto->descripcion }}"
-                                        data-unidad="{{ $producto->unidades }}"
-                                        data-precio="{{ $producto->ult_costo }}">
-                                    {{ $producto->clave }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td>
-                        <input type="text" class="form-control form-control-sm descripcion-input" readonly placeholder="Descripción">
-                    </td>
-                    <td>
-                        <input type="text" class="form-control form-control-sm unidad-input" readonly placeholder="Unidad">
-                    </td>
-                    <td>
-                        <input type="number" class="form-control form-control-sm cantidad-input" name="productos[${index}][cantidad]" step="0.01" min="0.01" value="1" required>
-                    </td>
-                    <td>
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text">$</span>
-                            <input type="number" class="form-control precio-input" name="productos[${index}][precio]" step="0.01" required>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text">$</span>
-                            <input type="text" class="form-control subtotal-text" readonly>
-                        </div>
-                    </td>
-                    <td class="text-center">
-                        <i class="fas fa-trash-alt btn-remove-row"></i>
-                    </td>
-                `;
-                
-                tbody.appendChild(newRow);
-                
-                // Inicializar Select2 en la nueva fila
-                $(newRow).find('.producto-select').select2({
-                    placeholder: 'Seleccionar producto/servicio',
-                    allowClear: true,
-                    width: '100%',
-                    templateResult: formatOption,
-                    templateSelection: formatOption
-                });
-                
-                productCount++;
-                
-                actualizarBotonesEliminar();
-                calcularTotalesGlobales();
-            });
-
-            // Eliminar fila
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('btn-remove-row')) {
-                    const row = e.target.closest('tr');
-                    if (document.querySelectorAll('.producto-row').length > 1) {
-                        row.remove();
-                        calcularTotalesGlobales();
-                        actualizarBotonesEliminar();
-                    }
-                }
-            });
-
-            // Función para actualizar visibilidad de botones eliminar
-            function actualizarBotonesEliminar() {
-                const rows = document.querySelectorAll('.producto-row');
-                rows.forEach((row, index) => {
-                    const btnRemove = row.querySelector('.btn-remove-row');
-                    if (btnRemove) {
-                        btnRemove.style.display = rows.length > 1 ? 'inline-block' : 'none';
-                    }
-                });
-            }
-
-            // Calcular subtotales iniciales para cada fila
-            document.querySelectorAll('.producto-row').forEach(row => {
-                const cantidad = parseFloat(row.querySelector('.cantidad-input').value) || 0;
-                const precio = parseFloat(row.querySelector('.precio-input').value) || 0;
-                const subtotal = cantidad * precio;
-                row.setAttribute('data-subtotal', subtotal);
-            });
-            
-            calcularTotalesGlobales();
-            actualizarBotonesEliminar();
-
-            // Validación del formulario
-            const form = document.getElementById('compraForm');
-            form.addEventListener('submit', function(event) {
-                const rows = document.querySelectorAll('.producto-row');
-                let hasProducts = false;
-                
-                rows.forEach(row => {
-                    const select = row.querySelector('.producto-select');
-                    if (select && select.value) {
-                        hasProducts = true;
-                    }
-                });
-                
-                if (!hasProducts) {
-                    event.preventDefault();
-                    alert('Debe agregar al menos un producto o servicio');
-                    return false;
-                }
-                
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                
-                form.classList.add('was-validated');
-            });
+        // Agregar nueva tarjeta
+        $('#agregarProducto').on('click', function() {
+            agregarProducto();
         });
+
+        // Validación del formulario
+        $('#compraForm').on('submit', function(event) {
+            let hasProducts = false;
+            
+            $('.producto-select').each(function() {
+                if ($(this).val()) {
+                    hasProducts = true;
+                }
+            });
+            
+            if (!hasProducts) {
+                event.preventDefault();
+                alert('Debe agregar al menos un producto o servicio');
+                return false;
+            }
+            
+            if (!this.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            $(this).addClass('was-validated');
+        });
+    });
     </script>
+    @include('general.modals.scripts')
 </body>
 </html>

@@ -286,10 +286,7 @@ class CompraController extends Controller
             abort(404);
         }
         
-        if (isset($compra->verificado) && $compra->verificado != 1) {
-            return redirect()->route('compras.index')
-                ->with('error', 'No se puede editar una compra que no está pendiente');
-        }
+        
         
         $request->validate([
             'consecutivo' => 'required|integer|min:1',
