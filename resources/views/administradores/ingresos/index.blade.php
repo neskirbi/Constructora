@@ -352,38 +352,50 @@
                                 
                                 <!-- Body de la tarjeta -->
                                 <div class="card-ingreso-body">
-                                    <!-- Información básica -->
-                                    <div class="info-grid">
-                                        <div class="info-item">
-                                            <div class="info-label">Contrato</div>
-                                            <div class="info-value">
-                                                {{ $contrato->contrato_no ?? 'N/A' }}
-                                                @if($contrato->obra)
-                                                <div class="text-muted" style="font-size: 0.85rem; margin-top: 2px;">
-                                                    {{ Str::limit($contrato->obra, 40) }}
-                                                </div>
-                                                @endif
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="info-item">
-                                            <div class="info-label">Cliente</div>
-                                            <div class="info-value">{{ $contrato->cliente ?? 'Sin cliente' }}</div>
-                                        </div>
-                                        
-                                        <div class="info-item">
-                                            <div class="info-label">Período</div>
-                                            <div class="info-value">
-                                                @if($ingreso->periodo_del && $ingreso->periodo_al)
-                                                {{ date('d/m/Y', strtotime($ingreso->periodo_del)) }} - 
-                                                {{ date('d/m/Y', strtotime($ingreso->periodo_al)) }}
-                                                @else
-                                                No especificado
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
 
+                                <div class="row mb-3">
+                                    <div class="col-md-4 mb-2 mb-md-0">
+                                        <small class="text-muted d-block">Consecutivo</small>
+                                        <span class="fw-bold">{{ $contrato->consecutivo ?? 'N/A' }}</span>
+                                    </div>
+                                    <div class="col-md-4 mb-2 mb-md-0">
+                                        <small class="text-muted d-block">Ref. Interna</small>
+                                        <span>{{ $contrato->refinterna ?? 'N/A' }}</span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <small class="text-muted d-block">No. Contrato</small>
+                                        <span>{{ $contrato->contrato_no ?? 'N/A' }}</span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Segunda fila: Cliente -->
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <small class="text-muted d-block">Cliente</small>
+                                        <span class="fw-bold" title="{{ $contrato->cliente ?? 'No especificado' }}">
+                                            {{ $contrato->cliente ?? 'No especificado' }}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Tercera fila: Obra -->
+                                <div class="row mb-3">
+                                    <div class="col-12">
+                                        <small class="text-muted d-block">Obra</small>
+                                        <span class="fw-bold" title="{{ $contrato->obra ?? 'Sin nombre de obra' }}">
+                                            {{ $contrato->obra ?? 'Sin nombre de obra' }}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Cuarta fila: Frente -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <small class="text-muted d-block">Frente</small>
+                                        <span>{{ $contrato->frente ?? 'No especificado' }}</span>
+                                    </div>
+                                </div>
+                                    
                                     <!-- Facturación -->
                                     <div class="info-grid mt-3">
                                         <div class="info-item">
@@ -416,12 +428,10 @@
                                         </div>
                                     </div>
 
-
-
                                     <!-- Botones -->
                                     <div class="d-flex justify-content-end gap-2 mt-3 pt-3 border-top">
                                         <a href="{{ route('aingresos.show', $ingreso->id) }}" 
-                                        class="btn btn-primary ">
+                                        class="btn btn-primary">
                                             <i class="fas fa-eye me-1"></i> Ver
                                         </a>
                                         @if($ingreso->verificado == 1)
@@ -436,6 +446,8 @@
                         </div>
                         @endforeach
                     </div>
+
+                    
                     
                     <!-- Paginación -->
                     <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
@@ -469,9 +481,7 @@
                             <i class="fas fa-times me-1"></i> Limpiar búsqueda
                         </a>
                         @endif
-                        <a href="{{ route('aingresos.create') }}" class="btn btn-primary btn-lg">
-                            <i class="fas fa-plus me-1"></i> Registrar Primer Ingreso
-                        </a>
+                        
                     </div>
                     @endif
                 </div>
