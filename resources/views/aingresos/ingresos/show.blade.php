@@ -813,97 +813,98 @@
                             
                             <!-- RESUMEN DE MONTOS DE LA ESTIMACIÓN (debajo de facturación) -->
                             <div class="resumen-montos mt-3">
-                                <h6 class="fw-bold mb-3"><i class="fas fa-calculator me-2"></i>Montos de la Estimación</h6>
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <small class="text-muted d-block">Importe Estimación</small>
-                                        <strong>${{ number_format($ingreso->importe_estimacion ?? 0, 2) }}</strong>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <small class="text-muted d-block">IVA %</small>
-                                        <strong>{{ number_format($ingreso->iva ?? 0, 2) }}%</strong>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <small class="text-muted d-block">Importe IVA</small>
-                                        <strong>${{ number_format($ingreso->importe_iva ?? 0, 2) }}</strong>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <small class="text-muted d-block">Total con IVA</small>
-                                        <strong>${{ number_format($ingreso->total_estimacion_con_iva ?? 0, 2) }}</strong>
-                                    </div>
-                                </div>
-                                <hr class="my-2">
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <small class="text-muted d-block">SICV - COP (2%)</small>
-                                        <strong>${{ number_format($ingreso->sicv_cop ?? 0, 2) }}</strong>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <small class="text-muted d-block">SRCOP - CDMX (1.5%)</small>
-                                        <strong>${{ number_format($ingreso->srcop_cdmx ?? 0, 2) }}</strong>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <small class="text-muted d-block">Ret. 5 al Millar</small>
-                                        <strong>${{ number_format($ingreso->retencion_5_al_millar ?? 0, 2) }}</strong>
-                                    </div>
-                                    
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-3">
-                                            <small class="text-muted d-block">Sanción Atraso Presentación</small>
-                                            <strong>    ${{ number_format($ingreso->sancion_atrazo_presentacion_estimacion ?? 0, 2) }}</strong>
-                                        </div>
-                                    
-                                    <div class="col-md-3">
-                                            <small class="text-muted d-block">Sanción Atraso de Obra</small>
-                                            <strong>    ${{ number_format($ingreso->sancion_atraso_de_obra ?? 0, 2) }}</strong>
-                                        </div>
-                                    
-                                    <div class="col-md-3">
-                                            <small class="text-muted d-block">Sanción por Obra Mal Ejecutada</small>
-                                            <strong>    ${{ number_format($ingreso->sancion_por_obra_mal_ejecutada ?? 0, 2) }}</strong>
-                                        </div>
-                                    <div class="col-md-3">
-                                        <small class="text-muted d-block">Total Ret/Sanc</small>
-                                        <strong>${{ number_format($ingreso->retenciones_o_sanciones ?? 0, 2) }}</strong>
-                                    </div>
-                                </div>
-                                <div class="row mt-2">
-                                    <div class="col-md-3">
-                                        <small class="text-muted d-block">Amort. Anticipo</small>
-                                        <strong>${{ number_format($ingreso->amortizacion_anticipo ?? 0, 2) }}</strong>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <small class="text-muted d-block">% IVA</small>
-                                        <strong>%{{ number_format($ingreso->amortizacion_iva ?? 0, 2) }}</strong>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <small class="text-muted d-block">Amort. IVA</small>
-                                        <strong>${{ number_format($ingreso->amortizacion_anticipo*($ingreso->amortizacion_iva/100) ?? 0, 2) }}</strong>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <small class="text-muted d-block">Total Amort.</small>
-                                        <strong>${{ number_format($ingreso->total_amortizacion ?? 0, 2) }}</strong>
-                                    </div>
-                                </div>
-                                
-                                <div class="row mt-2">
-                                    <div class="col-md-3">
-                                        
-                                    </div>
-                                    <div class="col-md-3">
-                                        
-                                    </div>
-                                    <div class="col-md-3">
-                                        
-                                    </div>
-                                    <div class="col-md-3">
-                                        <small class="text-muted d-block">Líquido a Cobrar</small>
-                                        <strong class="text-primary">${{ number_format($ingreso->estimado_menos_deducciones ?? 0, 2) }}</strong>
-                                    </div>
-                                </div>
-                                
-                            </div>
+    <h6 class="fw-bold mb-3"><i class="fas fa-calculator me-2"></i>Montos de la Estimación</h6>
+    
+    <!-- Fila 1: Importes Básicos -->
+    <div class="row">
+        <div class="col-md-3 <?php echo ($ingreso->importe_estimacion ?? 0) == 0 ? 'd-none' : ''; ?>">
+            <small class="text-muted d-block">Importe Estimación</small>
+            <strong>${{ number_format($ingreso->importe_estimacion ?? 0, 2) }}</strong>
+        </div>
+        <div class="col-md-3 <?php echo ($ingreso->iva ?? 0) == 0 ? 'd-none' : ''; ?>">
+            <small class="text-muted d-block">IVA %</small>
+            <strong>{{ number_format($ingreso->iva ?? 0, 2) }}%</strong>
+        </div>
+        <div class="col-md-3 <?php echo ($ingreso->importe_iva ?? 0) == 0 ? 'd-none' : ''; ?>">
+            <small class="text-muted d-block">Importe IVA</small>
+            <strong>${{ number_format($ingreso->importe_iva ?? 0, 2) }}</strong>
+        </div>
+        <div class="col-md-3 <?php echo ($ingreso->total_estimacion_con_iva ?? 0) == 0 ? 'd-none' : ''; ?>">
+            <small class="text-muted d-block">Total con IVA</small>
+            <strong>${{ number_format($ingreso->total_estimacion_con_iva ?? 0, 2) }}</strong>
+        </div>
+    </div>
+    
+    <hr class="my-2">
+    
+    <!-- Fila 2: SICV, SRCOP, Retención 5 al Millar -->
+    <div class="row">
+        <div class="col-md-3 <?php echo ($ingreso->sicv_cop ?? 0) == 0 ? 'd-none' : ''; ?>">
+            <small class="text-muted d-block">SICV - COP (2%)</small>
+            <strong>${{ number_format($ingreso->sicv_cop ?? 0, 2) }}</strong>
+        </div>
+        <div class="col-md-3 <?php echo ($ingreso->srcop_cdmx ?? 0) == 0 ? 'd-none' : ''; ?>">
+            <small class="text-muted d-block">SRCOP - CDMX (1.5%)</small>
+            <strong>${{ number_format($ingreso->srcop_cdmx ?? 0, 2) }}</strong>
+        </div>
+        <div class="col-md-3 <?php echo ($ingreso->retencion_5_al_millar ?? 0) == 0 ? 'd-none' : ''; ?>">
+            <small class="text-muted d-block">Ret. 5 al Millar</small>
+            <strong>${{ number_format($ingreso->retencion_5_al_millar ?? 0, 2) }}</strong>
+        </div>
+    </div>
+    
+    <!-- Fila 3: Sanciones -->
+    <div class="row">
+        <div class="col-md-3 <?php echo ($ingreso->sancion_atrazo_presentacion_estimacion ?? 0) == 0 ? 'd-none' : ''; ?>">
+            <small class="text-muted d-block">Sanción Atraso Presentación</small>
+            <strong>${{ number_format($ingreso->sancion_atrazo_presentacion_estimacion ?? 0, 2) }}</strong>
+        </div>
+        <div class="col-md-3 <?php echo ($ingreso->sancion_atraso_de_obra ?? 0) == 0 ? 'd-none' : ''; ?>">
+            <small class="text-muted d-block">Sanción Atraso de Obra</small>
+            <strong>${{ number_format($ingreso->sancion_atraso_de_obra ?? 0, 2) }}</strong>
+        </div>
+        <div class="col-md-3 <?php echo ($ingreso->sancion_por_obra_mal_ejecutada ?? 0) == 0 ? 'd-none' : ''; ?>">
+            <small class="text-muted d-block">Sanción por Obra Mal Ejecutada</small>
+            <strong>${{ number_format($ingreso->sancion_por_obra_mal_ejecutada ?? 0, 2) }}</strong>
+        </div>
+        <div class="col-md-3 <?php echo ($ingreso->retenciones_o_sanciones ?? 0) == 0 ? 'd-none' : ''; ?>">
+            <small class="text-muted d-block">Total Ret/Sanc</small>
+            <strong>${{ number_format($ingreso->retenciones_o_sanciones ?? 0, 2) }}</strong>
+        </div>
+    </div>
+    
+    <!-- Fila 4: Amortizaciones -->
+    <div class="row mt-2">
+        <div class="col-md-3 <?php echo ($ingreso->amortizacion_anticipo ?? 0) == 0 ? 'd-none' : ''; ?>">
+            <small class="text-muted d-block">Amort. Anticipo</small>
+            <strong>${{ number_format($ingreso->amortizacion_anticipo ?? 0, 2) }}</strong>
+        </div>
+        <div class="col-md-3 <?php echo ($ingreso->amortizacion_iva ?? 0) == 0 ? 'd-none' : ''; ?>">
+            <small class="text-muted d-block">% IVA</small>
+            <strong>%{{ number_format($ingreso->amortizacion_iva ?? 0, 2) }}</strong>
+        </div>
+        <?php 
+            $amorIva = ($ingreso->amortizacion_anticipo ?? 0) * (($ingreso->amortizacion_iva ?? 0) / 100);
+        ?>
+        <div class="col-md-3 <?php echo $amorIva == 0 ? 'd-none' : ''; ?>">
+            <small class="text-muted d-block">Amort. IVA</small>
+            <strong>${{ number_format($amorIva, 2) }}</strong>
+        </div>
+        <div class="col-md-3 <?php echo ($ingreso->total_amortizacion ?? 0) == 0 ? 'd-none' : ''; ?>">
+            <small class="text-muted d-block">Total Amort.</small>
+            <strong>${{ number_format($ingreso->total_amortizacion ?? 0, 2) }}</strong>
+        </div>
+    </div>
+    
+    <!-- Fila 5: Líquido a Cobrar (siempre visible) -->
+    <div class="row mt-2">
+        <div class="col-md-9"></div>
+        <div class="col-md-3">
+            <small class="text-muted d-block">Líquido a Cobrar</small>
+            <strong class="text-primary">${{ number_format($ingreso->estimado_menos_deducciones ?? 0, 2) }}</strong>
+        </div>
+    </div>
+</div>
                         </div>
                         
                         <!-- SECCIÓN 5: COBROS -->
