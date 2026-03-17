@@ -28,10 +28,7 @@ class DestajoDetalle extends Model
         'updated_at'
     ];
 
-    protected $casts = [
-        'cantidad' => 'decimal:20',
-        'ult_costo' => 'decimal:20'
-    ];
+    
 
     protected static function boot()
     {
