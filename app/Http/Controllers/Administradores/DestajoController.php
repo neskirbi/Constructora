@@ -26,9 +26,11 @@ class DestajoController extends Controller
             ->leftJoin('adestajos as u', 'd.id_usuario', '=', 'u.id')
             ->select(
                 'd.*',
+                'c.consecutivo',
                 'c.contrato_no',
                 'c.obra as contrato_obra',
                 'p.nombre as proveedor_nombre',
+                'p.especialidad as especialidad',
                 'p.clave as proveedor_clave',
                 'u.nombres as usuario_nombres',
                 'u.apellidos as usuario_apellidos'
