@@ -672,10 +672,10 @@
                                 <div class="col-md-4">
                                     <div class="form-group-custom">
                                         <label for="amortizacion_iva" class="form-label-custom">
-                                            Amortización I.V.A.
+                                            % I.V.A.
                                         </label>
                                         <div class="input-group input-group-custom">
-                                            <span class="input-group-text">$</span>
+                                            <span class="input-group-text">%</span>
                                             <input type="number" 
                                                    class="form-control form-control-custom numeric-input" 
                                                    id="amortizacion_iva" 
