@@ -883,7 +883,7 @@
             $('#id_contrato').val('{{ request('contrato_id') }}').trigger('change');
         }, 500);
     @endif
-});
+
 
 
 // Función para calcular importe del IVA y total de estimación
