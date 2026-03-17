@@ -52,9 +52,10 @@ class DestajoController extends Controller
             // Obtener todos los detalles de una sola vez
             $todosDetalles = DB::table('destajodetalles')
                 ->whereIn('id_destajo', $destajoIds)
-                ->groupBy('id_destajo')
-                ->orderby('clave','asc')
-                ->get();
+                ->orderBy('id_destajo')
+                ->orderBy('clave', 'asc')
+                ->get()
+                ->groupBy('id_destajo');
             
             // Asignar los detalles a cada destajo
             foreach ($destajos as $destajo) {
