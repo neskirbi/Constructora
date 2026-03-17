@@ -325,23 +325,16 @@
                                             <i class="fas fa-boxes me-2"></i>
                                             Productos / Servicios
                                         </h6>
-                                        <table class="detalles-table" style="table-layout: fixed; width: 100%;">
-                                            <colgroup>
-                                                <col style="width: auto;"> <!-- Clave -->
-                                                <col style="width: auto; min-width: 200px;"> <!-- Descripción (se expande) -->
-                                                <col style="width: auto;"> <!-- Unidad -->
-                                                <col style="width: auto;"> <!-- Cantidad -->
-                                                <col style="width: auto;"> <!-- P. Unitario -->
-                                                <col style="width: auto;"> <!-- Subtotal -->
-                                            </colgroup>
+                                        <table class="detalles-table" style="table-layout: auto; width: 100%;">
                                             <thead>
                                                 <tr>
-                                                    <th>Clave</th>
-                                                    <th>Descripción</th>
-                                                    <th>Unidad</th>
-                                                    <th class="text-end">Cantidad</th>
-                                                    <th class="text-end">P. Unitario</th>
-                                                    <th class="text-end">Subtotal</th>
+                                                    <th style="white-space: nowrap;">Clave</th>
+                                                    <th style="width: 100%;">Descripción</th>
+                                                    <!-- Descripción tomará el espacio disponible -->
+                                                    <th style="white-space: nowrap;">Unidad</th>
+                                                    <th style="white-space: nowrap;" class="text-end">Cantidad</th>
+                                                    <th style="white-space: nowrap;" class="text-end">P. Unitario</th>
+                                                    <th style="white-space: nowrap;" class="text-end">Subtotal</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
