@@ -314,7 +314,6 @@
 
     @include('footer')
     
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     
     <!-- INCLUIR SCRIPT COMÚN -->
     @include('acompras.compras.scripts')
@@ -361,3 +360,7 @@
     @include('general.modals.scripts')
 </body>
 </html>
+
+<!--Cambios 
+Que la alta de proveedor no refesque la pagina y la de material o servicio se cargue
+revisar por que no se agrega la especialidad-->
