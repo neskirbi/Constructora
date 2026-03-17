@@ -37,6 +37,7 @@ class IngresoController extends Controller
                             ->whereColumn('contratos.id', 'ingresos.id_contrato')
                             ->where(function ($q2) use ($search) {
                                 $q2->where('contratos.contrato_no', 'like', "%{$search}%")
+                                    ->orWhere('contratos.consecutivo', 'like', "%{$search}%")
                                     ->orWhere('contratos.obra', 'like', "%{$search}%")
                                     ->orWhere('contratos.cliente', 'like', "%{$search}%");
                             });
