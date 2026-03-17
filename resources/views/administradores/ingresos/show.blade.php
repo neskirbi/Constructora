@@ -395,20 +395,29 @@
                             <hr class="my-4">
                             
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group-custom">
                                         <label class="form-label-custom">Amortización Anticipo</label>
                                         <div class="info-display">
                                             ${{ number_format($ingreso->amortizacion_anticipo ?? 0, 2) }}
                                         </div>
                                     </div>
+                               </div>
+                                
+                                <div class="col-md-2">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">% I.V.A.</label>
+                                        <div class="info-display">
+                                            %{{ number_format($ingreso->amortizacion_iva ?? 0, 2) }}
+                                        </div>
+                                    </div>
                                 </div>
                                 
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <div class="form-group-custom">
                                         <label class="form-label-custom">Amortización I.V.A.</label>
                                         <div class="info-display">
-                                            ${{ number_format($ingreso->amortizacion_iva ?? 0, 2) }}
+                                            ${{ number_format($ingreso->amortizacion_anticipo*($ingreso->amortizacion_iva/100) ?? 0, 2) }}
                                         </div>
                                     </div>
                                 </div>
@@ -507,6 +516,23 @@
                                         <small class="text-muted d-block">Ret. 5 al Millar</small>
                                         <strong>${{ number_format($ingreso->retencion_5_al_millar ?? 0, 2) }}</strong>
                                     </div>
+                                    
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                            <small class="text-muted d-block">Sanción Atraso Presentación</small>
+                                            <strong>    ${{ number_format($ingreso->sancion_atrazo_presentacion_estimacion ?? 0, 2) }}</strong>
+                                        </div>
+                                    
+                                    <div class="col-md-3">
+                                            <small class="text-muted d-block">Sanción Atraso de Obra</small>
+                                            <strong>    ${{ number_format($ingreso->sancion_atraso_de_obra ?? 0, 2) }}</strong>
+                                        </div>
+                                    
+                                    <div class="col-md-3">
+                                            <small class="text-muted d-block">Sanción por Obra Mal Ejecutada</small>
+                                            <strong>    ${{ number_format($ingreso->sancion_por_obra_mal_ejecutada ?? 0, 2) }}</strong>
+                                        </div>
                                     <div class="col-md-3">
                                         <small class="text-muted d-block">Total Ret/Sanc</small>
                                         <strong>${{ number_format($ingreso->retenciones_o_sanciones ?? 0, 2) }}</strong>
@@ -518,18 +544,35 @@
                                         <strong>${{ number_format($ingreso->amortizacion_anticipo ?? 0, 2) }}</strong>
                                     </div>
                                     <div class="col-md-3">
+                                        <small class="text-muted d-block">% IVA</small>
+                                        <strong>%{{ number_format($ingreso->amortizacion_iva ?? 0, 2) }}</strong>
+                                    </div>
+                                    <div class="col-md-3">
                                         <small class="text-muted d-block">Amort. IVA</small>
-                                        <strong>${{ number_format($ingreso->amortizacion_iva ?? 0, 2) }}</strong>
+                                        <strong>${{ number_format($ingreso->amortizacion_anticipo*($ingreso->amortizacion_iva/100) ?? 0, 2) }}</strong>
                                     </div>
                                     <div class="col-md-3">
                                         <small class="text-muted d-block">Total Amort.</small>
                                         <strong>${{ number_format($ingreso->total_amortizacion ?? 0, 2) }}</strong>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-2">
+                                    <div class="col-md-3">
+                                        
+                                    </div>
+                                    <div class="col-md-3">
+                                        
+                                    </div>
+                                    <div class="col-md-3">
+                                        
                                     </div>
                                     <div class="col-md-3">
                                         <small class="text-muted d-block">Líquido a Cobrar</small>
                                         <strong class="text-primary">${{ number_format($ingreso->estimado_menos_deducciones ?? 0, 2) }}</strong>
                                     </div>
                                 </div>
+                                
                             </div>
                         </div>
                         
