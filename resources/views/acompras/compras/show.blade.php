@@ -261,7 +261,7 @@
                                                 <option value="">Seleccione un contrato</option>
                                                 @foreach($contratos as $contrato)
                                                     <option value="{{ $contrato->id }}" {{ old('id_contrato', $compra->id_contrato) == $contrato->id ? 'selected' : '' }}>
-                                                        {{ $contrato->contrato_no }} - {{ $contrato->obra ?? '' }}
+                                                        {{ $contrato->consecutivo }} - {{ $contrato->orefinternabra ?? '' }}
                                                     </option>
                                                 @endforeach
                                             </select>

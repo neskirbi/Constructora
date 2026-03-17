@@ -127,7 +127,7 @@
                                 <div class="row mb-4">
                                     <div class="col-md-3">
                                         <div class="mb-3">
-                                            <label for="consecutivo" class="form-label required-label">Consecutivo</label>
+                                            <label for="consecutivo" class="form-label required-label">Orden de Compra</label>
                                             <input type="number" 
                                                    class="form-control form-control-sm @error('consecutivo') is-invalid @enderror" 
                                                    id="consecutivo" 
@@ -172,7 +172,7 @@
                                                 <option value="">Seleccione un contrato</option>
                                                 @foreach($contratos as $contrato)
                                                     <option value="{{ $contrato->id }}" {{ old('id_contrato') == $contrato->id ? 'selected' : '' }}>
-                                                        {{ $contrato->contrato_no }} - {{ $contrato->obra ?? '' }}
+                                                        {{ $contrato->consecutivo }} - {{ $contrato->refinterna ?? '' }}
                                                     </option>
                                                 @endforeach
                                             </select>
