@@ -74,6 +74,7 @@ function crearTarjetaProducto(index, productosData) {
                         data-precio="${producto.ult_costo}">
                         ${producto.clave}
                     </option>`;
+                    console.log(producto.clave);
     });
 
     return `
