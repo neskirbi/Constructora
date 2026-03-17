@@ -35,10 +35,9 @@
                                     <i class="fas fa-boxes me-2 text-primary"></i>
                                     Productos y Servicios
                                 </h5>
-                                <span class="text-muted">
-                                    <i class="fas fa-cubes me-1"></i>
-                                    Total: {{ $productos->total() }} registro(s)
-                                </span>
+                                <a href="{{ route('productosyservicios.create') }}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-1"></i> Nuevo Producto/Servicio
+                                </a>
                             </div>
                         </div>
                         

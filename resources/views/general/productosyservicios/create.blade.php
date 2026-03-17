@@ -95,32 +95,7 @@
                                                     Ej: PZA, M2, LTS, KG
                                                 </small>
                                             </div>
-
-                                            <!-- Último costo -->
-                                            <div class="col-md-4">
-                                                <label class="form-label">
-                                                    Último costo <span class="text-danger">*</span>
-                                                </label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text">$</span>
-                                                    <input type="number" 
-                                                           class="form-control @error('ult_costo') is-invalid @enderror" 
-                                                           name="ult_costo" 
-                                                           id="ult_costo"
-                                                           value="{{ old('ult_costo') }}"
-                                                           step="0.01"
-                                                           placeholder="0.00"
-                                                           required>
-                                                    @error('ult_costo')
-                                                    <div class="invalid-feedback">
-                                                        {{ $message }}
-                                                    </div>
-                                                    @enderror
-                                                </div>
-                                                <small class="text-muted">
-                                                    Costo unitario actual
-                                                </small>
-                                            </div>
+                                            
 
                                             <!-- Descripción (ocupa toda la fila) -->
                                             <div class="col-12">

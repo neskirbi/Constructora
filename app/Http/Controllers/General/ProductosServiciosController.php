@@ -31,6 +31,7 @@ class ProductosServiciosController extends Controller
      */
     public function create()
     {
+        
         return view('general.productosyservicios.create');
     }
 
@@ -42,8 +43,7 @@ class ProductosServiciosController extends Controller
         $request->validate([
             'clave' => 'required|string|max:32|unique:productosyservicios,clave',
             'descripcion' => 'required|string',
-            'unidades' => 'required|string|max:10',
-            'ult_costo' => 'required|numeric'
+            'unidades' => 'required|string|max:10'
         ]);
 
         try {
@@ -54,7 +54,7 @@ class ProductosServiciosController extends Controller
                 'clave' => $request->clave,
                 'descripcion' => $request->descripcion,
                 'unidades' => $request->unidades,
-                'ult_costo' => $request->ult_costo
+                'ult_costo' => 0.0
             ]);
 
             DB::commit();

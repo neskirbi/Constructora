@@ -93,26 +93,6 @@
                                                 <small class="text-muted">Ej: PZA, M2, LTS</small>
                                             </div>
 
-                                            <!-- Último costo -->
-                                            <div class="col-md-4">
-                                                <label class="form-label">
-                                                    <i class="fas fa-dollar-sign me-1 text-primary"></i>
-                                                    Último costo <span class="text-danger">*</span>
-                                                </label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text">$</span>
-                                                    <input type="number" 
-                                                           class="form-control @error('ult_costo') is-invalid @enderror" 
-                                                           name="ult_costo" 
-                                                           value="{{ old('ult_costo', $producto->ult_costo) }}"
-                                                           step="0.01" 
-                                                           required>
-                                                    @error('ult_costo')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-
                                             <!-- Descripción -->
                                             <div class="col-12">
                                                 <label class="form-label">
