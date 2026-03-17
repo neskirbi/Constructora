@@ -382,5 +382,5 @@
 
 
 <!--Cambios
-Cambiar a un lista 
+Cambiar a un lista y que la busqueda de l select funcione
 -->

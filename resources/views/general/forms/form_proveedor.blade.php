@@ -11,7 +11,12 @@
     $estatusOptions = ['Activo', 'Inactivo', 'Suspendido'];        
     $clasificacionOptions = ['ADMON', 'COMPRAS', 'DESTAJO', 'MATERIALES', 'SERVICIOS'];
 ?>
-<form action="{{ route('proveedoresds.store') }}" method="POST" id="proveedorForm">
+
+<!-- Agregar jQuery y SweetAlert2 si no los tienes -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<form action="{{ route('proveedoresds.guardar') }}" method="POST" id="proveedorForm">
     @csrf
     
     <div class="row">
@@ -114,47 +119,46 @@
             </div>
             
             <div class="mb-3">
-    <label for="especialidad" class="form-label required-label">Especialidad</label>
-    <div class="input-group input-group-sm">
-        <select class="form-select form-select-sm @error('especialidad') is-invalid @enderror" 
-                id="especialidadSelect" 
-                name="especialidad"
-                required>
-            <option value="">Seleccione una especialidad</option>
-            @if(!empty($especialidadOptions) && count($especialidadOptions) > 0)
-                @foreach($especialidadOptions as $option)
-                    <option value="{{ $option }}" {{ old('especialidad') == $option ? 'selected' : '' }}>
-                        {{ $option }}
-                    </option>
-                @endforeach
-            @endif
-        </select>
-        
-        <!-- Input para nueva especialidad (oculto inicialmente) -->
-        <input type="text" 
-               class="form-control form-control-sm @error('especialidad') is-invalid @enderror" 
-               id="especialidadInput" 
-               name="especialidad"
-               maxlength="100"
-               placeholder="Ingrese nueva especialidad"
-               style="display: none;"
-               value="{{ old('especialidad') }}">
-        
-        <!-- Botón para cambiar a input -->
-        <button class="btn btn-outline-secondary" type="button" id="btnNuevaEspecialidad" onclick="mostrarInputEspecialidad()">
-            <i class="fas fa-plus"></i> Nueva
-        </button>
-        
-        <!-- Botón para volver al select (oculto inicialmente) -->
-        <button class="btn btn-outline-secondary" type="button" id="btnVolverSelect" onclick="volverSelectEspecialidad()" style="display: none;">
-            <i class="fas fa-list"></i> Volver al listado
-        </button>
-    </div>
-    @error('especialidad')
-        <div class="invalid-feedback">{{ $message }}</div>
-    @enderror
-    <small class="text-muted">Puede seleccionar una existente o hacer clic en "Nueva" para crear una</small>
-</div>
+                <label for="especialidad" class="form-label required-label">Especialidad</label>
+                <div class="input-group input-group-sm">
+                    <select class="form-select form-select-sm @error('especialidad') is-invalid @enderror" 
+                            id="especialidadSelect" 
+                            name="especialidad"
+                            required>
+                        <option value="">Seleccione una especialidad</option>
+                        @if(!empty($especialidadOptions) && count($especialidadOptions) > 0)
+                            @foreach($especialidadOptions as $option)
+                                <option value="{{ $option }}" {{ old('especialidad') == $option ? 'selected' : '' }}>
+                                    {{ $option }}
+                                </option>
+                            @endforeach
+                        @endif
+                    </select>
+                    
+                    <!-- Input para nueva especialidad (oculto inicialmente) -->
+                    <input type="text" 
+                           class="form-control form-control-sm @error('especialidad') is-invalid @enderror" 
+                           id="especialidadInput" 
+                           maxlength="100"
+                           placeholder="Ingrese nueva especialidad"
+                           style="display: none;"
+                           value="{{ old('especialidad') }}">
+                    
+                    <!-- Botón para cambiar a input -->
+                    <button class="btn btn-outline-secondary" type="button" id="btnNuevaEspecialidad" onclick="mostrarInputEspecialidad()">
+                        <i class="fas fa-plus"></i> Nueva
+                    </button>
+                    
+                    <!-- Botón para volver al select (oculto inicialmente) -->
+                    <button class="btn btn-outline-secondary" type="button" id="btnVolverSelect" onclick="volverSelectEspecialidad()" style="display: none;">
+                        <i class="fas fa-list"></i> Volver al listado
+                    </button>
+                </div>
+                @error('especialidad')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+                <small class="text-muted">Puede seleccionar una existente o hacer clic en "Nueva" para crear una</small>
+            </div>
         </div>
     </div>
     
@@ -164,7 +168,7 @@
                 <a href="{{ route('proveedoresds.index') }}" class="btn btn-secondary btn-sm">
                     <i class="fas fa-times me-1"></i> Cancelar
                 </a>
-                <button type="submit" class="btn btn-success btn-sm">
+                <button type="submit" class="btn btn-success btn-sm" id="btnGuardar">
                     <i class="fas fa-save me-1"></i> Guardar Proveedor
                 </button>
             </div>
@@ -172,122 +176,166 @@
     </div>
 </form>
 
-
-
-
 <script>
-
     function mostrarInputEspecialidad() {
-    const select = document.getElementById('especialidadSelect');
-    const input = document.getElementById('especialidadInput');
-    const btnNueva = document.getElementById('btnNuevaEspecialidad');
-    const btnVolver = document.getElementById('btnVolverSelect');
-    
-    select.style.display = 'none';
-    select.disabled = true;
-    select.removeAttribute('name'); // Quitar el name del select
-    
-    input.style.display = 'block';
-    input.disabled = false;
-    input.setAttribute('name', 'especialidad'); // Poner el name en el input
-    input.focus();
-    
-    btnNueva.style.display = 'none';
-    btnVolver.style.display = 'block';
-}
-
-function volverSelectEspecialidad() {
-    const select = document.getElementById('especialidadSelect');
-    const input = document.getElementById('especialidadInput');
-    const btnNueva = document.getElementById('btnNuevaEspecialidad');
-    const btnVolver = document.getElementById('btnVolverSelect');
-    
-    select.style.display = 'block';
-    select.disabled = false;
-    select.setAttribute('name', 'especialidad'); // Poner el name en el select
-    
-    input.style.display = 'none';
-    input.disabled = true;
-    input.removeAttribute('name'); // Quitar el name del input
-    input.value = ''; // Limpiar el input
-    
-    btnNueva.style.display = 'block';
-    btnVolver.style.display = 'none';
-}
-
-// Si hay un error de validación y venía del input, mostrar el input
-document.addEventListener('DOMContentLoaded', function() {
-    const oldValue = "{{ old('especialidad') }}";
-    if (oldValue) {
         const select = document.getElementById('especialidadSelect');
-        const options = Array.from(select.options).map(opt => opt.value);
+        const input = document.getElementById('especialidadInput');
+        const btnNueva = document.getElementById('btnNuevaEspecialidad');
+        const btnVolver = document.getElementById('btnVolverSelect');
         
-        if (!options.includes(oldValue)) {
-            mostrarInputEspecialidad();
-            document.getElementById('especialidadInput').value = oldValue;
-        }
+        select.style.display = 'none';
+        select.disabled = true;
+        select.removeAttribute('name'); // Quitar name del select
+        
+        input.style.display = 'block';
+        input.disabled = false;
+        input.setAttribute('name', 'especialidad'); // Poner name en el input
+        input.focus();
+        
+        btnNueva.style.display = 'none';
+        btnVolver.style.display = 'block';
     }
-});
 
-////////////////////////////////////////////////////////////////////////
-    function StartFormProveedor(){
+    function volverSelectEspecialidad() {
+        const select = document.getElementById('especialidadSelect');
+        const input = document.getElementById('especialidadInput');
+        const btnNueva = document.getElementById('btnNuevaEspecialidad');
+        const btnVolver = document.getElementById('btnVolverSelect');
+        
+        select.style.display = 'block';
+        select.disabled = false;
+        select.setAttribute('name', 'especialidad'); // Poner name en el select
+        
+        input.style.display = 'none';
+        input.disabled = true;
+        input.removeAttribute('name'); // Quitar name del input
+        input.value = ''; // Limpiar el input
+        
+        btnNueva.style.display = 'block';
+        btnVolver.style.display = 'none';
+    }
+
+    $(document).ready(function() {
+        console.log('Document ready ejecutado');
+        
         // Enfocar el campo clave automáticamente
-        document.getElementById('clave').focus();
+        $('#clave').focus();
         
-        // Validación del formulario
-        const form = document.getElementById('proveedorForm');
-        form.addEventListener('submit', function(event) {
-            if (!form.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
+        // Si hay un error de validación y venía del input, mostrar el input
+        const oldValue = "{{ old('especialidad') }}";
+        if (oldValue) {
+            const select = document.getElementById('especialidadSelect');
+            const options = Array.from(select.options).map(opt => opt.value);
+            
+            if (!options.includes(oldValue)) {
+                mostrarInputEspecialidad();
+                document.getElementById('especialidadInput').value = oldValue;
             }
-            form.classList.add('was-validated');
-        }, false);
-        
-        // Manejar nueva especialidad
-        document.getElementById('guardarNuevaEspecialidad').addEventListener('click', function() {
-            const nuevaEspecialidad = document.getElementById('nuevaEspecialidad').value.trim();
-            
-            if (nuevaEspecialidad === '') {
-                alert('Por favor ingrese un nombre para la especialidad');
-                return;
-            }
-            
-            // Verificar si ya existe
-            const select = document.getElementById('especialidad');
-            let existe = false;
-            
-            for (let i = 0; i < select.options.length; i++) {
-                if (select.options[i].value.toUpperCase() === nuevaEspecialidad.toUpperCase()) {
-                    existe = true;
-                    break;
-                }
-            }
-            
-            if (existe) {
-                alert('Esta especialidad ya existe en la lista');
-                return;
-            }
-            
-            // Agregar la nueva opción al select
-            const option = document.createElement('option');
-            option.value = nuevaEspecialidad;
-            option.text = nuevaEspecialidad;
-            option.selected = true;
-            select.add(option);
-            
-            // Cerrar modal y limpiar
-            const modal = bootstrap.Modal.getInstance(document.getElementById('nuevaEspecialidadModal'));
-            modal.hide();
-            document.getElementById('nuevaEspecialidad').value = '';
-        });
-        
-        // Limpiar campo al cerrar el modal
-        const modal = document.getElementById('nuevaEspecialidadModal');
-        modal.addEventListener('hidden.bs.modal', function() {
-            document.getElementById('nuevaEspecialidad').value = '';
-        });
-    }
+        }
 
- StartFormProveedor();
+        // Evento submit del formulario
+        $('#proveedorForm').on('submit', function(e) {
+            e.preventDefault();
+            console.log('Submit ejecutado');
+            
+            const form = $(this);
+            const submitBtn = $('#btnGuardar');
+            const originalText = submitBtn.html();
+            
+            // Validar el formulario
+            if (!this.checkValidity()) {
+                console.log('Formulario no válido');
+                form.addClass('was-validated');
+                return;
+            }
+            
+            console.log('Formulario válido, enviando...');
+            
+            // Deshabilitar botón
+            submitBtn.prop('disabled', true);
+            submitBtn.html('<i class="fas fa-spinner fa-spin me-1"></i> Guardando...');
+            
+            // Limpiar errores anteriores
+            $('.is-invalid').removeClass('is-invalid');
+            $('.invalid-feedback').remove();
+            
+            // Crear FormData
+            const formData = new FormData(this);
+            
+            // Debug: Ver qué datos se envían
+            console.log('Datos del formulario:');
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ': ' + pair[1]);
+            }
+            
+            // Enviar con AJAX
+            $.ajax({
+                url: form.attr('action'),
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Respuesta éxito:', response);
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Éxito!',
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            // window.location.href = response.redirect; // <-- COMENTADA
+                            // Opcional: puedes limpiar el formulario
+                            $('#proveedorForm')[0].reset();
+                            $('#clave').focus();
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    console.log('Error response:', xhr);
+                    
+                    if (xhr.status === 422) {
+                        // Errores de validación
+                        const errors = xhr.responseJSON.errors;
+                        console.log('Errores validación:', errors);
+                        
+                        // Mostrar errores en cada campo
+                        $.each(errors, function(field, messages) {
+                            const input = $(`#${field}`);
+                            input.addClass('is-invalid');
+                            
+                            if (messages.length > 0) {
+                                input.after(`<div class="invalid-feedback">${messages[0]}</div>`);
+                            }
+                        });
+                        
+                        const firstError = Object.values(errors)[0][0];
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error de validación',
+                            text: firstError
+                        });
+                        
+                    } else {
+                        let errorMsg = 'Error al guardar el proveedor';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMsg = xhr.responseJSON.message;
+                        }
+                        
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: errorMsg
+                        });
+                    }
+                    
+                    // Restaurar botón
+                    submitBtn.prop('disabled', false);
+                    submitBtn.html(originalText);
+                }
+            });
+        });
+    });
 </script>

@@ -128,4 +128,43 @@ class ProveedorController extends Controller
         return redirect()->route('proveedoresds.index')
             ->with('success', 'Proveedor eliminado exitosamente');
     }
+
+
+    public function guardarProveedor(Request $request)
+    {
+        try {
+            // Validar los datos
+            
+
+            // Crear el proveedor usando el modelo ProveedorSer
+            $proveedor = new ProveedorSer();
+            $proveedor->id = GetUuid();
+            $proveedor->clave = $request->clave;
+            $proveedor->nombre = $request->nombre;
+            $proveedor->calle = $request->calle;
+            $proveedor->telefono = $request->telefono;
+            $proveedor->clasificacion = $request->clasificacion;
+            $proveedor->estatus = $request->estatus;
+            $proveedor->especialidad = $request->especialidad;
+            $proveedor->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Proveedor guardado correctamente',
+                'redirect' => route('proveedoresds.index')
+            ], 200);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'errors' => $e->errors()
+            ], 422);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al guardar el proveedor: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

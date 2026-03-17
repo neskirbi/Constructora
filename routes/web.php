@@ -212,3 +212,5 @@ Route::resource('productosyservicios', 'App\Http\Controllers\General\ProductosSe
 
 Route::post('NuevoPS', [App\Http\Controllers\General\ProductosServiciosController::class, 'NuevoPS'])
 ->name('NuevoPS');
+
+Route::post('/proveedores/guardar', [App\Http\Controllers\General\ProveedorController::class, 'guardarProveedor'])->name('proveedoresds.guardar');
