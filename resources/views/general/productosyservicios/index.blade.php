@@ -69,27 +69,39 @@
 
                             <!-- Vista de LISTA (tabla) -->
                             <div class="table-responsive">
-                                <table class="table table-hover">
+                                <table class="table table-hover" style="table-layout: auto; width: 100%;">
                                     <thead class="table-light">
                                         <tr>
-                                            <th>Clave</th>
-                                            <th>Descripción</th>
-                                            <th>Unidades</th>
-                                            <th class="text-end">Último costo</th>
-                                            <th class="text-center">Opciones</th>
+                                            <th style="white-space: nowrap;">Clave</th>
+                                            <th style="white-space: nowrap;">Descripción</th>
+                                            <th style="white-space: nowrap;">Unidades</th>
+                                            <th style="white-space: nowrap;" class="text-end">Último costo</th>
+                                            <th style="white-space: nowrap;" class="text-center">Opciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @forelse($productos as $producto)
                                         <tr>
-                                            <!-- Clave sin diseño especial -->
-                                            <td>{{ $producto->clave }}</td>
-                                            <td>{{ $producto->descripcion }}</td>
-                                            <td>{{ $producto->unidades }}</td>
-                                            <td class="text-end fw-bold text-success">${{ number_format($producto->ult_costo, 2) }}</td>
-                                            <td class="text-center">
-                                                 <button type="button" 
-                                                        class="btn btn-sm btn-outline-danger flex-fill"
+                                            <!-- Clave - sin wrap para que no corte -->
+                                            <td style="white-space: nowrap;">{{ $producto->clave }}</td>
+                                            
+                                            <!-- Descripción - puede tener saltos de línea y wrap -->
+                                            <td style="white-space: normal; word-wrap: break-word; max-width: 400px;">
+                                                {{ $producto->descripcion }}
+                                            </td>
+                                            
+                                            <!-- Unidades - sin wrap -->
+                                            <td style="white-space: nowrap;">{{ $producto->unidades }}</td>
+                                            
+                                            <!-- Último costo - sin wrap, alineado a la derecha -->
+                                            <td style="white-space: nowrap;" class="text-end fw-bold text-success">
+                                                ${{ number_format($producto->ult_costo, 2) }}
+                                            </td>
+                                            
+                                            <!-- Opciones - sin wrap, centrado -->
+                                            <td style="white-space: nowrap;" class="text-center">
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-outline-danger"
                                                         onclick="confirmDelete('{{ $producto->id }}', '{{ $producto->clave }}')">
                                                     <i class="fas fa-trash-alt me-1"></i>Eliminar
                                                 </button>

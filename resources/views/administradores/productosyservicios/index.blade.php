@@ -57,56 +57,68 @@
 
                             <!-- Vista de LISTA (tabla) -->
                             <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Clave</th>
-                                            <th>Descripción</th>
-                                            <th>Unidades</th>
-                                            <th class="text-end">Último costo</th>
-                                            <th class="text-center">Fecha registro</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($productos as $producto)
-                                        <tr>
-                                            <!-- Clave sin diseño especial -->
-                                            <td>{{ $producto->clave }}</td>
-                                            <td>{{ $producto->descripcion }}</td>
-                                            <td>{{ $producto->unidades }}</td>
-                                            <td class="text-end fw-bold text-success">${{ number_format($producto->ult_costo, 2) }}</td>
-                                            <td class="text-center">
-                                                <small class="text-muted">
-                                                    <i class="fas fa-calendar-alt me-1"></i>
-                                                    {{ $producto->created_at->format('d/m/Y') }}
-                                                </small>
-                                                @if($producto->created_at != $producto->updated_at)
-                                                <br>
-                                                <small class="text-muted">
-                                                    <i class="fas fa-edit me-1"></i>
-                                                    {{ $producto->updated_at->format('d/m/Y') }}
-                                                </small>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        @empty
-                                        <tr>
-                                            <td colspan="5" class="text-center py-5">
-                                                <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-                                                <h5 class="text-muted">No hay productos o servicios registrados</h5>
-                                                <p class="text-muted mb-4">
-                                                    @if($search)
-                                                    No hay resultados para tu búsqueda "{{ $search }}"
-                                                    @else
-                                                    El catálogo de productos y servicios está vacío
-                                                    @endif
-                                                </p>
-                                            </td>
-                                        </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
+    <table class="table table-hover" style="table-layout: auto; width: 100%;">
+        <thead class="table-light">
+            <tr>
+                <th style="white-space: nowrap;">Clave</th>
+                <th style="white-space: nowrap;">Descripción</th>
+                <th style="white-space: nowrap;">Unidades</th>
+                <th style="white-space: nowrap;" class="text-end">Último costo</th>
+                <th style="white-space: nowrap;" class="text-center">Fecha registro</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($productos as $producto)
+            <tr>
+                <!-- Clave - sin wrap para que no corte -->
+                <td style="white-space: nowrap;">{{ $producto->clave }}</td>
+                
+                <!-- Descripción - puede tener saltos de línea y wrap -->
+                <td style="white-space: normal; word-wrap: break-word; max-width: 400px;">
+                    {{ $producto->descripcion }}
+                </td>
+                
+                <!-- Unidades - sin wrap -->
+                <td style="white-space: nowrap;">{{ $producto->unidades }}</td>
+                
+                <!-- Último costo - sin wrap, alineado a la derecha -->
+                <td style="white-space: nowrap;" class="text-end fw-bold text-success">
+                    ${{ number_format($producto->ult_costo, 2) }}
+                </td>
+                
+                <!-- Fecha registro - sin wrap, centrado -->
+                <td style="white-space: nowrap;" class="text-center">
+                    <small class="text-muted">
+                        <i class="fas fa-calendar-alt me-1"></i>
+                        {{ $producto->created_at->format('d/m/Y') }}
+                    </small>
+                    @if($producto->created_at != $producto->updated_at)
+                    <br>
+                    <small class="text-muted">
+                        <i class="fas fa-edit me-1"></i>
+                        {{ $producto->updated_at->format('d/m/Y') }}
+                    </small>
+                    @endif
+                </td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="5" class="text-center py-5">
+                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No hay productos o servicios registrados</h5>
+                    <p class="text-muted mb-4">
+                        @if($search)
+                        No hay resultados para tu búsqueda "{{ $search }}"
+                        @else
+                        El catálogo de productos y servicios está vacío
+                        @endif
+                    </p>
+                </td>
+            </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
 
                             <!-- Paginación -->
                             @if($productos->hasPages())
