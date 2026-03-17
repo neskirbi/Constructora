@@ -212,7 +212,7 @@
                                                 data-consecutivo="{{ $contrato->consecutivo ?? '' }}"
                                                 data-refinterna="{{ $contrato->refinterna ?? '' }}"
                                                 {{ old('id_contrato', $ultimoIngreso->id_contrato ?? '') == $contrato->id ? 'selected' : '' }}>
-                                                {{ $contrato->contrato_no }} - {{ Str::limit($contrato->obra, 50) }}
+                                                {{ $contrato->consecutivo }} - {{ Str::limit($contrato->obra, 50) }}
                                             </option>
                                             @endforeach
                                         </select>
