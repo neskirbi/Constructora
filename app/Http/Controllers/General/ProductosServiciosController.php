@@ -158,7 +158,7 @@ class ProductosServiciosController extends Controller
             DB::beginTransaction();
             
             // Verificar si el producto está siendo usado en otras tablas
-            $enUso = DB::table('csdetalles')->where('id_productoservicio', $id)->exists();
+            $enUso = DB::table('destajodetalles')->where('id_productoservicio', $id)->exists();
             
             if ($enUso) {
                 return redirect()->route('productosyservicios.index')

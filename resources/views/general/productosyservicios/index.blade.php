@@ -135,6 +135,51 @@
         </main>
     </div>
 
+    <!-- Modal de confirmación para eliminar (bonito) -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-body text-center p-4">
+                    <!-- Ícono de advertencia animado -->
+                    <div class="mb-4">
+                        <div class="rounded-circle bg-danger bg-opacity-10 d-inline-flex p-3">
+                            <i class="fas fa-exclamation-triangle fa-4x text-danger"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Título -->
+                    <h4 class="fw-bold mb-2">¿Confirmar eliminación?</h4>
+                    
+                    <!-- Mensaje dinámico -->
+                    <p class="text-muted mb-4" id="deleteMessage">
+                        ¿Estás seguro de que deseas eliminar el producto/servicio <strong id="productoNombre"></strong>?
+                    </p>
+                    
+                    <!-- Advertencia -->
+                    <div class="alert alert-warning bg-warning bg-opacity-10 border-0 mb-4 py-2">
+                        <i class="fas fa-info-circle me-1"></i>
+                        <small>Esta acción no se puede deshacer.</small>
+                    </div>
+                    
+                    <!-- Botones -->
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-light flex-fill py-2" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i> Cancelar
+                        </button>
+                        
+                        <form id="deleteForm" method="POST" class="flex-fill">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger w-100 py-2">
+                                <i class="fas fa-trash-alt me-1"></i> Sí, eliminar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @include('footer')
     
    <script>
