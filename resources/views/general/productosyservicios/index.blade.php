@@ -76,7 +76,7 @@
                                             <th>Descripción</th>
                                             <th>Unidades</th>
                                             <th class="text-end">Último costo</th>
-                                            <th class="text-center">Fecha registro</th>
+                                            <th class="text-center">Opciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -88,17 +88,11 @@
                                             <td>{{ $producto->unidades }}</td>
                                             <td class="text-end fw-bold text-success">${{ number_format($producto->ult_costo, 2) }}</td>
                                             <td class="text-center">
-                                                <small class="text-muted">
-                                                    <i class="fas fa-calendar-alt me-1"></i>
-                                                    {{ $producto->created_at->format('d/m/Y') }}
-                                                </small>
-                                                @if($producto->created_at != $producto->updated_at)
-                                                <br>
-                                                <small class="text-muted">
-                                                    <i class="fas fa-edit me-1"></i>
-                                                    {{ $producto->updated_at->format('d/m/Y') }}
-                                                </small>
-                                                @endif
+                                                 <button type="button" 
+                                                        class="btn btn-sm btn-outline-danger flex-fill"
+                                                        onclick="confirmDelete('{{ $producto->id }}', '{{ $producto->clave }}')">
+                                                    <i class="fas fa-trash-alt me-1"></i>Eliminar
+                                                </button>
                                             </td>
                                         </tr>
                                         @empty
