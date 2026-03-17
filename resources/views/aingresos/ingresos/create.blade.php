@@ -602,7 +602,7 @@
                                         </div>
                                     </div>
                                     
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <div class="form-group-custom">
                                             <label for="amortizacion_iva" class="form-label-custom">
                                                 % I.V.A.
@@ -640,7 +640,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <div class="form-group-custom">
                                             <label for="total_amortizacion" class="form-label-custom">
                                                 Total Amortización
