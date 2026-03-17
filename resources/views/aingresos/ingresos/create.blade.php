@@ -184,28 +184,75 @@
                                     Información del Contrato
                                 </h5>
                                 
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group-custom">
-                                            <label for="id_contrato" class="form-label-custom required-label">
-                                                Contrato
-                                            </label>
-                                            <select class="form-control form-control-custom" 
-                                                    id="id_contrato" 
-                                                    name="id_contrato" 
-                                                    value="{{ old('id_contrato') }}"
-                                                    required>
-                                                <option value="">Seleccionar contrato...</option>
-                                                @foreach($contratos as $contrato)
-                                                <option value="{{ $contrato->id }}" 
-                                                    {{ old('id_contrato', $ultimoIngreso->id_contrato ?? '') == $contrato->id ? 'selected' : '' }}>
-                                                    {{ $contrato->consecutivo }} - {{ Str::limit($contrato->obra, 50) }}
-                                                </option>
-                                                @endforeach
-                                            </select>
-                                            @error('id_contrato')
-                                                <div class="text-danger small mt-1">{{ $message }}</div>
-                                            @enderror
+                                <!-- Select con atributos data -->
+                                <div class="col-md-12">
+                                    <div class="form-group-custom">
+                                        <label for="id_contrato" class="form-label-custom required-label">
+                                            Contrato
+                                        </label>
+                                        <select class="form-control form-control-custom" 
+                                                id="id_contrato" 
+                                                name="id_contrato" 
+                                                value="{{ old('id_contrato') }}"
+                                                required>
+                                            <option value="">Seleccionar contrato...</option>
+                                            @foreach($contratos as $contrato)
+                                            <option value="{{ $contrato->id }}" 
+                                                data-contrato-no="{{ $contrato->contrato_no }}"
+                                                data-obra="{{ $contrato->obra }}"
+                                                data-cliente="{{ $contrato->cliente ?? '' }}"
+                                                data-monto-contrato="{{ $contrato->monto_contrato ?? 0 }}"
+                                                data-fecha-inicio="{{ $contrato->fecha_inicio ?? '' }}"
+                                                data-fecha-fin="{{ $contrato->fecha_fin ?? '' }}"
+                                                data-anticipo="{{ $contrato->anticipo ?? 0 }}"
+                                                data-porcentaje-anticipo="{{ $contrato->porcentaje_anticipo ?? 0 }}"
+                                                data-saldo-contrato="{{ $contrato->saldo_contrato ?? 0 }}"
+                                                data-iva-contrato="{{ $contrato->iva ?? 16 }}"
+                                                data-estatus="{{ $contrato->estatus ?? 'activo' }}"
+                                                data-consecutivo="{{ $contrato->consecutivo ?? '' }}"
+                                                data-refinterna="{{ $contrato->refinterna ?? '' }}"
+                                                {{ old('id_contrato', $ultimoIngreso->id_contrato ?? '') == $contrato->id ? 'selected' : '' }}>
+                                                {{ $contrato->contrato_no }} - {{ Str::limit($contrato->obra, 50) }}
+                                            </option>
+                                            @endforeach
+                                        </select>
+                                        @error('id_contrato')
+                                            <div class="text-danger small mt-1">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+
+                                
+                                <!-- Campos de información del contrato con IDs -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-4 mb-2 mb-md-0">
+                                            <small class="text-muted d-block">Consecutivo</small>
+                                            <span class="fw-bold" id="consecutivo_display">---</span>
+                                        </div>
+                                        <div class="col-md-4 mb-2 mb-md-0">
+                                            <small class="text-muted d-block">Ref. Interna</small>
+                                            <span id="refinterna_display">---</span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small class="text-muted d-block">No. Contrato</small>
+                                            <span id="contrato_no_display">---</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Segunda fila: Cliente -->
+                                    <div class="row mb-3">
+                                        <div class="col-12">
+                                            <small class="text-muted d-block">Cliente</small>
+                                            <span class="fw-bold" id="cliente_display">---</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Tercera fila: Obra -->
+                                    <div class="row mb-3">
+                                        <div class="col-12">
+                                            <small class="text-muted d-block">Obra</small>
+                                            <span class="fw-bold" id="obra_display">---</span>
                                         </div>
                                     </div>
                                 </div>
@@ -679,34 +726,86 @@
     </div>
 
     @include('footer')
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+
+    <script>
+    $(document).ready(function() {
+        // Inicializar Select2 con tema Bootstrap
+        $('#id_contrato').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            placeholder: 'Buscar contrato...',
+            allowClear: true,
+            language: {
+                noResults: function() { return "No se encontraron contratos"; },
+                searching: function() { return "Buscando..."; }
+            }
+        });
+
+        // Función para actualizar TODOS los campos de información del contrato
+        function actualizarInfoContrato() {
+            var selectedOption = $('#id_contrato').find('option:selected');
+            
+            if (selectedOption.val()) {
+                // Actualizar todos los spans
+                $('#consecutivo_display').text(selectedOption.data('consecutivo') || '---');
+                $('#refinterna_display').text(selectedOption.data('refinterna') || '---');
+                $('#contrato_no_display').text(selectedOption.data('contrato-no') || '---');
+                $('#cliente_display').text(selectedOption.data('cliente') || '---');
+                $('#obra_display').text(selectedOption.data('obra') || '---');
+                
+                // También puedes actualizar otros campos si existen
+                if ($('#frente_display').length) {
+                    $('#frente_display').text(selectedOption.data('frente') || '---');
+                }
+                
+                console.log('Datos del contrato cargados:', {
+                    consecutivo: selectedOption.data('consecutivo'),
+                    refinterna: selectedOption.data('refinterna'),
+                    contrato_no: selectedOption.data('contrato-no'),
+                    cliente: selectedOption.data('cliente'),
+                    obra: selectedOption.data('obra')
+                });
+            } else {
+                // Limpiar todos los campos
+                $('#consecutivo_display').text('---');
+                $('#refinterna_display').text('---');
+                $('#contrato_no_display').text('---');
+                $('#cliente_display').text('---');
+                $('#obra_display').text('---');
+                
+                if ($('#frente_display').length) {
+                    $('#frente_display').text('---');
+                }
+            }
+        }
+
+        // Evento change del select
+        $('#id_contrato').on('change', function() {
+            // Actualizar información básica del contrato
+            actualizarInfoContrato();
+            
+            var contratoId = $(this).val();
+            
+            if (contratoId) {
+                // Aquí va tu petición AJAX existente para cargar el último ingreso
+                // (Mantén tu código AJAX actual)
+                console.log('Contrato ID seleccionado:', contratoId);
+            }
+        });
+
+        // Si hay un contrato preseleccionado
+        @if(old('id_contrato', $ultimoIngreso->id_contrato ?? ''))
+            setTimeout(function() {
+                $('#id_contrato').val('{{ old('id_contrato', $ultimoIngreso->id_contrato ?? '') }}').trigger('change');
+            }, 200);
+        @endif
+    });
+    </script>
+    
     <script>
 
-        $(document).ready(function() {
-    // Inicializar Select2 con tema Bootstrap
-    $('#id_contrato').select2({
-        theme: 'bootstrap-5',
-        width: '100%',
-        placeholder: 'Buscar contrato por número o nombre de obra...',
-        allowClear: true,
-        language: {
-            noResults: function() {
-                return "No se encontraron contratos";
-            },
-            searching: function() {
-                return "Buscando...";
-            },
-            inputTooShort: function() {
-                return "Escribe para buscar";
-            }
-        },
-        minimumInputLength: 1 // Empieza a buscar después de 1 carácter
-    });
-
-    // Si el select ya tiene un valor preseleccionado, actualizar Select2
-    @if(old('id_contrato', $ultimoIngreso->id_contrato ?? ''))
-        $('#id_contrato').val('{{ old('id_contrato', $ultimoIngreso->id_contrato ?? '') }}').trigger('change');
-    @endif
+       
 
     // Resto de tu código existente para el evento change
     var datosCargados = false;
