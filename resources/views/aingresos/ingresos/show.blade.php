@@ -1034,7 +1034,7 @@ function calcularImporteIVAYTotal() {
 
 // Función para calcular 2% SICV
 function calcularSICV() {
-    const totalEstimacion = parseFloat($('#total_estimacion_con_iva').val()) || 0;
+    const totalEstimacion = parseFloat($('#importe_estimacion').val()) || 0;
     const resultado = totalEstimacion * 0.02; // 2%
     
     $('#sicv_cop').val(resultado.toFixed(2));
@@ -1044,7 +1044,7 @@ function calcularSICV() {
 
 // Función para calcular 1.5% SRCOP
 function calcularSRCOP() {
-    const totalEstimacion = parseFloat($('#total_estimacion_con_iva').val()) || 0;
+    const totalEstimacion = parseFloat($('#importe_estimacion').val()) || 0;
     const resultado = totalEstimacion * 0.015; // 1.5%
     
     $('#srcop_cdmx').val(resultado.toFixed(2));
