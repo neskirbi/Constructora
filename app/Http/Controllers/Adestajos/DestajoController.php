@@ -35,6 +35,7 @@ class DestajoController extends Controller
         if ($search) {
             $query->where(function($q) use ($search) {
                 $q->where('d.referencia', 'like', '%' . $search . '%')
+                  ->orWhere('c.consecutivo', 'like', '%' . $search . '%')
                   ->orWhere('c.contrato_no', 'like', '%' . $search . '%')
                   ->orWhere('p.nombre', 'like', '%' . $search . '%')
                   ->orWhere('p.clave', 'like', '%' . $search . '%');
@@ -52,7 +53,8 @@ class DestajoController extends Controller
             $todosDetalles = DB::table('destajodetalles')
                 ->whereIn('id_destajo', $destajoIds)
                 ->get()
-                ->groupBy('id_destajo');
+                ->groupBy('id_destajo')
+                ->orderby('clave','asc');
             
             // Asignar los detalles a cada destajo
             foreach ($destajos as $destajo) {
