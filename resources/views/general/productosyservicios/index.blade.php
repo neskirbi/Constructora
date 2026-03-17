@@ -137,7 +137,20 @@
 
     @include('footer')
     
-    <script>
+   <script>
+        function confirmDelete(id, nombre) {
+            // Establecer el nombre en el mensaje
+            document.getElementById('productoNombre').textContent = nombre;
+            
+            // Actualizar la acción del formulario
+            const form = document.getElementById('deleteForm');
+            form.action = '{{ route("productosyservicios.destroy", "") }}/' + id;
+            
+            // Mostrar el modal
+            const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            modal.show();
+        }
+        
         document.addEventListener('DOMContentLoaded', function() {
             @if(request()->has('search'))
             document.querySelector('input[name="search"]').focus();
