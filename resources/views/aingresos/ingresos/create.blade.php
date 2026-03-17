@@ -199,7 +199,7 @@
                                                 @foreach($contratos as $contrato)
                                                 <option value="{{ $contrato->id }}" 
                                                     {{ old('id_contrato', $ultimoIngreso->id_contrato ?? '') == $contrato->id ? 'selected' : '' }}>
-                                                    {{ $contrato->contrato_no }} - {{ Str::limit($contrato->obra, 50) }}
+                                                    {{ $contrato->consecutivo }} - {{ Str::limit($contrato->obra, 50) }}
                                                 </option>
                                                 @endforeach
                                             </select>
@@ -679,8 +679,114 @@
     </div>
 
     @include('footer')
-    
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script>
+
+        $(document).ready(function() {
+    // Inicializar Select2 con tema Bootstrap
+    $('#id_contrato').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: 'Buscar contrato por número o nombre de obra...',
+        allowClear: true,
+        language: {
+            noResults: function() {
+                return "No se encontraron contratos";
+            },
+            searching: function() {
+                return "Buscando...";
+            },
+            inputTooShort: function() {
+                return "Escribe para buscar";
+            }
+        },
+        minimumInputLength: 1 // Empieza a buscar después de 1 carácter
+    });
+
+    // Si el select ya tiene un valor preseleccionado, actualizar Select2
+    @if(old('id_contrato', $ultimoIngreso->id_contrato ?? ''))
+        $('#id_contrato').val('{{ old('id_contrato', $ultimoIngreso->id_contrato ?? '') }}').trigger('change');
+    @endif
+
+    // Resto de tu código existente para el evento change
+    var datosCargados = false;
+    
+    // Evento change del select de contrato
+    $('#id_contrato').on('change', function() {
+        var contratoId = $(this).val();
+        
+        if (contratoId) {
+            // Mostrar indicador de carga
+            Swal.fire({
+                title: 'Cargando...',
+                text: 'Buscando último ingreso del contrato',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            // Petición AJAX
+            $.ajax({
+                url: '{{ route("ingresos.ultimo", "") }}/' + contratoId,
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    Swal.close();
+                    
+                    if (response.success && response.data) {
+                        // Mostrar notificación
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Datos cargados',
+                            text: 'Se cargó la información del último ingreso',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                        
+                        // Cargar los datos en el formulario
+                        cargarDatosIngreso(response.data);
+                        datosCargados = true;
+                    } else {
+                        // No hay datos previos, limpiar formulario
+                        limpiarFormulario();
+                        
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Sin datos previos',
+                            text: 'No hay ingresos anteriores para este contrato',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.close();
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudo cargar la información del contrato',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        } else {
+            // Si no hay contrato seleccionado, limpiar formulario
+            limpiarFormulario();
+        }
+    });
+    
+    // Si hay un contrato preseleccionado desde la URL
+    @if(request()->has('contrato_id'))
+        setTimeout(function() {
+            $('#id_contrato').val('{{ request('contrato_id') }}').trigger('change');
+        }, 500);
+    @endif
+});
+
+
 // Función para calcular importe del IVA y total de estimación
 function calcularImporteIVAYTotal() {
     // Obtener valores numéricos reales
