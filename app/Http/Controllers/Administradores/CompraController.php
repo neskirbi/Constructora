@@ -25,14 +25,12 @@ class CompraController extends Controller
             ->leftJoin('proveedores_servicios as p', 'c.id_proveedor', '=', 'p.id')
             ->leftJoin('acompras as u', 'c.id_usuario', '=', 'u.id')
             ->select(
-                'c.*',
+                 'c.*',
                 'ct.contrato_no',
                 'ct.consecutivo',
                 'ct.obra as contrato_obra',
                 'p.nombre as proveedor_nombre',
                 'p.clave as proveedor_clave',
-                'u.nombres as usuario_nombres',
-                'u.apellidos as usuario_apellidos'
             );
         
         if ($search) {
