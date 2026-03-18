@@ -27,6 +27,7 @@ class CompraController extends Controller
             ->select(
                 'c.*',
                 'ct.contrato_no',
+                'ct.consecutivo',
                 'ct.obra as contrato_obra',
                 'p.nombre as proveedor_nombre',
                 'p.clave as proveedor_clave',

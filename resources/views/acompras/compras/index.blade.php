@@ -294,6 +294,10 @@
                                         <!-- Grid de información general del destajo -->
                                         <div class="info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem; width: 100%;">
                                             <div class="info-item" style="min-width: 0;">
+                                                <span class="info-label">Consecutivo</span>
+                                                <span class="info-value" style="word-wrap: break-word;">{{ $compra->consecutivo ?? 'N/A' }}</span>
+                                            </div>
+                                            <div class="info-item" style="min-width: 0;">
                                                 <span class="info-label">Referencia</span>
                                                 <span class="info-value" style="word-wrap: break-word;">{{ $compra->referencia ?? 'N/A' }}</span>
                                             </div>

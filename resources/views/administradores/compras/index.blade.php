@@ -290,6 +290,10 @@
                                         
                                         <!-- Grid de información general de la compra -->
                                         <div class="info-grid">
+                                             <div class="info-item" style="min-width: 0;">
+                                                <span class="info-label">Consecutivo</span>
+                                                <span class="info-value" style="word-wrap: break-word;">{{ $compra->consecutivo ?? 'N/A' }}</span>
+                                            </div>
                                             <div class="info-item">
                                                 <span class="info-label">Referencia</span>
                                                 <span class="info-value">{{ $compra->referencia ?? 'N/A' }}</span>
