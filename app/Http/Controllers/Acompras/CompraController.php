@@ -99,98 +99,96 @@ class CompraController extends Controller
     }
 
     public function store(Request $request)
-    {
-
-       $request->validate([
-            'consecutivo' => 'required|integer|min:1',
-            'id_contrato' => 'required|string|exists:contratos,id',
-            'id_proveedor' => 'required|string|exists:proveedores_servicios,id',
-            'referencia' => 'required|string|max:1500',
-            'iva' => 'nullable|numeric|min:0',
-            'fecha_entrega' => 'nullable|date',
-            'tipo_entrega' => 'nullable|string|in:recoleccion,envio',
-            'comentarios' => 'nullable|string|max:2000',
-            'productos' => 'required|array|min:1',
-            'productos.*.id_producto' => 'required|string|exists:productosyservicios,id',
-            'productos.*.cantidad' => 'required|numeric|min:0.01',
-            'productos.*.precio' => 'required|numeric|min:0',
-            'productos.*.descuento_porcentaje' => 'nullable|numeric|min:0|max:100',
-            'productos.*.descuento_monto' => 'nullable|numeric|min:0',
+{
+    $request->validate([
+        'consecutivo' => 'required|integer|min:1',
+        'id_contrato' => 'required|string|exists:contratos,id',
+        'id_proveedor' => 'required|string|exists:proveedores_servicios,id',
+        'referencia' => 'required|string|max:1500',
+        'iva' => 'nullable|numeric|min:0',
+        'productos' => 'required|array|min:1',
+        'productos.*.id_producto' => 'required|string|exists:productosyservicios,id',
+        'productos.*.cantidad' => 'required|numeric|min:0.01',
+        'productos.*.precio' => 'required|numeric|min:0',
+        'productos.*.descuento_porcentaje' => 'nullable|numeric|min:0|max:100',
+        'productos.*.descuento_monto' => 'nullable|numeric|min:0',
+        'productos.*.fecha_entrega' => 'nullable|date',        // NUEVO
+        'productos.*.tipo_entrega' => 'nullable|string|in:recoleccion,entrega', // NUEVO
+        'productos.*.comentarios' => 'nullable|string|max:2000', // NUEVO
+    ]);
+    
+    // Obtener el ID del usuario autenticado
+    $id_usuario = auth('acompras')->id();
+    
+    // Calcular el total de los productos
+    $costo_operado = 0;
+    foreach ($request->productos as $producto) {
+        $costo_operado += $producto['cantidad'] * $producto['precio'];
+    }
+    
+    $iva_porcentaje = $request->iva ?? 0;
+    $iva_calculado = $costo_operado * ($iva_porcentaje / 100);
+    $total = $costo_operado + $iva_calculado;
+    
+    DB::beginTransaction();
+    
+    try {
+        // Crear la compra principal (SIN fecha_entrega, tipo_entrega, comentarios)
+        $compra_id = GetUuid();
+        
+        DB::table('compras')->insert([
+            'id' => $compra_id,
+            'id_contrato' => $request->id_contrato,
+            'id_usuario' => $id_usuario,
+            'id_proveedor' => $request->id_proveedor,
+            'consecutivo' => $request->consecutivo,
+            'referencia' => $request->referencia,
+            'costo_operado' => $costo_operado,
+            'iva' => $iva_calculado,
+            'total' => $total,
+            'verificado' => 1,
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
         
-        // Obtener el ID del usuario autenticado
-        $id_usuario = auth('acompras')->id();
-        
-        // Calcular el total de los productos
-        $costo_operado = 0;
+        // Guardar los detalles (AHORA CON fecha_entrega, tipo_entrega, comentarios)
         foreach ($request->productos as $producto) {
-            $costo_operado += $producto['cantidad'] * $producto['precio'];
-        }
-        
-        $iva_porcentaje = $request->iva ?? 0;
-        $iva_calculado = $costo_operado * ($iva_porcentaje / 100);
-        $total = $costo_operado + $iva_calculado;
-        
-        DB::beginTransaction();
-        
-        try {
-            // Crear la compra principal
-            $compra_id = GetUuid();
+            $productoData = DB::table('productosyservicios')
+                ->where('id', $producto['id_producto'])
+                ->first();
             
-            DB::table('compras')->insert([
-                'id' => $compra_id,
-                'id_contrato' => $request->id_contrato,
-                'id_usuario' => $id_usuario,
-                'id_proveedor' => $request->id_proveedor,
-                'consecutivo' => $request->consecutivo,
-                'referencia' => $request->referencia,
-                'costo_operado' => $costo_operado,
-                'iva' => $iva_calculado,
-                'total' => $total,
-                'fecha_entrega' => $request->fecha_entrega,
-                'tipo_entrega' => $request->tipo_entrega,
-                'comentarios' => $request->comentarios,
-                'verificado' => 1,
+            DB::table('compradetalle')->insert([
+                'id' => GetUuid(),
+                'id_compra' => $compra_id,
+                'id_productoservicio' => $producto['id_producto'],
+                'clave' => $productoData->clave,
+                'descripcion' => $productoData->descripcion,
+                'unidades' => $productoData->unidades,
+                'cantidad' => $producto['cantidad'],
+                'descuento_porcentaje' => $producto['descuento_porcentaje'] ?? 0,
+                'descuento_monto' => $producto['descuento_monto'] ?? 0,
+                'ult_costo' => $producto['precio'],
+                'fecha_entrega' => $producto['fecha_entrega'] ?? null,    // NUEVO
+                'tipo_entrega' => $producto['tipo_entrega'] ?? null,      // NUEVO
+                'comentarios' => $producto['comentarios'] ?? null,        // NUEVO
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
-            
-            // Guardar los detalles
-            foreach ($request->productos as $producto) {
-                $productoData = DB::table('productosyservicios')
-                    ->where('id', $producto['id_producto'])
-                    ->first();
-                
-                DB::table('compradetalle')->insert([
-                    'id' => GetUuid(),
-                    'id_compra' => $compra_id,
-                    'id_productoservicio' => $producto['id_producto'],
-                    'clave' => $productoData->clave,
-                    'descripcion' => $productoData->descripcion,
-                    'unidades' => $productoData->unidades,
-                    'cantidad' => $producto['cantidad'],
-                    'cantidad' => $producto['cantidad'],
-                    'descuento_porcentaje' => $producto['descuento_porcentaje'],
-                    'descuento_monto' => $producto['descuento_monto'],
-                    'ult_costo' => $producto['precio'],
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ]);
-            }
-            
-            DB::commit();
-            
-            return redirect()->route('compras.index')
-                ->with('success', 'Compra creada exitosamente');
-                
-        } catch (\Exception $e) {
-            DB::rollBack();
-            
-            return redirect()->back()
-                ->with('error', 'Error al crear la compra: ' . $e->getMessage())
-                ->withInput();
         }
+        
+        DB::commit();
+        
+        return redirect()->route('compras.index')
+            ->with('success', 'Compra creada exitosamente');
+            
+    } catch (\Exception $e) {
+        DB::rollBack();
+        
+        return redirect()->back()
+            ->with('error', 'Error al crear la compra: ' . $e->getMessage())
+            ->withInput();
     }
+}
 
     /**
      * Display the specified resource.
@@ -209,10 +207,8 @@ class CompraController extends Controller
             'ct.cliente as contrato_cliente',
             'p.nombre as proveedor_nombre',
             'p.clave as proveedor_clave',
-            'p.telefono as proveedor_telefono',
-            'c.fecha_entrega',          // Nuevo campo
-            'c.tipo_entrega',            // Nuevo campo
-            'c.comentarios'               // Nuevo campo
+            'p.telefono as proveedor_telefono'
+            // QUITAR: 'c.fecha_entrega', 'c.tipo_entrega', 'c.comentarios'
         )
         ->first();
     
@@ -220,7 +216,7 @@ class CompraController extends Controller
         abort(404);
     }
     
-    // Obtener los detalles de la compra
+    // Obtener los detalles de la compra (AHORA CON LOS CAMPOS)
     $detalles = DB::table('compradetalle')
         ->where('id_compra', $id)
         ->get();
@@ -289,111 +285,109 @@ class CompraController extends Controller
     }
 
     public function update(Request $request, $id)
-    {
-        // Verificar si la compra existe
-        $compra = DB::table('compras')
-            ->where('id', $id)
-            ->first();
-        
-        if (!$compra) {
-            abort(404);
-        }
-        
-        
-        
-        $request->validate([
-            'consecutivo' => 'required|integer|min:1',
-            'id_contrato' => 'required|string|exists:contratos,id',
-            'id_proveedor' => 'required|string|exists:proveedores_servicios,id',
-            'referencia' => 'required|string|max:1500',
-            'iva' => 'nullable|numeric|min:0',
-            'fecha_entrega' => 'nullable|date',
-            'tipo_entrega' => 'nullable|string|in:recoleccion,envio',
-            'comentarios' => 'nullable|string|max:2000',
-            'productos' => 'required|array|min:1',
-            'productos.*.id_producto' => 'required|string|exists:productosyservicios,id',
-            'productos.*.cantidad' => 'required|numeric|min:0.01',
-            'productos.*.precio' => 'required|numeric|min:0',
-            'productos.*.descuento_porcentaje' => 'nullable|numeric|min:0|max:100',
-            'productos.*.descuento_monto' => 'nullable|numeric|min:0',
-        ]);
-        
-        // Calcular totales
-        $costo_operado = 0;
-        foreach ($request->productos as $producto) {
-            $costo_operado += $producto['cantidad'] * $producto['precio'];
-        }
-        
-        $iva_porcentaje = $request->iva ?? 0;
-        $iva_calculado = $costo_operado * ($iva_porcentaje / 100);
-        $total = $costo_operado + $iva_calculado;
-        
-        DB::beginTransaction();
-        
-        try {
-            // Actualizar compra principal
-           $updateData = [
-                'id_contrato' => $request->id_contrato,
-                'id_proveedor' => $request->id_proveedor,
-                'consecutivo' => $request->consecutivo,
-                'referencia' => $request->referencia,
-                'costo_operado' => $costo_operado,
-                'iva' => $iva_calculado,
-                'total' => $total,
-                'fecha_entrega' => $request->fecha_entrega,
-                'tipo_entrega' => $request->tipo_entrega,
-                'comentarios' => $request->comentarios,
-                'updated_at' => now()
-            ];
-            
-            if ($request->has('verificado')) {
-                $updateData['verificado'] = $request->verificado;
-            }
-            
-            DB::table('compras')
-                ->where('id', $id)
-                ->update($updateData);
-            
-            // Eliminar detalles antiguos
-            DB::table('compradetalle')
-                ->where('id_compra', $id)
-                ->delete();
-            
-            // Insertar nuevos detalles
-            foreach ($request->productos as $producto) {
-                $productoData = DB::table('productosyservicios')
-                    ->where('id', $producto['id_producto'])
-                    ->first();
-                
-                DB::table('compradetalle')->insert([
-                    'id' => GetUuid(),
-                    'id_compra' => $id,
-                    'id_productoservicio' => $producto['id_producto'],
-                    'clave' => $productoData->clave,
-                    'descripcion' => $productoData->descripcion,
-                    'unidades' => $productoData->unidades,
-                    'cantidad' => $producto['cantidad'],
-                    'descuento_porcentaje' => $producto['descuento_porcentaje'],
-                    'descuento_monto' => $producto['descuento_monto'],
-                    'ult_costo' => $producto['precio'],
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ]);
-            }
-            
-            DB::commit();
-            
-            return redirect('compras/' . $id)
-                ->with('success', 'Compra actualizada exitosamente');
-                
-        } catch (\Exception $e) {
-            DB::rollBack();
-            
-            return redirect()->back()
-                ->with('error', 'Error al actualizar la compra: ' . $e->getMessage())
-                ->withInput();
-        }
+{
+    // Verificar si la compra existe
+    $compra = DB::table('compras')
+        ->where('id', $id)
+        ->first();
+    
+    if (!$compra) {
+        abort(404);
     }
+    
+    $request->validate([
+        'consecutivo' => 'required|integer|min:1',
+        'id_contrato' => 'required|string|exists:contratos,id',
+        'id_proveedor' => 'required|string|exists:proveedores_servicios,id',
+        'referencia' => 'required|string|max:1500',
+        'iva' => 'nullable|numeric|min:0',
+        'productos' => 'required|array|min:1',
+        'productos.*.id_producto' => 'required|string|exists:productosyservicios,id',
+        'productos.*.cantidad' => 'required|numeric|min:0.01',
+        'productos.*.precio' => 'required|numeric|min:0',
+        'productos.*.descuento_porcentaje' => 'nullable|numeric|min:0|max:100',
+        'productos.*.descuento_monto' => 'nullable|numeric|min:0',
+        'productos.*.fecha_entrega' => 'nullable|date',        // NUEVO
+        'productos.*.tipo_entrega' => 'nullable|string|in:recoleccion,entrega', // NUEVO
+        'productos.*.comentarios' => 'nullable|string|max:2000', // NUEVO
+    ]);
+    
+    // Calcular totales
+    $costo_operado = 0;
+    foreach ($request->productos as $producto) {
+        $costo_operado += $producto['cantidad'] * $producto['precio'];
+    }
+    
+    $iva_porcentaje = $request->iva ?? 0;
+    $iva_calculado = $costo_operado * ($iva_porcentaje / 100);
+    $total = $costo_operado + $iva_calculado;
+    
+    DB::beginTransaction();
+    
+    try {
+        // Actualizar compra principal (SIN fecha_entrega, tipo_entrega, comentarios)
+        $updateData = [
+            'id_contrato' => $request->id_contrato,
+            'id_proveedor' => $request->id_proveedor,
+            'consecutivo' => $request->consecutivo,
+            'referencia' => $request->referencia,
+            'costo_operado' => $costo_operado,
+            'iva' => $iva_calculado,
+            'total' => $total,
+            'updated_at' => now()
+        ];
+        
+        if ($request->has('verificado')) {
+            $updateData['verificado'] = $request->verificado;
+        }
+        
+        DB::table('compras')
+            ->where('id', $id)
+            ->update($updateData);
+        
+        // Eliminar detalles antiguos
+        DB::table('compradetalle')
+            ->where('id_compra', $id)
+            ->delete();
+        
+        // Insertar nuevos detalles (AHORA CON fecha_entrega, tipo_entrega, comentarios)
+        foreach ($request->productos as $producto) {
+            $productoData = DB::table('productosyservicios')
+                ->where('id', $producto['id_producto'])
+                ->first();
+            
+            DB::table('compradetalle')->insert([
+                'id' => GetUuid(),
+                'id_compra' => $id,
+                'id_productoservicio' => $producto['id_producto'],
+                'clave' => $productoData->clave,
+                'descripcion' => $productoData->descripcion,
+                'unidades' => $productoData->unidades,
+                'cantidad' => $producto['cantidad'],
+                'descuento_porcentaje' => $producto['descuento_porcentaje'] ?? 0,
+                'descuento_monto' => $producto['descuento_monto'] ?? 0,
+                'ult_costo' => $producto['precio'],
+                'fecha_entrega' => $producto['fecha_entrega'] ?? null,    // NUEVO
+                'tipo_entrega' => $producto['tipo_entrega'] ?? null,      // NUEVO
+                'comentarios' => $producto['comentarios'] ?? null,        // NUEVO
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+        }
+        
+        DB::commit();
+        
+        return redirect('compras/' . $id)
+            ->with('success', 'Compra actualizada exitosamente');
+            
+    } catch (\Exception $e) {
+        DB::rollBack();
+        
+        return redirect()->back()
+            ->with('error', 'Error al actualizar la compra: ' . $e->getMessage())
+            ->withInput();
+    }
+}
 
     /**
      * Remove the specified resource from storage.

@@ -189,23 +189,22 @@ class CompraController extends Controller
     {
         // Obtener la compra con datos relacionados mediante JOIN
         $compra = DB::table('compras as c')
-            ->leftJoin('contratos as ct', 'c.id_contrato', '=', 'ct.id')
-            ->leftJoin('proveedores_servicios as p', 'c.id_proveedor', '=', 'p.id')
-            ->leftJoin('acompras as u', 'c.id_usuario', '=', 'u.id')
-            ->where('c.id', $id)
-            ->select(
-                'c.*',
-                'ct.contrato_no',
-                'ct.obra as contrato_obra',
-                'ct.cliente as contrato_cliente',
-                'p.nombre as proveedor_nombre',
-                'p.clave as proveedor_clave',
-                'p.telefono as proveedor_telefono',
-                'u.nombres as usuario_nombres',
-                'u.apellidos as usuario_apellidos',
-                'u.mail as usuario_email'
-            )
-            ->first();
+        ->leftJoin('contratos as ct', 'c.id_contrato', '=', 'ct.id')
+        ->leftJoin('proveedores_servicios as p', 'c.id_proveedor', '=', 'p.id')
+        ->where('c.id', $id)
+        ->select(
+            'c.*',
+            'ct.contrato_no',
+            'ct.obra as contrato_obra',
+            'ct.cliente as contrato_cliente',
+            'p.nombre as proveedor_nombre',
+            'p.clave as proveedor_clave',
+            'p.telefono as proveedor_telefono',
+            'c.fecha_entrega',          // Nuevo campo
+            'c.tipo_entrega',            // Nuevo campo
+            'c.comentarios'               // Nuevo campo
+        )
+        ->first();
         
         if (!$compra) {
             abort(404);

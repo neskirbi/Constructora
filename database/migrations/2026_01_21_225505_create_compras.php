@@ -31,10 +31,6 @@ class CreateCompras extends Migration
         $table->decimal('iva', 15, 2)->nullable();
         $table->decimal('total', 15, 2)->nullable();
         
-        // Nuevos campos
-        $table->date('fecha_entrega')->nullable();
-        $table->string('tipo_entrega', 20)->nullable()->comment('recoleccion, envio');
-        $table->text('comentarios')->nullable();
         
         $table->integer('verificado')->default(1);
         $table->timestamps();

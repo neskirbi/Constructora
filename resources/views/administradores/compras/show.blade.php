@@ -223,77 +223,121 @@
                         </div>
                         
                         <div class="compra-body">
-                            <!-- Proveedor -->
-                            <div class="compra-proveedor">
-                                <i class="fas fa-building"></i>
-                                <strong>Proveedor:</strong> {{ $compra->proveedor_nombre ?? 'Proveedor no encontrado' }}
-                                @if(isset($compra->proveedor_clave))
-                                <span class="text-muted ms-2">({{ $compra->proveedor_clave }})</span>
-                                @endif
-                            </div>
-                            
-                            <!-- Grid de información -->
-                            <div class="info-grid">
-                                <div class="info-item">
-                                    <span class="info-label">Referencia</span>
-                                    <span class="info-value">{{ $compra->referencia ?? 'N/A' }}</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">Contrato</span>
-                                    <span class="info-value">{{ $compra->contrato_no ?? 'N/A' }}</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">Costo Operado</span>
-                                    <span class="info-value moneda">${{ number_format($compra->costo_operado, 2) }}</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">IVA</span>
-                                    <span class="info-value moneda">${{ number_format($compra->iva, 2) }}</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">Total</span>
-                                    <span class="info-value moneda" style="font-size: 1.2rem;">${{ number_format($compra->total, 2) }}</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">Creado por</span>
-                                    <span class="info-value">{{ $compra->usuario_nombres ?? 'N/A' }} {{ $compra->usuario_apellidos ?? '' }}</span>
-                                </div>
-                            </div>
+    <!-- Proveedor -->
+    <div class="compra-proveedor">
+        <i class="fas fa-building"></i>
+        <strong>Proveedor:</strong> {{ $compra->proveedor_nombre ?? 'Proveedor no encontrado' }}
+        @if(isset($compra->proveedor_clave))
+        <span class="text-muted ms-2">({{ $compra->proveedor_clave }})</span>
+        @endif
+    </div>
+    
+    <!-- Grid de información -->
+    <div class="info-grid">
+        <div class="info-item">
+            <span class="info-label">Referencia</span>
+            <span class="info-value">{{ $compra->referencia ?? 'N/A' }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Contrato</span>
+            <span class="info-value">{{ $compra->contrato_no ?? 'N/A' }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Costo Operado</span>
+            <span class="info-value moneda">${{ number_format($compra->costo_operado, 2) }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">IVA</span>
+            <span class="info-value moneda">${{ number_format($compra->iva, 2) }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Total</span>
+            <span class="info-value moneda" style="font-size: 1.2rem;">${{ number_format($compra->total, 2) }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Creado por</span>
+            <span class="info-value">{{ $compra->usuario_nombres ?? 'N/A' }} {{ $compra->usuario_apellidos ?? '' }}</span>
+        </div>
+        
+        <!-- NUEVOS CAMPOS: Fecha Entrega y Tipo Entrega -->
+        <div class="info-item">
+            <span class="info-label">Fecha de Entrega</span>
+            <span class="info-value">{{ $compra->fecha_entrega ? \Carbon\Carbon::parse($compra->fecha_entrega)->format('d/m/Y') : 'N/A' }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Tipo de Entrega</span>
+            <span class="info-value">
+                @if($compra->tipo_entrega == 'recoleccion')
+                    <span class="badge bg-info">Recolección</span>
+                @elseif($compra->tipo_entrega == 'envio')
+                    <span class="badge bg-primary">Envío</span>
+                @else
+                    N/A
+                @endif
+            </span>
+        </div>
+    </div>
 
-                            <!-- Productos/Servicios -->
-                            @if(isset($detalles) && count($detalles) > 0)
-                            <h6 class="fw-bold mb-3">
-                                <i class="fas fa-boxes me-2"></i>
-                                Productos / Servicios
-                            </h6>
-                            <div class="table-responsive">
-                                <table class="detalles-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Clave</th>
-                                            <th>Descripción</th>
-                                            <th>Unidad</th>
-                                            <th class="text-end">Cantidad</th>
-                                            <th class="text-end">P. Unitario</th>
-                                            <th class="text-end">Subtotal</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($detalles as $detalle)
-                                        <tr>
-                                            <td><strong>{{ $detalle->clave }}</strong></td>
-                                            <td>{{ $detalle->descripcion }}</td>
-                                            <td>{{ $detalle->unidades }}</td>
-                                            <td class="text-end">{{ number_format($detalle->cantidad, 2) }}</td>
-                                            <td class="text-end moneda">${{ number_format($detalle->ult_costo, 2) }}</td>
-                                            <td class="text-end moneda">${{ number_format($detalle->cantidad * $detalle->ult_costo, 2) }}</td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                            @endif
-                        </div>
+    <!-- NUEVO: Comentarios (si existen) -->
+    @if($compra->comentarios)
+    <div class="row mt-3">
+        <div class="col-12">
+            <div class="card border-light">
+                <div class="card-header bg-light py-2">
+                    <h6 class="mb-0"><i class="fas fa-comment me-2"></i>Comentarios</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-0">{{ $compra->comentarios }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Productos/Servicios -->
+    @if(isset($detalles) && count($detalles) > 0)
+    <h6 class="fw-bold mb-3 mt-4">
+        <i class="fas fa-boxes me-2"></i>
+        Productos / Servicios
+    </h6>
+    <div class="table-responsive">
+        <table class="detalles-table">
+            <thead>
+                <tr>
+                    <th>Clave</th>
+                    <th>Descripción</th>
+                    <th>Unidad</th>
+                    <th class="text-end">Cantidad</th>
+                    <th class="text-end">% Desc.</th>
+                    <th class="text-end">Monto Desc.</th>
+                    <th class="text-end">P. Unitario</th>
+                    <th class="text-end">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($detalles as $detalle)
+                @php
+                    $descuentoPorcentaje = $detalle->descuento_porcentaje ?? 0;
+                    $descuentoMonto = $detalle->descuento_monto ?? 0;
+                    $subtotal = $detalle->cantidad * $detalle->ult_costo;
+                    $subtotalConDescuento = $subtotal - $descuentoMonto;
+                @endphp
+                <tr>
+                    <td><strong>{{ $detalle->clave }}</strong></td>
+                    <td>{{ $detalle->descripcion }}</td>
+                    <td>{{ $detalle->unidades }}</td>
+                    <td class="text-end">{{ number_format($detalle->cantidad, 4) }}</td>
+                    <td class="text-end">{{ $descuentoPorcentaje > 0 ? number_format($descuentoPorcentaje, 2) . '%' : '-' }}</td>
+                    <td class="text-end moneda">{{ $descuentoMonto > 0 ? '$' . number_format($descuentoMonto, 2) : '-' }}</td>
+                    <td class="text-end moneda">${{ number_format($detalle->ult_costo, 2) }}</td>
+                    <td class="text-end moneda">${{ number_format($subtotalConDescuento, 2) }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+    @endif
+</div>
                         
                         <div class="compra-footer">
                             <div>
@@ -303,10 +347,7 @@
                                 </small>
                                 @if($compra->updated_at && $compra->created_at != $compra->updated_at)
                                 <br>
-                                <small class="text-muted">
-                                    <i class="fas fa-edit me-1"></i>
-                                    Actualizado: {{ \Carbon\Carbon::parse($compra->updated_at)->format('d/m/Y H:i') }}
-                                </small>
+                               
                                 @endif
                             </div>
                             <div class="action-buttons">

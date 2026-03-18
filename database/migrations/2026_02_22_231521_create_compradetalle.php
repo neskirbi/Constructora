@@ -24,6 +24,13 @@ class CreateCompradetalle extends Migration
             $table->decimal('descuento_porcentaje', 15, 2); 
             $table->decimal('descuento_monto', 15, 2); 
             $table->decimal('ult_costo', 20, 2); 
+
+            // Nuevos campos
+            $table->date('fecha_entrega')->nullable();
+            $table->string('tipo_entrega', 20)->nullable()->comment('recoleccion, envio');
+            $table->text('comentarios')->nullable();
+        
+
             $table->timestamps();
         });
     }

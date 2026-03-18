@@ -16,6 +16,7 @@ class CompraDetalle extends Model
 
     protected $fillable = [
         'id', 'id_compra', 'id_productoservicio', 'clave', 'descripcion',
-        'unidades', 'cantidad','descuento_porcentaje','descuento_monto', 'ult_costo', 'created_at', 'updated_at'
+        'unidades', 'cantidad','descuento_porcentaje','descuento_monto', 'ult_costo', 'created_at', 'updated_at',
+        'fecha_entrega', 'tipo_entrega', 'comentarios'
     ];
 }

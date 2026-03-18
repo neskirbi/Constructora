@@ -18,7 +18,6 @@ class Compra extends Model
         'id', 'id_contrato', 'id_usuario', 'id_proveedor', 'consecutivo',
         'clave_concepto', 'descripcion_concepto', 'unidad_concepto',
         'costo_unitario_concepto', 'cantidad', 'referencia', 'costo_operado',
-        'iva', 'total', 'verificado', 'created_at', 'updated_at',
-        'fecha_entrega', 'tipo_entrega', 'comentarios'
+        'iva', 'total', 'verificado', 'created_at', 'updated_at'
     ];
 }

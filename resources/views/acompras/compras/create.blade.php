@@ -208,53 +208,7 @@
                                     </div>
                                 </div>
 
-                                <div class="row">
-                    <!-- Fecha de Entrega -->
-                    <div class="col-md-4 mb-3">
-                        <label for="fecha_entrega" class="form-label">Fecha de Entrega</label>
-                        <input type="date" 
-                               class="form-control form-control-sm @error('fecha_entrega') is-invalid @enderror" 
-                               id="fecha_entrega" 
-                               name="fecha_entrega" 
-                               value="{{ old('fecha_entrega', $compra->fecha_entrega ?? '') }}"
-                               style="height: 38px;">
-                        @error('fecha_entrega')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    
-                    <!-- Tipo de Recolección/Envío -->
-                    <div class="col-md-4 mb-3">
-                        <label for="tipo_entrega" class="form-label">Tipo de Entrega</label>
-                        <select class="form-select form-select-sm @error('tipo_entrega') is-invalid @enderror" 
-                                id="tipo_entrega" 
-                                name="tipo_entrega"
-                                style="height: 38px;">
-                            <option value="">Seleccionar</option>
-                            <option value="recoleccion" {{ old('tipo_entrega', $compra->tipo_entrega ?? '') == 'recoleccion' ? 'selected' : '' }}>Recolección</option>
-                            <option value="envio" {{ old('tipo_entrega', $compra->tipo_entrega ?? '') == 'envio' ? 'selected' : '' }}>Envío</option>
-                        </select>
-                        @error('tipo_entrega')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-                
-                <!-- Comentarios -->
-                <div class="row">
-                    <div class="col-md-12">
-                        <label for="comentarios" class="form-label">Comentarios</label>
-                        <textarea class="form-control form-control-sm @error('comentarios') is-invalid @enderror" 
-                                  id="comentarios" 
-                                  name="comentarios" 
-                                  rows="2"
-                                  placeholder="Comentarios adicionales...">{{ old('comentarios', $compra->comentarios ?? '') }}</textarea>
-                        @error('comentarios')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-                <br>
+                                
 
                                 <!-- Sección de Productos/Servicios -->
                                 <div class="row mb-3">
