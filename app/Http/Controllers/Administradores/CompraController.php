@@ -38,6 +38,7 @@ class CompraController extends Controller
             $query->where(function($q) use ($search) {
                 $q->where('c.referencia', 'like', '%' . $search . '%')
                   ->orWhere('ct.contrato_no', 'like', '%' . $search . '%')
+                  ->orWhere('ct.consecutivo', 'like', '%' . $search . '%')
                   ->orWhere('p.nombre', 'like', '%' . $search . '%')
                   ->orWhere('p.clave', 'like', '%' . $search . '%');
             });
