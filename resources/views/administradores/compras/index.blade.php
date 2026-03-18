@@ -246,7 +246,7 @@
                                     <div class="compra-header">
                                         <div class="compra-header-left">
                                             <div class="compra-consecutivo">
-                                                <i class="fas fa-hashtag me-1"></i>
+                                                Obra 
                                                 {{ $compra->consecutivo }}
                                             </div>
                                         </div>
