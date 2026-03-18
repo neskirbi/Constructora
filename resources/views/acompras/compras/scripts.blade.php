@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             step="0.01" 
                             min="0" 
                             max="100"
-                            value="0"
+                            value="0.00"
                             style="height: 38px;"
                             noformat>
                     </div>
@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 name="productos[${index}][descuento_monto]" 
                                 step="0.01" 
                                 min="0"
-                                value="0"
+                                value="0.00"
                                 style="height: 38px;">
                         </div>
                     </div>
@@ -227,46 +227,111 @@ document.addEventListener('DOMContentLoaded', function() {
 
     
     // Función para actualizar subtotal de una fila (VERSIÓN CORREGIDA)
-    window.actualizarSubtotalFila = function(card, campoModificado = null) {
-        const cantidad = parseFloat($(card).find('.cantidad-input').val()) || 0;
-        const precio = parseFloat($(card).find('.precio-input').val()) || 0;
-        let descuentoPorcentaje = parseFloat($(card).find('.descuento-porcentaje').val()) || 0;
-        let descuentoMonto = parseFloat($(card).find('.descuento-monto').val()) || 0;
+    // Función para calcular monto basado en porcentaje
+window.calcularDescuentoPorPorcentaje = function(card) {
+    const cantidad = parseFloat($(card).find('.cantidad-input').val()) || 0;
+    const precio = parseFloat($(card).find('.precio-input').val()) || 0;
+    let descuentoPorcentaje = parseFloat($(card).find('.descuento-porcentaje').val()) || 0;
+    
+    // Calcular subtotal sin descuento
+    let subtotalSinDescuento = cantidad * precio;
+    
+    // Calcular monto basado en porcentaje
+    let descuentoMonto = subtotalSinDescuento * (descuentoPorcentaje / 100);
+    
+    // Actualizar campo de monto
+    $(card).find('.descuento-monto').val(descuentoMonto.toFixed(2));
+    
+    // Calcular subtotal con descuento
+    let subtotal = subtotalSinDescuento - descuentoMonto;
+    
+    // Actualizar subtotal
+    $(card).find('.subtotal-text').val('$' + subtotal.toFixed(2));
+    $(card).closest('.producto-card').attr('data-subtotal', subtotal);
+    
+    return subtotal;
+};
+
+// Función para calcular porcentaje basado en monto
+window.calcularDescuentoPorMonto = function(card) {
+    const cantidad = parseFloat($(card).find('.cantidad-input').val()) || 0;
+    const precio = parseFloat($(card).find('.precio-input').val()) || 0;
+    let descuentoMonto = parseFloat($(card).find('.descuento-monto').val()) || 0;
+    
+    // Calcular subtotal sin descuento
+    let subtotalSinDescuento = cantidad * precio;
+    
+    // Calcular porcentaje basado en monto
+    let descuentoPorcentaje = 0;
+    if (subtotalSinDescuento > 0) {
+        descuentoPorcentaje = (descuentoMonto / subtotalSinDescuento) * 100;
+        $(card).find('.descuento-porcentaje').val(descuentoPorcentaje.toFixed(2));
+    }
+    
+    // Calcular subtotal con descuento
+    let subtotal = subtotalSinDescuento - descuentoMonto;
+    
+    // Actualizar subtotal
+    $(card).find('.subtotal-text').val('$' + subtotal.toFixed(2));
+    $(card).closest('.producto-card').attr('data-subtotal', subtotal);
+    
+    return subtotal;
+};
+
+// Función principal actualizada (más simple)
+window.actualizarSubtotalFila = function(card, campoModificado = null) {
+    if (campoModificado === 'porcentaje') {
+        calcularDescuentoPorPorcentaje(card);
+    } else if (campoModificado === 'monto') {
+        calcularDescuentoPorMonto(card);
+    } else {
+        // Si no se especifica campo, intentar con el que tenga valor
+        const descuentoPorcentaje = parseFloat($(card).find('.descuento-porcentaje').val()) || 0;
+        const descuentoMonto = parseFloat($(card).find('.descuento-monto').val()) || 0;
         
-        // Calcular subtotal sin descuento
-        let subtotalSinDescuento = cantidad * precio;
-        let subtotal = subtotalSinDescuento;
-        
-        // Aplicar lógica de descuentos según qué campo se modificó
-        if (campoModificado === 'porcentaje' && descuentoPorcentaje > 0) {
-            // Si se modificó el porcentaje, calcular el monto
-            descuentoMonto = subtotalSinDescuento * (descuentoPorcentaje / 100);
-            $(card).find('.descuento-monto').val(descuentoMonto.toFixed(2));
-            subtotal = subtotalSinDescuento - descuentoMonto;
-        } 
-        else if (campoModificado === 'monto' && descuentoMonto > 0) {
-            // Si se modificó el monto, calcular el porcentaje
-            if (subtotalSinDescuento > 0) {
-                descuentoPorcentaje = (descuentoMonto / subtotalSinDescuento) * 100;
-                $(card).find('.descuento-porcentaje').val(descuentoPorcentaje.toFixed(2));
-            }
-            subtotal = subtotalSinDescuento - descuentoMonto;
+        if (descuentoMonto > 0) {
+            calcularDescuentoPorMonto(card);
+        } else if (descuentoPorcentaje > 0) {
+            calcularDescuentoPorPorcentaje(card);
+        } else {
+            // Si no hay descuentos, solo actualizar subtotal sin descuento
+            const cantidad = parseFloat($(card).find('.cantidad-input').val()) || 0;
+            const precio = parseFloat($(card).find('.precio-input').val()) || 0;
+            const subtotal = cantidad * precio;
+            
+            $(card).find('.subtotal-text').val('$' + subtotal.toFixed(2));
+            $(card).closest('.producto-card').attr('data-subtotal', subtotal);
         }
-        else if (descuentoMonto > 0) {
-            // Si hay monto pero no se especificó campo, usar el monto
-            subtotal = subtotalSinDescuento - descuentoMonto;
-        }
-        else if (descuentoPorcentaje > 0) {
-            // Si hay porcentaje pero no se especificó campo, usar el porcentaje
-            descuentoMonto = subtotalSinDescuento * (descuentoPorcentaje / 100);
-            $(card).find('.descuento-monto').val(descuentoMonto.toFixed(2));
-            subtotal = subtotalSinDescuento - descuentoMonto;
-        }
-        
-        $(card).find('.subtotal-text').val('$' + subtotal.toFixed(2));
-        $(card).closest('.producto-card').attr('data-subtotal', subtotal);
-        calcularTotalesGlobales();
-    };
+    }
+    
+    calcularTotalesGlobales();
+};
+
+// Eventos actualizados
+$(document).on('input', '.descuento-porcentaje', function() {
+    const card = $(this).closest('.producto-card');
+    actualizarSubtotalFila(card, 'porcentaje');
+});
+
+$(document).on('input', '.descuento-monto', function() {
+    const card = $(this).closest('.producto-card');
+    actualizarSubtotalFila(card, 'monto');
+});
+
+$(document).on('input', '.cantidad-input, .precio-input', function() {
+    const card = $(this).closest('.producto-card');
+    // Al cambiar cantidad o precio, recalcular con el método apropiado
+    const descuentoMonto = parseFloat($(card).find('.descuento-monto').val()) || 0;
+    const descuentoPorcentaje = parseFloat($(card).find('.descuento-porcentaje').val()) || 0;
+    
+    if (descuentoMonto > 0) {
+        actualizarSubtotalFila(card, 'monto');
+    } else if (descuentoPorcentaje > 0) {
+        actualizarSubtotalFila(card, 'porcentaje');
+    } else {
+        actualizarSubtotalFila(card);
+    }
+});
 
     // Función para calcular todos los totales
     window.calcularTotalesGlobales = function() {
@@ -354,17 +419,7 @@ document.addEventListener('DOMContentLoaded', function() {
     calcularTotalesGlobales();
     actualizarBotonesEliminar();
 
-    // Evento para cambio en porcentaje de descuento
-    $(document).on('input', '.descuento-porcentaje', function() {
-        const card = $(this).closest('.producto-card');
-        actualizarSubtotalFila(card, 'porcentaje');
-    });
-
-    // Evento para cambio en monto de descuento
-    $(document).on('input', '.descuento-monto', function() {
-        const card = $(this).closest('.producto-card');
-        actualizarSubtotalFila(card, 'monto');
-    });
+   
 });
 
 
