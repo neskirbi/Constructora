@@ -114,6 +114,33 @@ document.addEventListener('DOMContentLoaded', function() {
                         <!-- Espacio vacío -->
                     </div>
                     <div class="col-md-2">
+                       
+                    </div>
+                    <div class="col-md-3">
+                       
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Precio Unitario</label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="height: 38px;">$</span>
+                            <input type="number" 
+                                class="form-control precio-input text-end" 
+                                name="productos[${index}][precio]" 
+                                step="0.0000000000000001" 
+                                style="height: 38px;"
+                                required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-2">
+                    <div class="col-md-3">
+                        <!-- Espacio vacío -->
+                    </div>
+                    <div class="col-md-1">
+                        <!-- Espacio vacío -->
+                    </div>
+                    <div class="col-md-2">
                         <label class="form-label">% Descuento</label>
                         <input type="number" 
                             class="form-control form-control-sm descuento-porcentaje text-end" 
@@ -137,30 +164,6 @@ document.addEventListener('DOMContentLoaded', function() {
                                 value="0"
                                 style="height: 38px;">
                         </div>
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label">Precio Unitario</label>
-                        <div class="input-group">
-                            <span class="input-group-text" style="height: 38px;">$</span>
-                            <input type="number" 
-                                class="form-control precio-input text-end" 
-                                name="productos[${index}][precio]" 
-                                step="0.0000000000000001" 
-                                style="height: 38px;"
-                                required>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="row mt-2">
-                    <div class="col-md-3">
-                        <!-- Espacio vacío -->
-                    </div>
-                    <div class="col-md-3">
-                        <!-- Espacio vacío -->
-                    </div>
-                    <div class="col-md-3">
-                        <!-- Espacio vacío -->
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">Subtotal</label>
