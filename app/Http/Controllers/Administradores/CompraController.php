@@ -199,16 +199,14 @@ class CompraController extends Controller
             'ct.cliente as contrato_cliente',
             'p.nombre as proveedor_nombre',
             'p.clave as proveedor_clave',
-            'p.telefono as proveedor_telefono',
-            'c.fecha_entrega',          // Nuevo campo
-            'c.tipo_entrega',            // Nuevo campo
-            'c.comentarios'               // Nuevo campo
+            'p.telefono as proveedor_telefono'
+            // QUITAR: 'c.fecha_entrega', 'c.tipo_entrega', 'c.comentarios'
         )
         ->first();
-        
-        if (!$compra) {
-            abort(404);
-        }
+    
+    if (!$compra) {
+        abort(404);
+    }
         
         // Obtener los detalles de la compra
         $detalles = DB::table('compradetalle')

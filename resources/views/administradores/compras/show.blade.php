@@ -232,111 +232,190 @@
         @endif
     </div>
     
-    <!-- Grid de información -->
-    <div class="info-grid">
-        <div class="info-item">
-            <span class="info-label">Referencia</span>
-            <span class="info-value">{{ $compra->referencia ?? 'N/A' }}</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">Contrato</span>
-            <span class="info-value">{{ $compra->contrato_no ?? 'N/A' }}</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">Costo Operado</span>
-            <span class="info-value moneda">${{ number_format($compra->costo_operado, 2) }}</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">IVA</span>
-            <span class="info-value moneda">${{ number_format($compra->iva, 2) }}</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">Total</span>
-            <span class="info-value moneda" style="font-size: 1.2rem;">${{ number_format($compra->total, 2) }}</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">Creado por</span>
-            <span class="info-value">{{ $compra->usuario_nombres ?? 'N/A' }} {{ $compra->usuario_apellidos ?? '' }}</span>
-        </div>
-        
-        <!-- NUEVOS CAMPOS: Fecha Entrega y Tipo Entrega -->
-        <div class="info-item">
-            <span class="info-label">Fecha de Entrega</span>
-            <span class="info-value">{{ $compra->fecha_entrega ? \Carbon\Carbon::parse($compra->fecha_entrega)->format('d/m/Y') : 'N/A' }}</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">Tipo de Entrega</span>
-            <span class="info-value">
-                @if($compra->tipo_entrega == 'recoleccion')
-                    <span class="badge bg-info">Recolección</span>
-                @elseif($compra->tipo_entrega == 'envio')
-                    <span class="badge bg-primary">Envío</span>
-                @else
-                    N/A
-                @endif
-            </span>
-        </div>
+   <!-- Grid de información principal (sin fecha/tipo/comentarios) -->
+<div class="info-grid">
+    <div class="info-item">
+        <span class="info-label">Referencia</span>
+        <span class="info-value">{{ $compra->referencia ?? 'N/A' }}</span>
     </div>
+    <div class="info-item">
+        <span class="info-label">Contrato</span>
+        <span class="info-value">{{ $compra->contrato_no ?? 'N/A' }}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Costo Operado</span>
+        <span class="info-value moneda">${{ number_format($compra->costo_operado, 2) }}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">IVA</span>
+        <span class="info-value moneda">${{ number_format($compra->iva, 2) }}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Total</span>
+        <span class="info-value moneda" style="font-size: 1.2rem;">${{ number_format($compra->total, 2) }}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Creado por</span>
+        <span class="info-value">{{ $compra->usuario_nombres ?? 'N/A' }} {{ $compra->usuario_apellidos ?? '' }}</span>
+    </div>
+</div>
 
-    <!-- NUEVO: Comentarios (si existen) -->
-    @if($compra->comentarios)
-    <div class="row mt-3">
-        <div class="col-12">
-            <div class="card border-light">
-                <div class="card-header bg-light py-2">
-                    <h6 class="mb-0"><i class="fas fa-comment me-2"></i>Comentarios</h6>
+    <!-- Productos/Servicios -->
+@if(isset($detalles) && count($detalles) > 0)
+<h6 class="fw-bold mb-3 mt-4">
+    <i class="fas fa-boxes me-2"></i>
+    Productos / Servicios
+</h6>
+
+<div id="productosContainer">
+    @foreach($detalles as $index => $detalle)
+    @php
+        $descuentoPorcentaje = $detalle->descuento_porcentaje ?? 0;
+        $descuentoMonto = $detalle->descuento_monto ?? 0;
+        $subtotal = $detalle->cantidad * $detalle->ult_costo;
+        $subtotalConDescuento = $subtotal - $descuentoMonto;
+    @endphp
+    <div class="producto-card-wrapper mb-3" data-index="{{ $index }}">
+        <div class="card producto-card">
+            <div class="card-header">
+                <h6 class="mb-0 float-start"><i class="fas fa-box me-2"></i>Producto #{{ $index + 1 }}</h6>
+            </div>
+            <div class="card-body">
+                <!-- Primera fila: Clave, Descripción, Unidad, Cantidad -->
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <label class="form-label">Clave</label>
+                        <input type="text" 
+                               class="form-control form-control-sm" 
+                               value="{{ $detalle->clave }}"
+                               readonly
+                               style="height: 38px; background-color: #f8f9fa;">
+                    </div>
+                    
+                    <div class="col-md-4 mb-2">
+                        <label class="form-label">Descripción</label>
+                        <input type="text" 
+                               class="form-control form-control-sm" 
+                               value="{{ $detalle->descripcion }}"
+                               readonly
+                               style="height: 38px; background-color: #f8f9fa;">
+                    </div>
+                    
+                    <div class="col-md-2 mb-2">
+                        <label class="form-label">Unidad</label>
+                        <input type="text" 
+                               class="form-control form-control-sm" 
+                               value="{{ $detalle->unidades }}"
+                               readonly
+                               style="height: 38px; background-color: #f8f9fa;">
+                    </div>
+                    
+                    <div class="col-md-3 mb-2">
+                        <label class="form-label">Cantidad</label>
+                        <input type="text" 
+                               class="form-control form-control-sm text-end" 
+                               value="{{ number_format($detalle->cantidad, 4) }}"
+                               readonly
+                               style="height: 38px; background-color: #f8f9fa;">
+                    </div>
                 </div>
-                <div class="card-body">
-                    <p class="mb-0">{{ $compra->comentarios }}</p>
+                
+                <!-- Segunda fila: % Descuento, Monto Descuento, Precio Unitario -->
+                <div class="row mt-2">
+                    <div class="col-md-3">
+                        <!-- Espacio vacío para alinear con la fila anterior -->
+                    </div>
+                    <div class="col-md-1">
+                        <!-- Espacio vacío -->
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">% Descuento</label>
+                        <input type="text" 
+                               class="form-control form-control-sm text-end" 
+                               value="{{ $descuentoPorcentaje > 0 ? number_format($descuentoPorcentaje, 2) . '%' : '-' }}"
+                               readonly
+                               style="height: 38px; background-color: #f8f9fa;">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Monto Descuento</label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="height: 38px;">$</span>
+                            <input type="text" 
+                                   class="form-control text-end" 
+                                   value="{{ $descuentoMonto > 0 ? number_format($descuentoMonto, 2) : '0.00' }}"
+                                   readonly
+                                   style="height: 38px; background-color: #f8f9fa;">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Precio Unitario</label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="height: 38px;">$</span>
+                            <input type="text" 
+                                   class="form-control text-end" 
+                                   value="{{ number_format($detalle->ult_costo, 2) }}"
+                                   readonly
+                                   style="height: 38px; background-color: #f8f9fa;">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tercera fila: Subtotal -->
+                <div class="row mt-2">
+                    <div class="col-md-3">
+                        <!-- Espacio vacío -->
+                    </div>
+                    <div class="col-md-3">
+                        <!-- Espacio vacío -->
+                    </div>
+                    <div class="col-md-3">
+                        <!-- Espacio vacío -->
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Subtotal</label>
+                        <div class="input-group">
+                            <span class="input-group-text" style="height: 38px;">$</span>
+                            <input type="text" 
+                                   class="form-control text-end" 
+                                   value="{{ number_format($subtotalConDescuento, 2) }}"
+                                   readonly
+                                   style="height: 38px; background-color: #f8f9fa;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cuarta fila: Fecha Entrega, Tipo Entrega y Comentarios -->
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Fecha de Entrega</label>
+                        <input type="text" 
+                               class="form-control form-control-sm" 
+                               value="{{ $detalle->fecha_entrega ? \Carbon\Carbon::parse($detalle->fecha_entrega)->format('d/m/Y') : 'No definida' }}"
+                               readonly
+                               style="height: 38px; background-color: #f8f9fa;">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Tipo de Entrega</label>
+                        <input type="text" 
+                               class="form-control form-control-sm" 
+                               value="@if($detalle->tipo_entrega == 'recoleccion') Recolección @elseif($detalle->tipo_entrega == 'entrega') Entrega @else No definido @endif"
+                               readonly
+                               style="height: 38px; background-color: #f8f9fa;">
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Comentarios</label>
+                        <textarea class="form-control form-control-sm" 
+                                  rows="2"
+                                  readonly
+                                  style="resize: none; background-color: #f8f9fa;">{{ $detalle->comentarios ?? '' }}</textarea>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    @endif
-
-    <!-- Productos/Servicios -->
-    @if(isset($detalles) && count($detalles) > 0)
-    <h6 class="fw-bold mb-3 mt-4">
-        <i class="fas fa-boxes me-2"></i>
-        Productos / Servicios
-    </h6>
-    <div class="table-responsive">
-        <table class="detalles-table">
-            <thead>
-                <tr>
-                    <th>Clave</th>
-                    <th>Descripción</th>
-                    <th>Unidad</th>
-                    <th class="text-end">Cantidad</th>
-                    <th class="text-end">% Desc.</th>
-                    <th class="text-end">Monto Desc.</th>
-                    <th class="text-end">P. Unitario</th>
-                    <th class="text-end">Subtotal</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($detalles as $detalle)
-                @php
-                    $descuentoPorcentaje = $detalle->descuento_porcentaje ?? 0;
-                    $descuentoMonto = $detalle->descuento_monto ?? 0;
-                    $subtotal = $detalle->cantidad * $detalle->ult_costo;
-                    $subtotalConDescuento = $subtotal - $descuentoMonto;
-                @endphp
-                <tr>
-                    <td><strong>{{ $detalle->clave }}</strong></td>
-                    <td>{{ $detalle->descripcion }}</td>
-                    <td>{{ $detalle->unidades }}</td>
-                    <td class="text-end">{{ number_format($detalle->cantidad, 4) }}</td>
-                    <td class="text-end">{{ $descuentoPorcentaje > 0 ? number_format($descuentoPorcentaje, 2) . '%' : '-' }}</td>
-                    <td class="text-end moneda">{{ $descuentoMonto > 0 ? '$' . number_format($descuentoMonto, 2) : '-' }}</td>
-                    <td class="text-end moneda">${{ number_format($detalle->ult_costo, 2) }}</td>
-                    <td class="text-end moneda">${{ number_format($subtotalConDescuento, 2) }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-    @endif
+    @endforeach
+</div>
+@endif
 </div>
                         
                         <div class="compra-footer">

@@ -1,3 +1,5 @@
 agregar decuento en compras: debe ser por porcentaje o por cantidad 
 Hacer que los select de proveedor y de prductos se cargue en tiempo real(en compras y destajo)
 revisar por que en el create de destajo y de compras el producto no sale la pura clave 
+
+bajar la fila de descuento a la par de subtotal 
