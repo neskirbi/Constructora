@@ -157,8 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // Función para agregar producto
-    agregarProducto = function() {
-        console.log('funcion');
+    window.agregarProducto = function() {
         const container = document.getElementById('productosContainer');
         if (container) {
             $(container).append(crearTarjetaProducto(window.productCount));

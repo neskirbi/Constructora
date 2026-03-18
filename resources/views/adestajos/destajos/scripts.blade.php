@@ -74,7 +74,6 @@ function crearTarjetaProducto(index, productosData) {
                         data-precio="${producto.ult_costo}">
                         ${producto.clave}
                     </option>`;
-                    console.log(producto.clave);
     });
 
     return `
@@ -132,15 +131,9 @@ function crearTarjetaProducto(index, productosData) {
                     </div>
                     
                     <div class="row mt-2">
-                        <div class="col-md-3">
-                            <!-- Espacio vacío -->
-                        </div>
-                        <div class="col-md-3">
-                            <!-- Espacio vacío -->
-                        </div>
-                        <div class="col-md-3">
-                            <!-- Espacio vacío -->
-                        </div>
+                        <div class="col-md-3"></div>
+                        <div class="col-md-3"></div>
+                        <div class="col-md-3"></div>
                         <div class="col-md-3">
                             <label class="form-label">Precio Unitario</label>
                             <div class="input-group">
@@ -156,15 +149,9 @@ function crearTarjetaProducto(index, productosData) {
                     </div>
                     
                     <div class="row mt-2">
-                        <div class="col-md-3">
-                            <!-- Espacio vacío -->
-                        </div>
-                        <div class="col-md-3">
-                            <!-- Espacio vacío -->
-                        </div>
-                        <div class="col-md-3">
-                            <!-- Espacio vacío -->
-                        </div>
+                        <div class="col-md-3"></div>
+                        <div class="col-md-3"></div>
+                        <div class="col-md-3"></div>
                         <div class="col-md-3">
                             <label class="form-label">Subtotal</label>
                             <div class="input-group">
@@ -181,6 +168,34 @@ function crearTarjetaProducto(index, productosData) {
         </div>
     `;
 }
+
+// FUNCIÓN PRINCIPAL PARA AGREGAR PRODUCTO (COMPARTIDA)
+window.agregarProducto = function() {
+    const container = document.getElementById('productosContainer');
+    if (container) {
+        const index = $('.producto-card-wrapper').length;
+        const productosData = window.productosData || [];
+        
+        $(container).append(crearTarjetaProducto(index, productosData));
+        
+        // Reinicializar Select2 para TODOS los selects (método seguro)
+        //$('.producto-select').select2('destroy');
+        initSelect2();
+        
+        actualizarBotonesEliminar();
+    }
+};
+
+// Función para actualizar visibilidad de botones eliminar
+window.actualizarBotonesEliminar = function() {
+    const cards = $('.producto-card');
+    cards.each(function() {
+        const btnRemove = $(this).closest('.producto-card-wrapper').find('.btn-remove-row');
+        if (btnRemove.length) {
+            btnRemove.css('display', cards.length > 1 ? 'inline-flex' : 'none');
+        }
+    });
+};
 
 // Evento cuando se selecciona un producto
 $(document).on('change', '.producto-select', function() {
@@ -227,5 +242,39 @@ $(document).on('input', '.cantidad-input, .precio-input', function() {
 // Evento para cambio en porcentaje de IVA
 $(document).on('input', '#iva', function() {
     calcularTotalesGlobales();
+});
+
+// Eliminar fila
+$(document).on('click', '.btn-remove-row', function() {
+    if ($('.producto-card').length > 1) {
+        $(this).closest('.producto-card-wrapper').remove();
+        calcularTotalesGlobales();
+        actualizarBotonesEliminar();
+    }
+});
+
+// Inicialización cuando el documento está listo
+$(document).ready(function() {
+    // Guardar datos de productos en variable global
+    window.productosData = @json($productos ?? []);
+    
+    // Inicializar Select2
+    initSelect2();
+    
+    // Configurar event listener para el botón agregarProducto
+    $('#agregarProducto').off('click').on('click', function() {
+        window.agregarProducto();
+    });
+    
+    // Para la vista SHOW: inicializar subtotales
+    $('.producto-card').each(function() {
+        const subtotalText = $(this).find('.subtotal-text').val();
+        // Limpiar formato de moneda para obtener el número
+        const subtotal = parseFloat(subtotalText.replace(/[$,]/g, '')) || 0;
+        $(this).attr('data-subtotal', subtotal);
+    });
+    
+    calcularTotalesGlobales();
+    actualizarBotonesEliminar();
 });
 </script>

@@ -319,63 +319,38 @@
     @include('adestajos.destajos.scripts')
     
     <script>
-    $(document).ready(function() {
-        let productCount = 0;
-        let productosData = @json($productos);
-        
-        // Inicializar con una tarjeta
-        $('#productosContainer').append(crearTarjetaProducto(productCount, productosData));
-        productCount++;
-        
-        // Inicializar Select2
+$(document).ready(function() {
+    // SOLO la inicialización de la primera tarjeta
+    if ($('.producto-card-wrapper').length === 0) {
+        $('#productosContainer').append(crearTarjetaProducto(0, window.productosData));
+        //$('.producto-select').select2('destroy');
         initSelect2();
-
-        // Agregar nueva tarjeta
-        $('#agregarProducto').on('click', function() {
-            $('#productosContainer').append(crearTarjetaProducto(productCount, productosData));
-            productCount++;
-            
-            // Reinicializar Select2 para los nuevos selects
-            $('.producto-select').select2('destroy');
-            initSelect2();
-        });
-
-        // Eliminar tarjeta
-        $(document).on('click', '.btn-remove-row', function() {
-            if ($('.producto-card').length > 1) {
-                $(this).closest('.producto-card-wrapper').remove();
-                calcularTotalesGlobales();
+        actualizarBotonesEliminar();
+    }
+    
+    // ✅ ESTO SÍ SE QUEDA - Validación del formulario
+    $('#destajoForm').on('submit', function(event) {
+        let hasProducts = false;
+        $('.producto-select').each(function() {
+            if ($(this).val()) {
+                hasProducts = true;
             }
         });
-
-        // Validación del formulario
-        $('#destajoForm').on('submit', function(event) {
-            let hasProducts = false;
-            
-            $('.producto-select').each(function() {
-                if ($(this).val()) {
-                    hasProducts = true;
-                }
-            });
-            
-            if (!hasProducts) {
-                event.preventDefault();
-                alert('Debe agregar al menos un producto o servicio');
-                return false;
-            }
-            
-            if (!this.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            
-            $(this).addClass('was-validated');
-        });
-
-        // Inicializar cálculos
-        calcularTotalesGlobales();
+        
+        if (!hasProducts) {
+            event.preventDefault();
+            alert('Debe agregar al menos un producto o servicio');
+            return false;
+        }
+        
+        if (!this.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        $(this).addClass('was-validated');
     });
-    </script>
+});
+</script>
     @include('general.modals.scripts')
 </body>
 </html>
