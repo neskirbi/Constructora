@@ -101,16 +101,21 @@ class CompraController extends Controller
     public function store(Request $request)
     {
 
-        $request->validate([
+       $request->validate([
             'consecutivo' => 'required|integer|min:1',
             'id_contrato' => 'required|string|exists:contratos,id',
             'id_proveedor' => 'required|string|exists:proveedores_servicios,id',
             'referencia' => 'required|string|max:1500',
             'iva' => 'nullable|numeric|min:0',
+            'fecha_entrega' => 'nullable|date',
+            'tipo_entrega' => 'nullable|string|in:recoleccion,envio',
+            'comentarios' => 'nullable|string|max:2000',
             'productos' => 'required|array|min:1',
             'productos.*.id_producto' => 'required|string|exists:productosyservicios,id',
-            'productos.*.cantidad' => 'required|numeric',
-            'productos.*.precio' => 'required|numeric',
+            'productos.*.cantidad' => 'required|numeric|min:0.01',
+            'productos.*.precio' => 'required|numeric|min:0',
+            'productos.*.descuento_porcentaje' => 'nullable|numeric|min:0|max:100',
+            'productos.*.descuento_monto' => 'nullable|numeric|min:0',
         ]);
         
         // Obtener el ID del usuario autenticado
@@ -142,6 +147,9 @@ class CompraController extends Controller
                 'costo_operado' => $costo_operado,
                 'iva' => $iva_calculado,
                 'total' => $total,
+                'fecha_entrega' => $request->fecha_entrega,
+                'tipo_entrega' => $request->tipo_entrega,
+                'comentarios' => $request->comentarios,
                 'verificado' => 1,
                 'created_at' => now(),
                 'updated_at' => now()
@@ -161,6 +169,9 @@ class CompraController extends Controller
                     'descripcion' => $productoData->descripcion,
                     'unidades' => $productoData->unidades,
                     'cantidad' => $producto['cantidad'],
+                    'cantidad' => $producto['cantidad'],
+                    'descuento_porcentaje' => $producto['descuento_porcentaje'],
+                    'descuento_monto' => $producto['descuento_monto'],
                     'ult_costo' => $producto['precio'],
                     'created_at' => now(),
                     'updated_at' => now()
@@ -185,49 +196,51 @@ class CompraController extends Controller
      * Display the specified resource.
      */
     public function show($id)
-    {
-        // Obtener la compra con datos relacionados mediante JOIN
-        $compra = DB::table('compras as c')
-            ->leftJoin('contratos as ct', 'c.id_contrato', '=', 'ct.id')
-            ->leftJoin('proveedores_servicios as p', 'c.id_proveedor', '=', 'p.id')
-            ->where('c.id', $id)
-            ->select(
-                'c.*',
-                'ct.contrato_no',
-                'ct.obra as contrato_obra',
-                'ct.cliente as contrato_cliente',
-                'p.nombre as proveedor_nombre',
-                'p.clave as proveedor_clave',
-                'p.telefono as proveedor_telefono',
-            )
-            ->first();
-        
-        if (!$compra) {
-            abort(404);
-        }
-        
-        // Obtener los detalles de la compra
-        $detalles = DB::table('compradetalle')
-            ->where('id_compra', $id)
-            ->get();
-        
-        // Obtener datos para los selects
-        $proveedores = DB::table('proveedores_servicios')
-            ->where('estatus', 'Activo')
-            ->orderBy('nombre')
-            ->get();
-        
-        $contratos = DB::table('contratos')
-            ->orderBy('contrato_no')
-            ->get();
-        
-        $productos = DB::table('productosyservicios')
-            ->orderBy('clave')
-            ->get();
-        
-        return view('acompras.compras.show', compact('compra', 'detalles', 'proveedores', 'contratos', 'productos'));
+{
+    // Obtener la compra con datos relacionados mediante JOIN
+    $compra = DB::table('compras as c')
+        ->leftJoin('contratos as ct', 'c.id_contrato', '=', 'ct.id')
+        ->leftJoin('proveedores_servicios as p', 'c.id_proveedor', '=', 'p.id')
+        ->where('c.id', $id)
+        ->select(
+            'c.*',
+            'ct.contrato_no',
+            'ct.obra as contrato_obra',
+            'ct.cliente as contrato_cliente',
+            'p.nombre as proveedor_nombre',
+            'p.clave as proveedor_clave',
+            'p.telefono as proveedor_telefono',
+            'c.fecha_entrega',          // Nuevo campo
+            'c.tipo_entrega',            // Nuevo campo
+            'c.comentarios'               // Nuevo campo
+        )
+        ->first();
+    
+    if (!$compra) {
+        abort(404);
     }
-
+    
+    // Obtener los detalles de la compra
+    $detalles = DB::table('compradetalle')
+        ->where('id_compra', $id)
+        ->get();
+    
+    // Obtener datos para los selects
+    $proveedores = DB::table('proveedores_servicios')
+        ->where('estatus', 'Activo')
+        ->orderBy('nombre')
+        ->get();
+    
+    $contratos = DB::table('contratos')
+        ->orderBy('contrato_no')
+        ->get();
+    
+    $productos = DB::table('productosyservicios')
+        ->orderBy('clave')
+        ->get();
+    
+    return view('acompras.compras.show', compact('compra', 'detalles', 'proveedores', 'contratos', 'productos'));
+}
 
 
     public function edit($id)
@@ -292,13 +305,17 @@ class CompraController extends Controller
             'consecutivo' => 'required|integer|min:1',
             'id_contrato' => 'required|string|exists:contratos,id',
             'id_proveedor' => 'required|string|exists:proveedores_servicios,id',
-            'referencia' => 'nullable|string|max:1500',
+            'referencia' => 'required|string|max:1500',
             'iva' => 'nullable|numeric|min:0',
+            'fecha_entrega' => 'nullable|date',
+            'tipo_entrega' => 'nullable|string|in:recoleccion,envio',
+            'comentarios' => 'nullable|string|max:2000',
             'productos' => 'required|array|min:1',
             'productos.*.id_producto' => 'required|string|exists:productosyservicios,id',
-            'productos.*.cantidad' => 'required|numeric',
-            'productos.*.precio' => 'required|numeric',
-            'verificado' => 'nullable|integer|in:0,1,2',
+            'productos.*.cantidad' => 'required|numeric|min:0.01',
+            'productos.*.precio' => 'required|numeric|min:0',
+            'productos.*.descuento_porcentaje' => 'nullable|numeric|min:0|max:100',
+            'productos.*.descuento_monto' => 'nullable|numeric|min:0',
         ]);
         
         // Calcular totales
@@ -315,7 +332,7 @@ class CompraController extends Controller
         
         try {
             // Actualizar compra principal
-            $updateData = [
+           $updateData = [
                 'id_contrato' => $request->id_contrato,
                 'id_proveedor' => $request->id_proveedor,
                 'consecutivo' => $request->consecutivo,
@@ -323,6 +340,9 @@ class CompraController extends Controller
                 'costo_operado' => $costo_operado,
                 'iva' => $iva_calculado,
                 'total' => $total,
+                'fecha_entrega' => $request->fecha_entrega,
+                'tipo_entrega' => $request->tipo_entrega,
+                'comentarios' => $request->comentarios,
                 'updated_at' => now()
             ];
             
@@ -353,6 +373,8 @@ class CompraController extends Controller
                     'descripcion' => $productoData->descripcion,
                     'unidades' => $productoData->unidades,
                     'cantidad' => $producto['cantidad'],
+                    'descuento_porcentaje' => $producto['descuento_porcentaje'],
+                    'descuento_monto' => $producto['descuento_monto'],
                     'ult_costo' => $producto['precio'],
                     'created_at' => now(),
                     'updated_at' => now()

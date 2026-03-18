@@ -297,6 +297,57 @@
                                     </div>
                                 </div>
 
+                                <!-- Fecha de Entrega y Tipo de Entrega -->
+<div class="row mt-4">
+    <div class="col-md-4 mb-3">
+        <label for="fecha_entrega" class="form-label">Fecha de Entrega</label>
+        <input type="date" 
+               class="form-control form-control-sm @error('fecha_entrega') is-invalid @enderror" 
+               id="fecha_entrega" 
+               name="fecha_entrega" 
+               value="{{ old('fecha_entrega', $compra->fecha_entrega ?? '') }}"
+               style="height: 38px;">
+        @error('fecha_entrega')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <label for="tipo_entrega" class="form-label">Tipo de Entrega</label>
+        <select class="form-select form-select-sm @error('tipo_entrega') is-invalid @enderror" 
+                id="tipo_entrega" 
+                name="tipo_entrega"
+                style="height: 38px;">
+            <option value="">Seleccionar</option>
+            <option value="recoleccion" {{ old('tipo_entrega', $compra->tipo_entrega ?? '') == 'recoleccion' ? 'selected' : '' }}>Recolección</option>
+            <option value="envio" {{ old('tipo_entrega', $compra->tipo_entrega ?? '') == 'envio' ? 'selected' : '' }}>Envío</option>
+        </select>
+        @error('tipo_entrega')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
+    
+    <div class="col-md-4 mb-3">
+        <!-- Espacio vacío para mantener el layout -->
+    </div>
+</div>
+
+<!-- Comentarios -->
+<div class="row">
+    <div class="col-md-12">
+        <label for="comentarios" class="form-label">Comentarios</label>
+        <textarea class="form-control form-control-sm @error('comentarios') is-invalid @enderror" 
+                  id="comentarios" 
+                  name="comentarios" 
+                  rows="3"
+                  placeholder="Comentarios adicionales...">{{ old('comentarios', $compra->comentarios ?? '') }}</textarea>
+        @error('comentarios')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
+</div>
+<br>
+
                                 <!-- Sección de Productos/Servicios editable -->
                                 <div class="row mb-3">
                                     <div class="col-12">
@@ -382,60 +433,56 @@
                                                 </div>
                                                 
                                                 <div class="row mt-2">
-    <div class="col-md-3">
-        <label class="form-label">Precio Unitario</label>
-        <div class="input-group">
-            <span class="input-group-text" style="height: 38px;">$</span>
-            <input type="number" 
-                   class="form-control precio-input text-end" 
-                   name="productos[{{ $index }}][precio]" 
-                   value="{{ $detalle->ult_costo }}"
-                   step="0.0000000000000001" 
-                   style="height: 38px;"
-                   required>
-        </div>
-    </div>
-    
-    <!-- NUEVO: % Descuento -->
-    <div class="col-md-3">
-        <label class="form-label">% Descuento</label>
-        <input type="number" 
-               class="form-control form-control-sm descuento-porcentaje text-end" 
-               name="productos[{{ $index }}][descuento_porcentaje]" 
-               step="0.01" 
-               min="0" 
-               max="100"
-               value="{{ $detalle->descuento_porcentaje ?? 0 }}"
-               style="height: 38px;">
-    </div>
-    
-    <!-- NUEVO: Monto Descuento -->
-    <div class="col-md-3">
-        <label class="form-label">Monto Descuento</label>
-        <div class="input-group">
-            <span class="input-group-text" style="height: 38px;">$</span>
-            <input type="number" 
-                   class="form-control descuento-monto text-end" 
-                   name="productos[{{ $index }}][descuento_monto]" 
-                   step="0.01" 
-                   min="0"
-                   value="{{ $detalle->descuento_monto ?? 0 }}"
-                   style="height: 38px;">
-        </div>
-    </div>
-    
-    <div class="col-md-3">
-        <label class="form-label">Subtotal con Descuento</label>
-        <div class="input-group">
-            <span class="input-group-text" style="height: 38px;">$</span>
-            <input type="text" 
-                   class="form-control subtotal-text text-end" 
-                   value="${{ number_format($detalle->cantidad * $detalle->ult_costo, 2) }}"
-                   readonly
-                   style="height: 38px; background-color: #f8f9fa;">
-        </div>
-    </div>
-</div>
+                                                    <div class="col-md-3">
+                                                        <!-- Espacio vacío -->
+                                                    </div>
+                                                    <div class="col-md-1">
+                                                        <!-- Espacio vacío -->
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label class="form-label">% Descuento</label>
+                                                        <input type="number" 
+                                                            class="form-control form-control-sm descuento-porcentaje text-end" 
+                                                            name="productos[{{ $index }}][descuento_porcentaje]" 
+                                                            step="0.01" 
+                                                            min="0" 
+                                                            max="100"
+                                                            value="{{ $detalle->descuento_porcentaje ?? 0 }}"
+                                                            style="height: 38px;"
+                                                            noformat>
+                                                    </div>
+                                                    
+                                                    <!-- NUEVO: Monto Descuento -->
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Monto Descuento</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text" style="height: 38px;">$</span>
+                                                            <input type="number" 
+                                                                class="form-control descuento-monto text-end" 
+                                                                name="productos[{{ $index }}][descuento_monto]" 
+                                                                step="0.01" 
+                                                                min="0"
+                                                                value="{{ $detalle->descuento_monto ?? 0 }}"
+                                                                style="height: 38px;">
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Precio Unitario</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text" style="height: 38px;">$</span>
+                                                            <input type="number" 
+                                                                class="form-control precio-input text-end" 
+                                                                name="productos[{{ $index }}][precio]" 
+                                                                value="{{ $detalle->ult_costo }}"
+                                                                step="0.0000000000000001" 
+                                                                style="height: 38px;"
+                                                                required>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    
+                                                </div>
                                                 
                                                 <div class="row mt-2">
                                                     <div class="col-md-3">
@@ -501,7 +548,8 @@
                                                                value="{{ old('iva', $compra->iva ? round(($compra->iva / $compra->costo_operado) * 100, 2) : 16) }}"
                                                                step="0.01"
                                                                min="0"
-                                                               style="height: 38px;">
+                                                               style="height: 38px;"
+                                                               noformat>
                                                         <span class="input-group-text" style="height: 38px;">%</span>
                                                     </div>
                                                 </div>

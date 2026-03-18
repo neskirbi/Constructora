@@ -383,6 +383,14 @@ function GenerarPass(element){
 })();
 
 
+function dispararEventos(selector) {
+    var input = document.querySelector(selector);
+    if (input) {
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+}
+
 
 
 

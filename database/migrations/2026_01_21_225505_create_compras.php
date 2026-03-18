@@ -14,28 +14,31 @@ class CreateCompras extends Migration
     public function up()
     {
         Schema::create('compras', function (Blueprint $table) {
-            $table->string('id',32)->unique();
-            $table->string('id_contrato',32);            
-            $table->string('id_usuario',32);
-            $table->string('id_proveedor',32);
-          
-            
-            $table->integer('consecutivo')->nullable();
-            
-            $table->string('clave_concepto', 50)->nullable();
-            $table->text('descripcion_concepto')->nullable();
-            $table->string('unidad_concepto', 50)->nullable();
-            $table->decimal('costo_unitario_concepto', 15, 2)->nullable();
-            $table->decimal('cantidad', 15, 2)->nullable();
-            $table->string('referencia', 1500)->nullable();
-            $table->decimal('costo_operado', 15, 2)->nullable();
-            $table->decimal('iva', 15, 2)->nullable();
-            $table->decimal('total', 15, 2)->nullable();
-            
-            
-            $table->integer('verificado')->default(1);
-            $table->timestamps();
-        });
+        $table->string('id',32)->unique();
+        $table->string('id_contrato',32);            
+        $table->string('id_usuario',32);
+        $table->string('id_proveedor',32);
+        
+        $table->integer('consecutivo')->nullable();
+        
+        $table->string('clave_concepto', 50)->nullable();
+        $table->text('descripcion_concepto')->nullable();
+        $table->string('unidad_concepto', 50)->nullable();
+        $table->decimal('costo_unitario_concepto', 15, 2)->nullable();
+        $table->decimal('cantidad', 15, 2)->nullable();
+        $table->string('referencia', 1500)->nullable();
+        $table->decimal('costo_operado', 15, 2)->nullable();
+        $table->decimal('iva', 15, 2)->nullable();
+        $table->decimal('total', 15, 2)->nullable();
+        
+        // Nuevos campos
+        $table->date('fecha_entrega')->nullable();
+        $table->string('tipo_entrega', 20)->nullable()->comment('recoleccion, envio');
+        $table->text('comentarios')->nullable();
+        
+        $table->integer('verificado')->default(1);
+        $table->timestamps();
+    });
     }
 
     /**

@@ -21,6 +21,8 @@ class CreateCompradetalle extends Migration
             $table->text('descripcion');
             $table->string('unidades', 10);
             $table->decimal('cantidad', 15, 2); 
+            $table->decimal('descuento_porcentaje', 15, 2); 
+            $table->decimal('descuento_monto', 15, 2); 
             $table->decimal('ult_costo', 20, 2); 
             $table->timestamps();
         });

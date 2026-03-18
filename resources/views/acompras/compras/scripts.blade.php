@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <div class="col-md-3">
                                     <!-- Espacio vacío -->
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-1">
                                     <!-- Espacio vacío -->
                                 </div>
                                 <div class="col-md-2">
@@ -122,9 +122,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                         min="0" 
                                         max="100"
                                         value="0"
-                                        style="height: 38px;">
+                                        style="height: 38px;"
+                                        noformat>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-3">
                                     <label class="form-label">Monto Descuento</label>
                                     <div class="input-group">
                                         <span class="input-group-text" style="height: 38px;">$</span>
@@ -280,6 +281,8 @@ document.addEventListener('DOMContentLoaded', function() {
             card.find('.descripcion-input').val(descripcion || '');
             card.find('.unidad-input').val(unidad || '');
             card.find('.precio-input').val(precio || 0);
+
+            
             
             actualizarSubtotalFila(card);
         }
