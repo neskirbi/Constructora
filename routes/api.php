@@ -21,3 +21,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Registro (desde start)
 Route::post('GenerarPass', 'App\Http\Controllers\ApiController@GenerarPass');
 
+Route::get('BuscarProveedor', 'App\Http\Controllers\General\ApiController@BuscarProveedor');
+
+Route::get('BuscarProductos', 'App\Http\Controllers\General\ApiController@BuscarProductos');

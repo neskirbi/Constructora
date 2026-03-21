@@ -1,56 +1,41 @@
 {{-- resources/views/acompras/compras/scripts.blade.php --}}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Variable global para el contador de productos
+   
+// Variable global para el contador de productos
     window.productCount = {{ isset($detalles) ? count($detalles) : 1 }};
+
+
     
-    // Inicializar Select2 para selects de productos
-    window.initSelect2 = function(selector = '.producto-select') {
-        $(selector).select2({
-            placeholder: 'Seleccionar producto/servicio',
-            allowClear: true,
-            width: '100%',
-            templateResult: formatOption,
-            templateSelection: formatOption
+    // VALIDACIÓN DEL FORMULARIO (una sola vez)
+    $('#compraForm').on('submit', function(event) {
+        let hasProducts = false;
+        
+        // Buscar productos agregados (los que tienen ID)
+        $('.producto-id').each(function() {
+            if ($(this).val() && $(this).val() !== '') {
+                hasProducts = true;
+            }
         });
-    }
-
-    // Inicializar Select2 para proveedor
-    window.initProveedorSelect2 = function() {
-        $('#id_proveedor').select2({
-            placeholder: 'Seleccionar proveedor',
-            allowClear: true,
-            width: '100%',
-            templateResult: formatOptionProveedor,
-            templateSelection: formatOptionProveedor
-        });
-    }
-
-    function formatOption(option) {
-        if (!option.id) return option.text;
-        return $('<span>' + option.text + '</span>');
-    }
-
-    function formatOptionProveedor(option) {
-        if (!option.id) return option.text;
-        return $('<span>' + option.text + '</span>');
-    }
-
+        
+        if (!hasProducts) {
+            event.preventDefault();
+            alert('Debe agregar al menos un producto o servicio');
+            return false;
+        }
+        
+        if (!this.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        
+        $(this).addClass('was-validated');
+    });
     // Función para crear una nueva tarjeta de producto
     // Busca esta función
     window.crearTarjetaProducto = function(index) {
-    let productosData = window.productosData || @json($productos ?? []);
-    let options = '<option value="">Seleccionar</option>';
+   
     
-    productosData.forEach(function(producto) {
-        options += `<option value="${producto.id}" 
-                        data-clave="${producto.clave}"
-                        data-descripcion="${producto.descripcion}"
-                        data-unidad="${producto.unidades}"
-                        data-precio="${producto.ult_costo}">
-                        ${producto.clave}
-                    </option>`;
-    });
 
     return `
     <div class="producto-card-wrapper mb-3" data-index="${index}">
@@ -67,12 +52,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="row">
                     <div class="col-md-3 mb-2">
                         <label class="form-label">Clave</label>
-                        <select class="form-select form-select-sm producto-select" 
-                                name="productos[${index}][id_producto]" 
-                                style="width: 100%; height: 38px;"
-                                required>
-                            ${options}
-                        </select>
+                        <input type="text" 
+                               class="form-control form-control-sm producto-busqueda" 
+                               placeholder="Escriba para buscar producto..."
+                               autocomplete="off"
+                               style="height: 38px;">
+                        <input type="hidden" 
+                               class="producto-id" 
+                               name="productos[${index}][id_producto]" 
+                               required>
+                        <div class="producto-resultados list-group position-absolute w-100 shadow-sm" 
+                             style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto; background: white;"></div>
                     </div>
                     
                     <div class="col-md-4 mb-2">
@@ -403,10 +393,7 @@ $(document).on('input', '.cantidad-input, .precio-input', function() {
         }
     });
 
-    // Inicializar
-    window.productosData = @json($productos ?? []);
-    initSelect2();
-    initProveedorSelect2();
+ 
     
     // Calcular subtotales iniciales para cada tarjeta
     $('.producto-card').each(function() {
@@ -424,4 +411,136 @@ $(document).on('input', '.cantidad-input, .precio-input', function() {
 
 
 
+// Inicialización de búsqueda de proveedores - RESPUESTA INMEDIATA
+$(document).ready(function() {
+    
+    // Evento de búsqueda - keydown para respuesta inmediata
+    $('#proveedor_busqueda').on('keyup', function() {
+        CargarListaProveedores( $(this).val());       
+        
+    });
+    
+    // Seleccionar proveedor
+    $(document).on('click', '.proveedor-item', function() {
+        const proveedorId = $(this).data('id');
+        const proveedorClave = $(this).data('clave');
+        const proveedorNombre = $(this).data('nombre');
+        const proveedorTexto = proveedorClave + ' - ' + proveedorNombre;
+        
+        $('#id_proveedor').val(proveedorId);
+        $('#proveedor_busqueda').val(proveedorTexto);
+        $('#proveedor_resultados').hide();
+    });
+    
+    // Ocultar resultados al hacer clic fuera
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#proveedor_busqueda, #proveedor_resultados').length) {
+            $('#proveedor_resultados').hide();
+        }
+    });
+    
+    // Navegación con teclado
+    $(document).on('keydown', '#proveedor_busqueda', function(e) {
+        const resultados = $('#proveedor_resultados .proveedor-item');
+        const selected = resultados.filter('.active');
+        
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (selected.length === 0) {
+                resultados.first().addClass('active');
+            } else {
+                selected.removeClass('active');
+                selected.next().addClass('active');
+            }
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (selected.length === 0) {
+                resultados.last().addClass('active');
+            } else {
+                selected.removeClass('active');
+                selected.prev().addClass('active');
+            }
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (selected.length > 0) {
+                selected.click();
+            }
+        } else if (e.key === 'Escape') {
+            $('#proveedor_resultados').hide();
+        }
+    });
+});
+
+
+// Inicialización de búsqueda de productos
+$(document).ready(function() {
+    let searchTimeoutProductos;
+    
+    // Evento de búsqueda de productos (delegación para productos dinámicos)
+    $(document).on('input', '.producto-busqueda', function() {
+        const termino = $(this).val().trim();
+        const card = $(this).closest('.producto-card');
+        
+       CargarListaProductos(termino, card);
+    });
+    
+    // Seleccionar producto
+    $(document).on('click', '.producto-item', function() {
+        const productoId = $(this).data('id');
+        const productoClave = $(this).data('clave');
+        const productoDescripcion = $(this).data('descripcion');
+        const productoUnidad = $(this).data('unidad');
+        const productoPrecio = $(this).data('precio');
+        
+        const card = $(this).closest('.producto-card');
+        
+        card.find('.producto-id').val(productoId);
+        card.find('.producto-busqueda').val(productoClave);
+        card.find('.descripcion-input').val(productoDescripcion);
+        card.find('.unidad-input').val(productoUnidad);
+        card.find('.precio-input').val(productoPrecio);
+        card.find('.producto-resultados').hide();
+        
+        actualizarSubtotalFila(card);
+    });
+    
+    // Ocultar resultados de productos al hacer clic fuera
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.producto-busqueda, .producto-resultados').length) {
+            $('.producto-resultados').hide();
+        }
+    });
+    
+    // Navegación con teclado para productos
+    $(document).on('keydown', '.producto-busqueda', function(e) {
+        const card = $(this).closest('.producto-card');
+        const resultados = card.find('.producto-resultados .producto-item');
+        const selected = resultados.filter('.active');
+        
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (selected.length === 0) {
+                resultados.first().addClass('active');
+            } else {
+                selected.removeClass('active');
+                selected.next().addClass('active');
+            }
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (selected.length === 0) {
+                resultados.last().addClass('active');
+            } else {
+                selected.removeClass('active');
+                selected.prev().addClass('active');
+            }
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (selected.length > 0) {
+                selected.click();
+            }
+        } else if (e.key === 'Escape') {
+            card.find('.producto-resultados').hide();
+        }
+    });
+});
 </script>

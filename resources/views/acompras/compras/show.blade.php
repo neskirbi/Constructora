@@ -164,7 +164,6 @@
                     <div class="card shadow-sm form-card">
                         <div class="compra-header">
                             <div class="compra-consecutivo">
-                                <i class="fas fa-hashtag me-2"></i>
                                 Editar Compra #{{ $compra->consecutivo }}
                             </div>
                             
@@ -274,20 +273,21 @@
                                     <div class="col-md-3">
                                         <div class="mb-3">
                                             <label for="id_proveedor" class="form-label required-label">Proveedor</label>
-                                            <select class="form-select form-select-sm @error('id_proveedor') is-invalid @enderror" 
-                                                    id="id_proveedor" 
-                                                    name="id_proveedor"
-                                                    required
-                                                    style="height: 38px;">
-                                                <option value="">Seleccione un proveedor</option>
-                                                @foreach($proveedores as $proveedor)
-                                                    <option value="{{ $proveedor->id }}" {{ old('id_proveedor', $compra->id_proveedor) == $proveedor->id ? 'selected' : '' }}>
-                                                        {{ $proveedor->clave }} - {{ $proveedor->nombre }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
+                                            <input type="text" 
+                                                class="form-control form-control-sm @error('id_proveedor') is-invalid @enderror" 
+                                                id="proveedor_busqueda" 
+                                                placeholder="Escriba para buscar proveedor..."
+                                                autocomplete="off"
+                                                value="{{ $compra->proveedor_clave ?? '' }} - {{ $compra->proveedor_nombre ?? '' }}"
+                                                style="height: 38px;">
+                                            <input type="hidden" 
+                                                id="id_proveedor" 
+                                                name="id_proveedor" 
+                                                value="{{ old('id_proveedor', $compra->id_proveedor ?? '') }}" 
+                                                required>
+                                            <div id="proveedor_resultados" class="list-group position-absolute w-100 shadow-sm" style="display: none; z-index: 1000; max-height: 300px; overflow-y: auto;"></div>
                                             @error('id_proveedor')
-                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
                                             @enderror
                                             <button type="button" class="btn btn-success btn-block btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#nuevoProveedorModal">
                                                 <i class="fas fa-plus-circle me-2"></i>
@@ -332,22 +332,18 @@
                                                 <div class="row">
                                                     <div class="col-md-3 mb-2">
                                                         <label class="form-label">Clave</label>
-                                                        <select class="form-select form-select-sm producto-select" 
-                                                                name="productos[{{ $index }}][id_producto]" 
-                                                                style="width: 100%; height: 38px;"
-                                                                required>
-                                                            <option value="">Seleccionar</option>
-                                                            @foreach($productos as $producto)
-                                                                <option value="{{ $producto->id }}" 
-                                                                        data-clave="{{ $producto->clave }}"
-                                                                        data-descripcion="{{ $producto->descripcion }}"
-                                                                        data-unidad="{{ $producto->unidades }}"
-                                                                        data-precio="{{ $producto->ult_costo }}"
-                                                                        {{ $detalle->id_productoservicio == $producto->id ? 'selected' : '' }}>
-                                                                    {{ $producto->clave }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
+                                                        <input type="text" 
+                                                            class="form-control form-control-sm producto-busqueda" 
+                                                            placeholder="Escriba para buscar producto..."
+                                                            autocomplete="off"
+                                                            value="{{ $detalle->clave }}"
+                                                            style="height: 38px;">
+                                                        <input type="hidden" 
+                                                            class="producto-id" 
+                                                            name="productos[{{ $index }}][id_producto]" 
+                                                            value="{{ $detalle->id_productoservicio }}">
+                                                        <div class="producto-resultados list-group position-absolute w-100 shadow-sm" 
+                                                            style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto; background: white;"></div>
                                                     </div>
                                                     
                                                     <div class="col-md-4 mb-2">
@@ -460,34 +456,34 @@
                                                 </div>
 
                                                 <!-- NUEVA FILA: Fecha Entrega, Tipo Entrega y Comentarios -->
-<div class="row mt-3">
-    <div class="col-md-4">
-        <label class="form-label">Fecha de Entrega</label>
-        <input type="date" 
-            class="form-control form-control-sm" 
-            name="productos[{{ $index }}][fecha_entrega]" 
-            value="{{ $detalle->fecha_entrega ?? '' }}"
-            style="height: 38px;">
-    </div>
-    <div class="col-md-3">
-        <label class="form-label">Tipo de Entrega</label>
-        <select class="form-select form-select-sm" 
-                name="productos[{{ $index }}][tipo_entrega]" 
-                style="height: 38px;">
-            <option value="">Seleccionar</option>
-            <option value="recoleccion" {{ isset($detalle->tipo_entrega) && $detalle->tipo_entrega == 'recoleccion' ? 'selected' : '' }}>Recolección</option>
-            <option value="entrega" {{ isset($detalle->tipo_entrega) && $detalle->tipo_entrega == 'entrega' ? 'selected' : '' }}>Entrega</option>
-        </select>
-    </div>
-    <div class="col-md-5">
-        <label class="form-label">Comentarios</label>
-        <textarea class="form-control form-control-sm" 
-                  name="productos[{{ $index }}][comentarios]" 
-                  rows="2"
-                  placeholder="Comentarios adicionales..."
-                  style="resize: vertical;">{{ $detalle->comentarios ?? '' }}</textarea>
-    </div>
-</div>
+                                                <div class="row mt-3">
+                                                    <div class="col-md-4">
+                                                        <label class="form-label">Fecha de Entrega</label>
+                                                        <input type="date" 
+                                                            class="form-control form-control-sm" 
+                                                            name="productos[{{ $index }}][fecha_entrega]" 
+                                                            value="{{ $detalle->fecha_entrega ?? '' }}"
+                                                            style="height: 38px;">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Tipo de Entrega</label>
+                                                        <select class="form-select form-select-sm" 
+                                                                name="productos[{{ $index }}][tipo_entrega]" 
+                                                                style="height: 38px;">
+                                                            <option value="">Seleccionar</option>
+                                                            <option value="recoleccion" {{ isset($detalle->tipo_entrega) && $detalle->tipo_entrega == 'recoleccion' ? 'selected' : '' }}>Recolección</option>
+                                                            <option value="entrega" {{ isset($detalle->tipo_entrega) && $detalle->tipo_entrega == 'entrega' ? 'selected' : '' }}>Entrega</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <label class="form-label">Comentarios</label>
+                                                        <textarea class="form-control form-control-sm" 
+                                                                name="productos[{{ $index }}][comentarios]" 
+                                                                rows="2"
+                                                                placeholder="Comentarios adicionales..."
+                                                                style="resize: vertical;">{{ $detalle->comentarios ?? '' }}</textarea>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -601,29 +597,7 @@
             agregarProducto();
         });
 
-        // Validación del formulario
-        $('#compraForm').on('submit', function(event) {
-            let hasProducts = false;
-            
-            $('.producto-select').each(function() {
-                if ($(this).val()) {
-                    hasProducts = true;
-                }
-            });
-            
-            if (!hasProducts) {
-                event.preventDefault();
-                alert('Debe agregar al menos un producto o servicio');
-                return false;
-            }
-            
-            if (!this.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            
-            $(this).addClass('was-validated');
-        });
+        
     });
     </script>
     @include('general.modals.scripts')

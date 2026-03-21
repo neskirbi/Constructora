@@ -392,6 +392,128 @@ function dispararEventos(selector) {
 }
 
 
+function CargarListaProveedores(busqueda) {
+    // Si no hay búsqueda o es muy corta, no buscar
+    console.log('Antes: '+busqueda);
+    if (!busqueda || busqueda.trim().length == 0 ) {
+       console.log('Vacio');
+        return;
+    }
+    console.log('Despues: '+busqueda);
+
+     const resultadosDiv = $('#proveedor_resultados');
+                resultadosDiv.empty();
+
+    $.ajax({
+        headers: { 
+            "APP-KEY": AppKey()
+        },
+        async: true,
+        method: 'get',
+        url: Url() + "api/BuscarProveedor",
+        data: { 
+            q: busqueda
+        }
+    }).done(function(data) {
+        console.log('Proveedores encontrados:', data);
+        // ELIMINA ESTA LÍNEA: MostrarResultadosProveedores(resultados);
+        if (data && data.length > 0) {
+            
+            
+            data.forEach(function(proveedor) {
+                    resultadosDiv.append(`
+                        <div class="list-group-item list-group-item-action proveedor-item" 
+                                data-id="${proveedor.id}" 
+                                data-clave="${proveedor.clave}"
+                                data-nombre="${proveedor.nombre}"
+                                data-especialidad="${proveedor.especialidad || ''}"
+                                data-telefono="${proveedor.telefono || ''}">
+                            <div>
+                                <strong>${proveedor.clave}</strong> - ${proveedor.nombre}
+                                ${proveedor.especialidad ? '<br><small class="text-muted">' + proveedor.especialidad + '</small>' : ''}
+                            </div>
+                        </div>
+                    `);
+                });
+                resultadosDiv.show();
+
+        } else {
+            resultadosDiv.append('<div class="list-group-item text-muted">No se encontraron proveedores</div>');
+            console.error('No regreso nada :');
+        }
+    }).fail(function(xhr) {
+        console.error('Error al buscar proveedores:', xhr);
+      
+        alert('Error de conexión al buscar proveedores');
+    });
+}
+
+
+ 
+function CargarListaProductos(busqueda, card, callback) {
+    // Si no hay búsqueda o es muy corta, no buscar
+    if (!busqueda || busqueda.trim().length == 0) {
+        if (callback) callback([]);
+        return;
+    }
+    
+    $.ajax({
+        headers: { 
+            "APP-KEY": AppKey()
+        },
+        async: true,
+        method: 'get',
+        url: Url() + "api/BuscarProductos",
+        data: { 
+            q: busqueda
+        }
+    }).done(function(data) {
+        console.log('Productos encontrados:', data);
+        
+        // Guardar referencia al contenedor de resultados del producto
+        const resultadosDiv = card.find('.producto-resultados');
+        
+        if (resultadosDiv.length === 0) {
+            // CORREGIDO: usar .producto-busqueda en lugar de .producto-select
+            card.find('.producto-busqueda').after(`
+                <div class="producto-resultados list-group position-absolute w-100 shadow-sm" 
+                     style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto; background: white;"></div>
+            `);
+        }
+        
+        const resultadosContainer = card.find('.producto-resultados');
+        resultadosContainer.empty();
+        
+        if (data && data.length > 0) {
+            data.forEach(function(producto) {
+                resultadosContainer.append(`
+                    <div class="list-group-item list-group-item-action producto-item" 
+                         data-id="${producto.id}"
+                         data-clave="${producto.clave}"
+                         data-descripcion="${producto.descripcion}"
+                         data-unidad="${producto.unidades}"
+                         data-precio="${producto.ult_costo}">
+                        <div>
+                            <strong>${producto.clave}</strong> - ${producto.descripcion}
+                            <br>
+                            <small class="text-muted">Unidad: ${producto.unidades} | Precio: $${producto.ult_costo}</small>
+                        </div>
+                    </div>
+                `);
+            });
+            resultadosContainer.show();
+        } else {
+            resultadosContainer.append('<div class="list-group-item text-muted">No se encontraron productos</div>').show();
+        }
+        
+        if (callback) callback(data);
+        
+    }).fail(function(xhr) {
+        console.error('Error al buscar productos:', xhr);
+        if (callback) callback([]);
+        alert('Error de conexión al buscar productos');
+    });
+}
 
 
 

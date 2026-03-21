@@ -185,20 +185,20 @@
                                     <div class="col-md-3">
                                         <div class="mb-3">
                                             <label for="id_proveedor" class="form-label required-label">Proveedor</label>
-                                            <select class="form-select form-select-sm @error('id_proveedor') is-invalid @enderror" 
-                                                    id="id_proveedor" 
-                                                    name="id_proveedor"
-                                                    required
-                                                    style="height: 38px;">
-                                                <option value="">Seleccione un proveedor</option>
-                                                @foreach($proveedores as $proveedor)
-                                                    <option value="{{ $proveedor->id }}" {{ old('id_proveedor') == $proveedor->id ? 'selected' : '' }}>
-                                                        {{ $proveedor->clave }} - {{ $proveedor->nombre }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
+                                            <input type="text" 
+                                                class="form-control form-control-sm @error('id_proveedor') is-invalid @enderror" 
+                                                id="proveedor_busqueda" 
+                                                placeholder="Escriba para buscar proveedor..."
+                                                autocomplete="off"
+                                                style="height: 38px;">
+                                            <input type="hidden" 
+                                                id="id_proveedor" 
+                                                name="id_proveedor" 
+                                                value="{{ old('id_proveedor', $compra->id_proveedor ?? '') }}" 
+                                                required>
+                                            <div id="proveedor_resultados" class="list-group position-absolute w-100 shadow-sm" style="display: none; z-index: 1000; max-height: 300px; overflow-y: auto;"></div>
                                             @error('id_proveedor')
-                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
                                             @enderror
                                             <button type="button" class="btn btn-success btn-block btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#nuevoProveedorModal">
                                                 <i class="fas fa-plus-circle me-2"></i>
@@ -335,29 +335,7 @@
             agregarProducto();
         });
 
-        // Validación del formulario
-        $('#compraForm').on('submit', function(event) {
-            let hasProducts = false;
-            
-            $('.producto-select').each(function() {
-                if ($(this).val()) {
-                    hasProducts = true;
-                }
-            });
-            
-            if (!hasProducts) {
-                event.preventDefault();
-                alert('Debe agregar al menos un producto o servicio');
-                return false;
-            }
-            
-            if (!this.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            
-            $(this).addClass('was-validated');
-        });
+        
     });
     </script>
     @include('general.modals.scripts')

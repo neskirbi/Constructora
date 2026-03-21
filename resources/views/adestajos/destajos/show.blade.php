@@ -183,29 +183,30 @@
                                         </div>
                                     </div>
                                     <div class="col-md-3">
-                                        <div class="mb-3">
-                                            <label for="id_proveedor" class="form-label required-label">Proveedor</label>
-                                            <select class="form-select form-select-sm @error('id_proveedor') is-invalid @enderror" 
-                                                    id="id_proveedor" 
-                                                    name="id_proveedor"
-                                                    required
-                                                    style="height: 38px;">
-                                                <option value="">Seleccione un proveedor</option>
-                                                @foreach($proveedores as $proveedor)
-                                                    <option value="{{ $proveedor->id }}" {{ old('id_proveedor', $destajo->id_proveedor) == $proveedor->id ? 'selected' : '' }}>
-                                                        {{ $proveedor->clave}} - {{$proveedor->nombre}}
-                                                     </option>
-                                                @endforeach
-                                            </select>
-                                            @error('id_proveedor')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                            <button type="button" class="btn btn-success btn-block btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#nuevoProveedorModal">
-                                                <i class="fas fa-plus-circle me-2"></i>
-                                                Nuevo Proveedor
-                                            </button>
-                                        </div>
-                                    </div>
+    <div class="mb-3">
+        <label for="id_proveedor" class="form-label required-label">Proveedor</label>
+        <input type="text" 
+               class="form-control form-control-sm @error('id_proveedor') is-invalid @enderror" 
+               id="proveedor_busqueda" 
+               placeholder="Escriba para buscar proveedor..."
+               autocomplete="off"
+               value="{{ $destajo->proveedor_clave ?? '' }} - {{ $destajo->proveedor_nombre ?? '' }}"
+               style="height: 38px;">
+        <input type="hidden" 
+               id="id_proveedor" 
+               name="id_proveedor" 
+               value="{{ old('id_proveedor', $destajo->id_proveedor ?? '') }}" 
+               required>
+        <div id="proveedor_resultados" class="list-group position-absolute w-100 shadow-sm" style="display: none; z-index: 1000; max-height: 300px; overflow-y: auto;"></div>
+        @error('id_proveedor')
+            <div class="invalid-feedback d-block">{{ $message }}</div>
+        @enderror
+        <button type="button" class="btn btn-success btn-block btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#nuevoProveedorModal">
+            <i class="fas fa-plus-circle me-2"></i>
+            Nuevo Proveedor
+        </button>
+    </div>
+</div>
                                 </div>
 
                                 <!-- SECCIÓN DE PRODUCTOS/SERVICIOS - CON LOOP BLADE -->
@@ -235,22 +236,18 @@
                                                 <div class="row">
                                                     <div class="col-md-3 mb-2">
                                                         <label class="form-label">Clave</label>
-                                                        <select class="form-select form-select-sm producto-select" 
-                                                                name="productos[{{ $index }}][id_producto]" 
-                                                                style="width: 100%; height: 38px;"
-                                                                required>
-                                                            <option value="">Seleccionar</option>
-                                                            @foreach($productos as $producto)
-                                                                <option value="{{ $producto->id }}" 
-                                                                        data-clave="{{ $producto->clave }}"
-                                                                        data-descripcion="{{ $producto->descripcion }}"
-                                                                        data-unidad="{{ $producto->unidades }}"
-                                                                        data-precio="{{ $producto->ult_costo }}"
-                                                                        {{ $detalle->id_productoservicio == $producto->id ? 'selected' : '' }}>
-                                                                    {{ $producto->clave }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
+                                                        <input type="text" 
+                                                            class="form-control form-control-sm producto-busqueda" 
+                                                            placeholder="Escriba para buscar producto..."
+                                                            autocomplete="off"
+                                                            value="{{ $detalle->clave }}"
+                                                            style="height: 38px;">
+                                                        <input type="hidden" 
+                                                            class="producto-id" 
+                                                            name="productos[{{ $index }}][id_producto]" 
+                                                            value="{{ $detalle->id_productoservicio }}">
+                                                        <div class="producto-resultados list-group position-absolute w-100 shadow-sm" 
+                                                            style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto; background: white;"></div>
                                                     </div>
                                                     
                                                     <div class="col-md-4 mb-2">
@@ -547,29 +544,13 @@
     
     <script>
 $(document).ready(function() {
-    // SOLO la validación del formulario (si la necesitas)
-    $('#destajoForm').on('submit', function(event) {
-        let hasProducts = false;
-        $('.producto-select').each(function() {
-            if ($(this).val()) {
-                hasProducts = true;
-            }
-        });
-        
-        if (!hasProducts) {
-            event.preventDefault();
-            alert('Debe agregar al menos un producto o servicio');
-            return false;
-        }
-        
-        if (!this.checkValidity()) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-        $(this).addClass('was-validated');
+    window.productCount = {{ count($detalles) }};
+    
+    $('#agregarProducto').on('click', function() {
+        agregarProducto();
     });
 });
-</script>  
+</script> 
     
     @include('general.modals.scripts')
 </body>
