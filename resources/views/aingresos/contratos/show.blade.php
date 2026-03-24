@@ -899,7 +899,7 @@
                                                         <div class="form-group-custom">
                                                             <label class="form-label-custom">Fecha Actual</label>
                                                             <input type="text" class="form-control bg-light" 
-                                                                value="{{ $contrato->fecha_terminacion_obra ? $ult_fecha->fecha_terminacion_obra->format('d/m/Y') : 'No definida' }}" readonly>
+                                                                value="{{ optional($ult_fecha->fecha_terminacion_obra ?? $contrato->fecha_terminacion_obra)->format('d/m/Y') }}" readonly>
                                                         </div>
                                                     </div>
                                                     <div class="col-md-6">
@@ -907,7 +907,7 @@
                                                             <label for="fecha_terminacion_obra" class="form-label-custom required-label">Nueva Fecha</label>
                                                             <input type="date" class="form-control" id="fecha_terminacion_obra" 
                                                                 name="fecha_terminacion_obra" required
-                                                                value="{{ $ult_fecha->fecha_terminacion_obra ? $ult_fecha->fecha_terminacion_obra->format('Y-m-d') : '' }}"
+                                                                value="{{ optional($ult_fecha->fecha_terminacion_obra ?? $contrato->fecha_terminacion_obra)->format('d/m/Y') }}"
                                                                 placeholder="{{ $contrato->fecha_terminacion_obra ? '' : 'No definida' }}">
                                                         </div>
                                                     </div>

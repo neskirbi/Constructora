@@ -210,7 +210,6 @@ document.addEventListener('DOMContentLoaded', function() {
             window.productCount++;
             
             // Reinicializar Select2 para los nuevos selects
-            initSelect2('.producto-select');
             actualizarBotonesEliminar();
         }
     };

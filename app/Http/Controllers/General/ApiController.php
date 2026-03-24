@@ -21,8 +21,11 @@ class ApiController extends Controller
         
         // Buscar SOLO por clave
         if (!empty($search)) {
-            $query->where('clave', 'LIKE', "%{$search}%");
-        }
+        $query->where(function($q) use ($search) {
+            $q->where('clave', 'LIKE', "%{$search}%")
+              ->orWhere('nombre', 'LIKE', "%{$search}%");
+        });
+    }
         
         $proveedores = $query->orderBy('clave')
                              ->limit($limit)

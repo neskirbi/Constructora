@@ -327,7 +327,7 @@
         window.productCount = 1;
         
         // Reinicializar Select2
-        initSelect2();
+        
 
         // Agregar nueva tarjeta
         $('#agregarProducto').on('click', function() {
