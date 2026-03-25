@@ -20,18 +20,6 @@
             border-radius: 8px;
             padding: 15px;
         }
-        .select2-container--default .select2-selection--single {
-            height: 38px !important;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-        }
-        .select2-container--default .select2-selection--single .select2-selection__rendered {
-            line-height: 36px !important;
-            padding-left: 12px;
-        }
-        .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 36px !important;
-        }
         .form-control-sm, .input-group-sm .form-control {
             height: 38px;
         }
@@ -94,7 +82,6 @@
             text-align: right;
         }
     </style>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
 <body>
     <div class="main-container">
@@ -316,7 +303,6 @@
     @include('general.modals.modalProveedores')
 
     @include('footer')    
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <!-- INCLUIR SCRIPT COMÚN -->
     @include('acompras.compras.scripts')
     
@@ -325,9 +311,7 @@
         // Inicializar con una tarjeta
         $('#productosContainer').append(crearTarjetaProducto(0));
         window.productCount = 1;
-        
-        // Reinicializar Select2
-        
+                
 
         // Agregar nueva tarjeta
         $('#agregarProducto').on('click', function() {

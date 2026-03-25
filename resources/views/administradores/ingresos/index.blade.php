@@ -354,17 +354,21 @@
                                 <div class="card-ingreso-body">
 
                                     <div class="row mb-3">
-                                        <div class="col-md-4 mb-2 mb-md-0">
+                                        <div class="col-md-3 mb-2 mb-md-0">
                                             <small class="text-muted d-block">Consecutivo</small>
                                             <span class="fw-bold">{{ $contrato->consecutivo ?? 'N/A' }}</span>
                                         </div>
-                                        <div class="col-md-4 mb-2 mb-md-0">
+                                        <div class="col-md-3 mb-2 mb-md-0">
                                             <small class="text-muted d-block">Ref. Interna</small>
                                             <span>{{ $contrato->refinterna ?? 'N/A' }}</span>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3 mb-2 mb-md-0">
                                             <small class="text-muted d-block">No. Contrato</small>
                                             <span>{{ $contrato->contrato_no ?? 'N/A' }}</span>
+                                        </div>
+                                        <div class="col-md-3 mb-2 mb-md-0">
+                                            <small class="text-muted d-block">Empresa</small>
+                                            <span>{{ $contrato->empresa ?? 'N/A' }}</span>
                                         </div>
                                     </div>
                                     

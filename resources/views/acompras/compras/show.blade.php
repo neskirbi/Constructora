@@ -20,18 +20,6 @@
             border-radius: 8px;
             padding: 15px;
         }
-        .select2-container--default .select2-selection--single {
-            height: 38px !important;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-        }
-        .select2-container--default .select2-selection--single .select2-selection__rendered {
-            line-height: 36px !important;
-            padding-left: 12px;
-        }
-        .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 36px !important;
-        }
         .form-control-sm, .input-group-sm .form-control {
             height: 38px;
         }
@@ -97,34 +85,6 @@
             background-color: #f8f9fa;
             cursor: not-allowed;
         }
-        .compra-header {
-            padding: 15px 20px;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-bottom: 1px solid #dee2e6;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .compra-consecutivo {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #0d6efd;
-            margin: 0;
-        }
-        .compra-proveedor {
-            font-size: 1.1rem;
-            color: #495057;
-            font-weight: 500;
-            margin-bottom: 20px;
-            padding: 10px 15px;
-            background: #e7f1ff;
-            border-radius: 8px;
-            border-left: 4px solid #0d6efd;
-        }
-        .compra-proveedor i {
-            color: #0d6efd;
-            margin-right: 8px;
-        }
         .compra-estado {
             padding: 6px 15px;
             border-radius: 20px;
@@ -148,8 +108,25 @@
             color: #155724;
             border: 1px solid #c3e6cb;
         }
+        /* Estilos para la sección de pago */
+        .payment-section {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+        }
+        .payment-section h6 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .payment-section .form-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
     </style>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
 <body>
     <div class="main-container">
@@ -161,13 +138,16 @@
 
             <div class="content-area">
                 <div class="container-fluid py-4">
-                    <div class="card shadow-sm form-card">
-                        <div class="compra-header">
-                            <div class="compra-consecutivo">
-                                Editar Compra #{{ $compra->consecutivo }}
-                            </div>
+                    <div class="card">
+                        <div class="card-header">
                             
-                            @php
+                            <div class="card-title">
+                                <h5 class="mb-0">
+                                <i class="fa fa-pencil" aria-hidden="true"></i> Editar Compra: {{ $compra->consecutivo }}
+                            </h5>
+                            </div>
+                            <div class="card-tools">
+                                @php
                                 $estadoClase = '';
                                 $estadoTexto = '';
                                 $estadoIcono = '';
@@ -195,6 +175,10 @@
                                 {{ $estadoTexto }}
                             </span>
                             @endif
+                            </div>
+                          
+                            
+                            
                         </div>
                         
                         <div class="card-body">
@@ -203,13 +187,7 @@
                                 @method('PUT')
                                 
                                 <!-- Proveedor (solo visual, no editable en formulario) -->
-                                <div class="compra-proveedor">
-                                    <i class="fas fa-building"></i>
-                                    <strong>Proveedor:</strong> {{ $compra->proveedor_nombre ?? 'Proveedor no encontrado' }}
-                                    @if(isset($compra->proveedor_clave))
-                                    <span class="text-muted ms-2">({{ $compra->proveedor_clave }})</span>
-                                    @endif
-                                </div>
+                                
                                 
                                 <!-- Información General editable -->
                                 <div class="row mb-4">
@@ -557,6 +535,54 @@
                                 <input type="hidden" name="total" id="total_hidden" value="{{ $compra->total }}">
 
                                
+                                <!-- Sección de Método de Pago -->
+<div class="payment-section">
+    <h6>
+        <i class="fas fa-credit-card me-2"></i>
+        Información de Pago
+    </h6>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="mb-3">
+                <label for="metodo_pago" class="form-label required-label">Método de Pago</label>
+                <select class="form-select form-select-sm @error('metodo_pago') is-invalid @enderror" 
+                        id="metodo_pago" 
+                        name="metodo_pago"
+                        required
+                        style="height: 38px;">
+                    <option value="">Seleccione un método</option>
+                    <option value="efectivo" {{ old('metodo_pago', $compra->metodo_pago ?? '') == 'efectivo' ? 'selected' : '' }}>
+                        <i class="fas fa-money-bill-wave me-2"></i> Efectivo
+                    </option>
+                    <option value="transferencia" {{ old('metodo_pago', $compra->metodo_pago ?? '') == 'transferencia' ? 'selected' : '' }}>
+                        <i class="fas fa-exchange-alt me-2"></i> Transferencia
+                    </option>
+                </select>
+                @error('metodo_pago')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="mb-3">
+                <label for="empresa_pago" class="form-label">Empresa</label>
+                <input type="text" 
+                       class="form-control form-control-sm @error('empresa_pago') is-invalid @enderror" 
+                       id="empresa_pago" 
+                       name="empresa_pago" 
+                       value="{{ old('empresa_pago', $compra->empresa_pago ?? '') }}"
+                       placeholder="Ej: Banco XYZ, Transferencia #123, o nombre de la empresa"
+                       maxlength="255"
+                       style="height: 38px;">
+                <small class="text-muted">Especifique el banco, número de transferencia o empresa relacionada</small>
+                @error('empresa_pago')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+        </div>
+    </div>
+</div>
 
                                 <div class="row mt-4">
                                     <div class="col-12">
@@ -582,7 +608,6 @@
     @include('general.modals.modalProveedores')
     
     @include('footer')
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <!-- INCLUIR SCRIPT COMÚN -->
     @include('acompras.compras.scripts')
     

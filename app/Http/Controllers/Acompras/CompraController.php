@@ -303,21 +303,43 @@ class CompraController extends Controller
         'id_proveedor' => 'required|string|exists:proveedores_servicios,id',
         'referencia' => 'required|string|max:1500',
         'iva' => 'nullable|numeric|min:0',
+        'metodo_pago' => 'required|string|in:efectivo,transferencia', // NUEVO: validación método de pago
+        'empresa_pago' => 'nullable|string|max:255', // NUEVO: campo empresa
         'productos' => 'required|array|min:1',
         'productos.*.id_producto' => 'required|string|exists:productosyservicios,id',
         'productos.*.cantidad' => 'required|numeric|min:0.01',
         'productos.*.precio' => 'required|numeric|min:0',
         'productos.*.descuento_porcentaje' => 'nullable|numeric|min:0|max:100',
         'productos.*.descuento_monto' => 'nullable|numeric|min:0',
-        'productos.*.fecha_entrega' => 'nullable|date',        // NUEVO
-        'productos.*.tipo_entrega' => 'nullable|string|in:recoleccion,entrega', // NUEVO
-        'productos.*.comentarios' => 'nullable|string|max:2000', // NUEVO
+        'productos.*.fecha_entrega' => 'nullable|date',
+        'productos.*.tipo_entrega' => 'nullable|string|in:recoleccion,entrega',
+        'productos.*.comentarios' => 'nullable|string|max:2000',
     ]);
+    
+    // Validación condicional: si método de pago es transferencia, empresa_pago es requerido
+    if ($request->metodo_pago === 'transferencia' && empty($request->empresa_pago)) {
+        return redirect()->back()
+            ->with('error', 'El campo empresa/banco es requerido cuando el método de pago es transferencia')
+            ->withInput();
+    }
     
     // Calcular totales
     $costo_operado = 0;
     foreach ($request->productos as $producto) {
-        $costo_operado += $producto['cantidad'] * $producto['precio'];
+        // Aplicar descuentos al cálculo
+        $precio_unitario = $producto['precio'];
+        $descuento_monto = $producto['descuento_monto'] ?? 0;
+        $descuento_porcentaje = $producto['descuento_porcentaje'] ?? 0;
+        
+        // Calcular precio con descuento
+        $precio_con_descuento = $precio_unitario;
+        if ($descuento_monto > 0) {
+            $precio_con_descuento = $precio_unitario - $descuento_monto;
+        } elseif ($descuento_porcentaje > 0) {
+            $precio_con_descuento = $precio_unitario * (1 - ($descuento_porcentaje / 100));
+        }
+        
+        $costo_operado += $producto['cantidad'] * $precio_con_descuento;
     }
     
     $iva_porcentaje = $request->iva ?? 0;
@@ -327,7 +349,7 @@ class CompraController extends Controller
     DB::beginTransaction();
     
     try {
-        // Actualizar compra principal (SIN fecha_entrega, tipo_entrega, comentarios)
+        // Actualizar compra principal (INCLUYENDO método de pago y empresa)
         $updateData = [
             'id_contrato' => $request->id_contrato,
             'id_proveedor' => $request->id_proveedor,
@@ -336,6 +358,8 @@ class CompraController extends Controller
             'costo_operado' => $costo_operado,
             'iva' => $iva_calculado,
             'total' => $total,
+            'metodo_pago' => $request->metodo_pago, // NUEVO: método de pago
+            'empresa_pago' => $request->empresa_pago, // NUEVO: empresa/banco/referencia
             'updated_at' => now()
         ];
         
@@ -352,11 +376,20 @@ class CompraController extends Controller
             ->where('id_compra', $id)
             ->delete();
         
-        // Insertar nuevos detalles (AHORA CON fecha_entrega, tipo_entrega, comentarios)
+        // Insertar nuevos detalles
         foreach ($request->productos as $producto) {
             $productoData = DB::table('productosyservicios')
                 ->where('id', $producto['id_producto'])
                 ->first();
+            
+            // Calcular descuentos para el detalle
+            $descuento_porcentaje = $producto['descuento_porcentaje'] ?? 0;
+            $descuento_monto = $producto['descuento_monto'] ?? 0;
+            
+            // Si se especifica descuento porcentaje, calcular monto
+            if ($descuento_porcentaje > 0 && $descuento_monto == 0) {
+                $descuento_monto = ($producto['precio'] * $descuento_porcentaje) / 100;
+            }
             
             DB::table('compradetalle')->insert([
                 'id' => GetUuid(),
@@ -366,12 +399,12 @@ class CompraController extends Controller
                 'descripcion' => $productoData->descripcion,
                 'unidades' => $productoData->unidades,
                 'cantidad' => $producto['cantidad'],
-                'descuento_porcentaje' => $producto['descuento_porcentaje'] ?? 0,
-                'descuento_monto' => $producto['descuento_monto'] ?? 0,
+                'descuento_porcentaje' => $descuento_porcentaje,
+                'descuento_monto' => $descuento_monto,
                 'ult_costo' => $producto['precio'],
-                'fecha_entrega' => $producto['fecha_entrega'] ?? null,    // NUEVO
-                'tipo_entrega' => $producto['tipo_entrega'] ?? null,      // NUEVO
-                'comentarios' => $producto['comentarios'] ?? null,        // NUEVO
+                'fecha_entrega' => $producto['fecha_entrega'] ?? null,
+                'tipo_entrega' => $producto['tipo_entrega'] ?? null,
+                'comentarios' => $producto['comentarios'] ?? null,
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
@@ -390,7 +423,6 @@ class CompraController extends Controller
             ->withInput();
     }
 }
-
     /**
      * Remove the specified resource from storage.
      */
