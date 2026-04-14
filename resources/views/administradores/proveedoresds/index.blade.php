@@ -128,7 +128,7 @@
                                     Mostrando {{ $proveedores->firstItem() }} a {{ $proveedores->lastItem() }} de {{ $proveedores->total() }} registros
                                 </div>
                                 <div>
-                                    {{ $proveedores->links() }}
+                                   {{ $proveedores->appends(request()->query())->links('pagination::bootstrap-4') }}
                                 </div>
                             </div>
                             @endif
