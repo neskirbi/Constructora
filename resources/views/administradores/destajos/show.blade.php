@@ -226,10 +226,8 @@
                             <!-- Proveedor -->
                             <div class="destajo-proveedor">
                                 <i class="fas fa-building"></i>
-                                <strong>Proveedor:</strong> {{ $destajo->proveedor_nombre ?? 'Proveedor no encontrado' }}
-                                @if(isset($destajo->proveedor_clave))
-                                <span class="text-muted ms-2">({{ $destajo->proveedor_clave }})</span>
-                                @endif
+                                <strong>Proveedor:</strong> {{ $destajo->proveedor_clave }} {{ $destajo->proveedor_nombre ?? 'Proveedor no encontrado' }}
+                               
                             </div>
                             
                             <!-- Grid de información -->
