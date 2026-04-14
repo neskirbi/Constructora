@@ -255,7 +255,7 @@
                                                                class="form-control form-control-sm text-end" 
                                                                id="iva" 
                                                                name="iva" 
-                                                               value="{{ old('iva', 16) }}"
+                                                               value="{{ old('iva', 0) }}"
                                                                step="0.01"
                                                                min="0"
                                                                noformat
