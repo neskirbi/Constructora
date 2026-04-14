@@ -12,7 +12,7 @@ class ApiController extends Controller
     public function BuscarProveedor(Request $request)
     {
         $search = $request->get('q', '');
-        $limit = 5; // Solo 5 resultadosfgh
+        $limit = 15; // Solo 5 resultadosfgh
         
         $query = ProveedorSer::query();
         
@@ -49,7 +49,7 @@ class ApiController extends Controller
     public function BuscarProductos(Request $request)
     {
         $search = $request->get('q', '');
-        $limit = 5;
+        $limit = 15;
         
         $query = ProductoServicio::query();
         

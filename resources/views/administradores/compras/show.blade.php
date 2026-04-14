@@ -423,54 +423,54 @@
                         </div>
                         @endif
                         <!-- Sección de Método de Pago (solo lectura) -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="payment-info-card" style="background: #f8f9fa; border-radius: 8px; padding: 15px;">
-            <h6 class="mb-3 fw-bold">
-                <i class="fas fa-credit-card me-2"></i>
-                Información de Pago
-            </h6>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="info-item">
-                        <span class="info-label">Método de Pago</span>
-                        <span class="info-value">
-                            @if(isset($compra->metodo_pago))
-                                @if($compra->metodo_pago == 'efectivo')
-                                    <i class="fas fa-money-bill-wave text-success me-1"></i> Efectivo
-                                @elseif($compra->metodo_pago == 'transferencia')
-                                    <i class="fas fa-exchange-alt text-primary me-1"></i> Transferencia
-                                @else
-                                    {{ $compra->metodo_pago }}
-                                @endif
-                            @else
-                                <span class="text-muted">No especificado</span>
-                            @endif
-                        </span>
-                    </div>
-                </div>
-                <div class="col-md-8">
-                    <div class="info-item">
-                        <span class="info-label">
-                            @if(isset($compra->metodo_pago) && $compra->metodo_pago == 'transferencia')
-                                Banco / Referencia
-                            @else
-                                Empresa / Referencia
-                            @endif
-                        </span>
-                        <span class="info-value">
-                            @if(isset($compra->empresa_pago) && !empty($compra->empresa_pago))
-                                <i class="fas fa-building me-1 text-secondary"></i> {{ $compra->empresa_pago }}
-                            @else
-                                <span class="text-muted">No especificado</span>
-                            @endif
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="payment-info-card" style="background: #f8f9fa; border-radius: 8px; padding: 15px;">
+                                    <h6 class="mb-3 fw-bold">
+                                        <i class="fas fa-credit-card me-2"></i>
+                                        Información de Pago
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="info-item">
+                                                <span class="info-label">Método de Pago</span>
+                                                <span class="info-value">
+                                                    @if(isset($compra->metodo_pago))
+                                                        @if($compra->metodo_pago == 'efectivo')
+                                                            <i class="fas fa-money-bill-wave text-success me-1"></i> Efectivo
+                                                        @elseif($compra->metodo_pago == 'transferencia')
+                                                            <i class="fas fa-exchange-alt text-primary me-1"></i> Transferencia
+                                                        @else
+                                                            {{ $compra->metodo_pago }}
+                                                        @endif
+                                                    @else
+                                                        <span class="text-muted">No especificado</span>
+                                                    @endif
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="info-item">
+                                                <span class="info-label">
+                                                    @if(isset($compra->metodo_pago) && $compra->metodo_pago == 'transferencia')
+                                                        Banco / Referencia
+                                                    @else
+                                                        Empresa / Referencia
+                                                    @endif
+                                                </span>
+                                                <span class="info-value">
+                                                    @if(isset($compra->empresa_pago) && !empty($compra->empresa_pago))
+                                                        <i class="fas fa-building me-1 text-secondary"></i> {{ $compra->empresa_pago }}
+                                                    @else
+                                                        <span class="text-muted">No especificado</span>
+                                                    @endif
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         </div>
 
                         
