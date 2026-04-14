@@ -189,7 +189,7 @@
                         <div class="destajo-header">
                             <div class="destajo-consecutivo">
                                 <i class="fas fa-hashtag me-2"></i>
-                                Destajo #{{ $destajo->consecutivo }}
+                                {{ $destajo->consecutivo }}
                             </div>
                             
                             @php
@@ -234,6 +234,10 @@
                             
                             <!-- Grid de información -->
                             <div class="info-grid">
+                                 <div class="info-item">
+                                    <span class="info-label">Obra</span>
+                                    <span class="info-value">{{ $destajo->obra ?? '' }}</span>
+                                </div>
                                 <div class="info-item">
                                     <span class="info-label">Referencia</span>
                                     <span class="info-value">{{ $destajo->referencia ?? 'N/A' }}</span>
@@ -254,10 +258,7 @@
                                     <span class="info-label">Total</span>
                                     <span class="info-value moneda" style="font-size: 1.2rem;">${{ number_format($destajo->total, 2) }}</span>
                                 </div>
-                                <div class="info-item">
-                                    <span class="info-label">Creado por</span>
-                                    <span class="info-value">{{ $destajo->usuario_nombres ?? 'N/A' }} {{ $destajo->usuario_apellidos ?? '' }}</span>
-                                </div>
+                               
                             </div>
 
                             <!-- Productos/Servicios -->
@@ -267,26 +268,29 @@
                                 Productos / Servicios
                             </h6>
                             <div class="table-responsive">
-                                <table class="detalles-table">
+                                <table class="detalles-table" style="table-layout: auto; width: 100%;">
                                     <thead>
                                         <tr>
-                                            <th>Clave</th>
-                                            <th>Descripción</th>
-                                            <th>Unidad</th>
-                                            <th class="text-end">Cantidad</th>
-                                            <th class="text-end">P. Unitario</th>
-                                            <th class="text-end">Subtotal</th>
+                                            <tr>
+                                                    <th style="white-space: nowrap;">Clave</th>
+                                                    <th style="width: 100%;">Descripción</th>
+                                                    <!-- Descripción tomará el espacio disponible -->
+                                                    <th style="white-space: nowrap;">Unidad</th>
+                                                    <th style="white-space: nowrap;" class="text-end">Cantidad</th>
+                                                    <th style="white-space: nowrap;" class="text-end">P. Unitario</th>
+                                                    <th style="white-space: nowrap;" class="text-end">Subtotal</th>
+                                                </tr>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @foreach($detalles as $detalle)
                                         <tr>
-                                            <td><strong>{{ $detalle->clave }}</strong></td>
-                                            <td>{{ $detalle->descripcion }}</td>
-                                            <td>{{ $detalle->unidades }}</td>
-                                            <td class="text-end">{{ number_format($detalle->cantidad, 2) }}</td>
-                                            <td class="text-end moneda">${{ number_format($detalle->ult_costo, 2) }}</td>
-                                            <td class="text-end moneda">${{ number_format($detalle->cantidad * $detalle->ult_costo, 2) }}</td>
+                                            <td style="white-space: nowrap;"><strong>{{ $detalle->clave }}</strong></td>
+                                            <td style="word-wrap: break-word;">{{ $detalle->descripcion }}</td>
+                                            <td style="white-space: nowrap;">{{ $detalle->unidades }}</td>
+                                            <td class="text-end" style="white-space: nowrap;">{{ number_format($detalle->cantidad, 2) }}</td>
+                                            <td class="text-end moneda" style="white-space: nowrap;">${{ number_format($detalle->ult_costo, 2) }}</td>
+                                            <td class="text-end moneda" style="white-space: nowrap;">${{ number_format($detalle->cantidad * $detalle->ult_costo, 2) }}</td>
                                         </tr>
                                         @endforeach
                                     </tbody>

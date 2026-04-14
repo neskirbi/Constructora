@@ -200,6 +200,7 @@ class DestajoController extends Controller
             ->where('d.id', $id)
             ->select(
                 'd.*',
+                'c.consecutivo as obra',
                 'c.contrato_no',
                 'c.obra as contrato_obra',
                 'c.cliente as contrato_cliente',
