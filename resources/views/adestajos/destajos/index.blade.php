@@ -293,6 +293,7 @@
                                         </div>
                                         
                                         <!-- Grid de información general del destajo -->
+                                        <!-- Grid de información general del destajo -->
                                         <div class="info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem; width: 100%;">
                                             <div class="info-item" style="min-width: 0;">
                                                 <span class="info-label">Referencia</span>

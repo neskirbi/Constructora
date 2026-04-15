@@ -285,12 +285,18 @@
                                         <!-- Proveedor en el body (fuera del grid) -->
                                         <div class="destajo-proveedor">
                                             <i class="fas fa-building"></i>
+                                            {{ $destajo->proveedor_clave }} 
                                             {{ $destajo->proveedor_nombre ?? 'Proveedor no encontrado' }} - 
                                             {{ $destajo->especialidad ?? '' }}
                                         </div>
                                         
                                         <!-- Grid de información general del destajo -->
                                         <div class="info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem; width: 100%;">
+                                            
+                                            <div class="info-item">
+                                                <span class="info-label">Obra</span>
+                                                <span class="info-value">{{ $destajo->obra ?? '' }}</span>
+                                            </div>
                                             <div class="info-item" style="min-width: 0;">
                                                 <span class="info-label">Referencia</span>
                                                 <span class="info-value" style="word-wrap: break-word;">{{ $destajo->referencia ?? 'N/A' }}</span>
