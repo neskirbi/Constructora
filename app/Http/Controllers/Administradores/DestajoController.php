@@ -40,6 +40,7 @@ class DestajoController extends Controller
             $query->where(function($q) use ($search) {
                 $q->where('d.referencia', 'like', '%' . $search . '%')
                   ->orWhere('c.contrato_no', 'like', '%' . $search . '%')
+                  ->orWhere('d.consecutivo', 'like', '%' . $search . '%')
                   ->orWhere('c.consecutivo', 'like', '%' . $search . '%')
                   ->orWhere('p.nombre', 'like', '%' . $search . '%')
                   ->orWhere('p.clave', 'like', '%' . $search . '%');
