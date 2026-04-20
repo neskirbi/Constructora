@@ -126,7 +126,45 @@
             font-size: 0.85rem;
             margin-bottom: 0.5rem;
         }
+
+
+        /* Hacer más grande el dropdown (contenedor de opciones) */
+.select2-dropdown {
+    font-size: 1rem;  /* Texto más grande */
+    min-width: 400px;  /* Ancho mínimo más grande */
+    width: auto !important;  /* Ancho automático */
+}
+
+/* Agrandar el campo de búsqueda dentro del dropdown */
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    height: 45px;  /* Más alto */
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;  /* Texto más grande */
+}
+
+/* Agrandar las opciones del dropdown */
+.select2-container--default .select2-results__option {
+    padding: 12px 15px;  /* Más padding vertical y horizontal */
+    font-size: 1rem;  /* Texto más grande */
+    min-height: 45px;  /* Altura mínima más grande */
+}
+
+/* Agrandar el contenedor de resultados */
+.select2-container--default .select2-results > .select2-results__options {
+    max-height: 400px;  /* Altura máxima más grande (opcional) */
+}
+
+/* Opcional: hacer más ancho el dropdown en general */
+.select2-container {
+    width: 100% !important;
+}
+
+.select2-container--open .select2-dropdown {
+    min-width: 350px;  /* Ancho mínimo del dropdown desplegado */
+}
     </style>
+
+    <!-- Select2 CSS -->
 </head>
 <body>
     <div class="main-container">
@@ -228,25 +266,25 @@
                                     </div>
                                     
                                     <div class="col-md-3">
-                                        <div class="mb-3">
-                                            <label for="id_contrato" class="form-label required-label">Contrato</label>
-                                            <select class="form-select form-select-sm @error('id_contrato') is-invalid @enderror" 
-                                                    id="id_contrato" 
-                                                    name="id_contrato"
-                                                    required
-                                                    style="height: 38px;">
-                                                <option value="">Seleccione un contrato</option>
-                                                @foreach($contratos as $contrato)
-                                                    <option value="{{ $contrato->id }}" {{ old('id_contrato', $compra->id_contrato) == $contrato->id ? 'selected' : '' }}>
-                                                        {{ $contrato->consecutivo }} - {{ $contrato->refinterna ?? '' }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            @error('id_contrato')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
+    <div class="mb-3">
+        <label for="id_contrato" class="form-label required-label">Contrato</label>
+        <select class="form-select form-select-sm contrato-select @error('id_contrato') is-invalid @enderror" 
+                id="id_contrato" 
+                name="id_contrato"
+                required
+                style="width: 100%;">
+            <option value="">Seleccione un contrato</option>
+            @foreach($contratos as $contrato)
+                <option value="{{ $contrato->id }}" {{ old('id_contrato', $compra->id_contrato) == $contrato->id ? 'selected' : '' }}>
+                    {{ $contrato->consecutivo }} - {{ $contrato->refinterna ?? '' }}
+                </option>
+            @endforeach
+        </select>
+        @error('id_contrato')
+            <div class="invalid-feedback">{{ $message }}</div>
+        @enderror
+    </div>
+</div>
                                     
                                     <div class="col-md-3">
                                         <div class="mb-3">

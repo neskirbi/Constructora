@@ -1,4 +1,9 @@
 {{-- resources/views/acompras/compras/scripts.blade.php --}}
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/es.js"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
    
@@ -541,5 +546,24 @@ $(document).ready(function() {
             card.find('.producto-resultados').hide();
         }
     });
+
+
+    // Inicializar Select2 para el select de contratos
+if ($('#id_contrato').length) {
+    $('#id_contrato').select2({
+        theme: 'default',
+        placeholder: 'Seleccione un contrato',
+        allowClear: true,
+        width: '100%',
+        language: {
+            noResults: function() {
+                return "No se encontraron contratos";
+            },
+            searching: function() {
+                return "Buscando...";
+            }
+        }
+    });
+}
 });
 </script>
