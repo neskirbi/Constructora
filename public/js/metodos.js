@@ -511,7 +511,7 @@ function CargarListaProductos(busqueda, card, callback) {
     }).fail(function(xhr) {
         console.error('Error al buscar productos:', xhr);
         if (callback) callback([]);
-        alert('Error de conexión al buscar productos');
+        //alert('Error de conexión al buscar productos');
     });
 }
 
