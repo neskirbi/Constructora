@@ -151,12 +151,12 @@
                                     <div class="col-md-3">
                                         <div class="mb-3">
                                             <label for="consecutivo" class="form-label required-label">Orden de Compra</label>
-                                            <input type="number" 
+                                            <input type="text" 
                                                    class="form-control form-control-sm @error('consecutivo') is-invalid @enderror" 
                                                    id="consecutivo" 
                                                    name="consecutivo" 
                                                    value="{{ old('consecutivo', $siguienteConsecutivo) }}"
-                                                   min="1"
+                                                   
                                                    required
                                                    noformat
                                                    style="height: 38px;">

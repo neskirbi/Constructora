@@ -232,12 +232,11 @@
                                     <div class="col-md-3">
                                         <div class="mb-3">
                                             <label for="consecutivo" class="form-label required-label">Consecutivo</label>
-                                            <input type="number" 
+                                            <input type="text" 
                                                    class="form-control form-control-sm readonly-field @error('consecutivo') is-invalid @enderror" 
                                                    id="consecutivo" 
                                                    name="consecutivo" 
                                                    value="{{ old('consecutivo', $compra->consecutivo) }}"
-                                                   min="1"
                                                    required
                                                    readonly
                                                    noformat
