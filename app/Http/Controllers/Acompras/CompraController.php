@@ -73,8 +73,8 @@ class CompraController extends Controller
     public function create()
     {
         // Obtener el último consecutivo para sugerir el siguiente
-        $ultimoConsecutivo = Compra::max('consecutivo') ?? 0;
-        $siguienteConsecutivo = $ultimoConsecutivo + 1;
+        
+        $siguienteConsecutivo = '';
         
         // Obtener proveedores activos para select
         $proveedores = DB::table('proveedores_servicios')
