@@ -103,7 +103,7 @@ class CompraController extends Controller
     public function store(Request $request)
 {
     $request->validate([
-        'consecutivo' => 'required|integer|min:1',
+        'consecutivo' => 'required|alpha_num|min:1',
         'id_contrato' => 'required|string|exists:contratos,id',
         'id_proveedor' => 'required|string|exists:proveedores_servicios,id',
         'referencia' => 'required|string|max:1500',
@@ -298,7 +298,7 @@ class CompraController extends Controller
     }
     
     $request->validate([
-        'consecutivo' => 'required|integer|min:1',
+        'consecutivo' => 'required|alpha_num|min:1',
         'id_contrato' => 'required|string|exists:contratos,id',
         'id_proveedor' => 'required|string|exists:proveedores_servicios,id',
         'referencia' => 'required|string|max:1500',
