@@ -185,25 +185,25 @@
                                     </div>
                                     
                                     <div class="col-md-3">
-    <div class="mb-3">
-        <label for="id_contrato" class="form-label required-label">Contrato</label>
-        <select class="form-select form-select-sm contrato-select @error('id_contrato') is-invalid @enderror" 
-                id="id_contrato" 
-                name="id_contrato"
-                required
-                style="width: 100%;">
-            <option value="">Seleccione un contrato</option>
-            @foreach($contratos as $contrato)
-                <option value="{{ $contrato->id }}" {{ old('id_contrato') == $contrato->id ? 'selected' : '' }}>
-                    {{ $contrato->consecutivo }} - {{ $contrato->refinterna ?? '' }}
-                </option>
-            @endforeach
-        </select>
-        @error('id_contrato')
-            <div class="invalid-feedback">{{ $message }}</div>
-        @enderror
-    </div>
-</div>
+                                        <div class="mb-3">
+                                            <label for="id_contrato" class="form-label required-label">Contrato</label>
+                                            <select class="form-select form-select-sm contrato-select @error('id_contrato') is-invalid @enderror" 
+                                                    id="id_contrato" 
+                                                    name="id_contrato"
+                                                    required
+                                                    style="width: 100%;">
+                                                <option value="">Seleccione un contrato</option>
+                                                @foreach($contratos as $contrato)
+                                                    <option value="{{ $contrato->id }}" {{ old('id_contrato') == $contrato->id ? 'selected' : '' }}>
+                                                        {{ $contrato->consecutivo }} - {{ $contrato->refinterna ?? '' }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('id_contrato')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
                                     
                                     <div class="col-md-3">
                                         <div class="mb-3">

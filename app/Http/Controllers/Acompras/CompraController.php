@@ -27,7 +27,8 @@ class CompraController extends Controller
             ->select(
                 'c.*',
                 'ct.contrato_no',
-                'ct.consecutivo',
+                'ct.consecutivo as consecutivo_contrato',
+                'ct.refinterna',
                 'ct.obra as contrato_obra',
                 'p.nombre as proveedor_nombre',
                 'p.clave as proveedor_clave',
@@ -38,6 +39,7 @@ class CompraController extends Controller
                 $q->where('c.referencia', 'like', '%' . $search . '%')
                   ->orWhere('ct.consecutivo', 'like', '%' . $search . '%')
                   ->orWhere('ct.contrato_no', 'like', '%' . $search . '%')
+                  ->orWhere('c.consecutivo', 'like', '%' . $search . '%')
                   ->orWhere('p.nombre', 'like', '%' . $search . '%')
                   ->orWhere('p.clave', 'like', '%' . $search . '%');
             });

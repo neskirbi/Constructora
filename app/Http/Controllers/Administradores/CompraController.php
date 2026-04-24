@@ -25,9 +25,10 @@ class CompraController extends Controller
             ->leftJoin('proveedores_servicios as p', 'c.id_proveedor', '=', 'p.id')
             ->leftJoin('acompras as u', 'c.id_usuario', '=', 'u.id')
             ->select(
-                 'c.*',
+                'c.*',
                 'ct.contrato_no',
-                'ct.consecutivo',
+                'ct.consecutivo as consecutivo_contrato',
+                'ct.refinterna',
                 'ct.obra as contrato_obra',
                 'p.nombre as proveedor_nombre',
                 'p.clave as proveedor_clave',
@@ -36,8 +37,9 @@ class CompraController extends Controller
         if ($search) {
             $query->where(function($q) use ($search) {
                 $q->where('c.referencia', 'like', '%' . $search . '%')
+                   ->orWhere('ct.consecutivo', 'like', '%' . $search . '%')
                   ->orWhere('ct.contrato_no', 'like', '%' . $search . '%')
-                  ->orWhere('ct.consecutivo', 'like', '%' . $search . '%')
+                  ->orWhere('c.consecutivo', 'like', '%' . $search . '%')
                   ->orWhere('p.nombre', 'like', '%' . $search . '%')
                   ->orWhere('p.clave', 'like', '%' . $search . '%');
             });

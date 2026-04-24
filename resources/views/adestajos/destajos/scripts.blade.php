@@ -330,5 +330,47 @@ $(document).ready(function() {
             card.find('.producto-resultados').hide();
         }
     });
+
+
+    if ($('#id_contrato').length) {
+        $('#id_contrato').select2({
+            theme: 'default',
+            placeholder: 'Seleccione un contrato',
+            allowClear: true,
+            width: '100%',
+            dropdownAutoWidth: true,
+            language: {
+                noResults: function() {
+                    return "No se encontraron contratos";
+                },
+                searching: function() {
+                    return "Buscando...";
+                }
+            },
+            // Para mejorar la búsqueda en textos largos
+            matcher: function(params, data) {
+                // Si no hay término de búsqueda, mostrar todos
+                if ($.trim(params.term) === '') {
+                    return data;
+                }
+                
+                // Convertir a minúsculas para búsqueda insensible a mayúsculas
+                var term = params.term.toLowerCase();
+                var text = data.text.toLowerCase();
+                
+                // Buscar en el texto completo
+                if (text.indexOf(term) > -1) {
+                    return data;
+                }
+                
+                return null;
+            }
+        });
+        
+        // Ajustar el ancho del dropdown cuando se abre
+        $('#id_contrato').on('select2:open', function() {
+            $('.select2-container--open .select2-dropdown').css('min-width', '350px');
+        });
+    }
 });
 </script>

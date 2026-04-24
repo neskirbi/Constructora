@@ -165,15 +165,15 @@
                                     <div class="col-md-3">
                                         <div class="mb-3">
                                             <label for="id_contrato" class="form-label required-label">Contrato</label>
-                                            <select class="form-select form-select-sm @error('id_contrato') is-invalid @enderror" 
+                                            <select class="form-select form-select-sm contrato-select @error('id_contrato') is-invalid @enderror" 
                                                     id="id_contrato" 
                                                     name="id_contrato"
                                                     required
-                                                    style="height: 38px;">
+                                                    style="width: 100%;">
                                                 <option value="">Seleccione un contrato</option>
                                                 @foreach($contratos as $contrato)
                                                     <option value="{{ $contrato->id }}" {{ old('id_contrato', $destajo->id_contrato) == $contrato->id ? 'selected' : '' }}>
-                                                        {{ $contrato->consecutivo }} - {{ $contrato->obra ?? '' }}
+                                                        {{ $contrato->consecutivo }} - {{ $contrato->refinterna ?? $contrato->obra ?? '' }}
                                                     </option>
                                                 @endforeach
                                             </select>
@@ -183,30 +183,30 @@
                                         </div>
                                     </div>
                                     <div class="col-md-3">
-    <div class="mb-3">
-        <label for="id_proveedor" class="form-label required-label">Proveedor</label>
-        <input type="text" 
-               class="form-control form-control-sm @error('id_proveedor') is-invalid @enderror" 
-               id="proveedor_busqueda" 
-               placeholder="Escriba para buscar proveedor..."
-               autocomplete="off"
-               value="{{ $destajo->proveedor_clave ?? '' }} - {{ $destajo->proveedor_nombre ?? '' }}"
-               style="height: 38px;">
-        <input type="hidden" 
-               id="id_proveedor" 
-               name="id_proveedor" 
-               value="{{ old('id_proveedor', $destajo->id_proveedor ?? '') }}" 
-               required>
-        <div id="proveedor_resultados" class="list-group position-absolute w-100 shadow-sm" style="display: none; z-index: 1000; max-height: 300px; overflow-y: auto;"></div>
-        @error('id_proveedor')
-            <div class="invalid-feedback d-block">{{ $message }}</div>
-        @enderror
-        <button type="button" class="btn btn-success btn-block btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#nuevoProveedorModal">
-            <i class="fas fa-plus-circle me-2"></i>
-            Nuevo Proveedor
-        </button>
-    </div>
-</div>
+                                        <div class="mb-3">
+                                            <label for="id_proveedor" class="form-label required-label">Proveedor</label>
+                                            <input type="text" 
+                                                class="form-control form-control-sm @error('id_proveedor') is-invalid @enderror" 
+                                                id="proveedor_busqueda" 
+                                                placeholder="Escriba para buscar proveedor..."
+                                                autocomplete="off"
+                                                value="{{ $destajo->proveedor_clave ?? '' }} - {{ $destajo->proveedor_nombre ?? '' }}"
+                                                style="height: 38px;">
+                                            <input type="hidden" 
+                                                id="id_proveedor" 
+                                                name="id_proveedor" 
+                                                value="{{ old('id_proveedor', $destajo->id_proveedor ?? '') }}" 
+                                                required>
+                                            <div id="proveedor_resultados" class="list-group position-absolute w-100 shadow-sm" style="display: none; z-index: 1000; max-height: 300px; overflow-y: auto;"></div>
+                                            @error('id_proveedor')
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                            @enderror
+                                            <button type="button" class="btn btn-success btn-block btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#nuevoProveedorModal">
+                                                <i class="fas fa-plus-circle me-2"></i>
+                                                Nuevo Proveedor
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- SECCIÓN DE PRODUCTOS/SERVICIOS - CON LOOP BLADE -->

@@ -246,7 +246,7 @@
                                     <div class="compra-header">
                                         <div class="compra-header-left">
                                             <div class="compra-consecutivo">
-                                                Obra 
+                                                Compra 
                                                 {{ $compra->consecutivo }}
                                             </div>
                                         </div>
@@ -289,32 +289,36 @@
                                         </div>
                                         
                                         <!-- Grid de información general de la compra -->
-                                        <div class="info-grid">
-                                             <div class="info-item" style="min-width: 0;">
+                                        <div class="info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem; width: 100%;">
+                                            <div class="info-item" style="min-width: 0;">
                                                 <span class="info-label">Consecutivo</span>
-                                                <span class="info-value" style="word-wrap: break-word;">{{ $compra->consecutivo ?? 'N/A' }}</span>
+                                                <span class="info-value" style="word-wrap: break-word;">{{ $compra->consecutivo_contrato ?? 'N/A' }}</span>
                                             </div>
-                                            <div class="info-item">
-                                                <span class="info-label">Referencia</span>
-                                                <span class="info-value">{{ $compra->referencia ?? 'N/A' }}</span>
+                                            <div class="info-item" style="min-width: 0;">
+                                                <span class="info-label">Referencia Interna</span>
+                                                <span class="info-value" style="word-wrap: break-word;">{{ $compra->refinterna ?? 'N/A' }}</span>
                                             </div>
-                                            <div class="info-item">
+                                            <div class="info-item" style="min-width: 0;">
                                                 <span class="info-label">Contrato</span>
-                                                <span class="info-value">
+                                                <span class="info-value" style="word-wrap: break-word;">
                                                     {{ $compra->contrato_no ?? 'N/A' }}
                                                 </span>
                                             </div>
-                                            <div class="info-item">
+                                            <div class="info-item" style="min-width: 0;">
+                                                <span class="info-label">Referencia</span>
+                                                <span class="info-value" style="word-wrap: break-word;">{{ $compra->referencia ?? 'N/A' }}</span>
+                                            </div>
+                                            <div class="info-item" style="min-width: 0;">
                                                 <span class="info-label">Costo Operado</span>
-                                                <span class="info-value moneda">${{ number_format($compra->costo_operado, 2) }}</span>
+                                                <span class="info-value moneda" style="white-space: nowrap;">${{ number_format($compra->costo_operado, 2) }}</span>
                                             </div>
-                                            <div class="info-item">
+                                            <div class="info-item" style="min-width: 0;">
                                                 <span class="info-label">IVA</span>
-                                                <span class="info-value moneda">${{ number_format($compra->iva, 2) }}</span>
+                                                <span class="info-value moneda" style="white-space: nowrap;">${{ number_format($compra->iva, 2) }}</span>
                                             </div>
-                                            <div class="info-item">
+                                            <div class="info-item" style="min-width: 0;">
                                                 <span class="info-label">Total</span>
-                                                <span class="info-value moneda" style="font-size: 1.1rem;">
+                                                <span class="info-value moneda" style="font-size: 1.1rem; white-space: nowrap;">
                                                     ${{ number_format($compra->total, 2) }}
                                                 </span>
                                             </div>

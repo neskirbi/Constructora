@@ -249,7 +249,7 @@
                                     <div class="compra-header">
                                         <div class="compra-header-left">
                                             <div class="compra-consecutivo">
-                                                Obra 
+                                                Compra 
                                                 {{ $compra->consecutivo }}
                                             </div>
                                         </div>
@@ -295,17 +295,21 @@
                                         <div class="info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem; width: 100%;">
                                             <div class="info-item" style="min-width: 0;">
                                                 <span class="info-label">Consecutivo</span>
-                                                <span class="info-value" style="word-wrap: break-word;">{{ $compra->consecutivo ?? 'N/A' }}</span>
+                                                <span class="info-value" style="word-wrap: break-word;">{{ $compra->consecutivo_contrato ?? 'N/A' }}</span>
                                             </div>
                                             <div class="info-item" style="min-width: 0;">
-                                                <span class="info-label">Referencia</span>
-                                                <span class="info-value" style="word-wrap: break-word;">{{ $compra->referencia ?? 'N/A' }}</span>
+                                                <span class="info-label">Referencia Interna</span>
+                                                <span class="info-value" style="word-wrap: break-word;">{{ $compra->refinterna ?? 'N/A' }}</span>
                                             </div>
                                             <div class="info-item" style="min-width: 0;">
                                                 <span class="info-label">Contrato</span>
                                                 <span class="info-value" style="word-wrap: break-word;">
                                                     {{ $compra->contrato_no ?? 'N/A' }}
                                                 </span>
+                                            </div>
+                                            <div class="info-item" style="min-width: 0;">
+                                                <span class="info-label">Referencia</span>
+                                                <span class="info-value" style="word-wrap: break-word;">{{ $compra->referencia ?? 'N/A' }}</span>
                                             </div>
                                             <div class="info-item" style="min-width: 0;">
                                                 <span class="info-label">Costo Operado</span>
