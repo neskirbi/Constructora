@@ -324,37 +324,36 @@
                                         </div>
 
                                         <!-- Tabla de detalles (productos/servicios) -->
-                                        @if(isset($destajo->detalles) && count($destajo->detalles) > 0)
-                                        <h6 class="fw-bold mb-2">
-                                            <i class="fas fa-boxes me-2"></i>
-                                            Productos / Servicios
-                                        </h6>
-                                        <table class="detalles-table" style="table-layout: auto; width: 100%;">
-                                            <thead>
-                                                <tr>
-                                                    <th style="white-space: nowrap;">Clave</th>
-                                                    <th style="width: 100%;">Descripción</th>
-                                                    <!-- Descripción tomará el espacio disponible -->
-                                                    <th style="white-space: nowrap;">Unidad</th>
-                                                    <th style="white-space: nowrap;" class="text-end">Cantidad</th>
-                                                    <th style="white-space: nowrap;" class="text-end">P. Unitario</th>
-                                                    <th style="white-space: nowrap;" class="text-end">Subtotal</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach($destajo->detalles as $detalle)
-                                                <tr>
-                                                    <td style="white-space: nowrap;"><strong>{{ $detalle->clave }}</strong></td>
-                                                    <td style="word-wrap: break-word;">{{ $detalle->descripcion }}</td>
-                                                    <td style="white-space: nowrap;">{{ $detalle->unidades }}</td>
-                                                    <td class="text-end" style="white-space: nowrap;">{{ number_format($detalle->cantidad, 2) }}</td>
-                                                    <td class="text-end moneda" style="white-space: nowrap;">${{ number_format($detalle->ult_costo, 2) }}</td>
-                                                    <td class="text-end moneda" style="white-space: nowrap;">${{ number_format($detalle->cantidad * $detalle->ult_costo, 2) }}</td>
-                                                </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                        @endif
+@if(isset($destajo->detalles) && count($destajo->detalles) > 0)
+<h6 class="fw-bold mb-2">
+    <i class="fas fa-boxes me-2"></i>
+    Productos / Servicios
+</h6>
+<table class="detalles-table">
+    <thead>
+        <tr>
+            <th>Clave</th>
+            <th>Descripción</th>
+            <th>Unidad</th>
+            <th class="text-end">Cantidad</th>
+            <th class="text-end">P. Unitario</th>
+            <th class="text-end">Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($destajo->detalles as $detalle)
+        <tr>
+            <td><strong>{{ $detalle->clave }}</strong></td>
+            <td>{{ $detalle->descripcion }}</td>
+            <td>{{ $detalle->unidades }}</td>
+            <td class="text-end">{{ number_format($detalle->cantidad, 2) }}</td>
+            <td class="text-end moneda">${{ number_format($detalle->ult_costo, 2) }}</td>
+            <td class="text-end moneda">${{ number_format($detalle->cantidad * $detalle->ult_costo, 2) }}</td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
+@endif
                                     </div>
                                     
                                     <div class="destajo-footer">

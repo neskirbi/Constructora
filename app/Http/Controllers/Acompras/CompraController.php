@@ -55,6 +55,7 @@ class CompraController extends Controller
             // Obtener todos los detalles de una sola vez
             $todosDetalles = DB::table('compradetalle')
                 ->whereIn('id_compra', $compraIds)
+                ->orderBy('created_at','asc')
                 ->get()
                 ->groupBy('id_compra');
             
