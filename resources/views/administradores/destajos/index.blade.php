@@ -189,6 +189,11 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             margin-top: 20px;
         }
+        
+        /* Aseguramos que las tablas no se desborden */
+        .table-responsive {
+            overflow-x: auto;
+        }
     </style>
 </head>
 <body>
@@ -219,7 +224,7 @@
                                             <input type="text" 
                                                    name="search" 
                                                    class="form-control" 
-                                                   placeholder="Buscar por clave, descripción, referencia..." 
+                                                   placeholder="Buscar por referencia, contrato, proveedor..." 
                                                    value="{{ $search ?? '' }}">
                                             <button class="btn btn-primary" type="submit">
                                                 <i class="fas fa-search"></i>
@@ -246,8 +251,7 @@
                                     <div class="destajo-header">
                                         <div class="destajo-header-left">
                                             <div class="destajo-consecutivo">
-                                                <i class="fas fa-hashtag me-1"></i>
-                                                {{ $destajo->consecutivo }}
+                                                Destajo {{ $destajo->consecutivo }}
                                             </div>
                                         </div>
                                         
@@ -285,27 +289,28 @@
                                         <!-- Proveedor en el body (fuera del grid) -->
                                         <div class="destajo-proveedor">
                                             <i class="fas fa-building"></i>
-                                            {{ $destajo->proveedor_clave }} 
-                                            {{ $destajo->proveedor_nombre ?? 'Proveedor no encontrado' }} - 
-                                            {{ $destajo->especialidad ?? '' }}
+                                            {{ $destajo->proveedor_nombre ?? 'Proveedor no encontrado' }}
                                         </div>
                                         
                                         <!-- Grid de información general del destajo -->
                                         <div class="info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem; width: 100%;">
-                                            
-                                            <div class="info-item">
-                                                <span class="info-label">Obra</span>
-                                                <span class="info-value">{{ $destajo->obra ?? '' }}</span>
+                                            <div class="info-item" style="min-width: 0;">
+                                                <span class="info-label">Consecutivo</span>
+                                                <span class="info-value" style="word-wrap: break-word;">{{ $destajo->consecutivo_contrato ?? 'N/A' }}</span>
                                             </div>
                                             <div class="info-item" style="min-width: 0;">
-                                                <span class="info-label">Referencia</span>
-                                                <span class="info-value" style="word-wrap: break-word;">{{ $destajo->referencia ?? 'N/A' }}</span>
+                                                <span class="info-label">Referencia Interna</span>
+                                                <span class="info-value" style="word-wrap: break-word;">{{ $destajo->refinterna ?? 'N/A' }}</span>
                                             </div>
                                             <div class="info-item" style="min-width: 0;">
                                                 <span class="info-label">Contrato</span>
                                                 <span class="info-value" style="word-wrap: break-word;">
                                                     {{ $destajo->contrato_no ?? 'N/A' }}
                                                 </span>
+                                            </div>
+                                            <div class="info-item" style="min-width: 0;">
+                                                <span class="info-label">Referencia</span>
+                                                <span class="info-value" style="word-wrap: break-word;">{{ $destajo->referencia ?? 'N/A' }}</span>
                                             </div>
                                             <div class="info-item" style="min-width: 0;">
                                                 <span class="info-label">Costo Operado</span>
@@ -324,36 +329,36 @@
                                         </div>
 
                                         <!-- Tabla de detalles (productos/servicios) -->
-@if(isset($destajo->detalles) && count($destajo->detalles) > 0)
-<h6 class="fw-bold mb-2">
-    <i class="fas fa-boxes me-2"></i>
-    Productos / Servicios
-</h6>
-<table class="detalles-table">
-    <thead>
-        <tr>
-            <th>Clave</th>
-            <th>Descripción</th>
-            <th>Unidad</th>
-            <th class="text-end">Cantidad</th>
-            <th class="text-end">P. Unitario</th>
-            <th class="text-end">Subtotal</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach($destajo->detalles as $detalle)
-        <tr>
-            <td><strong>{{ $detalle->clave }}</strong></td>
-            <td>{{ $detalle->descripcion }}</td>
-            <td>{{ $detalle->unidades }}</td>
-            <td class="text-end">{{ number_format($detalle->cantidad, 2) }}</td>
-            <td class="text-end moneda">${{ number_format($detalle->ult_costo, 2) }}</td>
-            <td class="text-end moneda">${{ number_format($detalle->cantidad * $detalle->ult_costo, 2) }}</td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
-@endif
+                                        @if(isset($destajo->detalles) && count($destajo->detalles) > 0)
+                                        <h6 class="fw-bold mb-2">
+                                            <i class="fas fa-boxes me-2"></i>
+                                            Productos / Servicios
+                                        </h6>
+                                        <table class="detalles-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Clave</th>
+                                                    <th>Descripción</th>
+                                                    <th>Unidad</th>
+                                                    <th class="text-end">Cantidad</th>
+                                                    <th class="text-end">P. Unitario</th>
+                                                    <th class="text-end">Subtotal</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($destajo->detalles as $detalle)
+                                                <tr>
+                                                    <td><strong>{{ $detalle->clave }}</strong></td>
+                                                    <td>{{ $detalle->descripcion }}</td>
+                                                    <td>{{ $detalle->unidades }}</td>
+                                                    <td class="text-end">{{ number_format($detalle->cantidad, 2) }}</td>
+                                                    <td class="text-end moneda">${{ number_format($detalle->ult_costo, 2) }}</td>
+                                                    <td class="text-end moneda">${{ number_format($detalle->cantidad * $detalle->ult_costo, 2) }}</td>
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                        @endif
                                     </div>
                                     
                                     <div class="destajo-footer">
@@ -382,22 +387,18 @@
                                 @endforeach
                             @else
                                 <div class="empty-state">
-                                    <i class="fas fa-file-invoice-dollar"></i>
+                                    <i class="fas fa-calculator"></i>
                                     <h5>No se encontraron destajos</h5>
                                     <p class="text-muted mb-4">
                                         @if($search)
                                         No hay resultados para tu búsqueda "{{ $search }}"
                                         @else
-                                        Aún no has creado ningún destajo
+                                        Aún no hay destajos registrados
                                         @endif
                                     </p>
                                     @if($search)
                                     <a href="{{ route('adestajos.index') }}" class="btn btn-outline-primary">
                                         <i class="fas fa-list me-1"></i> Ver todos los destajos
-                                    </a>
-                                    @else
-                                    <a href="{{ route('adestajos.create') }}" class="btn btn-primary">
-                                        <i class="fas fa-plus me-1"></i> Crear primer destajo
                                     </a>
                                     @endif
                                 </div>
