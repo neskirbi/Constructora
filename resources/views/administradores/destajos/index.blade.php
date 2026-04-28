@@ -287,34 +287,36 @@
                                             {{ $destajo->proveedor_nombre ?? 'Proveedor no encontrado' }}
                                         </div>
                                         
-                                        <div class="info-grid">
+                                        <!-- Grid de información general del destajo -->
+                                        <div class="info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem; width: 100%;">
+                                            
                                             <div class="info-item">
-                                                <span class="info-label">Consecutivo</span>
-                                                <span class="info-value">{{ $destajo->consecutivo_contrato ?? 'N/A' }}</span>
+                                                <span class="info-label">Obra</span>
+                                                <span class="info-value">{{ $destajo->obra ?? '' }}</span>
                                             </div>
-                                            <div class="info-item">
-                                                <span class="info-label">Referencia Interna</span>
-                                                <span class="info-value">{{ $destajo->refinterna ?? 'N/A' }}</span>
-                                            </div>
-                                            <div class="info-item">
-                                                <span class="info-label">Contrato</span>
-                                                <span class="info-value">{{ $destajo->contrato_no ?? 'N/A' }}</span>
-                                            </div>
-                                            <div class="info-item">
+                                            <div class="info-item" style="min-width: 0;">
                                                 <span class="info-label">Referencia</span>
-                                                <span class="info-value">{{ $destajo->referencia ?? 'N/A' }}</span>
+                                                <span class="info-value" style="word-wrap: break-word;">{{ $destajo->referencia ?? 'N/A' }}</span>
                                             </div>
-                                            <div class="info-item">
+                                            <div class="info-item" style="min-width: 0;">
+                                                <span class="info-label">Contrato</span>
+                                                <span class="info-value" style="word-wrap: break-word;">
+                                                    {{ $destajo->contrato_no ?? 'N/A' }}
+                                                </span>
+                                            </div>
+                                            <div class="info-item" style="min-width: 0;">
                                                 <span class="info-label">Costo Operado</span>
-                                                <span class="info-value moneda">${{ number_format($destajo->costo_operado, 2) }}</span>
+                                                <span class="info-value moneda" style="white-space: nowrap;">${{ number_format($destajo->costo_operado, 2) }}</span>
                                             </div>
-                                            <div class="info-item">
+                                            <div class="info-item" style="min-width: 0;">
                                                 <span class="info-label">IVA</span>
-                                                <span class="info-value moneda">${{ number_format($destajo->iva, 2) }}</span>
+                                                <span class="info-value moneda" style="white-space: nowrap;">${{ number_format($destajo->iva, 2) }}</span>
                                             </div>
-                                            <div class="info-item">
+                                            <div class="info-item" style="min-width: 0;">
                                                 <span class="info-label">Total</span>
-                                                <span class="info-value moneda">${{ number_format($destajo->total, 2) }}</span>
+                                                <span class="info-value moneda" style="font-size: 1.1rem; white-space: nowrap;">
+                                                    ${{ number_format($destajo->total, 2) }}
+                                                </span>
                                             </div>
                                         </div>
 
