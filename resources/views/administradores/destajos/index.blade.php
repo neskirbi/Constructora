@@ -329,7 +329,7 @@
                                             <thead>
                                                 <tr>
                                                     <th style="white-space: nowrap;">Clave</th>
-                                                    <th style="width: 20%;">Descripción</th>
+                                                    <th style="width: 100%;">Descripción</th>
                                                     <th style="white-space: nowrap;">Unidad</th>
                                                     <th style="white-space: nowrap;" class="text-end">Cantidad</th>
                                                     <th style="white-space: nowrap;" class="text-end">P. Unitario</th>
@@ -340,7 +340,7 @@
                                                 @foreach($destajo->detalles as $detalle)
                                                 <tr>
                                                     <td style="white-space: nowrap;"><strong>{{ $detalle->clave }}</strong></td>
-                                                    <td style="word-wrap: break-word;">{{ $detalle->descripcion }}</td>
+                                                    <td style="word-wrap: break-word;">ok</td>
                                                     <td style="white-space: nowrap;">{{ $detalle->unidades }}</td>
                                                     <td class="text-end" style="white-space: nowrap;">{{ number_format($detalle->cantidad, 2) }}</td>
                                                     <td class="text-end moneda" style="white-space: nowrap;">${{ number_format($detalle->ult_costo, 2) }}</td>
