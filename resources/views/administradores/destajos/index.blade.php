@@ -329,7 +329,7 @@
                                             <thead>
                                                 <tr>
                                                     <th style="white-space: nowrap;">Clave</th>
-                                                    <th style="width: 100%;">Descripción</th>
+                                                    <th style="width: 50%;">Descripción</th>
                                                     <th style="white-space: nowrap;">Unidad</th>
                                                     <th style="white-space: nowrap;" class="text-end">Cantidad</th>
                                                     <th style="white-space: nowrap;" class="text-end">P. Unitario</th>
