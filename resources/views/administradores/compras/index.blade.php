@@ -93,6 +93,7 @@
             font-size: 0.9rem;
             border-collapse: collapse;
             margin-top: 15px;
+            table-layout: auto;
         }
         .detalles-table th {
             background-color: #f8f9fa;
@@ -246,8 +247,7 @@
                                     <div class="compra-header">
                                         <div class="compra-header-left">
                                             <div class="compra-consecutivo">
-                                                Compra 
-                                                {{ $compra->consecutivo }}
+                                                Compra {{ $compra->consecutivo }}
                                             </div>
                                         </div>
                                         
@@ -282,49 +282,42 @@
                                     </div>
                                     
                                     <div class="compra-body">
-                                        <!-- Proveedor en el body (fuera del grid) -->
                                         <div class="compra-proveedor">
                                             <i class="fas fa-building"></i>
                                             {{ $compra->proveedor_nombre ?? 'Proveedor no encontrado' }}
                                         </div>
                                         
-                                        <!-- Grid de información general de la compra -->
-                                        <div class="info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1.5rem; width: 100%;">
-                                            <div class="info-item" style="min-width: 0;">
+                                        <div class="info-grid">
+                                            <div class="info-item">
                                                 <span class="info-label">Consecutivo</span>
-                                                <span class="info-value" style="word-wrap: break-word;">{{ $compra->consecutivo_contrato ?? 'N/A' }}</span>
+                                                <span class="info-value">{{ $compra->consecutivo_contrato ?? 'N/A' }}</span>
                                             </div>
-                                            <div class="info-item" style="min-width: 0;">
+                                            <div class="info-item">
                                                 <span class="info-label">Referencia Interna</span>
-                                                <span class="info-value" style="word-wrap: break-word;">{{ $compra->refinterna ?? 'N/A' }}</span>
+                                                <span class="info-value">{{ $compra->refinterna ?? 'N/A' }}</span>
                                             </div>
-                                            <div class="info-item" style="min-width: 0;">
+                                            <div class="info-item">
                                                 <span class="info-label">Contrato</span>
-                                                <span class="info-value" style="word-wrap: break-word;">
-                                                    {{ $compra->contrato_no ?? 'N/A' }}
-                                                </span>
+                                                <span class="info-value">{{ $compra->contrato_no ?? 'N/A' }}</span>
                                             </div>
-                                            <div class="info-item" style="min-width: 0;">
+                                            <div class="info-item">
                                                 <span class="info-label">Referencia</span>
-                                                <span class="info-value" style="word-wrap: break-word;">{{ $compra->referencia ?? 'N/A' }}</span>
+                                                <span class="info-value">{{ $compra->referencia ?? 'N/A' }}</span>
                                             </div>
-                                            <div class="info-item" style="min-width: 0;">
+                                            <div class="info-item">
                                                 <span class="info-label">Costo Operado</span>
-                                                <span class="info-value moneda" style="white-space: nowrap;">${{ number_format($compra->costo_operado, 2) }}</span>
+                                                <span class="info-value moneda">${{ number_format($compra->costo_operado, 2) }}</span>
                                             </div>
-                                            <div class="info-item" style="min-width: 0;">
+                                            <div class="info-item">
                                                 <span class="info-label">IVA</span>
-                                                <span class="info-value moneda" style="white-space: nowrap;">${{ number_format($compra->iva, 2) }}</span>
+                                                <span class="info-value moneda">${{ number_format($compra->iva, 2) }}</span>
                                             </div>
-                                            <div class="info-item" style="min-width: 0;">
+                                            <div class="info-item">
                                                 <span class="info-label">Total</span>
-                                                <span class="info-value moneda" style="font-size: 1.1rem; white-space: nowrap;">
-                                                    ${{ number_format($compra->total, 2) }}
-                                                </span>
+                                                <span class="info-value moneda">${{ number_format($compra->total, 2) }}</span>
                                             </div>
                                         </div>
 
-                                        <!-- Tabla de detalles (productos/servicios) -->
                                         @if(isset($compra->detalles) && count($compra->detalles) > 0)
                                         <h6 class="fw-bold mb-2">
                                             <i class="fas fa-boxes me-2"></i>
@@ -333,23 +326,23 @@
                                         <table class="detalles-table">
                                             <thead>
                                                 <tr>
-                                                    <th>Clave</th>
-                                                    <th>Descripción</th>
-                                                    <th>Unidad</th>
-                                                    <th class="text-end">Cantidad</th>
-                                                    <th class="text-end">P. Unitario</th>
-                                                    <th class="text-end">Subtotal</th>
+                                                    <th style="white-space: nowrap;">Clave</th>
+                                                    <th style="width: 100%;">Descripción</th>
+                                                    <th style="white-space: nowrap;">Unidad</th>
+                                                    <th style="white-space: nowrap;" class="text-end">Cantidad</th>
+                                                    <th style="white-space: nowrap;" class="text-end">P. Unitario</th>
+                                                    <th style="white-space: nowrap;" class="text-end">Subtotal</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 @foreach($compra->detalles as $detalle)
                                                 <tr>
-                                                    <td><strong>{{ $detalle->clave }}</strong></td>
-                                                    <td>{{ $detalle->descripcion }}</td>
-                                                    <td>{{ $detalle->unidades }}</td>
-                                                    <td class="text-end">{{ number_format($detalle->cantidad, 2) }}</td>
-                                                    <td class="text-end moneda">${{ number_format($detalle->ult_costo, 2) }}</td>
-                                                    <td class="text-end moneda">${{ number_format($detalle->cantidad * $detalle->ult_costo, 2) }}</td>
+                                                    <td style="white-space: nowrap;"><strong>{{ $detalle->clave }}</strong></td>
+                                                    <td style="word-wrap: break-word;">{{ $detalle->descripcion }}</td>
+                                                    <td style="white-space: nowrap;">{{ $detalle->unidades }}</td>
+                                                    <td class="text-end" style="white-space: nowrap;">{{ number_format($detalle->cantidad, 2) }}</td>
+                                                    <td class="text-end moneda" style="white-space: nowrap;">${{ number_format($detalle->ult_costo, 2) }}</td>
+                                                    <td class="text-end moneda" style="white-space: nowrap;">${{ number_format($detalle->cantidad * $detalle->ult_costo, 2) }}</td>
                                                 </tr>
                                                 @endforeach
                                             </tbody>
