@@ -288,37 +288,7 @@
                                         </div>
                                         
                                         <!-- Grid de información general del destajo -->
-                                        <div class="info-grid">
-                                            
-                                            <div class="info-item">
-                                                <span class="info-label">Obra</span>
-                                                <span class="info-value">{{ $destajo->obra ?? '' }}</span>
-                                            </div>
-                                            <div class="info-item" style="min-width: 0;">
-                                                <span class="info-label">Referencia</span>
-                                                <span class="info-value" style="word-wrap: break-word;">{{ $destajo->referencia ?? 'N/A' }}</span>
-                                            </div>
-                                            <div class="info-item" style="min-width: 0;">
-                                                <span class="info-label">Contrato</span>
-                                                <span class="info-value" style="word-wrap: break-word;">
-                                                    {{ $destajo->contrato_no ?? 'N/A' }}
-                                                </span>
-                                            </div>
-                                            <div class="info-item" style="min-width: 0;">
-                                                <span class="info-label">Costo Operado</span>
-                                                <span class="info-value moneda" style="white-space: nowrap;">${{ number_format($destajo->costo_operado, 2) }}</span>
-                                            </div>
-                                            <div class="info-item" style="min-width: 0;">
-                                                <span class="info-label">IVA</span>
-                                                <span class="info-value moneda" style="white-space: nowrap;">${{ number_format($destajo->iva, 2) }}</span>
-                                            </div>
-                                            <div class="info-item" style="min-width: 0;">
-                                                <span class="info-label">Total</span>
-                                                <span class="info-value moneda" style="font-size: 1.1rem; white-space: nowrap;">
-                                                    ${{ number_format($destajo->total, 2) }}
-                                                </span>
-                                            </div>
-                                        </div>
+                                        
 
                                         @if(isset($destajo->detalles) && count($destajo->detalles) > 0)
                                         <h6 class="fw-bold mb-2">

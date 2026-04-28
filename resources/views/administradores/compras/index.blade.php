@@ -287,7 +287,36 @@
                                             {{ $compra->proveedor_nombre ?? 'Proveedor no encontrado' }}
                                         </div>
                                         
-                                        
+                                        <div class="info-grid">
+                                            <div class="info-item">
+                                                <span class="info-label">Consecutivo</span>
+                                                <span class="info-value">{{ $compra->consecutivo_contrato ?? 'N/A' }}</span>
+                                            </div>
+                                            <div class="info-item">
+                                                <span class="info-label">Referencia Interna</span>
+                                                <span class="info-value">{{ $compra->refinterna ?? 'N/A' }}</span>
+                                            </div>
+                                            <div class="info-item">
+                                                <span class="info-label">Contrato</span>
+                                                <span class="info-value">{{ $compra->contrato_no ?? 'N/A' }}</span>
+                                            </div>
+                                            <div class="info-item">
+                                                <span class="info-label">Referencia</span>
+                                                <span class="info-value">{{ $compra->referencia ?? 'N/A' }}</span>
+                                            </div>
+                                            <div class="info-item">
+                                                <span class="info-label">Costo Operado</span>
+                                                <span class="info-value moneda">${{ number_format($compra->costo_operado, 2) }}</span>
+                                            </div>
+                                            <div class="info-item">
+                                                <span class="info-label">IVA</span>
+                                                <span class="info-value moneda">${{ number_format($compra->iva, 2) }}</span>
+                                            </div>
+                                            <div class="info-item">
+                                                <span class="info-label">Total</span>
+                                                <span class="info-value moneda">${{ number_format($compra->total, 2) }}</span>
+                                            </div>
+                                        </div>
 
                                         @if(isset($compra->detalles) && count($compra->detalles) > 0)
                                         <h6 class="fw-bold mb-2">
