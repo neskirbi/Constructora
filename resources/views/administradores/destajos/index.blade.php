@@ -340,7 +340,7 @@
                                                 @foreach($destajo->detalles as $detalle)
                                                 <tr>
                                                     <td style="white-space: nowrap;"><strong>{{ $detalle->clave }}</strong></td>
-                                                    <td style="word-wrap: break-word;">{{ $detalle->descripcion }}</td>
+                                                    <td style="word-wrap: break-word;">ok</td>
                                                     <td style="white-space: nowrap;">{{ $detalle->unidades }}</td>
                                                     <td class="text-end" style="white-space: nowrap;">{{ number_format($detalle->cantidad, 2) }}</td>
                                                     <td class="text-end moneda" style="white-space: nowrap;">${{ number_format($detalle->ult_costo, 2) }}</td>
