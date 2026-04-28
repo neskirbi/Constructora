@@ -190,6 +190,14 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             margin-top: 20px;
         }
+
+        .detalles-table td:nth-child(2) {
+            word-break: break-word;      /* Fuerza quiebre de palabras largas */
+            word-wrap: break-word;       /* Para navegadores antiguos */
+            overflow-wrap: break-word;   /* Estandar moderno */
+            white-space: normal;
+            max-width: 500px;            /* Ancho máximo antes de quebrar */
+        }
     </style>
 </head>
 <body>
@@ -340,7 +348,7 @@
                                                 @foreach($destajo->detalles as $detalle)
                                                 <tr>
                                                     <td style="white-space: nowrap;"><strong>{{ $detalle->clave }}</strong></td>
-                                                    <td style="word-wrap: break-word;">ok</td>
+                                                    <td style="word-wrap: break-word;">{{ $detalle->descripcion }}</td>
                                                     <td style="white-space: nowrap;">{{ $detalle->unidades }}</td>
                                                     <td class="text-end" style="white-space: nowrap;">{{ number_format($detalle->cantidad, 2) }}</td>
                                                     <td class="text-end moneda" style="white-space: nowrap;">${{ number_format($detalle->ult_costo, 2) }}</td>
