@@ -173,6 +173,14 @@
             display: flex;
             gap: 10px;
         }
+
+        .detalles-table td:nth-child(2) {
+            word-break: break-word;      /* Fuerza quiebre de palabras largas */
+            word-wrap: break-word;       /* Para navegadores antiguos */
+            overflow-wrap: break-word;   /* Estandar moderno */
+            white-space: normal;
+            max-width: 500px;            /* Ancho máximo antes de quebrar */
+        }
     </style>
 </head>
 <body>
