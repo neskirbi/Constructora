@@ -128,7 +128,24 @@ class CompraController extends Controller
     // Calcular el total de los productos
     $costo_operado = 0;
     foreach ($request->productos as $producto) {
-        $costo_operado += $producto['cantidad'] * $producto['precio'];
+        $cantidad = $producto['cantidad'];
+        $precio_unitario = $producto['precio'];
+        $descuento_monto = $producto['descuento_monto'] ?? 0;
+        $descuento_porcentaje = $producto['descuento_porcentaje'] ?? 0;
+        
+        // Calcular subtotal sin descuento
+        $subtotal = $cantidad * $precio_unitario;
+        
+        // Aplicar descuento
+        if ($descuento_monto > 0) {
+            $subtotal_con_descuento = $subtotal - $descuento_monto;
+        } elseif ($descuento_porcentaje > 0) {
+            $subtotal_con_descuento = $subtotal * (1 - ($descuento_porcentaje / 100));
+        } else {
+            $subtotal_con_descuento = $subtotal;
+        }
+        
+        $costo_operado += $subtotal_con_descuento;
     }
     
     $iva_porcentaje = $request->iva ?? 0;
@@ -149,7 +166,7 @@ class CompraController extends Controller
             'consecutivo' => $request->consecutivo,
             'referencia' => $request->referencia,
             'costo_operado' => $costo_operado,
-            'iva' => $iva_calculado,
+            'iva' => $request->iva,
             'total' => $total,
             'verificado' => 1,
             'created_at' => now(),
@@ -327,22 +344,24 @@ class CompraController extends Controller
     }
     
     // Calcular totales
-    $costo_operado = 0;
+     $costo_operado = 0;
     foreach ($request->productos as $producto) {
-        // Aplicar descuentos al cálculo
+        $cantidad = $producto['cantidad'];
         $precio_unitario = $producto['precio'];
         $descuento_monto = $producto['descuento_monto'] ?? 0;
         $descuento_porcentaje = $producto['descuento_porcentaje'] ?? 0;
         
-        // Calcular precio con descuento
-        $precio_con_descuento = $precio_unitario;
+        $subtotal = $cantidad * $precio_unitario;
+        
         if ($descuento_monto > 0) {
-            $precio_con_descuento = $precio_unitario - $descuento_monto;
+            $subtotal_con_descuento = $subtotal - $descuento_monto;
         } elseif ($descuento_porcentaje > 0) {
-            $precio_con_descuento = $precio_unitario * (1 - ($descuento_porcentaje / 100));
+            $subtotal_con_descuento = $subtotal * (1 - ($descuento_porcentaje / 100));
+        } else {
+            $subtotal_con_descuento = $subtotal;
         }
         
-        $costo_operado += $producto['cantidad'] * $precio_con_descuento;
+        $costo_operado += $subtotal_con_descuento;
     }
     
     $iva_porcentaje = $request->iva ?? 0;
@@ -359,7 +378,7 @@ class CompraController extends Controller
             'consecutivo' => $request->consecutivo,
             'referencia' => $request->referencia,
             'costo_operado' => $costo_operado,
-            'iva' => $iva_calculado,
+            'iva' => $request->iva,
             'total' => $total,
             'metodo_pago' => $request->metodo_pago, // NUEVO: método de pago
             'empresa_pago' => $request->empresa_pago, // NUEVO: empresa/banco/referencia
