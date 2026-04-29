@@ -198,6 +198,7 @@
                                                 value="{{ old('consecutivo', $contrato->consecutivo) }}"
                                                 placeholder="Número consecutivo"
                                                 min="1"
+                                                step="0.01"
                                                 noformat>
                                             @error('consecutivo')
                                                 <div class="text-danger small mt-1">{{ $message }}</div>

@@ -80,7 +80,7 @@ class ContratoController extends Controller
         // Validar todos los campos del formulario según la estructura de la tabla
         $validatedData = $request->validate([
             // Información general
-            'consecutivo' => 'nullable|integer',
+            'consecutivo' => 'nullable|numeric',
             'obra' => 'nullable|string',
             'refinterna' => 'nullable|string',
             'empresa' => 'nullable|string|max:255',
@@ -283,7 +283,7 @@ class ContratoController extends Controller
         // Validar todos los campos del formulario según la estructura de la tabla
         $validatedData = $request->validate([
             // Información general
-            'consecutivo' => 'nullable|integer',
+            'consecutivo' => 'nullable|numeric',
             'obra' => 'nullable|string',
             'refinterna' => 'nullable|string',
             'empresa' => 'nullable|string|max:255',

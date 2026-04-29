@@ -207,6 +207,7 @@
                                                 value="{{ old('consecutivo', $siguienteConsecutivo) }}"
                                                 placeholder="Número consecutivo"
                                                 min="1"
+                                                step="0.01"
                                                 noformat>
                                            
                                         </div>
