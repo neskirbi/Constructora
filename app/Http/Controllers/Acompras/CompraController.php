@@ -127,6 +127,7 @@ class CompraController extends Controller
     
     // Calcular el total de los productos
     $costo_operado = 0;
+    
     foreach ($request->productos as $producto) {
         $cantidad = $producto['cantidad'];
         $precio_unitario = $producto['precio'];
@@ -174,6 +175,7 @@ class CompraController extends Controller
         ]);
         
         // Guardar los detalles (AHORA CON fecha_entrega, tipo_entrega, comentarios)
+        $orden = 1;
         foreach ($request->productos as $producto) {
             $productoData = DB::table('productosyservicios')
                 ->where('id', $producto['id_producto'])
@@ -193,6 +195,7 @@ class CompraController extends Controller
                 'fecha_entrega' => $producto['fecha_entrega'] ?? null,    // NUEVO
                 'tipo_entrega' => $producto['tipo_entrega'] ?? null,      // NUEVO
                 'comentarios' => $producto['comentarios'] ?? null,        // NUEVO
+                'orden' => $orden++,  // <--- AGREGAR ESTA LÍNEA
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
@@ -241,6 +244,7 @@ class CompraController extends Controller
     // Obtener los detalles de la compra (AHORA CON LOS CAMPOS)
     $detalles = DB::table('compradetalle')
         ->where('id_compra', $id)
+        ->orderBy('orden', 'asc')
         ->get();
     
     // Obtener datos para los selects
@@ -398,7 +402,9 @@ class CompraController extends Controller
             ->where('id_compra', $id)
             ->delete();
         
+            
         // Insertar nuevos detalles
+        $orden = 1;
         foreach ($request->productos as $producto) {
             $productoData = DB::table('productosyservicios')
                 ->where('id', $producto['id_producto'])
@@ -427,6 +433,7 @@ class CompraController extends Controller
                 'fecha_entrega' => $producto['fecha_entrega'] ?? null,
                 'tipo_entrega' => $producto['tipo_entrega'] ?? null,
                 'comentarios' => $producto['comentarios'] ?? null,
+                'orden' => $orden++,  // <--- AGREGAR ESTA LÍNEA
                 'created_at' => now(),
                 'updated_at' => now()
             ]);

@@ -13,8 +13,8 @@ class ReporteIngresosController extends Controller
     {
         // Obtener lista de contratos para el select
         $contratos = DB::table('contratos')
-            ->select('id', 'contrato_no', 'obra', 'cliente')
-            ->orderBy('contrato_no')
+            ->select('id','consecutivo', 'contrato_no', 'obra', 'cliente')
+            ->orderBy('consecutivo')
             ->get();
         
         return view('reportes.ingresos.ingresos', compact('contratos'));

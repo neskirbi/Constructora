@@ -30,6 +30,8 @@ class CreateCompras extends Migration
             $table->string('empresa_pago', 255)->nullable();
             
             $table->integer('verificado')->default(1);
+            
+            $table->integer('orden');
             $table->timestamps();
         });
     }
