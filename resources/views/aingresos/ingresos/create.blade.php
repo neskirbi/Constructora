@@ -452,6 +452,87 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    <div class="col-md-4">
+    <div class="form-group-custom">
+        <div class="d-flex justify-content-between align-items-center">
+            <label for="derechos_supervision" class="form-label-custom mb-0">
+                Derechos de Supervisión y Control de Obra (2%)
+            </label>
+            <div class="form-check mb-0">
+                <input class="form-check-input" type="checkbox" id="aplicar_derechos_supervision">
+                <label class="form-check-label small" for="aplicar_derechos_supervision">
+                    Aplicar
+                </label>
+            </div>
+        </div>
+        <div class="input-group input-group-custom mt-1">
+            <span class="input-group-text">$</span>
+            <input type="number" 
+                   class="form-control form-control-custom numeric-input" 
+                   id="derechos_supervision" 
+                   name="derechos_supervision" 
+                   value="{{ old('derechos_supervision', $ultimoIngreso->derechos_supervision ?? 0) }}"
+                   step="0.01"
+                   placeholder="0.00"
+                   min="0" readonly>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-4">
+    <div class="form-group-custom">
+        <div class="d-flex justify-content-between align-items-center">
+            <label for="aportacion_cmic" class="form-label-custom mb-0">
+                Aportación C.M.I.C Estado de México (0.50%)
+            </label>
+            <div class="form-check mb-0">
+                <input class="form-check-input" type="checkbox" id="aplicar_aportacion_cmic">
+                <label class="form-check-label small" for="aplicar_aportacion_cmic">
+                    Aplicar
+                </label>
+            </div>
+        </div>
+        <div class="input-group input-group-custom mt-1">
+            <span class="input-group-text">$</span>
+            <input type="number" 
+                   class="form-control form-control-custom numeric-input" 
+                   id="aportacion_cmic" 
+                   name="aportacion_cmic" 
+                   value="{{ old('aportacion_cmic', $ultimoIngreso->aportacion_cmic ?? 0) }}"
+                   step="0.01"
+                   placeholder="0.00"
+                   min="0" readonly>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-4">
+    <div class="form-group-custom">
+        <div class="d-flex justify-content-between align-items-center">
+            <label for="delegacion_icic" class="form-label-custom mb-0">
+                Delegación Estado de México I.C.I.C. (0.20%)
+            </label>
+            <div class="form-check mb-0">
+                <input class="form-check-input" type="checkbox" id="aplicar_delegacion_icic">
+                <label class="form-check-label small" for="aplicar_delegacion_icic">
+                    Aplicar
+                </label>
+            </div>
+        </div>
+        <div class="input-group input-group-custom mt-1">
+            <span class="input-group-text">$</span>
+            <input type="number" 
+                   class="form-control form-control-custom numeric-input" 
+                   id="delegacion_icic" 
+                   name="delegacion_icic" 
+                   value="{{ old('delegacion_icic', $ultimoIngreso->delegacion_icic ?? 0) }}"
+                   step="0.01"
+                   placeholder="0.00"
+                   min="0" readonly>
+        </div>
+    </div>
+</div>
                                     
                                     <div class="col-md-4">
                                         <div class="form-group-custom">
@@ -553,6 +634,8 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    
 
                                     <div class="col-md-4">
                                         
@@ -747,564 +830,9 @@
     @include('footer')
 
 
-    <script>
-    $(document).ready(function() {
-        // Inicializar Select2 con tema Bootstrap
-        $('#id_contrato').select2({
-            theme: 'bootstrap-5',
-            width: '100%',
-            placeholder: 'Buscar contrato...',
-            allowClear: true,
-            language: {
-                noResults: function() { return "No se encontraron contratos"; },
-                searching: function() { return "Buscando..."; }
-            }
-        });
-
-        // Función para actualizar TODOS los campos de información del contrato
-        function actualizarInfoContrato() {
-            var selectedOption = $('#id_contrato').find('option:selected');
-            
-            if (selectedOption.val()) {
-                // Actualizar todos los spans
-                $('#consecutivo_display').text(selectedOption.data('consecutivo') || '---');
-                $('#refinterna_display').text(selectedOption.data('refinterna') || '---');
-                $('#contrato_no_display').text(selectedOption.data('contrato-no') || '---');
-                $('#cliente_display').text(selectedOption.data('cliente') || '---');
-                $('#obra_display').text(selectedOption.data('obra') || '---');
-                
-                // También puedes actualizar otros campos si existen
-                if ($('#frente_display').length) {
-                    $('#frente_display').text(selectedOption.data('frente') || '---');
-                }
-                
-                console.log('Datos del contrato cargados:', {
-                    consecutivo: selectedOption.data('consecutivo'),
-                    refinterna: selectedOption.data('refinterna'),
-                    contrato_no: selectedOption.data('contrato-no'),
-                    cliente: selectedOption.data('cliente'),
-                    obra: selectedOption.data('obra')
-                });
-            } else {
-                // Limpiar todos los campos
-                $('#consecutivo_display').text('---');
-                $('#refinterna_display').text('---');
-                $('#contrato_no_display').text('---');
-                $('#cliente_display').text('---');
-                $('#obra_display').text('---');
-                
-                if ($('#frente_display').length) {
-                    $('#frente_display').text('---');
-                }
-            }
-        }
-
-        // Evento change del select
-        $('#id_contrato').on('change', function() {
-            // Actualizar información básica del contrato
-            actualizarInfoContrato();
-            
-            var contratoId = $(this).val();
-            
-            if (contratoId) {
-                // Aquí va tu petición AJAX existente para cargar el último ingreso
-                // (Mantén tu código AJAX actual)
-                console.log('Contrato ID seleccionado:', contratoId);
-            }
-        });
-
-        // Si hay un contrato preseleccionado
-        @if(old('id_contrato', $ultimoIngreso->id_contrato ?? ''))
-            setTimeout(function() {
-                $('#id_contrato').val('{{ old('id_contrato', $ultimoIngreso->id_contrato ?? '') }}').trigger('change');
-            }, 200);
-        @endif
-    });
-    </script>
-    
-    <script>
-
-       
-
-    // Resto de tu código existente para el evento change
-    var datosCargados = false;
-    
-    // Evento change del select de contrato
-    $('#id_contrato').on('change', function() {
-        var contratoId = $(this).val();
-        
-        if (contratoId) {
-            // Mostrar indicador de carga
-            Swal.fire({
-                title: 'Cargando...',
-                text: 'Buscando último ingreso del contrato',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-            
-            // Petición AJAX
-            $.ajax({
-                url: '{{ route("ingresos.ultimo", "") }}/' + contratoId,
-                type: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    Swal.close();
-                    
-                    if (response.success && response.data) {
-                        // Mostrar notificación
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Datos cargados',
-                            text: 'Se cargó la información del último ingreso',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                        
-                        // Cargar los datos en el formulario
-                        cargarDatosIngreso(response.data);
-                        datosCargados = true;
-                    } else {
-                        // No hay datos previos, limpiar formulario
-                        limpiarFormulario();
-                        
-                        Swal.fire({
-                            icon: 'info',
-                            title: 'Sin datos previos',
-                            text: 'No hay ingresos anteriores para este contrato',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                    }
-                },
-                error: function(xhr, status, error) {
-                    Swal.close();
-                    console.error('Error:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'No se pudo cargar la información del contrato',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-                }
-            });
-        } else {
-            // Si no hay contrato seleccionado, limpiar formulario
-            limpiarFormulario();
-        }
-    });
-    
-    // Si hay un contrato preseleccionado desde la URL
-    @if(request()->has('contrato_id'))
-        setTimeout(function() {
-            $('#id_contrato').val('{{ request('contrato_id') }}').trigger('change');
-        }, 500);
-    @endif
-
-
-
-// Función para calcular importe del IVA y total de estimación
-function calcularImporteIVAYTotal() {
-    // Obtener valores numéricos reales
-    const importeEstimacion = parseFloat($('#importe_estimacion').val()) || 0;
-    const iva = parseFloat($('#iva').val()) || 0;
-    
-    // Calcular importe del IVA
-    const importeIVACalculado = importeEstimacion * (iva / 100);
-    
-    // Calcular total = importe + importe IVA
-    const totalCalculado = importeEstimacion + importeIVACalculado;
-    
-    // Asignar valores
-    $('#importe_iva').val(importeIVACalculado.toFixed(2));
-    $('#total_estimacion_con_iva').val(totalCalculado.toFixed(2));
-    
-    // Disparar eventos
-    dispararEventos('#importe_iva');
-    dispararEventos('#total_estimacion_con_iva');
-    
-    // Recalcular porcentajes si los checkboxes están activos
-    if ($('#aplicar_sicv').is(':checked')) {
-        calcularSICV();
-    }
-    if ($('#aplicar_srcop').is(':checked')) {
-        calcularSRCOP();
-    } else {
-        calcularRetencionesSanciones();
-    }
-}
-
-// Función para calcular 2% SICV
-function calcularSICV() {
-    const totalEstimacion = parseFloat($('#importe_estimacion').val()) || 0;
-    const resultado = totalEstimacion * 0.02; // 2%
-    
-    $('#sicv_cop').val(resultado.toFixed(2));
-    
-    calcularRetencionesSanciones();
-}
-
-// Función para calcular 1.5% SRCOP
-function calcularSRCOP() {
-    const totalEstimacion = parseFloat($('#importe_estimacion').val()) || 0;
-    const resultado = totalEstimacion * 0.015; // 1.5%
-    
-    $('#srcop_cdmx').val(resultado.toFixed(2));
-    
-    calcularRetencionesSanciones();
-}
-
-
-// Función para calcular Retenciones o Sanciones
-function calcularRetencionesSanciones() {
-    // Lista de IDs de los campos a sumar
-    var camposRetenciones = [
-        'sicv_cop',
-        'srcop_cdmx',
-        'retencion_5_al_millar',
-        'sancion_atrazo_presentacion_estimacion',
-        'sancion_atraso_de_obra',
-        'sancion_por_obra_mal_ejecutada',
-        'retencion_por_atraso_en_programa_obra'
-    ];
-    
-    var total = 0;
-    
-    // Sumar todos los valores
-    $.each(camposRetenciones, function(index, id) {
-        var valor = parseFloat($('#' + id).val()) || 0;
-        total += valor;
-    });
-    
-    // Actualizar el campo de retenciones o sanciones
-    $('#retenciones_o_sanciones').val(total.toFixed(2));
-    dispararEventos('#retenciones_o_sanciones');
-    
-    // Calcular estimado menos deducciones
-    calcularEstimadoMenosDeducciones();
-}
-
-// Función para calcular Total Amortización
-function calcularTotalAmortizacion() {
-    var amortizacionAnticipo = parseFloat($('#amortizacion_anticipo').val()) || 0;
-    var amortizacionIva = parseFloat($('#amortizacion_iva').val()) || 0;
-    
-    // Calcular el IVA de la amortización (amortizacion_anticipo * (amortizacion_iva/100))
-    var ivaCalculado = amortizacionAnticipo * (amortizacionIva / 100);
-    
-    // Calcular el total (amortizacion_anticipo + ivaCalculado)
-    var total = amortizacionAnticipo + ivaCalculado;
-    
-    // Asignar valores
-    $('#amor_iva').val(ivaCalculado.toFixed(2));
-    $('#total_amortizacion').val(total.toFixed(2));
-    
-    // Disparar eventos
-    dispararEventos('#amor_iva');
-    dispararEventos('#total_amortizacion');
-    
-    // Calcular estimado menos deducciones
-    calcularEstimadoMenosDeducciones();
-}
-
-// Función para calcular Estimado menos Deducciones
-function calcularEstimadoMenosDeducciones() {
-    var totalEstimacionConIva = parseFloat($('#total_estimacion_con_iva').val()) || 0;
-    var retencionesSanciones = parseFloat($('#retenciones_o_sanciones').val()) || 0;
-    var totalAmortizacion = parseFloat($('#total_amortizacion').val()) || 0;
-    
-    var resultado = totalEstimacionConIva - retencionesSanciones - totalAmortizacion;
-    
-    $('#estimado_menos_deducciones').val(resultado.toFixed(2));
-    dispararEventos('#estimado_menos_deducciones');
-}
-
-// Función para disparar eventos
-function dispararEventos(selector) {
-    var input = document.querySelector(selector);
-    if (input) {
-        input.dispatchEvent(new Event('input', { bubbles: true }));
-        input.dispatchEvent(new Event('keyup', { bubbles: true }));
-        input.dispatchEvent(new Event('change', { bubbles: true }));
-    }
-}
-
-// Inicializar eventos
-$(document).ready(function() {
-    // Evento para importe estimación e IVA
-    $('#importe_estimacion, #iva').on('input', function() {
-        calcularImporteIVAYTotal();
-    });
-    
-    // Eventos para checkboxes (dentro del document ready)
-    $('#aplicar_sicv').on('change', function() {
-        if ($(this).is(':checked')) {
-            calcularSICV();
-        } else {
-            $('#sicv_cop').val('0.00');
-            calcularRetencionesSanciones();
-        }
-        dispararEventos('#sicv_cop');// Si los pongo se dispara el evento pero el checkbox no se queda checked
-    });
-
-    $('#aplicar_srcop').on('change', function() {
-        if ($(this).is(':checked')) {
-            calcularSRCOP();
-        } else {
-            $('#srcop_cdmx').val('0.00');
-            calcularRetencionesSanciones();
-        }
-        dispararEventos('#srcop_cdmx');// Si los pongo se dispara el evento pero el checkbox no se queda checked
-    });
-    
-  
-   
-    
-    // Campos para calcular retenciones
-    var camposRetenciones = [
-        'retencion_5_al_millar',
-        'sancion_atrazo_presentacion_estimacion',
-        'sancion_atraso_de_obra',
-        'sancion_por_obra_mal_ejecutada',
-        'retencion_por_atraso_en_programa_obra'
-    ];
-    
-    $.each(camposRetenciones, function(index, id) {
-        $('#' + id).on('input', function() {
-            calcularRetencionesSanciones();
-        });
-    });
-    
-    // Campos para amortización
-    $('#amortizacion_anticipo, #amortizacion_iva').on('input', function() {
-        calcularTotalAmortizacion();
-    });
-    
-    // Validar IVA
-    $('#iva').on('change', function() {
-        let valor = parseFloat($(this).val()) || 0;
-        if (valor < 0) $(this).val(0);
-        if (valor > 100) $(this).val(100);
-    });
-    
-    // Calcular valores iniciales
-    setTimeout(function() {
-        calcularImporteIVAYTotal();
-        calcularRetencionesSanciones();
-        calcularTotalAmortizacion();
-        calcularEstimadoMenosDeducciones();
-    }, 200);
-});
-</script>
-
-<script>
-$(document).ready(function() {
-    
-    // Variable para controlar si ya se cargaron datos iniciales
-    var datosCargados = false;
-    
-    // Evento change del select de contrato
-    $('#id_contrato').on('change', function() {
-        var contratoId = $(this).val();
-        
-        if (contratoId) {
-            // Mostrar indicador de carga
-            Swal.fire({
-                title: 'Cargando...',
-                text: 'Buscando último ingreso del contrato',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-            
-            // Petición AJAX
-            $.ajax({
-                url: '{{ route("ingresos.ultimo", "") }}/' + contratoId,
-                type: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    Swal.close();
-                    
-                    if (response.success && response.data) {
-                        // Mostrar notificación
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Datos cargados',
-                            text: 'Se cargó la información del último ingreso',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                        
-                        // Cargar los datos en el formulario
-                        cargarDatosIngreso(response.data);
-                        datosCargados = true;
-                    } else {
-                        // No hay datos previos, limpiar formulario
-                        limpiarFormulario();
-                        
-                        Swal.fire({
-                            icon: 'info',
-                            title: 'Sin datos previos',
-                            text: 'No hay ingresos anteriores para este contrato',
-                            timer: 2000,
-                            showConfirmButton: false
-                        });
-                    }
-                },
-                error: function(xhr, status, error) {
-                    Swal.close();
-                    console.error('Error:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'No se pudo cargar la información del contrato',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-                }
-            });
-        } else {
-            // Si no hay contrato seleccionado, limpiar formulario
-            limpiarFormulario();
-        }
-    });
-    
-    // Función para cargar datos del ingreso en el formulario
-    function cargarDatosIngreso(data) {
-        // Información básica
-        
-        $('#periodo_del').val(data.periodo_del || '');
-        $('#periodo_al').val(data.periodo_al || '');
-        
-        // Montos de estimación
-        $('#importe_estimacion').val(data.importe_estimacion || 0);
-        dispararEventos('#importe_estimacion');
-        
-        $('#iva').val(data.iva || 0);
-        dispararEventos('#iva');
-        
-        $('#importe_iva').val(data.importe_iva || 0);
-        $('#total_estimacion_con_iva').val(data.total_estimacion_con_iva || 0);
-        
-        // SICV y SRCOP (valores y checkboxes)
-        $('#sicv_cop').val(data.sicv_cop || 0);
-        if (parseFloat(data.sicv_cop) > 0) {
-            $('#aplicar_sicv').prop('checked', true);
-            dispararEventos('#aplicar_sicv');
-        } else {
-            $('#aplicar_sicv').prop('checked', false);
-        }
-        
-        $('#srcop_cdmx').val(data.srcop_cdmx || 0);
-        if (parseFloat(data.srcop_cdmx) > 0) {
-            $('#aplicar_srcop').prop('checked', true);
-            dispararEventos('#aplicar_srcop');
-        } else {
-            $('#aplicar_srcop').prop('checked', false);
-        }
-        
-        // Retenciones y sanciones
-        $('#retencion_5_al_millar').val(data.retencion_5_al_millar || 0);
-        dispararEventos('#retencion_5_al_millar');
-        
-        $('#sancion_atrazo_presentacion_estimacion').val(data.sancion_atrazo_presentacion_estimacion || 0);
-        dispararEventos('#sancion_atrazo_presentacion_estimacion');
-        
-        $('#sancion_atraso_de_obra').val(data.sancion_atraso_de_obra || 0);
-        dispararEventos('#sancion_atraso_de_obra');
-        
-        $('#sancion_por_obra_mal_ejecutada').val(data.sancion_por_obra_mal_ejecutada || 0);
-        dispararEventos('#sancion_por_obra_mal_ejecutada');
-        
-        $('#retencion_por_atraso_en_programa_obra').val(data.retencion_por_atraso_en_programa_obra || 0);
-        dispararEventos('#retencion_por_atraso_en_programa_obra');
-        
-        $('#retenciones_o_sanciones').val(data.retenciones_o_sanciones || 0);
-        
-        // Amortizaciones
-        $('#amortizacion_anticipo').val(data.amortizacion_anticipo || 0);
-        dispararEventos('#amortizacion_anticipo');
-        
-        $('#amortizacion_iva').val(data.amortizacion_iva || 0);
-        dispararEventos('#amortizacion_iva');
-        
-        $('#total_amortizacion').val(data.total_amortizacion || 0);
-        
-        // Estimado menos deducciones
-        $('#estimado_menos_deducciones').val(data.estimado_menos_deducciones || 0);
-        
      
-    }
-    
-    // Función para limpiar el formulario
-    function limpiarFormulario() {
-        // Información básica
-      
-        $('#periodo_del').val('');
-        $('#periodo_al').val('');
-        
-        // Montos de estimación
-        $('#importe_estimacion').val(0);
-        dispararEventos('#importe_estimacion');
-        
-        $('#iva').val(0);
-        dispararEventos('#iva');
-        
-        $('#importe_iva').val(0);
-        $('#total_estimacion_con_iva').val(0);
-        
-        // SICV y SRCOP
-        $('#sicv_cop').val(0);
-        $('#aplicar_sicv').prop('checked', false);
-        
-        $('#srcop_cdmx').val(0);
-        $('#aplicar_srcop').prop('checked', false);
-        
-        // Retenciones y sanciones
-        $('#retencion_5_al_millar').val(0);
-        dispararEventos('#retencion_5_al_millar');
-        
-        $('#sancion_atrazo_presentacion_estimacion').val(0);
-        dispararEventos('#sancion_atrazo_presentacion_estimacion');
-        
-        $('#sancion_atraso_de_obra').val(0);
-        dispararEventos('#sancion_atraso_de_obra');
-        
-        $('#sancion_por_obra_mal_ejecutada').val(0);
-        dispararEventos('#sancion_por_obra_mal_ejecutada');
-        
-        $('#retencion_por_atraso_en_programa_obra').val(0);
-        dispararEventos('#retencion_por_atraso_en_programa_obra');
-        
-        $('#retenciones_o_sanciones').val(0);
-        
-        // Amortizaciones
-        $('#amortizacion_anticipo').val(0);
-        dispararEventos('#amortizacion_anticipo');
-        
-        $('#amortizacion_iva').val(0);
-        dispararEventos('#amortizacion_iva');
-        
-        $('#total_amortizacion').val(0);
-        
-        // Estimado menos deducciones
-        $('#estimado_menos_deducciones').val(0);
-       
-    }
-    
-    // Si hay un contrato preseleccionado (por ejemplo desde la URL), cargar sus datos
-    @if(request()->has('contrato_id'))
-        setTimeout(function() {
-            $('#id_contrato').trigger('change');
-        }, 500);
-    @endif
-    
-});
-</script>
-   
+     
+    @include('aingresos.ingresos.script')
 </body>
 </html>
 
