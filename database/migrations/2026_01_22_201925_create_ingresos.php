@@ -26,8 +26,14 @@ class CreateIngresos extends Migration
         $table->date('fecha_factura')->nullable();
         $table->decimal('importe_estimacion', 15, 2)->default(0);
         $table->decimal('iva', 15, 2)->default(0);
+        $table->decimal('importe_iva', 15, 2)->default(0);
         $table->decimal('retenciones_o_sanciones', 15, 2)->default(0);
         $table->decimal('total_estimacion_con_iva', 15, 2)->default(0);
+        $table->decimal('sicv_cop', 15, 2)->default(0);
+        $table->decimal('srcop_cdmx', 15, 2)->default(0);
+        $table->decimal('derechos_supervision', 15, 2)->default(0);
+        $table->decimal('aportacion_cmic', 15, 2)->default(0);
+        $table->decimal('delegacion_icic', 15, 2)->default(0);
         $table->decimal('avance_obra_estimacion', 10, 2)->default(0);
         $table->decimal('avance_obra_real', 10, 2)->default(0);
         $table->decimal('porcentaje_avance_financiero', 10, 2)->default(0);
@@ -49,11 +55,6 @@ class CreateIngresos extends Migration
         $table->decimal('por_estimar', 15, 2)->default(0);
         $table->string('status')->nullable();
         $table->decimal('estimado_menos_deducciones', 15, 2)->default(0);
-
-        // ← SOLO AGREGAR ESTOS 3 CAMPOS FALTANTES
-        $table->decimal('importe_iva', 15, 2)->default(0)->after('iva');
-        $table->decimal('sicv_cop', 15, 2)->default(0)->after('total_estimacion_con_iva');
-        $table->decimal('srcop_cdmx', 15, 2)->default(0)->after('sicv_cop');
         
         $table->integer('verificado')->default(1);
         $table->timestamps();
@@ -68,7 +69,7 @@ class CreateIngresos extends Migration
     public function down()
     {
         Schema::table('ingresos', function (Blueprint $table) {
-            //
+            $table->dropColumn(['derechos_supervision', 'aportacion_cmic', 'delegacion_icic']);
         });
     }
 }

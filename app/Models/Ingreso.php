@@ -31,19 +31,22 @@ class Ingreso extends Model
         'fecha_factura',
         'importe_estimacion',
         'iva',
-        'importe_iva', // ← NUEVO
+        'importe_iva',
         'retenciones_o_sanciones',
         'total_estimacion_con_iva',
-        'sicv_cop', // ← NUEVO
-        'srcop_cdmx', // ← NUEVO
+        'sicv_cop',
+        'srcop_cdmx',
+        'derechos_supervision',           // ← NUEVO
+        'aportacion_cmic',                // ← NUEVO
+        'delegacion_icic',                // ← NUEVO
         'retencion_5_al_millar',
         'sancion_atrazo_presentacion_estimacion',
         'sancion_atraso_de_obra',
         'sancion_por_obra_mal_ejecutada',
         'retencion_por_atraso_en_programa_obra',
         'amortizacion_anticipo',
-        'amortizacion_iva', // ← CAMBIADO (antes amortizacion_con_iva)
-        'total_amortizacion', // ← NUEVO
+        'amortizacion_iva',
+        'total_amortizacion',
         'liquido_a_cobrar',
         'liquido_cobrado',
         'fecha_cobro',
@@ -70,6 +73,9 @@ class Ingreso extends Model
         'total_estimacion_con_iva' => 'decimal:2',
         'sicv_cop' => 'decimal:2',
         'srcop_cdmx' => 'decimal:2',
+        'derechos_supervision' => 'decimal:2',        // ← NUEVO
+        'aportacion_cmic' => 'decimal:2',             // ← NUEVO
+        'delegacion_icic' => 'decimal:2',             // ← NUEVO
         'retencion_5_al_millar' => 'decimal:2',
         'sancion_atrazo_presentacion_estimacion' => 'decimal:2',
         'sancion_atraso_de_obra' => 'decimal:2',
