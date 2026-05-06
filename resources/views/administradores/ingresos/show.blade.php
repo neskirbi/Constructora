@@ -328,7 +328,35 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
+                                <!-- NUEVOS CAMPOS -->
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Derechos de Supervisión y Control de Obra (2%)</label>
+                                        <div class="info-display">
+                                            ${{ number_format($ingreso->derechos_supervision ?? 0, 2) }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Aportación C.M.I.C Estado de México (0.50%)</label>
+                                        <div class="info-display">
+                                            ${{ number_format($ingreso->aportacion_cmic ?? 0, 2) }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <label class="form-label-custom">Delegación Estado de México I.C.I.C. (0.20%)</label>
+                                        <div class="info-display">
+                                            ${{ number_format($ingreso->delegacion_icic ?? 0, 2) }}
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="col-md-4">
                                     <div class="form-group-custom">
                                         <label class="form-label-custom">Retención 5 al Millar</label>

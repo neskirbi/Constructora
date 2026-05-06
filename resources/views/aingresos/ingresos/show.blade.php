@@ -519,6 +519,91 @@
                                         </div>
                                     </div>
                                 </div>
+
+
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <label for="derechos_supervision" class="form-label-custom mb-0">
+                                                Derechos de Supervisión y Control de Obra (2%)
+                                            </label>
+                                            <div class="form-check mb-0">
+                                                <input class="form-check-input" type="checkbox" id="aplicar_derechos_supervision" 
+                                                    {{ ($ingreso->derechos_supervision ?? 0) > 0 ? 'checked' : '' }}>
+                                                <label class="form-check-label small" for="aplicar_derechos_supervision">
+                                                    Aplicar
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="input-group input-group-custom mt-1">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" 
+                                                class="form-control form-control-custom numeric-input" 
+                                                id="derechos_supervision" 
+                                                name="derechos_supervision" 
+                                                value="{{ old('derechos_supervision', $ingreso->derechos_supervision ?? 0) }}"
+                                                step="0.01"
+                                                placeholder="0.00"
+                                                min="0" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <label for="aportacion_cmic" class="form-label-custom mb-0">
+                                                Aportación C.M.I.C Estado de México (0.50%)
+                                            </label>
+                                            <div class="form-check mb-0">
+                                                <input class="form-check-input" type="checkbox" id="aplicar_aportacion_cmic" 
+                                                    {{ ($ingreso->aportacion_cmic ?? 0) > 0 ? 'checked' : '' }}>
+                                                <label class="form-check-label small" for="aplicar_aportacion_cmic">
+                                                    Aplicar
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="input-group input-group-custom mt-1">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" 
+                                                class="form-control form-control-custom numeric-input" 
+                                                id="aportacion_cmic" 
+                                                name="aportacion_cmic" 
+                                                value="{{ old('aportacion_cmic', $ingreso->aportacion_cmic ?? 0) }}"
+                                                step="0.01"
+                                                placeholder="0.00"
+                                                min="0" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group-custom">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <label for="delegacion_icic" class="form-label-custom mb-0">
+                                                Delegación Estado de México I.C.I.C. (0.20%)
+                                            </label>
+                                            <div class="form-check mb-0">
+                                                <input class="form-check-input" type="checkbox" id="aplicar_delegacion_icic" 
+                                                    {{ ($ingreso->delegacion_icic ?? 0) > 0 ? 'checked' : '' }}>
+                                                <label class="form-check-label small" for="aplicar_delegacion_icic">
+                                                    Aplicar
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="input-group input-group-custom mt-1">
+                                            <span class="input-group-text">$</span>
+                                            <input type="number" 
+                                                class="form-control form-control-custom numeric-input" 
+                                                id="delegacion_icic" 
+                                                name="delegacion_icic" 
+                                                value="{{ old('delegacion_icic', $ingreso->delegacion_icic ?? 0) }}"
+                                                step="0.01"
+                                                placeholder="0.00"
+                                                min="0" readonly>
+                                        </div>
+                                    </div>
+                                </div>
                                 
                                 <div class="col-md-4">
                                     <div class="form-group-custom">
@@ -1081,38 +1166,49 @@ function calcularImporteIVAYTotal() {
     }
     if ($('#aplicar_srcop').is(':checked')) {
         calcularSRCOP();
-    } else {
-        calcularRetencionesSanciones();
     }
+    // NUEVOS CHECKBOXES
+    if ($('#aplicar_derechos_supervision').is(':checked')) {
+        const totalEstimacion = parseFloat($('#importe_estimacion').val()) || 0;
+        $('#derechos_supervision').val((totalEstimacion * 0.02).toFixed(2));
+    }
+    if ($('#aplicar_aportacion_cmic').is(':checked')) {
+        const totalEstimacion = parseFloat($('#importe_estimacion').val()) || 0;
+        $('#aportacion_cmic').val((totalEstimacion * 0.005).toFixed(2));
+    }
+    if ($('#aplicar_delegacion_icic').is(':checked')) {
+        const totalEstimacion = parseFloat($('#importe_estimacion').val()) || 0;
+        $('#delegacion_icic').val((totalEstimacion * 0.002).toFixed(2));
+    }
+    
+    calcularRetencionesSanciones();
 }
 
 // Función para calcular 2% SICV
 function calcularSICV() {
     const totalEstimacion = parseFloat($('#importe_estimacion').val()) || 0;
-    const resultado = totalEstimacion * 0.02; // 2%
-    
+    const resultado = totalEstimacion * 0.02;
     $('#sicv_cop').val(resultado.toFixed(2));
-    
     calcularRetencionesSanciones();
 }
 
 // Función para calcular 1.5% SRCOP
 function calcularSRCOP() {
     const totalEstimacion = parseFloat($('#importe_estimacion').val()) || 0;
-    const resultado = totalEstimacion * 0.015; // 1.5%
-    
+    const resultado = totalEstimacion * 0.015;
     $('#srcop_cdmx').val(resultado.toFixed(2));
-    
     calcularRetencionesSanciones();
 }
 
-
-// Función para calcular Retenciones o Sanciones
+// Función para calcular Retenciones o Sanciones (ACTUALIZADA con nuevos campos)
 function calcularRetencionesSanciones() {
-    // Lista de IDs de los campos a sumar
+    // Lista de IDs de los campos a sumar (INCLUYE los 3 nuevos)
     var camposRetenciones = [
         'sicv_cop',
         'srcop_cdmx',
+        'derechos_supervision',
+        'aportacion_cmic',
+        'delegacion_icic',
         'retencion_5_al_millar',
         'sancion_atrazo_presentacion_estimacion',
         'sancion_atraso_de_obra',
@@ -1141,21 +1237,15 @@ function calcularTotalAmortizacion() {
     var amortizacionAnticipo = parseFloat($('#amortizacion_anticipo').val()) || 0;
     var amortizacionIva = parseFloat($('#amortizacion_iva').val()) || 0;
     
-    // Calcular el IVA de la amortización (amortizacion_anticipo * (amortizacion_iva/100))
     var ivaCalculado = amortizacionAnticipo * (amortizacionIva / 100);
-    
-    // Calcular el total (amortizacion_anticipo + ivaCalculado)
     var total = amortizacionAnticipo + ivaCalculado;
     
-    // Asignar valores
     $('#amor_iva').val(ivaCalculado.toFixed(2));
     $('#total_amortizacion').val(total.toFixed(2));
     
-    // Disparar eventos
     dispararEventos('#amor_iva');
     dispararEventos('#total_amortizacion');
     
-    // Calcular estimado menos deducciones
     calcularEstimadoMenosDeducciones();
 }
 
@@ -1188,7 +1278,7 @@ $(document).ready(function() {
         calcularImporteIVAYTotal();
     });
     
-    // Eventos para checkboxes (dentro del document ready)
+    // Evento checkbox SICV
     $('#aplicar_sicv').on('change', function() {
         if ($(this).is(':checked')) {
             calcularSICV();
@@ -1196,9 +1286,10 @@ $(document).ready(function() {
             $('#sicv_cop').val('0.00');
             calcularRetencionesSanciones();
         }
-        dispararEventos('#sicv_cop');// Si los pongo se dispara el evento pero el checkbox no se queda checked
+        dispararEventos('#sicv_cop');
     });
 
+    // Evento checkbox SRCOP
     $('#aplicar_srcop').on('change', function() {
         if ($(this).is(':checked')) {
             calcularSRCOP();
@@ -1206,14 +1297,52 @@ $(document).ready(function() {
             $('#srcop_cdmx').val('0.00');
             calcularRetencionesSanciones();
         }
-        dispararEventos('#srcop_cdmx');// Si los pongo se dispara el evento pero el checkbox no se queda checked
+        dispararEventos('#srcop_cdmx');
+    });
+
+    // Evento Derechos Supervisión (2%)
+    $('#aplicar_derechos_supervision').on('change', function() {
+        if ($(this).is(':checked')) {
+            const totalEstimacion = parseFloat($('#importe_estimacion').val()) || 0;
+            $('#derechos_supervision').val((totalEstimacion * 0.02).toFixed(2));
+        } else {
+            $('#derechos_supervision').val('0.00');
+        }
+        dispararEventos('#derechos_supervision');
+        calcularRetencionesSanciones();
+    });
+
+    // Evento Aportación CMIC (0.50%)
+    $('#aplicar_aportacion_cmic').on('change', function() {
+        if ($(this).is(':checked')) {
+            const totalEstimacion = parseFloat($('#importe_estimacion').val()) || 0;
+            $('#aportacion_cmic').val((totalEstimacion * 0.005).toFixed(2));
+        } else {
+            $('#aportacion_cmic').val('0.00');
+        }
+        dispararEventos('#aportacion_cmic');
+        calcularRetencionesSanciones();
+    });
+
+    // Evento Delegación ICIC (0.20%)
+    $('#aplicar_delegacion_icic').on('change', function() {
+        if ($(this).is(':checked')) {
+            const totalEstimacion = parseFloat($('#importe_estimacion').val()) || 0;
+            $('#delegacion_icic').val((totalEstimacion * 0.002).toFixed(2));
+        } else {
+            $('#delegacion_icic').val('0.00');
+        }
+        dispararEventos('#delegacion_icic');
+        calcularRetencionesSanciones();
     });
     
-  
-   
-    
-    // Campos para calcular retenciones
+    // Campos de retenciones y sanciones
     var camposRetenciones = [
+        'sicv_cop',
+        'srcop_cdmx',
+        'derechos_supervision',
+        'aportacion_cmic',
+        'delegacion_icic',
         'retencion_5_al_millar',
         'sancion_atrazo_presentacion_estimacion',
         'sancion_atraso_de_obra',
@@ -1247,28 +1376,20 @@ $(document).ready(function() {
         calcularEstimadoMenosDeducciones();
     }, 200);
 });
-</script>
 
-
-<script>
-// Función para calcular Por Cobrar (Líquido a cobrar - Líquido cobrado)
+// Script para Por Cobrar
 $(document).ready(function() {
-    // Obtener el valor del líquido a cobrar desde el modelo
     const liquidoACobrar = {{ $ingreso->estimado_menos_deducciones ?? 0 }};
     
-    // Función para calcular y actualizar el campo Por Cobrar
-    $('#liquido_cobrado').on('input', function() {
+    function actualizarPorCobrar() {
         const liquidoCobrado = parseFloat($('#liquido_cobrado').val()) || 0;
         const porCobrar = liquidoACobrar - liquidoCobrado;
         $('#por_cobrar').val(porCobrar.toFixed(2));
         dispararEventos('#por_cobrar');
-    });
+    }
     
-    
-     //$('#liquido_cobrado').on('input', calcularPorCobrar);`
-    
-    // Calcular el valor inicial al cargar la página
-    calcularPorCobrar();
+    $('#liquido_cobrado').on('input', actualizarPorCobrar);
+    actualizarPorCobrar();
 });
 </script>
 </body>

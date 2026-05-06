@@ -167,42 +167,45 @@ public function update(Request $request, $id)
     try {
         $ingreso = Ingreso::findOrFail($id);
         
-        // Validación de campos del primer formulario
-        
-        
-        // Asignar manualmente cada campo para depurar
+        // Asignar manualmente cada campo
         $ingreso->no_estimacion = $request->no_estimacion;
         $ingreso->periodo_del = $request->periodo_del;
         $ingreso->periodo_al = $request->periodo_al;
         $ingreso->importe_estimacion = $request->importe_estimacion ?? 0;
         $ingreso->iva = $request->iva ?? 0;
         $ingreso->importe_iva = $request->importe_iva ?? 0;
-        
         $ingreso->total_estimacion_con_iva = $request->total_estimacion_con_iva ?? 0;        
         
-
+        // Porcentajes
         $ingreso->sicv_cop = $request->sicv_cop ?? 0;
         $ingreso->srcop_cdmx = $request->srcop_cdmx ?? 0;
+        
+        // NUEVOS CAMPOS
+        $ingreso->derechos_supervision = $request->derechos_supervision ?? 0;
+        $ingreso->aportacion_cmic = $request->aportacion_cmic ?? 0;
+        $ingreso->delegacion_icic = $request->delegacion_icic ?? 0;
+        
+        // Retenciones y sanciones
         $ingreso->retencion_5_al_millar = $request->retencion_5_al_millar ?? 0;
         $ingreso->sancion_atrazo_presentacion_estimacion = $request->sancion_atrazo_presentacion_estimacion ?? 0;
         $ingreso->sancion_atraso_de_obra = $request->sancion_atraso_de_obra ?? 0;
         $ingreso->sancion_por_obra_mal_ejecutada = $request->sancion_por_obra_mal_ejecutada ?? 0;
         $ingreso->retencion_por_atraso_en_programa_obra = $request->retencion_por_atraso_en_programa_obra ?? 0;
         $ingreso->retenciones_o_sanciones = $request->retenciones_o_sanciones ?? 0;
+        
+        // Amortizaciones
         $ingreso->amortizacion_anticipo = $request->amortizacion_anticipo ?? 0;
         $ingreso->amortizacion_iva = $request->amortizacion_iva ?? 0;
         $ingreso->total_amortizacion = $request->total_amortizacion ?? 0;
         $ingreso->estimado_menos_deducciones = $request->estimado_menos_deducciones ?? 0;
         $ingreso->liquido_a_cobrar = $request->estimado_menos_deducciones ?? 0;
         
-        // Guardar
         $ingreso->save();
         
         return redirect()->route('ingresos.show', $ingreso->id)
             ->with('success', 'Información actualizada exitosamente.');
             
     } catch (\Exception $e) {
-        // Si hay error, lo mostramos
         return back()->withErrors(['error' => 'Error: ' . $e->getMessage()])->withInput();
     }
 }
