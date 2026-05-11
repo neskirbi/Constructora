@@ -4,6 +4,9 @@ use App\Models\Administrador;
 use App\Models\Aingreso;
 use App\Models\Adestajo;
 use App\Models\Acompra;
+use App\Models\Contrato;
+use App\Models\Ingreso;
+use App\Models\AmpliacionMonto;
 
 date_default_timezone_set('America/Mexico_City');
 
@@ -187,6 +190,79 @@ function GetUuid(){
             ->select(DB::raw('MAX(CAST(clave AS UNSIGNED)) as max_clave'))
             ->value('max_clave');
         return $maxClave ? $maxClave + 1 : 1;
+    }
+
+    function TotalContrato($id){
+        
+
+        $monto = Contrato::select(DB::raw('SUM(contratos.total) as monto'))
+            ->where('id', $id)
+            ->first(); 
+
+        $taotalcontrato = $monto->monto ?? 0;
+
+
+        $extenciones = AmpliacionMonto::select(DB::raw('SUM(ampliacionesmonto.total) as monto'))
+            ->where('id_contrato', $id)
+            ->first(); 
+
+        $extenciones = $extenciones->monto ?? 0;
+
+
+        $total = ($taotalcontrato + $extenciones) ; 
+        
+        
+        
+        // Actualizar correctamente
+        Contrato::where('id', $id)
+            ->update(['total_contrato' => $total]);
+        
+    }
+
+    function TotalIngresos($id){
+        
+
+
+        $facturado = Ingreso::select(DB::raw('SUM(ingresos.total_estimacion_con_iva) as ingresos'))
+            ->where('id_contrato', $id)
+            ->first(); 
+
+        // Extraer el valor, manejar null
+        $totalFacturado = $facturado->ingresos ?? 0;
+
+      
+        
+        
+        
+        // Actualizar correctamente
+        Contrato::where('id', $id)
+            ->update(['total_facturado' => $totalFacturado]);
+        
+    }
+
+
+    function TotalLiquido($id){
+        
+
+
+        $facturado = Ingreso::select(DB::raw('SUM(ingresos.liquido_a_cobrar) as liquido_a_cobrar'),
+        DB::raw('SUM(ingresos.liquido_a_cobrar) as liquido_cobrado'))
+            ->where('id_contrato', $id)
+            ->first(); 
+
+        // Extraer el valor, manejar null
+        $total_liquidoacobrar = $facturado->liquido_a_cobrar ?? 0;
+        $total_liquidocobrado = $facturado->ingliquido_cobradoresos ?? 0;
+
+      
+        
+        
+        
+        // Actualizar correctamente
+        Contrato::where('id', $id)
+            ->update(['liquido_a_cobrar' => $total_liquidoacobrar,
+            'liquido_cobrado' => $total_liquidocobrado]);
+        
     }
 
     function Comentarios(){

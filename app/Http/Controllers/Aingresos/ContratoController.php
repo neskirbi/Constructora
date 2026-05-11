@@ -212,7 +212,7 @@ class ContratoController extends Controller
 
         // Crear el contrato en la base de datos
         $contrato = Contrato::create($datosContrato);
-
+        TotalContrato($datosContrato['id']);
         // Redireccionar con mensaje de éxito
         return redirect()->route('contratos.index')
             ->with('success', 'Contrato ' . $contrato->contrato_no . ' creado exitosamente');
@@ -411,6 +411,7 @@ class ContratoController extends Controller
         // Actualizar el contrato en la base de datos
         $contrato->update($datosContrato);
 
+        TotalContrato($contrato->id);
         // Redireccionar con mensaje de éxito
         return redirect()->back()
             ->with('success', 'Contrato ' . $contrato->contrato_no . ' actualizado exitosamente');
@@ -545,6 +546,7 @@ public function storeAmpliacionMonto(Request $request, $id)
         
         DB::commit();
         
+        TotalContrato($contrato->id);
         return redirect()->route('contratos.show', $id)
             ->with('success', 'Ampliación de monto registrada exitosamente');
         
@@ -626,7 +628,7 @@ public function destroyAmpliacionMonto($id)
         //$contrato->save();
         
         DB::commit();
-        
+        TotalContrato($contrato->id);
         return redirect()->back()->with('success', 'Ampliación de monto eliminada');
         
     } catch (\Exception $e) {

@@ -129,6 +129,8 @@ class IngresoController extends Controller
 
         $ingreso->save();
         
+        TotalIngresos($request->id_contrato);
+        TotalLiquido($request->id_contrato);
         return redirect('ingresos')
             ->with('success', 'Ingreso creado exitosamente.');
     }
@@ -201,7 +203,9 @@ public function update(Request $request, $id)
         $ingreso->liquido_a_cobrar = $request->estimado_menos_deducciones ?? 0;
         
         $ingreso->save();
-        
+        TotalIngresos($ingreso->id_contrato);
+        TotalLiquido($ingreso->id_contrato);
+
         return redirect()->route('ingresos.show', $ingreso->id)
             ->with('success', 'Información actualizada exitosamente.');
             
@@ -239,7 +243,8 @@ public function updateFacturacion(Request $request, $id)
     
     // Actualizar todos los campos (facturación + cobros)
     $ingreso->update($validated);
-    
+    TotalIngresos($ingreso->id_contrato);
+    TotalLiquido($ingreso->id_contrato);
     return redirect()->route('ingresos.show', $ingreso->id)
         ->with('success', 'Datos guardados exitosamente.');
 }
@@ -262,7 +267,8 @@ public function updateFacturacion(Request $request, $id)
         }
         
         $ingreso->delete();
-        
+        TotalIngresos($ingreso->id_contrato);
+        TotalLiquido($ingreso->id_contrato);
         return redirect()->route('ingresos')
             ->with('success', 'Ingreso eliminado exitosamente.');
     }

@@ -365,6 +365,13 @@
                                                 Estado: {{ ucfirst($ingreso->status) }}
                                             </span>
                                             @endif
+
+                                             @if(ucfirst($ingreso->status) === "Pagado")
+                                            <span class="fecha-badge ms-2" style="background: #e7f5ff; color: #0d6efd;">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Fecha Cobro: {{ optional($ingreso->fecha_cobro)->format('Y-m-d')}}
+                                            </span>
+                                            @endif
                                         </div>
                                     </div>
                                     <span class="{{ $statusClass }}">{{ $statusText }}</span>
@@ -419,6 +426,49 @@
                                         </div>
                                     </div>
 
+                                    <div class="row mb-4">
+                                        <div class="col-md-6">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <small>Importe Contrato</small>
+                                                            <h5>${{ number_format($contrato->total ?? 0, 2) }}</h5>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <small>Importe Facturado</small>
+                                                            <h5>${{ number_format($contrato->total_facturado ?? 0, 2) }}</h5>
+                                                        </div>
+                                                        <div class="col-md-12 mt-2">
+                                                            <small>Importe por Facturar</small>
+                                                            <h5>${{ number_format(($contrato->total ?? 0) - ($contrato->total_facturado ?? 0), 2) }}</h5>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <small>Importe Líquido</small>
+                                                            <h5>${{ number_format($contrato->liquido_a_cobrar ?? 0, 2) }}</h5>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <small>Líquido Cobrado</small>
+                                                            <h5>${{ number_format($contrato->liquido_cobrado ?? 0, 2) }}</h5>
+                                                        </div>
+                                                        <div class="col-md-12 mt-2">
+                                                            <small>Líquido por Cobrar</small>
+                                                            <h5>${{ number_format(($contrato->liquido_a_cobrar ?? 0) - ($contrato->liquido_cobrado ?? 0), 2) }}</h5>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <!-- Facturación -->
                                     <div class="info-grid mt-3">
                                         <div class="info-item">
@@ -444,7 +494,14 @@
                                         </div>
                                         
                                         <div class="info-item">
-                                            <div class="info-label">Importe Facturado</div>
+                                            <div class="info-label">Importe Factura</div>
+                                            <div class="info-value">
+                                                ${{ number_format($ingreso->total_estimacion_con_iva ?? 0, 2) }}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="info-item">
+                                            <div class="info-label">Importe Liquido</div>
                                             <div class="info-value">
                                                 ${{ number_format($ingreso->estimado_menos_deducciones ?? 0, 2) }}
                                             </div>

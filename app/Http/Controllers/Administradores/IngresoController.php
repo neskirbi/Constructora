@@ -184,7 +184,7 @@ class IngresoController extends Controller
     {
         $ingreso = Ingreso::findOrFail($id);
         
-        // Solo cambia el puto campo verificado
+        // Solo cambia el campo verificado
         $ingreso->verificado = $request->verificado;
         $ingreso->save();
         

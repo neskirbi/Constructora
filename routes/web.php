@@ -214,3 +214,10 @@ Route::post('NuevoPS', [App\Http\Controllers\General\ProductosServiciosControlle
 ->name('NuevoPS');
 
 Route::post('/proveedores/guardar', [App\Http\Controllers\General\ProveedorController::class, 'guardarProveedor'])->name('proveedoresds.guardar');
+
+
+/**
+ * Soporte
+ */
+
+Route::get('SacarTotales', [App\Http\Controllers\Soporte\TareasController::class, 'SacarTotales']);

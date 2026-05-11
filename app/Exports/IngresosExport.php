@@ -131,15 +131,14 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             'Liquido a cobrar',
             'Liquido Cobrado',
             'Fecha Cobro',
-            'POR COBRAR',
+            'POR COBRAR',        // ← Solo UNO, con nueva fórmula
             'POR FACTURAR',
-            'Por Cobrar',
             'Por Estimar',
             'Status'
         ];
     }
-    
-    public function map($row): array
+        
+        public function map($row): array
     {
         // Total a cobrar contrato c/IVA = Importe Contrato + Convenio Aplicación
         $totalACobrar = $row->importe_contrato + ($row->convenio_aplicacion_monto ?? 0);
@@ -152,6 +151,9 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
         
         // Importe Facturado = Total Estimacion con IVA - Total Deducciones
         $importeFacturado = $row->total_estimacion_con_iva - $row->total_deducciones;
+        
+        // NUEVA FÓRMULA: POR COBRAR = Importe de Estimación - Líquido Cobrado
+        $porCobrar = ($row->importe_estimacion ?? 0) - ($row->liquido_cobrado ?? 0);
         
         return [
             $row->n_obra ?? '',
@@ -174,7 +176,7 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             $row->n_factura ?? '',
             $this->formatDate($row->fecha_factura),
             $this->formatNumber($row->importe_estimacion),
-            $this->formatPercent($row->iva),   // Muestra el porcentaje (ej. 16.00)
+            $this->formatPercent($row->iva),
             $this->formatNumber($row->total_estimacion_con_iva),
             $this->formatDate($row->fecha_elaboracion),
             $this->formatNumber($row->cargos_adicionales_3_5),
@@ -190,9 +192,8 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             $this->formatNumber($row->liquido_a_cobrar),
             $this->formatNumber($row->liquido_cobrado),
             $this->formatDate($row->fecha_cobro),
-            $this->formatNumber($row->por_cobrar),
+            $this->formatNumber($porCobrar),        // ← NUEVA FÓRMULA
             $this->formatNumber($porFacturar),
-            $this->formatNumber($row->por_cobrar),
             $this->formatNumber($row->por_estimar),
             $row->status ?? '',
         ];
