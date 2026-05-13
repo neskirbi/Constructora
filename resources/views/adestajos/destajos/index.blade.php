@@ -318,9 +318,9 @@
                                             </div>
                                             <div class="info-item" style="min-width: 0;">
                                                 <span class="info-label">Contrato</span>
-                                                <span class="info-value">
-                                                    {{ $destajo->contrato_no ?? 'N/A' }}
-                                                </span>
+                                               <span class="info-value" style="white-space: nowrap; overflow-x: auto; max-width: 100%; display: inline-block;">
+    {{ $destajo->contrato_no ?? 'N/A' }}
+</span>
                                             </div>
                                             <div class="info-item" style="min-width: 0;">
                                                 <span class="info-label">Costo Operado</span>
