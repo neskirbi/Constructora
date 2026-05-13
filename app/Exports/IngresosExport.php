@@ -72,13 +72,12 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
                 'ingresos.liquido_a_cobrar',
                 'ingresos.liquido_cobrado',
                 'ingresos.fecha_cobro',
-                'ingresos.por_cobrar',
                 'ingresos.por_estimar',
                 'ingresos.status',
                 'ingresos.estimado_menos_deducciones'
             )
-            ->orderBy('contratos.consecutivo')      // Primero por Número de Contrato
-            ->orderBy('ingresos.factura');        // Luego por fecha de cobro
+            ->orderBy('contratos.consecutivo')
+            ->orderBy('ingresos.factura');
         
         if ($this->idContrato && $this->idContrato != 'todos') {
             $query->where('ingresos.id_contrato', $this->idContrato);
@@ -123,11 +122,10 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             'Amortización con I.V.A.',
             'Total deducciones',
             'Importe Facturado',
-            'Liquido a cobrar',
-            'Liquido Cobrado',
+            'Líquido a cobrar',
+            'Líquido por cobrar',
+            'Líquido Cobrado',
             'Fecha Cobro',
-            'POR COBRAR',
-            'POR FACTURAR',
             'Por Estimar',
             'Status'
         ];
@@ -138,20 +136,17 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
         // Total a cobrar contrato c/IVA = Importe Contrato + Convenio Aplicación
         $totalACobrar = $row->importe_contrato + ($row->convenio_aplicacion_monto ?? 0);
         
-        // Total facturado = Total Estimacion con IVA
-        $totalFacturado = $row->total_estimacion_con_iva;
-        
-        // POR FACTURAR = Total a cobrar (contrato + ampliaciones) - Total facturado
-        $porFacturar = $totalACobrar - $totalFacturado;
-        
         // Importe Facturado = Total Estimacion con IVA - Total Deducciones
         $importeFacturado = $row->total_estimacion_con_iva - $row->total_deducciones;
         
-        // NUEVA FÓRMULA PARA LÍQUIDO A COBRAR = estimado_menos_deducciones - liquido_cobrado
-        $liquidoACobrar = ($row->estimado_menos_deducciones ?? 0) - ($row->liquido_cobrado ?? 0);
+        // Líquido a cobrar = estimado_menos_deducciones
+        $liquidoACobrar = $row->estimado_menos_deducciones ?? 0;
         
-        // POR COBRAR = Importe de Estimación - Líquido Cobrado
-        $porCobrar = ($row->importe_estimacion ?? 0) - ($row->liquido_cobrado ?? 0);
+        // Líquido por cobrar = estimado_menos_deducciones - liquido_cobrado
+        $liquidoPorCobrar = ($row->estimado_menos_deducciones ?? 0) - ($row->liquido_cobrado ?? 0);
+        
+        // Líquido Cobrado = liquido_cobrado
+        $liquidoCobrado = $row->liquido_cobrado ?? 0;
         
         return [
             $row->n_obra ?? '',
@@ -187,11 +182,10 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             $this->formatNumber($row->amortizacion_con_iva),
             $this->formatNumber($row->total_deducciones),
             $this->formatNumber($importeFacturado),
-            $this->formatNumber($liquidoACobrar),    // ← FÓRMULA CORREGIDA
-            $this->formatNumber($row->liquido_cobrado),
+            $this->formatNumber($liquidoACobrar),      // Líquido a cobrar
+            $this->formatNumber($liquidoPorCobrar),    // Líquido por cobrar
+            $this->formatNumber($liquidoCobrado),      // Líquido Cobrado
             $this->formatDate($row->fecha_cobro),
-            $this->formatNumber($porCobrar),
-            $this->formatNumber($porFacturar),
             $this->formatNumber($row->por_estimar),
             $row->status ?? '',
         ];
@@ -208,17 +202,19 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
     }
     
     private function formatNumber($number)
-{
-    // Retorna el número formateado sin símbolo de moneda
-    if ($number === null || $number === '') {
-        return '0.00';
+    {
+        if ($number === null || $number === '') {
+            return '0.00';
+        }
+        return number_format((float)$number, 2, '.', ',');
     }
-    return number_format((float)$number, 2, '.', ',');
-}
     
     private function formatPercent($number)
     {
-        return $number ? number_format((float)$number, 2) : '0.00';
+        if ($number === null || $number === '') {
+            return '0.00';
+        }
+        return number_format((float)$number, 2, '.', ',');
     }
     
     public function columnWidths(): array
@@ -231,62 +227,61 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             'U' => 15, 'V' => 22, 'W' => 18, 'X' => 25, 'Y' => 22,
             'Z' => 30, 'AA' => 22, 'AB' => 30, 'AC' => 25, 'AD' => 22,
             'AE' => 22, 'AF' => 22, 'AG' => 22, 'AH' => 22, 'AI' => 22,
-            'AJ' => 22, 'AK' => 22, 'AL' => 15, 'AM' => 15, 'AN' => 15,
-            'AO' => 15
+            'AJ' => 22, 'AK' => 22, 'AL' => 15, 'AM' => 15
         ];
     }
     
     public function styles(Worksheet $sheet)
-{
-    // Estilo para encabezados (41 columnas: A a AO)
-    $sheet->getStyle('A1:AO1')->applyFromArray([
-        'font' => [
-            'bold' => true,
-            'size' => 11,
-            'color' => ['rgb' => 'FFFFFF'],
-        ],
-        'fill' => [
-            'fillType' => Fill::FILL_SOLID,
-            'startColor' => ['rgb' => '4472C4'],
-        ],
-        'alignment' => [
-            'horizontal' => Alignment::HORIZONTAL_CENTER,
-            'vertical' => Alignment::VERTICAL_CENTER,
-            'wrapText' => true,
-        ],
-        'borders' => [
-            'allBorders' => [
-                'borderStyle' => Border::BORDER_MEDIUM,
-                'color' => ['rgb' => '000000'],
+    {
+        // Estilo para encabezados
+        $sheet->getStyle('A1:AM1')->applyFromArray([
+            'font' => [
+                'bold' => true,
+                'size' => 11,
+                'color' => ['rgb' => 'FFFFFF'],
             ],
-        ],
-    ]);
-    
-    $sheet->getRowDimension(1)->setRowHeight(40);
-    
-    // 🔴 CAMBIO: Formato de número SIN símbolo de moneda (solo números con 2 decimales)
-    $currencyColumns = ['K', 'L', 'M', 'N', 'T', 'U', 'V', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN'];
-    foreach ($currencyColumns as $col) {
-        $sheet->getStyle($col . '2:' . $col . '1000')
-              ->getNumberFormat()
-              ->setFormatCode('#,##0.00');  // ← Cambiado: sin $, solo número con separador de miles
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => '4472C4'],
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_CENTER,
+                'vertical' => Alignment::VERTICAL_CENTER,
+                'wrapText' => true,
+            ],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_MEDIUM,
+                    'color' => ['rgb' => '000000'],
+                ],
+            ],
+        ]);
+        
+        $sheet->getRowDimension(1)->setRowHeight(40);
+        
+        // Formato número SIN símbolo de moneda
+        $currencyColumns = ['K', 'L', 'M', 'N', 'T', 'U', 'V', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM'];
+        foreach ($currencyColumns as $col) {
+            $sheet->getStyle($col . '2:' . $col . '1000')
+                  ->getNumberFormat()
+                  ->setFormatCode('#,##0.00');
+        }
+        
+        // Formato fecha
+        $dateColumns = ['H', 'I', 'J', 'P', 'Q', 'S', 'W', 'AH'];
+        foreach ($dateColumns as $col) {
+            $sheet->getStyle($col . '2:' . $col . '1000')
+                  ->getNumberFormat()
+                  ->setFormatCode('dd/mm/yyyy');
+        }
     }
-    
-    // Formato fecha
-    $dateColumns = ['H', 'I', 'J', 'P', 'Q', 'S', 'W', 'AJ'];
-    foreach ($dateColumns as $col) {
-        $sheet->getStyle($col . '2:' . $col . '1000')
-              ->getNumberFormat()
-              ->setFormatCode('dd/mm/yyyy');
-    }
-}
     
     public function registerEvents(): array
     {
         return [
             AfterSheet::class => function(AfterSheet $event) {
                 $event->sheet->freezePane('A2');
-                $event->sheet->setAutoFilter('A1:AO1');
+                $event->sheet->setAutoFilter('A1:AM1');
             },
         ];
     }
