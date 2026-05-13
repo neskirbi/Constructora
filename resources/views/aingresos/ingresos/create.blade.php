@@ -796,7 +796,7 @@
                                                     name="status" 
                                                     readonly>
                                                 <option value="">Seleccionar status...</option>
-                                                <option value="pagado" {{ old('status', $ultimoIngreso->status ?? 'en_tramite') == 'pagado' ? 'selected' : '' }}>Pagado</option>
+                                                <option value="Cobrado" {{ old('status', $ultimoIngreso->status ?? 'en_tramite') == 'Cobrado' ? 'selected' : '' }}>Cobrado</option>
                                                 <option value="en_tramite" {{ old('status', $ultimoIngreso->status ?? 'en_tramite') == 'en_tramite' ? 'selected' : '' }}>En Trámite</option>
                                             </select>
                                         </div>
