@@ -76,7 +76,8 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
                 'ingresos.por_estimar',
                 'ingresos.status',
                 'ingresos.estimado_menos_deducciones'
-            )     // Primero por Número de Contrato
+            )
+            ->orderBy('contratos.consecutivo')      // Primero por Número de Contrato
             ->orderBy('ingresos.factura');        // Luego por fecha de cobro
         
         if ($this->idContrato && $this->idContrato != 'todos') {
