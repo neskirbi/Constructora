@@ -126,7 +126,6 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
         'Líquido Cobrado',       // ← liquido_cobrado (INTERCAMBIADO)
         'Líquido por cobrar',    // ← estimado_menos_deducciones - liquido_cobrado (INTERCAMBIADO)
         'Fecha Cobro',
-        'Por Estimar',
         'Status'
     ];
 }
@@ -186,7 +185,6 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
         $this->formatNumber($liquidoCobrado),      // Líquido Cobrado (INTERCAMBIADO)
         $this->formatNumber($liquidoPorCobrar),    // Líquido por cobrar (INTERCAMBIADO)
         $this->formatDate($row->fecha_cobro),
-        $this->formatNumber($row->por_estimar),
         $row->status ?? '',
     ];
 }
