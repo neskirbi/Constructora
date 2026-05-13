@@ -147,40 +147,66 @@ class ReporteIngresosController extends Controller
     }
     
     public function exportarExcel(Request $request)
-    {
-        $request->validate([
-            'fecha_desde' => 'required|date',
-            'fecha_hasta' => 'required|date|after_or_equal:fecha_desde',
-            'id_contrato' => 'nullable'
-        ]);
-        
-        $fechaDesde = $request->fecha_desde;
-        $fechaHasta = $request->fecha_hasta;
-        $idContrato = $request->id_contrato;
-        
-        // Obtener nombre del contrato si se filtró
-        $nombreContrato = '';
-        if ($idContrato && $idContrato != 'todos') {
-            $contrato = DB::table('contratos')
-                ->select('contrato_no', 'obra')
-                ->where('id', $idContrato)
-                ->first();
-            $nombreContrato = $contrato ? "_{$contrato->contrato_no}" : '';
-        }
-        
-        $nombreArchivo = 'reporte_ingresos' . $nombreContrato . '_' . date('Ymd_His') . '.xlsx';
-        
-        // Verificar si existe la clase de exportación de Excel
-        if (class_exists('\Maatwebsite\Excel\Facades\Excel') && class_exists('\App\Exports\IngresosExport')) {
-            return \Maatwebsite\Excel\Facades\Excel::download(
-                new \App\Exports\IngresosExport($fechaDesde, $fechaHasta, $idContrato),
-                $nombreArchivo
-            );
-        } else {
-            // Si no existe Laravel Excel, generar un CSV simple
-            return $this->exportarCSV($fechaDesde, $fechaHasta, $idContrato);
+{
+    $request->validate([
+        'fecha_desde' => 'required|date',
+        'fecha_hasta' => 'required|date|after_or_equal:fecha_desde',
+        'id_contrato' => 'nullable'
+    ]);
+    
+    $fechaDesde = $request->fecha_desde;
+    $fechaHasta = $request->fecha_hasta;
+    $idContrato = $request->id_contrato;
+    
+    // Obtener nombre del contrato si se filtró
+    $nombreContrato = '';
+    if ($idContrato && $idContrato != 'todos') {
+        $contrato = DB::table('contratos')
+            ->select('contrato_no', 'obra')
+            ->where('id', $idContrato)
+            ->first();
+        if ($contrato) {
+            // 🔧 SANITIZAR: Reemplazar / y \ por -
+            $nombreContrato = "_{$this->sanitizarNombreArchivo($contrato->contrato_no)}";
         }
     }
+    
+    $nombreArchivo = 'reporte_ingresos' . $nombreContrato . '_' . date('Ymd_His') . '.xlsx';
+    
+    // Verificar si existe la clase de exportación de Excel
+    if (class_exists('\Maatwebsite\Excel\Facades\Excel') && class_exists('\App\Exports\IngresosExport')) {
+        return \Maatwebsite\Excel\Facades\Excel::download(
+            new \App\Exports\IngresosExport($fechaDesde, $fechaHasta, $idContrato),
+            $nombreArchivo
+        );
+    } else {
+        // Si no existe Laravel Excel, generar un CSV simple
+        return $this->exportarCSV($fechaDesde, $fechaHasta, $idContrato);
+    }
+}
+
+/**
+ * Sanitiza el nombre del archivo eliminando caracteres no permitidos
+ */
+private function sanitizarNombreArchivo($nombre)
+{
+    // Caracteres no permitidos en nombres de archivo en Windows/Linux
+    $caracteresNoPermitidos = ['/', '\\', ':', '*', '?', '"', '<', '>', '|'];
+    
+    // Reemplazar caracteres no permitidos por guiones
+    $nombreLimpio = str_replace($caracteresNoPermitidos, '-', $nombre);
+    
+    // Eliminar caracteres de control y espacios al inicio/final
+    $nombreLimpio = trim($nombreLimpio);
+    
+    // Reemplazar múltiples guiones por uno solo
+    $nombreLimpio = preg_replace('/-+/', '-', $nombreLimpio);
+    
+    // Limitar longitud (opcional, máximo 200 caracteres)
+    $nombreLimpio = substr($nombreLimpio, 0, 200);
+    
+    return $nombreLimpio;
+}
     
     private function exportarCSV($fechaDesde, $fechaHasta, $idContrato)
     {
