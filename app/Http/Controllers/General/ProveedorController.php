@@ -24,7 +24,7 @@ class ProveedorController extends Controller
                     ->orWhere('clasificacion', 'like', '%' . $search . '%')
                     ->orWhere('especialidad', 'like', '%' . $search . '%');
             })
-            ->orderBy('nombre', 'asc')
+            ->orderBy('clave', 'asc')
             ->paginate(15);
         
         return view('general.proveedores.index', compact('proveedores', 'search'));
