@@ -38,6 +38,7 @@ class DestajosExport implements
     {
         $query = DB::table('destajos as d')
             ->select(
+                'd.id',  // <--- AGREGADO: necesario para buscar detalles
                 'd.consecutivo',
                 'd.created_at as fecha',
                 'd.referencia',
@@ -62,7 +63,7 @@ class DestajosExport implements
 
         foreach ($destajos as $destajo) {
             $detalles = DB::table('destajodetalles')
-                ->where('id_destajo', $destajo->id)
+                ->where('id_destajo', $destajo->id)  // <--- AHORA SÍ FUNCIONA
                 ->get();
 
             if ($detalles->count() > 0) {
