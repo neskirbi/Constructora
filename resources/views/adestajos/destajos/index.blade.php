@@ -118,7 +118,7 @@
         }
         .info-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            grid-template-columns: repeat(6, 1fr);
             gap: 15px;
             margin-bottom: 15px;
             padding: 15px;
@@ -126,8 +126,6 @@
             border-radius: 8px;
             width: 100%;
             box-sizing: border-box;
-            margin-left: 0;
-            margin-right: 0;
         }
         .info-item {
             display: flex;
@@ -144,6 +142,8 @@
             font-size: 1rem;
             font-weight: 600;
             color: #495057;
+            white-space: nowrap;
+            overflow: visible;
         }
         .btn-action {
             padding: 8px 16px;
@@ -312,25 +312,25 @@
                                                 <span class="info-label">Obra</span>
                                                 <span class="info-value">{{ $destajo->obra ?? '' }}</span>
                                             </div>
-                                            <div class="info-item" style="min-width: 0;">
+                                            <div class="info-item">
                                                 <span class="info-label">Referencia</span>
                                                 <span class="info-value">{{ $destajo->referencia ?? 'N/A' }}</span>
                                             </div>
-                                            <div class="info-item" style="min-width: 0;">
+                                            <div class="info-item">
                                                 <span class="info-label">Contrato</span>
                                                 <span class="info-value">
                                                     {{ $destajo->contrato_no ?? 'N/A' }}
                                                 </span>
                                             </div>
-                                            <div class="info-item" style="min-width: 0;">
+                                            <div class="info-item">
                                                 <span class="info-label">Costo Operado</span>
                                                 <span class="info-value moneda" style="white-space: nowrap;">${{ number_format($destajo->costo_operado, 2) }}</span>
                                             </div>
-                                            <div class="info-item" style="min-width: 0;">
+                                            <div class="info-item">
                                                 <span class="info-label">IVA</span>
                                                 <span class="info-value moneda" style="white-space: nowrap;">${{ number_format($destajo->iva, 2) }}</span>
                                             </div>
-                                            <div class="info-item" style="min-width: 0;">
+                                            <div class="info-item">
                                                 <span class="info-label">Total</span>
                                                 <span class="info-value moneda" style="font-size: 1.1rem; white-space: nowrap;">
                                                     ${{ number_format($destajo->total, 2) }}
