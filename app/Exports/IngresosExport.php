@@ -208,9 +208,13 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
     }
     
     private function formatNumber($number)
-    {
-        return $number ? number_format((float)$number, 2) : '0.00';
+{
+    // Retorna el número formateado sin símbolo de moneda
+    if ($number === null || $number === '') {
+        return '0.00';
     }
+    return number_format((float)$number, 2, '.', ',');
+}
     
     private function formatPercent($number)
     {
@@ -233,49 +237,49 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
     }
     
     public function styles(Worksheet $sheet)
-    {
-        // Estilo para encabezados (41 columnas: A a AO)
-        $sheet->getStyle('A1:AO1')->applyFromArray([
-            'font' => [
-                'bold' => true,
-                'size' => 11,
-                'color' => ['rgb' => 'FFFFFF'],
+{
+    // Estilo para encabezados (41 columnas: A a AO)
+    $sheet->getStyle('A1:AO1')->applyFromArray([
+        'font' => [
+            'bold' => true,
+            'size' => 11,
+            'color' => ['rgb' => 'FFFFFF'],
+        ],
+        'fill' => [
+            'fillType' => Fill::FILL_SOLID,
+            'startColor' => ['rgb' => '4472C4'],
+        ],
+        'alignment' => [
+            'horizontal' => Alignment::HORIZONTAL_CENTER,
+            'vertical' => Alignment::VERTICAL_CENTER,
+            'wrapText' => true,
+        ],
+        'borders' => [
+            'allBorders' => [
+                'borderStyle' => Border::BORDER_MEDIUM,
+                'color' => ['rgb' => '000000'],
             ],
-            'fill' => [
-                'fillType' => Fill::FILL_SOLID,
-                'startColor' => ['rgb' => '4472C4'],
-            ],
-            'alignment' => [
-                'horizontal' => Alignment::HORIZONTAL_CENTER,
-                'vertical' => Alignment::VERTICAL_CENTER,
-                'wrapText' => true,
-            ],
-            'borders' => [
-                'allBorders' => [
-                    'borderStyle' => Border::BORDER_MEDIUM,
-                    'color' => ['rgb' => '000000'],
-                ],
-            ],
-        ]);
-        
-        $sheet->getRowDimension(1)->setRowHeight(40);
-        
-        // Formato moneda para columnas numéricas
-        $currencyColumns = ['K', 'L', 'M', 'N', 'T', 'U', 'V', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN'];
-        foreach ($currencyColumns as $col) {
-            $sheet->getStyle($col . '2:' . $col . '1000')
-                  ->getNumberFormat()
-                  ->setFormatCode('$#,##0.00');
-        }
-        
-        // Formato fecha
-        $dateColumns = ['H', 'I', 'J', 'P', 'Q', 'S', 'W', 'AJ'];
-        foreach ($dateColumns as $col) {
-            $sheet->getStyle($col . '2:' . $col . '1000')
-                  ->getNumberFormat()
-                  ->setFormatCode('dd/mm/yyyy');
-        }
+        ],
+    ]);
+    
+    $sheet->getRowDimension(1)->setRowHeight(40);
+    
+    // 🔴 CAMBIO: Formato de número SIN símbolo de moneda (solo números con 2 decimales)
+    $currencyColumns = ['K', 'L', 'M', 'N', 'T', 'U', 'V', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN'];
+    foreach ($currencyColumns as $col) {
+        $sheet->getStyle($col . '2:' . $col . '1000')
+              ->getNumberFormat()
+              ->setFormatCode('#,##0.00');  // ← Cambiado: sin $, solo número con separador de miles
     }
+    
+    // Formato fecha
+    $dateColumns = ['H', 'I', 'J', 'P', 'Q', 'S', 'W', 'AJ'];
+    foreach ($dateColumns as $col) {
+        $sheet->getStyle($col . '2:' . $col . '1000')
+              ->getNumberFormat()
+              ->setFormatCode('dd/mm/yyyy');
+    }
+}
     
     public function registerEvents(): array
     {
