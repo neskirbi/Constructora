@@ -159,9 +159,7 @@ class DestajosExport implements
     {
         return [
             'E' => NumberFormat::FORMAT_DATE_DDMMYYYY,   // Fecha
-            'G' => '"$"#,##0.00',                        // Costo Unitario
             'H' => '#,##0.00',                           // Cantidad
-            'I' => '"$"#,##0.00',                        // Costo operado
         ];
     }
 
