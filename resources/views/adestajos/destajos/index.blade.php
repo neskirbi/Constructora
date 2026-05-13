@@ -124,6 +124,7 @@
             padding: 15px;
             background: #f8f9fa;
             border-radius: 8px;
+            width: 100%;           /* ← Agrega esta línea */
         }
         .info-item {
             display: flex;
@@ -196,6 +197,8 @@
             white-space: normal;
             max-width: 500px;            /* Ancho máximo antes de quebrar */
         }
+
+        
     </style>
 </head>
 <body>
@@ -299,7 +302,6 @@
                                             {{ $destajo->especialidad ?? '' }}
                                         </div>
                                         
-                                        <!-- Grid de información general del destajo -->
                                         <!-- Grid de información general del destajo -->
                                         <div class="info-grid">
                                             
@@ -488,3 +490,4 @@
     </script>
 </body>
 </html>
+

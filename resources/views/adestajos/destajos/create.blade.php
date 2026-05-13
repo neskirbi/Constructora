@@ -336,6 +336,10 @@ $(document).ready(function() {
 </html>
 
 
-<!--Cambios
-Cambiar a un lista y que la busqueda de l select funcione
+
+
+<!--
+ListaDeseos
+Que se ponga la busquedar de contrato como la de proveedor y tambien en compras 
+e ingresos
 -->

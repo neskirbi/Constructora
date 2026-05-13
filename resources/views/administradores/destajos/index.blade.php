@@ -125,6 +125,7 @@
             padding: 15px;
             background: #f8f9fa;
             border-radius: 8px;
+            width: 100%;           /* ← Agrega esta línea */
         }
         .info-item {
             display: flex;
