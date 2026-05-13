@@ -308,11 +308,11 @@
                                             </div>
                                             <div class="info-item" style="min-width: 0;">
                                                 <span class="info-label">Referencia</span>
-                                                <span class="info-value" style="word-wrap: break-word;">{{ $destajo->referencia ?? 'N/A' }}</span>
+                                                <span class="info-value" >{{ $destajo->referencia ?? 'N/A' }}</span>
                                             </div>
                                             <div class="info-item" style="min-width: 0;">
                                                 <span class="info-label">Contrato</span>
-                                                <span class="info-value" style="word-wrap: break-word;">
+                                                <span class="info-value">
                                                     {{ $destajo->contrato_no ?? 'N/A' }}
                                                 </span>
                                             </div>
