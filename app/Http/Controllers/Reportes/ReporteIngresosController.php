@@ -23,13 +23,9 @@ class ReporteIngresosController extends Controller
     public function generar(Request $request)
     {
         $request->validate([
-            'fecha_desde' => 'required|date',
-            'fecha_hasta' => 'required|date|after_or_equal:fecha_desde',
             'id_contrato' => 'nullable'
         ]);
         
-        $fechaDesde = $request->fecha_desde;
-        $fechaHasta = $request->fecha_hasta;
         $idContrato = $request->id_contrato;
         
         // Construir la consulta con JOIN usando los nombres correctos de los campos
@@ -84,7 +80,7 @@ class ReporteIngresosController extends Controller
                 'ingresos.verificado',
                 'ingresos.created_at'
             )
-            ->whereBetween('ingresos.created_at', [$fechaDesde, $fechaHasta])
+            ->orderBy('contratos.consecutivo')
             ->orderBy('ingresos.created_at');
         
         // Filtrar por contrato específico si se seleccionó
@@ -119,8 +115,6 @@ class ReporteIngresosController extends Controller
         if ($request->ajax()) {
             $view = view('reportes.ingresos.partials.resultado_tabla', compact(
                 'ingresos',
-                'fechaDesde',
-                'fechaHasta',
                 'idContrato',
                 'totales',
                 'contratoSeleccionado'
@@ -129,8 +123,6 @@ class ReporteIngresosController extends Controller
             return response()->json([
                 'html' => $view,
                 'totales' => $totales,
-                'fechaDesde' => $fechaDesde,
-                'fechaHasta' => $fechaHasta,
                 'contratoSeleccionado' => $contratoSeleccionado
             ]);
         }
@@ -138,8 +130,6 @@ class ReporteIngresosController extends Controller
         // Si no es AJAX, devolver la vista completa (para compatibilidad)
         return view('reportes.ingresos.resultado', compact(
             'ingresos',
-            'fechaDesde',
-            'fechaHasta',
             'idContrato',
             'totales',
             'contratoSeleccionado'
@@ -147,70 +137,66 @@ class ReporteIngresosController extends Controller
     }
     
     public function exportarExcel(Request $request)
-{
-    $request->validate([
-        'fecha_desde' => 'required|date',
-        'fecha_hasta' => 'required|date|after_or_equal:fecha_desde',
-        'id_contrato' => 'nullable'
-    ]);
-    
-    $fechaDesde = $request->fecha_desde;
-    $fechaHasta = $request->fecha_hasta;
-    $idContrato = $request->id_contrato;
-    
-    // Obtener nombre del contrato si se filtró
-    $nombreContrato = '';
-    if ($idContrato && $idContrato != 'todos') {
-        $contrato = DB::table('contratos')
-            ->select('contrato_no', 'obra')
-            ->where('id', $idContrato)
-            ->first();
-        if ($contrato) {
-            // 🔧 SANITIZAR: Reemplazar / y \ por -
-            $nombreContrato = "_{$this->sanitizarNombreArchivo($contrato->contrato_no)}";
+    {
+        $request->validate([
+            'id_contrato' => 'nullable'
+        ]);
+        
+        $idContrato = $request->id_contrato;
+        
+        // Obtener nombre del contrato si se filtró
+        $nombreContrato = '';
+        if ($idContrato && $idContrato != 'todos') {
+            $contrato = DB::table('contratos')
+                ->select('contrato_no', 'obra')
+                ->where('id', $idContrato)
+                ->first();
+            if ($contrato) {
+                // Sanitizar: Reemplazar / y \ por -
+                $nombreContrato = "_{$this->sanitizarNombreArchivo($contrato->contrato_no)}";
+            }
+        }
+        
+        $nombreArchivo = 'reporte_ingresos' . $nombreContrato . '_' . date('Ymd_His') . '.xlsx';
+        
+        // Verificar si existe la clase de exportación de Excel
+        if (class_exists('\Maatwebsite\Excel\Facades\Excel') && class_exists('\App\Exports\IngresosExport')) {
+            return \Maatwebsite\Excel\Facades\Excel::download(
+                new \App\Exports\IngresosExport($idContrato),  // ← SOLO enviamos idContrato
+                $nombreArchivo
+            );
+        } else {
+            // Si no existe Laravel Excel, generar un CSV simple
+            return $this->exportarCSV($idContrato);
         }
     }
     
-    $nombreArchivo = 'reporte_ingresos' . $nombreContrato . '_' . date('Ymd_His') . '.xlsx';
-    
-    // Verificar si existe la clase de exportación de Excel
-    if (class_exists('\Maatwebsite\Excel\Facades\Excel') && class_exists('\App\Exports\IngresosExport')) {
-        return \Maatwebsite\Excel\Facades\Excel::download(
-            new \App\Exports\IngresosExport($fechaDesde, $fechaHasta, $idContrato),
-            $nombreArchivo
-        );
-    } else {
-        // Si no existe Laravel Excel, generar un CSV simple
-        return $this->exportarCSV($fechaDesde, $fechaHasta, $idContrato);
-    }
-}
-
-/**
- * Sanitiza el nombre del archivo eliminando caracteres no permitidos
- */
-private function sanitizarNombreArchivo($nombre)
-{
-    // Caracteres no permitidos en nombres de archivo en Windows/Linux
-    $caracteresNoPermitidos = ['/', '\\', ':', '*', '?', '"', '<', '>', '|'];
-    
-    // Reemplazar caracteres no permitidos por guiones
-    $nombreLimpio = str_replace($caracteresNoPermitidos, '-', $nombre);
-    
-    // Eliminar caracteres de control y espacios al inicio/final
-    $nombreLimpio = trim($nombreLimpio);
-    
-    // Reemplazar múltiples guiones por uno solo
-    $nombreLimpio = preg_replace('/-+/', '-', $nombreLimpio);
-    
-    // Limitar longitud (opcional, máximo 200 caracteres)
-    $nombreLimpio = substr($nombreLimpio, 0, 200);
-    
-    return $nombreLimpio;
-}
-    
-    private function exportarCSV($fechaDesde, $fechaHasta, $idContrato)
+    /**
+     * Sanitiza el nombre del archivo eliminando caracteres no permitidos
+     */
+    private function sanitizarNombreArchivo($nombre)
     {
-        // Obtener los datos usando la misma consulta que en generar()
+        // Caracteres no permitidos en nombres de archivo en Windows/Linux
+        $caracteresNoPermitidos = ['/', '\\', ':', '*', '?', '"', '<', '>', '|'];
+        
+        // Reemplazar caracteres no permitidos por guiones
+        $nombreLimpio = str_replace($caracteresNoPermitidos, '-', $nombre);
+        
+        // Eliminar caracteres de control y espacios al inicio/final
+        $nombreLimpio = trim($nombreLimpio);
+        
+        // Reemplazar múltiples guiones por uno solo
+        $nombreLimpio = preg_replace('/-+/', '-', $nombreLimpio);
+        
+        // Limitar longitud (opcional, máximo 200 caracteres)
+        $nombreLimpio = substr($nombreLimpio, 0, 200);
+        
+        return $nombreLimpio;
+    }
+    
+    private function exportarCSV($idContrato)
+    {
+        // Obtener los datos sin filtro de fechas
         $query = DB::table('ingresos')
             ->join('contratos', 'ingresos.id_contrato', '=', 'contratos.id')
             ->select(
@@ -233,7 +219,7 @@ private function sanitizarNombreArchivo($nombre)
                 'ingresos.verificado',
                 'ingresos.created_at'
             )
-            ->whereBetween('ingresos.created_at', [$fechaDesde, $fechaHasta])
+            ->orderBy('contratos.consecutivo')
             ->orderBy('ingresos.created_at');
         
         if ($idContrato && $idContrato != 'todos') {

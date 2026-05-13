@@ -100,12 +100,12 @@
             <div class="content-area">
                 <div class="page-header">
                     <h1 class="page-title">Reporte de Ingresos</h1>
-                    <p class="page-subtitle">Exportar ingresos a Excel por contrato y período</p>
+                    <p class="page-subtitle">Exportar ingresos a Excel por contrato</p>
                 </div>
 
                 <div class="card">
                     <div class="info-box">
-                        <p><strong>Nota:</strong> Seleccione un contrato y período de fechas para exportar los ingresos a Excel. El archivo se abrirá en una nueva pestaña.</p>
+                        <p><strong>Nota:</strong> Seleccione un contrato para exportar todos los ingresos registrados. El archivo se abrirá en una nueva pestaña.</p>
                     </div>
 
                     <form action="{{ route('reportes.ingresos.exportar.excel') }}" method="POST" id="exportForm" target="_blank">
@@ -118,35 +118,11 @@
                                     <option value="todos">-- Todos los contratos --</option>
                                     @foreach($contratos as $contrato)
                                         <option value="{{ $contrato->id }}">
-                                            {{ $contrato->consecutivo }} - {{ $contrato->obra }})
+                                            {{ $contrato->consecutivo }} - {{ $contrato->obra }}
                                         </option>
                                     @endforeach
                                 </select>
                                 <small class="text-muted">Selecciona "Todos los contratos" para reporte general</small>
-                            </div>
-                        </div>
-
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <label class="form-label">Fecha Desde *</label>
-                                <input type="date" 
-                                       name="fecha_desde" 
-                                       id="fecha_desde"
-                                       class="form-control" 
-                                       required 
-                                       value="{{ date('Y-m-01') }}"
-                                       max="{{ date('Y-m-d') }}">
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <label class="form-label">Fecha Hasta *</label>
-                                <input type="date" 
-                                       name="fecha_hasta" 
-                                       id="fecha_hasta"
-                                       class="form-control" 
-                                       required 
-                                       value="{{ date('Y-m-d') }}"
-                                       max="{{ date('Y-m-d') }}">
                             </div>
                         </div>
 
@@ -177,8 +153,7 @@
                         </h6>
                         <ul class="mb-0" style="color: #555; font-size: 14px;">
                             <li>Selecciona un contrato específico o "Todos los contratos" para el reporte general</li>
-                            <li>Define el período de fechas para filtrar los ingresos</li>
-                            <li>El archivo Excel incluirá todos los ingresos registrados en el período seleccionado</li>
+                            <li>El archivo Excel incluirá TODOS los ingresos registrados del contrato seleccionado</li>
                             <li>El reporte se abrirá automáticamente en una nueva pestaña</li>
                         </ul>
                     </div>
@@ -191,34 +166,10 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const hoy = new Date().toISOString().split('T')[0];
-            document.getElementById('fecha_hasta').max = hoy;
-            document.getElementById('fecha_desde').max = hoy;
-            
             const form = document.getElementById('exportForm');
             const btnExportar = document.getElementById('btnExportar');
             
-            // Validación de fechas en tiempo real
-            document.getElementById('fecha_desde').addEventListener('change', function() {
-                document.getElementById('fecha_hasta').min = this.value;
-            });
-            
             form.addEventListener('submit', function(e) {
-                const fechaDesde = document.getElementById('fecha_desde').value;
-                const fechaHasta = document.getElementById('fecha_hasta').value;
-                
-                if (!fechaDesde || !fechaHasta) {
-                    e.preventDefault();
-                    alert('Por favor, selecciona ambas fechas.');
-                    return false;
-                }
-                
-                if (new Date(fechaHasta) < new Date(fechaDesde)) {
-                    e.preventDefault();
-                    alert('La fecha "Hasta" no puede ser anterior a la fecha "Desde".');
-                    return false;
-                }
-                
                 // Mostrar indicador de carga
                 btnExportar.classList.add('loading');
                 const originalText = btnExportar.innerHTML;

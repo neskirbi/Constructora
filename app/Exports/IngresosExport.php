@@ -18,14 +18,10 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles, WithColumnWidths, WithEvents, ShouldAutoSize
 {
-    protected $fechaDesde;
-    protected $fechaHasta;
     protected $idContrato;
     
-    public function __construct($fechaDesde, $fechaHasta, $idContrato)
+    public function __construct($idContrato)
     {
-        $this->fechaDesde = $fechaDesde;
-        $this->fechaHasta = $fechaHasta;
         $this->idContrato = $idContrato;
     }
     
@@ -81,9 +77,8 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
                 'ingresos.status',
                 'ingresos.estimado_menos_deducciones'
             )
-            ->whereBetween('ingresos.fecha_cobro', [$this->fechaDesde, $this->fechaHasta])
             ->orderBy('contratos.consecutivo')      // Primero por Número de Contrato
-            ->orderBy('ingresos.fecha_cobro');        // Luego por fecha de creación
+            ->orderBy('ingresos.fecha_cobro');        // Luego por fecha de cobro
         
         if ($this->idContrato && $this->idContrato != 'todos') {
             $query->where('ingresos.id_contrato', $this->idContrato);
@@ -131,14 +126,14 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             'Liquido a cobrar',
             'Liquido Cobrado',
             'Fecha Cobro',
-            'POR COBRAR',        // ← Solo UNO, con nueva fórmula
+            'POR COBRAR',
             'POR FACTURAR',
             'Por Estimar',
             'Status'
         ];
     }
         
-        public function map($row): array
+    public function map($row): array
     {
         // Total a cobrar contrato c/IVA = Importe Contrato + Convenio Aplicación
         $totalACobrar = $row->importe_contrato + ($row->convenio_aplicacion_monto ?? 0);
@@ -152,7 +147,10 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
         // Importe Facturado = Total Estimacion con IVA - Total Deducciones
         $importeFacturado = $row->total_estimacion_con_iva - $row->total_deducciones;
         
-        // NUEVA FÓRMULA: POR COBRAR = Importe de Estimación - Líquido Cobrado
+        // NUEVA FÓRMULA PARA LÍQUIDO A COBRAR = estimado_menos_deducciones - liquido_cobrado
+        $liquidoACobrar = ($row->estimado_menos_deducciones ?? 0) - ($row->liquido_cobrado ?? 0);
+        
+        // POR COBRAR = Importe de Estimación - Líquido Cobrado
         $porCobrar = ($row->importe_estimacion ?? 0) - ($row->liquido_cobrado ?? 0);
         
         return [
@@ -189,10 +187,10 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             $this->formatNumber($row->amortizacion_con_iva),
             $this->formatNumber($row->total_deducciones),
             $this->formatNumber($importeFacturado),
-            $this->formatNumber($row->liquido_a_cobrar),
+            $this->formatNumber($liquidoACobrar),    // ← FÓRMULA CORREGIDA
             $this->formatNumber($row->liquido_cobrado),
             $this->formatDate($row->fecha_cobro),
-            $this->formatNumber($porCobrar),        // ← NUEVA FÓRMULA
+            $this->formatNumber($porCobrar),
             $this->formatNumber($porFacturar),
             $this->formatNumber($row->por_estimar),
             $row->status ?? '',
@@ -210,6 +208,11 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
     }
     
     private function formatNumber($number)
+    {
+        return $number ? number_format((float)$number, 2) : '0.00';
+    }
+    
+    private function formatPercent($number)
     {
         return $number ? number_format((float)$number, 2) : '0.00';
     }
@@ -282,10 +285,5 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
                 $event->sheet->setAutoFilter('A1:AO1');
             },
         ];
-    }
-
-    private function formatPercent($number)
-    {
-        return $number ? number_format((float)$number, 2) : '0.00';
     }
 }
