@@ -124,7 +124,10 @@
             padding: 15px;
             background: #f8f9fa;
             border-radius: 8px;
-            width: 100%;           /* ← Agrega esta línea */
+            width: 100%;
+            box-sizing: border-box;
+            margin-left: 0;
+            margin-right: 0;
         }
         .info-item {
             display: flex;
