@@ -245,14 +245,14 @@ function GetUuid(){
         
 
 
-        $facturado = Ingreso::select(DB::raw('SUM(ingresos.liquido_a_cobrar) as liquido_a_cobrar'),
-        DB::raw('SUM(ingresos.liquido_a_cobrar) as liquido_cobrado'))
+        $facturado = Ingreso::select(DB::raw('SUM(ingresos.estimado_menos_deducciones) as liquido_a_cobrar'),
+        DB::raw('SUM(ingresos.liquido_cobrado) as liquido_cobrado'))
             ->where('id_contrato', $id)
             ->first(); 
 
         // Extraer el valor, manejar null
         $total_liquidoacobrar = $facturado->liquido_a_cobrar ?? 0;
-        $total_liquidocobrado = $facturado->ingliquido_cobradoresos ?? 0;
+        $total_liquidocobrado = $facturado->liquido_cobrado ?? 0;
 
       
         
