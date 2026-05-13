@@ -81,9 +81,9 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
                 'ingresos.status',
                 'ingresos.estimado_menos_deducciones'
             )
-            ->whereBetween('ingresos.created_at', [$this->fechaDesde, $this->fechaHasta])
+            ->whereBetween('ingresos.fecha_cobro', [$this->fechaDesde, $this->fechaHasta])
             ->orderBy('contratos.consecutivo')      // Primero por Número de Contrato
-            ->orderBy('ingresos.created_at');        // Luego por fecha de creación
+            ->orderBy('ingresos.fecha_cobro');        // Luego por fecha de creación
         
         if ($this->idContrato && $this->idContrato != 'todos') {
             $query->where('ingresos.id_contrato', $this->idContrato);
