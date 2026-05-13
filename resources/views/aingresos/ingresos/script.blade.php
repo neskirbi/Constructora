@@ -91,8 +91,8 @@ $(document).ready(function() {
 
     // Función para calcular 2% Derechos de Supervisión
     function calcularDerechosSupervision() {
-        const totalEstimacion = parseFloat($('#importe_estimacion').val()) || 0;
-        const resultado = totalEstimacion * 0.02;
+        const totalEstimacionConIva = parseFloat($('#total_estimacion_con_iva').val()) || 0;
+        const resultado = totalEstimacionConIva * 0.02;
         $('#derechos_supervision').val(resultado.toFixed(2));
         calcularRetencionesSanciones();
     }
