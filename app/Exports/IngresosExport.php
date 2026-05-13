@@ -87,109 +87,109 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
     }
     
     public function headings(): array
-    {
-        return [
-            'N° obra',
-            'Empresa',
-            'Numero de Contrato',
-            'Descripcion según contrato',
-            'Referencia interna',
-            'Cliente',
-            'AREA',
-            'Fecha Firma de Contrato',
-            'Fecha Inicio de Obra',
-            'Fecha Terminación de Obra',
-            'Importe de Anticipo c/IVA',
-            'Importe de Contrato c/IVA',
-            'Convenio Apliacion de monto c/IVA',
-            'Total a cobrar contrato c/IVA',
-            '# Estimación',
-            'del',
-            'al',
-            'N° Factura',
-            'Fecha',
-            'Importe de Estimación',
-            'I.V.A.',
-            'Total Estimacion con IVA',
-            'Fecha Elaboracion',
-            '3.5 % Cargos Adicionales',
-            'Retencion 5 al millar',
-            'Sancion atrazo presntacion estimacion',
-            'Sancion atraso de obra',
-            'Sancion por obra mal ejecutada',
-            'Retencion por atraso en programa de obra',
-            'Amortización anticipo',
-            'Amortización con I.V.A.',
-            'Total deducciones',
-            'Importe Facturado',
-            'Líquido a cobrar',
-            'Líquido por cobrar',
-            'Líquido Cobrado',
-            'Fecha Cobro',
-            'Por Estimar',
-            'Status'
-        ];
-    }
+{
+    return [
+        'N° obra',
+        'Empresa',
+        'Numero de Contrato',
+        'Descripcion según contrato',
+        'Referencia interna',
+        'Cliente',
+        'AREA',
+        'Fecha Firma de Contrato',
+        'Fecha Inicio de Obra',
+        'Fecha Terminación de Obra',
+        'Importe de Anticipo c/IVA',
+        'Importe de Contrato c/IVA',
+        'Convenio Apliacion de monto c/IVA',
+        'Total a cobrar contrato c/IVA',
+        '# Estimación',
+        'del',
+        'al',
+        'N° Factura',
+        'Fecha',
+        'Importe de Estimación',
+        'I.V.A.',
+        'Total Estimacion con IVA',
+        'Fecha Elaboracion',
+        '3.5 % Cargos Adicionales',
+        'Retencion 5 al millar',
+        'Sancion atrazo presntacion estimacion',
+        'Sancion atraso de obra',
+        'Sancion por obra mal ejecutada',
+        'Retencion por atraso en programa de obra',
+        'Amortización anticipo',
+        'Amortización con I.V.A.',
+        'Total deducciones',
+        'Importe Facturado',
+        'Líquido a cobrar',      // ← estimado_menos_deducciones
+        'Líquido Cobrado',       // ← liquido_cobrado (INTERCAMBIADO)
+        'Líquido por cobrar',    // ← estimado_menos_deducciones - liquido_cobrado (INTERCAMBIADO)
+        'Fecha Cobro',
+        'Por Estimar',
+        'Status'
+    ];
+}
         
     public function map($row): array
-    {
-        // Total a cobrar contrato c/IVA = Importe Contrato + Convenio Aplicación
-        $totalACobrar = $row->importe_contrato + ($row->convenio_aplicacion_monto ?? 0);
-        
-        // Importe Facturado = Total Estimacion con IVA - Total Deducciones
-        $importeFacturado = $row->total_estimacion_con_iva - $row->total_deducciones;
-        
-        // Líquido a cobrar = estimado_menos_deducciones
-        $liquidoACobrar = $row->estimado_menos_deducciones ?? 0;
-        
-        // Líquido por cobrar = estimado_menos_deducciones - liquido_cobrado
-        $liquidoPorCobrar = ($row->estimado_menos_deducciones ?? 0) - ($row->liquido_cobrado ?? 0);
-        
-        // Líquido Cobrado = liquido_cobrado
-        $liquidoCobrado = $row->liquido_cobrado ?? 0;
-        
-        return [
-            $row->n_obra ?? '',
-            $row->empresa ?? '',
-            $row->numero_contrato ?? '',
-            $row->descripcion_segun_contrato ?? '',
-            $row->referencia_interna ?? '',
-            $row->cliente ?? '',
-            'Ingresos',
-            $this->formatDate($row->fecha_contrato),
-            $this->formatDate($row->fecha_inicio_obra),
-            $this->formatDate($row->fecha_terminacion_obra),
-            $this->formatNumber($row->monto_anticipo),
-            $this->formatNumber($row->importe_contrato),
-            $this->formatNumber($row->convenio_aplicacion_monto),
-            $this->formatNumber($totalACobrar),
-            $row->no_estimacion ?? '',
-            $this->formatDate($row->periodo_del),
-            $this->formatDate($row->periodo_al),
-            $row->n_factura ?? '',
-            $this->formatDate($row->fecha_factura),
-            $this->formatNumber($row->importe_estimacion),
-            $this->formatPercent($row->iva),
-            $this->formatNumber($row->total_estimacion_con_iva),
-            $this->formatDate($row->fecha_elaboracion),
-            $this->formatNumber($row->cargos_adicionales_3_5),
-            $this->formatNumber($row->retencion_5_al_millar),
-            $this->formatNumber($row->sancion_atrazo_presentacion_estimacion),
-            $this->formatNumber($row->sancion_atraso_de_obra),
-            $this->formatNumber($row->sancion_por_obra_mal_ejecutada),
-            $this->formatNumber($row->retencion_por_atraso_en_programa_obra),
-            $this->formatNumber($row->amortizacion_anticipo),
-            $this->formatNumber($row->amortizacion_con_iva),
-            $this->formatNumber($row->total_deducciones),
-            $this->formatNumber($importeFacturado),
-            $this->formatNumber($liquidoACobrar),      // Líquido a cobrar
-            $this->formatNumber($liquidoPorCobrar),    // Líquido por cobrar
-            $this->formatNumber($liquidoCobrado),      // Líquido Cobrado
-            $this->formatDate($row->fecha_cobro),
-            $this->formatNumber($row->por_estimar),
-            $row->status ?? '',
-        ];
-    }
+{
+    // Total a cobrar contrato c/IVA = Importe Contrato + Convenio Aplicación
+    $totalACobrar = $row->importe_contrato + ($row->convenio_aplicacion_monto ?? 0);
+    
+    // Importe Facturado = Total Estimacion con IVA - Total Deducciones
+    $importeFacturado = $row->total_estimacion_con_iva - $row->total_deducciones;
+    
+    // Líquido a cobrar = estimado_menos_deducciones
+    $liquidoACobrar = $row->estimado_menos_deducciones ?? 0;
+    
+    // Líquido Cobrado = liquido_cobrado
+    $liquidoCobrado = $row->liquido_cobrado ?? 0;
+    
+    // Líquido por cobrar = estimado_menos_deducciones - liquido_cobrado
+    $liquidoPorCobrar = ($row->estimado_menos_deducciones ?? 0) - ($row->liquido_cobrado ?? 0);
+    
+    return [
+        $row->n_obra ?? '',
+        $row->empresa ?? '',
+        $row->numero_contrato ?? '',
+        $row->descripcion_segun_contrato ?? '',
+        $row->referencia_interna ?? '',
+        $row->cliente ?? '',
+        'Ingresos',
+        $this->formatDate($row->fecha_contrato),
+        $this->formatDate($row->fecha_inicio_obra),
+        $this->formatDate($row->fecha_terminacion_obra),
+        $this->formatNumber($row->monto_anticipo),
+        $this->formatNumber($row->importe_contrato),
+        $this->formatNumber($row->convenio_aplicacion_monto),
+        $this->formatNumber($totalACobrar),
+        $row->no_estimacion ?? '',
+        $this->formatDate($row->periodo_del),
+        $this->formatDate($row->periodo_al),
+        $row->n_factura ?? '',
+        $this->formatDate($row->fecha_factura),
+        $this->formatNumber($row->importe_estimacion),
+        $this->formatPercent($row->iva),
+        $this->formatNumber($row->total_estimacion_con_iva),
+        $this->formatDate($row->fecha_elaboracion),
+        $this->formatNumber($row->cargos_adicionales_3_5),
+        $this->formatNumber($row->retencion_5_al_millar),
+        $this->formatNumber($row->sancion_atrazo_presentacion_estimacion),
+        $this->formatNumber($row->sancion_atraso_de_obra),
+        $this->formatNumber($row->sancion_por_obra_mal_ejecutada),
+        $this->formatNumber($row->retencion_por_atraso_en_programa_obra),
+        $this->formatNumber($row->amortizacion_anticipo),
+        $this->formatNumber($row->amortizacion_con_iva),
+        $this->formatNumber($row->total_deducciones),
+        $this->formatNumber($importeFacturado),
+        $this->formatNumber($liquidoACobrar),      // Líquido a cobrar
+        $this->formatNumber($liquidoCobrado),      // Líquido Cobrado (INTERCAMBIADO)
+        $this->formatNumber($liquidoPorCobrar),    // Líquido por cobrar (INTERCAMBIADO)
+        $this->formatDate($row->fecha_cobro),
+        $this->formatNumber($row->por_estimar),
+        $row->status ?? '',
+    ];
+}
     
     private function formatDate($date)
     {
