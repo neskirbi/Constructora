@@ -14,7 +14,7 @@ class ReporteDestajoController extends Controller
 {
     public function index()
     {
-        $contratos = Contrato::select('id', 'refinterna', 'obra')
+        $contratos = Contrato::select('id', 'consecutivo', 'obra')
             ->orderBy('refinterna')
             ->get();
         

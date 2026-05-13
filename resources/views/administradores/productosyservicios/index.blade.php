@@ -201,5 +201,6 @@
 </html>
 
 <!--
-solo admin puede borrar 
+ListaDeseos
+Aqui agregar que pueda editar 
 -->
