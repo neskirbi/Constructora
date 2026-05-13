@@ -38,14 +38,12 @@ class DestajosExport implements
     {
         $query = DB::table('destajos as d')
             ->select(
-                'd.id',  // <--- AGREGADO: necesario para buscar detalles
+                'd.id',
                 'd.consecutivo',
                 'd.created_at as fecha',
                 'd.referencia',
-                'd.iva',
-                'd.total',
                 'c.consecutivo as almacen',
-                'c.refinterna',
+                'c.frente',
                 'p.clave as clave_proveedor',
                 'p.nombre as proveedor'
             )
@@ -63,7 +61,7 @@ class DestajosExport implements
 
         foreach ($destajos as $destajo) {
             $detalles = DB::table('destajodetalles')
-                ->where('id_destajo', $destajo->id)  // <--- AHORA SÍ FUNCIONA
+                ->where('id_destajo', $destajo->id)
                 ->get();
 
             if ($detalles->count() > 0) {
@@ -81,7 +79,7 @@ class DestajosExport implements
                     $fila->unidad = $detalle->unidades;
                     $fila->referencia = $destajo->referencia;
                     $fila->nombre_proveedor = $destajo->proveedor;
-                    $fila->fechas = $destajo->fecha;
+                    $fila->frente = $destajo->frente;
                     
                     $filas->push($fila);
                 }
@@ -99,7 +97,7 @@ class DestajosExport implements
                 $fila->unidad = '';
                 $fila->referencia = $destajo->referencia;
                 $fila->nombre_proveedor = $destajo->proveedor;
-                $fila->fechas = $destajo->fecha;
+                $fila->frente = $destajo->frente;
                 
                 $filas->push($fila);
             }
@@ -123,7 +121,7 @@ class DestajosExport implements
             'Unidad',
             'REFERENCIA',
             'Nombre Proveedor',
-            'Fechas'
+            'Frente'
         ];
     }
 
@@ -142,7 +140,7 @@ class DestajosExport implements
             $fila->unidad ?? '',
             $fila->referencia ?? '',
             $fila->nombre_proveedor ?? '',
-            $fila->fechas ? date('d/m/Y', strtotime($fila->fechas)) : '',
+            $fila->frente ?? '',
         ];
     }
 
@@ -164,7 +162,6 @@ class DestajosExport implements
             'G' => '"$"#,##0.00',                        // Costo Unitario
             'H' => '#,##0.00',                           // Cantidad
             'I' => '"$"#,##0.00',                        // Costo operado
-            'M' => NumberFormat::FORMAT_DATE_DDMMYYYY,   // Fechas
         ];
     }
 
@@ -187,7 +184,6 @@ class DestajosExport implements
 
                 $sheet->getStyle('A2:A' . $lastRow)->getAlignment()->setHorizontal('center');
                 $sheet->getStyle('E2:E' . $lastRow)->getAlignment()->setHorizontal('center');
-                $sheet->getStyle('M2:M' . $lastRow)->getAlignment()->setHorizontal('center');
                 $sheet->getStyle('G2:I' . $lastRow)->getAlignment()->setHorizontal('right');
 
                 $sheet->getStyle('A1:' . $lastColumn . '1')->getAlignment()->setHorizontal('center');
