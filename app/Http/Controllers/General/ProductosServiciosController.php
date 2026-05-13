@@ -105,6 +105,7 @@ class ProductosServiciosController extends Controller
      */
     public function update(Request $request, $id)
     {
+        //return $request;
         $producto = ProductoServicio::find($id);
         
         if (!$producto) {
@@ -112,12 +113,7 @@ class ProductosServiciosController extends Controller
                 ->with('error', 'Producto no encontrado');
         }
 
-        $request->validate([
-            'clave' => 'required|string|max:32|unique:productosyservicios,clave,' . $id . ',id',
-            'descripcion' => 'required|string',
-            'unidades' => 'required|string|max:10',
-            'ult_costo' => 'required|numeric'
-        ]);
+        
 
         try {
             DB::beginTransaction();
@@ -125,8 +121,7 @@ class ProductosServiciosController extends Controller
             $producto->update([
                 'clave' => $request->clave,
                 'descripcion' => $request->descripcion,
-                'unidades' => $request->unidades,
-                'ult_costo' => $request->ult_costo
+                'unidades' => $request->unidades
             ]);
 
             DB::commit();

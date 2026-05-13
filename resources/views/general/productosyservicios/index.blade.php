@@ -76,7 +76,7 @@
                                             <th style="white-space: nowrap;">Descripción</th>
                                             <th style="white-space: nowrap;">Unidades</th>
                                             <th style="white-space: nowrap;" class="text-end">Último costo</th>
-                                            <th style="white-space: nowrap;" class="text-center">Opciones</th>
+                                            <th style="white-space: nowrap;" class="text-center" colspan="2">Opciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -99,6 +99,13 @@
                                             </td>
                                             
                                             <!-- Opciones - sin wrap, centrado -->
+                                             <td style="white-space: nowrap;" class="text-center">
+                                                <a type="button"
+                                                    class="btn btn-sm btn-outline-info" 
+                                                    href="{{url('productosyservicios')}}/{{$producto->id}}">
+                                                    <i class="fas fa-eye me-1"></i>Revisar
+                                                </a>
+                                            </td>
                                             <td style="white-space: nowrap;" class="text-center">
                                                 <button type="button" 
                                                         class="btn btn-sm btn-outline-danger"
