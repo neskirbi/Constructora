@@ -1139,6 +1139,8 @@
 
     @include('footer')
     
+    @include('aingresos.ingresos.script')
+
    <script>
 $(document).ready(function() {
     // Inicializar eventos comunes

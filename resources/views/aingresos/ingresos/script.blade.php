@@ -30,13 +30,22 @@ function calcularImporteIVAYTotal() {
     if ($('#aplicar_srcop').is(':checked')) {
         calcularSRCOP();
     }
+    if ($('#aplicar_derechos_supervision').is(':checked')) {
+        calcularDerechosSupervision();
+    }
+    if ($('#aplicar_aportacion_cmic').is(':checked')) {
+        calcularAportacionCMIC();
+    }
+    if ($('#aplicar_delegacion_icic').is(':checked')) {
+        calcularDelegacionICIC();
+    }
     calcularRetencionesSanciones();
 }
 
 // Función para calcular 2% SICV
 function calcularSICV() {
     const totalEstimacion = parseFloat($('#importe_estimacion').val()) || 0;
-    const resultado = totalEstimacion * 0.02; // 2%
+    const resultado = totalEstimacion * 0.02;
     
     $('#sicv_cop').val(resultado.toFixed(2));
     
@@ -46,19 +55,51 @@ function calcularSICV() {
 // Función para calcular 1.5% SRCOP
 function calcularSRCOP() {
     const totalEstimacion = parseFloat($('#importe_estimacion').val()) || 0;
-    const resultado = totalEstimacion * 0.015; // 1.5%
+    const resultado = totalEstimacion * 0.015;
     
     $('#srcop_cdmx').val(resultado.toFixed(2));
     
     calcularRetencionesSanciones();
 }
 
-// Función para calcular Retenciones o Sanciones
+// Función para calcular 2% Derechos de Supervisión (usa Total Estimación con IVA)
+function calcularDerechosSupervision() {
+    const totalEstimacionConIva = parseFloat($('#total_estimacion_con_iva').val()) || 0;
+    const resultado = totalEstimacionConIva * 0.02;
+    
+    $('#derechos_supervision').val(resultado.toFixed(2));
+    dispararEventos('#derechos_supervision');
+    calcularRetencionesSanciones();
+}
+
+// Función para calcular 0.50% Aportación CMIC (usa Total Estimación con IVA)
+function calcularAportacionCMIC() {
+    const totalEstimacionConIva = parseFloat($('#total_estimacion_con_iva').val()) || 0;
+    const resultado = totalEstimacionConIva * 0.005;
+    
+    $('#aportacion_cmic').val(resultado.toFixed(2));
+    dispararEventos('#aportacion_cmic');
+    calcularRetencionesSanciones();
+}
+
+// Función para calcular 0.20% Delegación ICIC (usa Total Estimación con IVA)
+function calcularDelegacionICIC() {
+    const totalEstimacionConIva = parseFloat($('#total_estimacion_con_iva').val()) || 0;
+    const resultado = totalEstimacionConIva * 0.002;
+    
+    $('#delegacion_icic').val(resultado.toFixed(2));
+    dispararEventos('#delegacion_icic');
+    calcularRetencionesSanciones();
+}
+
+// Función para calcular Retenciones o Sanciones (INCLUYE NUEVOS CAMPOS)
 function calcularRetencionesSanciones() {
-    // Lista de IDs de los campos a sumar
     var camposRetenciones = [
         'sicv_cop',
         'srcop_cdmx',
+        'derechos_supervision',
+        'aportacion_cmic',
+        'delegacion_icic',
         'retencion_5_al_millar',
         'sancion_atrazo_presentacion_estimacion',
         'sancion_atraso_de_obra',
@@ -68,17 +109,14 @@ function calcularRetencionesSanciones() {
     
     var total = 0;
     
-    // Sumar todos los valores
     $.each(camposRetenciones, function(index, id) {
         var valor = parseFloat($('#' + id).val()) || 0;
         total += valor;
     });
     
-    // Actualizar el campo de retenciones o sanciones
     $('#retenciones_o_sanciones').val(total.toFixed(2));
     dispararEventos('#retenciones_o_sanciones');
     
-    // Calcular estimado menos deducciones
     calcularEstimadoMenosDeducciones();
 }
 
@@ -87,21 +125,15 @@ function calcularTotalAmortizacion() {
     var amortizacionAnticipo = parseFloat($('#amortizacion_anticipo').val()) || 0;
     var amortizacionIva = parseFloat($('#amortizacion_iva').val()) || 0;
     
-    // Calcular el IVA de la amortización
     var ivaCalculado = amortizacionAnticipo * (amortizacionIva / 100);
-    
-    // Calcular el total
     var total = amortizacionAnticipo + ivaCalculado;
     
-    // Asignar valores
     $('#amor_iva').val(ivaCalculado.toFixed(2));
     $('#total_amortizacion').val(total.toFixed(2));
     
-    // Disparar eventos
     dispararEventos('#amor_iva');
     dispararEventos('#total_amortizacion');
     
-    // Calcular estimado menos deducciones
     calcularEstimadoMenosDeducciones();
 }
 
@@ -154,7 +186,7 @@ function actualizarInfoContrato() {
     }
 }
 
-// Función para cargar datos del ingreso (compartida)
+// Función para cargar datos del ingreso (CON NUEVOS CAMPOS)
 function cargarDatosIngreso(data) {
     $('#periodo_del').val(data.periodo_del || '');
     $('#periodo_al').val(data.periodo_al || '');
@@ -182,6 +214,31 @@ function cargarDatosIngreso(data) {
         $('#aplicar_srcop').prop('checked', true);
     } else {
         $('#aplicar_srcop').prop('checked', false);
+    }
+    
+    
+    // Derechos Supervisión
+    $('#derechos_supervision').val(data.derechos_supervision || 0);
+    if (parseFloat(data.derechos_supervision) > 0) {
+        $('#aplicar_derechos_supervision').prop('checked', true);
+    } else {
+        $('#aplicar_derechos_supervision').prop('checked', false);
+    }
+    
+    // Aportación CMIC
+    $('#aportacion_cmic').val(data.aportacion_cmic || 0);
+    if (parseFloat(data.aportacion_cmic) > 0) {
+        $('#aplicar_aportacion_cmic').prop('checked', true);
+    } else {
+        $('#aplicar_aportacion_cmic').prop('checked', false);
+    }
+    
+    // Delegación ICIC
+    $('#delegacion_icic').val(data.delegacion_icic || 0);
+    if (parseFloat(data.delegacion_icic) > 0) {
+        $('#aplicar_delegacion_icic').prop('checked', true);
+    } else {
+        $('#aplicar_delegacion_icic').prop('checked', false);
     }
     
     // Retenciones y sanciones
@@ -214,7 +271,7 @@ function cargarDatosIngreso(data) {
     $('#estimado_menos_deducciones').val(data.estimado_menos_deducciones || 0);
 }
 
-// Función para limpiar formulario (compartida)
+// Función para limpiar formulario (CON NUEVOS CAMPOS)
 function limpiarFormulario() {
     $('#periodo_del').val('');
     $('#periodo_al').val('');
@@ -233,6 +290,15 @@ function limpiarFormulario() {
     
     $('#srcop_cdmx').val(0);
     $('#aplicar_srcop').prop('checked', false);
+    
+    $('#derechos_supervision').val(0);
+    $('#aplicar_derechos_supervision').prop('checked', false);
+    
+    $('#aportacion_cmic').val(0);
+    $('#aplicar_aportacion_cmic').prop('checked', false);
+    
+    $('#delegacion_icic').val(0);
+    $('#aplicar_delegacion_icic').prop('checked', false);
     
     $('#retencion_5_al_millar').val(0);
     dispararEventos('#retencion_5_al_millar');
@@ -262,7 +328,7 @@ function limpiarFormulario() {
     $('#estimado_menos_deducciones').val(0);
 }
 
-// Inicializar eventos comunes
+// Inicializar eventos comunes (CON NUEVOS CHECKBOXES)
 function inicializarEventosComunes() {
     // Evento para importe estimación e IVA
     $('#importe_estimacion, #iva').on('input', function() {
@@ -277,6 +343,7 @@ function inicializarEventosComunes() {
             $('#sicv_cop').val('0.00');
             calcularRetencionesSanciones();
         }
+        dispararEventos('#sicv_cop');
     });
 
     $('#aplicar_srcop').on('change', function() {
@@ -286,6 +353,37 @@ function inicializarEventosComunes() {
             $('#srcop_cdmx').val('0.00');
             calcularRetencionesSanciones();
         }
+        dispararEventos('#srcop_cdmx');
+    });
+    
+    $('#aplicar_derechos_supervision').on('change', function() {
+        if ($(this).is(':checked')) {
+            calcularDerechosSupervision();
+        } else {
+            $('#derechos_supervision').val('0.00');
+            calcularRetencionesSanciones();
+        } 
+        dispararEventos('#derechos_supervision');
+    });
+    
+    $('#aplicar_aportacion_cmic').on('change', function() {
+        if ($(this).is(':checked')) {
+            calcularAportacionCMIC();
+        } else {
+            $('#aportacion_cmic').val('0.00');
+            calcularRetencionesSanciones();
+        }
+        dispararEventos('#aportacion_cmic');
+    });
+    
+    $('#aplicar_delegacion_icic').on('change', function() {
+        if ($(this).is(':checked')) {
+            calcularDelegacionICIC();
+        } else {
+            $('#delegacion_icic').val('0.00');
+            calcularRetencionesSanciones();
+        }
+        dispararEventos('#delegacion_icic');
     });
     
     // Campos para calcular retenciones
