@@ -833,6 +833,72 @@
      
      
     @include('aingresos.ingresos.script')
+
+    <script>
+$(document).ready(function() {
+    // Inicializar Select2
+    inicializarSelect2();
+    
+    // Evento change del select de contrato
+    $('#id_contrato').on('change', function() {
+        actualizarInfoContrato();
+        var contratoId = $(this).val();
+        
+        if (contratoId) {
+            Swal.fire({
+                title: 'Cargando...',
+                text: 'Buscando último ingreso del contrato',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+            
+            cargarDatosContrato(contratoId, '{{ route("ingresos.ultimo", "") }}', function(data) {
+                Swal.close();
+                if (data) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Datos cargados',
+                        text: 'Se cargó la información del último ingreso',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    cargarDatosIngreso(data);
+                } else {
+                    limpiarFormulario();
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Sin datos previos',
+                        text: 'No hay ingresos anteriores para este contrato',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        } else {
+            limpiarFormulario();
+        }
+    });
+    
+    // Inicializar eventos comunes
+    inicializarEventosComunes();
+    
+    // Calcular valores iniciales
+    calcularValoresIniciales();
+    
+    // Si hay un contrato preseleccionado
+    @if(old('id_contrato', $ultimoIngreso->id_contrato ?? ''))
+        setTimeout(function() {
+            $('#id_contrato').val('{{ old('id_contrato', $ultimoIngreso->id_contrato ?? '') }}').trigger('change');
+        }, 200);
+    @endif
+    
+    @if(request()->has('contrato_id'))
+        setTimeout(function() {
+            $('#id_contrato').val('{{ request('contrato_id') }}').trigger('change');
+        }, 500);
+    @endif
+});
+</script>
 </body>
 </html>
 
