@@ -328,7 +328,7 @@
                                                        value="{{ old('importe_estimacion', $ultimoIngreso->importe_estimacion ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
-                                                       min="0">
+                                                       >
                                             </div>
                                         </div>
                                     </div>
@@ -347,7 +347,7 @@
                                                        value="{{ old('iva', $ultimoIngreso->iva ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
-                                                       min="0"
+                                                       
                                                        noformat>
                                             </div>
                                         </div>
@@ -367,7 +367,7 @@
                                                        value="{{ old('importe_iva', $ultimoIngreso->importe_iva ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
-                                                       min="0">
+                                                       >
                                             </div>
                                         </div>
                                     </div>
@@ -386,7 +386,7 @@
                                                        value="{{ old('total_estimacion_con_iva', $ultimoIngreso->total_estimacion_con_iva ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
-                                                       min="0"
+                                                       
                                                        readonly>
                                             </div>
                                         </div>
@@ -420,7 +420,7 @@
                                                     value="{{ old('sicv_cop', $ultimoIngreso->sicv_cop ?? 0) }}"
                                                     step="0.01"
                                                     placeholder="0.00"
-                                                    min="0" readonly>
+                                                     readonly>
                                             </div>
                                         </div>
                                     </div>
@@ -448,7 +448,7 @@
                                                     value="{{ old('srcop_cdmx', $ultimoIngreso->srcop_cdmx ?? 0) }}"
                                                     step="0.01"
                                                     placeholder="0.00"
-                                                    min="0" readonly>
+                                                     readonly>
                                             </div>
                                         </div>
                                     </div>
@@ -475,7 +475,7 @@
                    value="{{ old('derechos_supervision', $ultimoIngreso->derechos_supervision ?? 0) }}"
                    step="0.01"
                    placeholder="0.00"
-                   min="0" readonly>
+                    readonly>
         </div>
     </div>
 </div>
@@ -502,7 +502,7 @@
                    value="{{ old('aportacion_cmic', $ultimoIngreso->aportacion_cmic ?? 0) }}"
                    step="0.01"
                    placeholder="0.00"
-                   min="0" readonly>
+                    readonly>
         </div>
     </div>
 </div>
@@ -529,7 +529,7 @@
                    value="{{ old('delegacion_icic', $ultimoIngreso->delegacion_icic ?? 0) }}"
                    step="0.01"
                    placeholder="0.00"
-                   min="0" readonly>
+                    readonly>
         </div>
     </div>
 </div>
@@ -550,7 +550,7 @@
                                                     value="{{ old('retencion_5_al_millar', $ultimoIngreso->retencion_5_al_millar ?? 0) }}"
                                                     step="0.01"
                                                     placeholder="0.00"
-                                                    min="0">
+                                                    >
                                             </div>
                                         </div>
                                     </div>
@@ -571,7 +571,7 @@
                                                        value="{{ old('sancion_atrazo_presentacion_estimacion', $ultimoIngreso->sancion_atrazo_presentacion_estimacion ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
-                                                       min="0">
+                                                       >
                                             </div>
                                         </div>
                                     </div>
@@ -590,7 +590,7 @@
                                                        value="{{ old('sancion_atraso_de_obra', $ultimoIngreso->sancion_atraso_de_obra ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
-                                                       min="0">
+                                                       >
                                             </div>
                                         </div>
                                     </div>
@@ -609,7 +609,7 @@
                                                        value="{{ old('sancion_por_obra_mal_ejecutada', $ultimoIngreso->sancion_por_obra_mal_ejecutada ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
-                                                       min="0">
+                                                       >
                                             </div>
                                         </div>
                                     </div>
@@ -630,7 +630,7 @@
                                                        value="{{ old('retencion_por_atraso_en_programa_obra', $ultimoIngreso->retencion_por_atraso_en_programa_obra ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
-                                                       min="0">
+                                                       >
                                             </div>
                                         </div>
                                     </div>
@@ -655,7 +655,7 @@
                                                        value="{{ old('retenciones_o_sanciones', $ultimoIngreso->retenciones_o_sanciones ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
-                                                       min="0"
+                                                       
                                                        readonly>
                                             </div>
                                         </div>
@@ -680,7 +680,7 @@
                                                        value="{{ old('amortizacion_anticipo', $ultimoIngreso->amortizacion_anticipo ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
-                                                       min="0">
+                                                       >
                                             </div>
                                         </div>
                                     </div>
@@ -699,7 +699,7 @@
                                                        value="{{ old('amortizacion_iva', $ultimoIngreso->amortizacion_iva ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
-                                                       min="0">
+                                                       >
                                             </div>
                                         </div>
                                     </div>
@@ -718,7 +718,7 @@
                                                        value="{{ old('amor_iva', $ultimoIngreso->amor_iva ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
-                                                       min="0">
+                                                       >
                                             </div>
                                         </div>
                                     </div>
@@ -737,7 +737,7 @@
                                                        value="{{ old('total_amortizacion', $ultimoIngreso->total_amortizacion ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
-                                                       min="0"
+                                                       
                                                        readonly>
                                             </div>
                                         </div>

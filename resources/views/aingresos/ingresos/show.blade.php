@@ -396,7 +396,7 @@
                                                    value="{{ old('importe_estimacion', $ingreso->importe_estimacion) }}"
                                                    step="0.01"
                                                    placeholder="0.00"
-                                                   min="0">
+                                                   >
                                         </div>
                                     </div>
                                 </div>
@@ -415,7 +415,7 @@
                                                    value="{{ old('iva', $ingreso->iva) }}"
                                                    step="0.01"
                                                    placeholder="0.00"
-                                                   min="0"
+                                                   
                                                    noformat>
                                         </div>
                                     </div>
@@ -435,7 +435,7 @@
                                                    value="{{ old('importe_iva', $ingreso->importe_iva) }}"
                                                    step="0.01"
                                                    placeholder="0.00"
-                                                   min="0"
+                                                   
                                                    readonly>
                                         </div>
                                     </div>
@@ -455,7 +455,7 @@
                                                    value="{{ old('total_estimacion_con_iva', $ingreso->total_estimacion_con_iva) }}"
                                                    step="0.01"
                                                    placeholder="0.00"
-                                                   min="0"
+                                                   
                                                    readonly>
                                         </div>
                                     </div>
@@ -488,7 +488,7 @@
                                                 value="{{ old('sicv_cop', $ingreso->sicv_cop) }}"
                                                 step="0.01"
                                                 placeholder="0.00"
-                                                min="0" readonly>
+                                                 readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -515,7 +515,7 @@
                                                 value="{{ old('srcop_cdmx', $ingreso->srcop_cdmx) }}"
                                                 step="0.01"
                                                 placeholder="0.00"
-                                                min="0" readonly>
+                                                 readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -544,7 +544,7 @@
                                                 value="{{ old('derechos_supervision', $ingreso->derechos_supervision ?? 0) }}"
                                                 step="0.01"
                                                 placeholder="0.00"
-                                                min="0" readonly>
+                                                 readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -572,7 +572,7 @@
                                                 value="{{ old('aportacion_cmic', $ingreso->aportacion_cmic ?? 0) }}"
                                                 step="0.01"
                                                 placeholder="0.00"
-                                                min="0" readonly>
+                                                 readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -600,7 +600,7 @@
                                                 value="{{ old('delegacion_icic', $ingreso->delegacion_icic ?? 0) }}"
                                                 step="0.01"
                                                 placeholder="0.00"
-                                                min="0" readonly>
+                                                 readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -621,7 +621,7 @@
                                                 value="{{ old('retencion_5_al_millar', $ingreso->retencion_5_al_millar) }}"
                                                 step="0.01"
                                                 placeholder="0.00"
-                                                min="0">
+                                                >
                                         </div>
                                     </div>
                                 </div>
@@ -642,7 +642,7 @@
                                                    value="{{ old('sancion_atrazo_presentacion_estimacion', $ingreso->sancion_atrazo_presentacion_estimacion) }}"
                                                    step="0.01"
                                                    placeholder="0.00"
-                                                   min="0">
+                                                   >
                                         </div>
                                     </div>
                                 </div>
@@ -661,7 +661,7 @@
                                                    value="{{ old('sancion_atraso_de_obra', $ingreso->sancion_atraso_de_obra) }}"
                                                    step="0.01"
                                                    placeholder="0.00"
-                                                   min="0">
+                                                   >
                                         </div>
                                     </div>
                                 </div>
@@ -680,7 +680,7 @@
                                                    value="{{ old('sancion_por_obra_mal_ejecutada', $ingreso->sancion_por_obra_mal_ejecutada) }}"
                                                    step="0.01"
                                                    placeholder="0.00"
-                                                   min="0">
+                                                   >
                                         </div>
                                     </div>
                                 </div>
@@ -701,7 +701,7 @@
                                                    value="{{ old('retencion_por_atraso_en_programa_obra', $ingreso->retencion_por_atraso_en_programa_obra) }}"
                                                    step="0.01"
                                                    placeholder="0.00"
-                                                   min="0">
+                                                   >
                                         </div>
                                     </div>
                                 </div>
@@ -724,7 +724,7 @@
                                                    value="{{ old('retenciones_o_sanciones', $ingreso->retenciones_o_sanciones) }}"
                                                    step="0.01"
                                                    placeholder="0.00"
-                                                   min="0"
+                                                   
                                                    readonly>
                                         </div>
                                     </div>
@@ -749,7 +749,7 @@
                                                    value="{{ old('amortizacion_anticipo', $ingreso->amortizacion_anticipo) }}"
                                                    step="0.01"
                                                    placeholder="0.00"
-                                                   min="0">
+                                                   >
                                         </div>
                                     </div>
                                 </div>
@@ -768,7 +768,7 @@
                                                    value="{{ old('amortizacion_iva', $ingreso->amortizacion_iva) }}"
                                                    step="0.01"
                                                    placeholder="0.00"
-                                                   min="0">
+                                                   >
                                         </div>
                                     </div>
                                 </div>
@@ -787,7 +787,7 @@
                                                        value="{{ old('amor_iva', $ultimoIngreso->amor_iva ?? 0) }}"
                                                        step="0.01"
                                                        placeholder="0.00"
-                                                       min="0">
+                                                       >
                                             </div>
                                         </div>
                                     </div>
@@ -806,7 +806,7 @@
                                                    value="{{ old('total_amortizacion', $ingreso->total_amortizacion) }}"
                                                    step="0.01"
                                                    placeholder="0.00"
-                                                   min="0"
+                                                   
                                                    readonly>
                                         </div>
                                     </div>
@@ -1032,7 +1032,7 @@
                                                        name="liquido_cobrado" 
                                                        value="{{ old('liquido_cobrado', $ingreso->liquido_cobrado) }}"
                                                        step="0.01"
-                                                       min="0"
+                                                       
                                                        required>
                                             </div>
                                         </div>
