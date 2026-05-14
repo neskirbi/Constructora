@@ -1304,7 +1304,7 @@ $(document).ready(function() {
     $('#aplicar_derechos_supervision').on('change', function() {
         if ($(this).is(':checked')) {
             const totalEstimacion = parseFloat($('#importe_estimacion').val()) || 0;
-            $('#derechos_supervision').val((totalEstimacion * 0.02).toFixed(2));
+            $('#derechos_supervision').val((total_estimacion_con_iva * 0.02).toFixed(2));
         } else {
             $('#derechos_supervision').val('0.00');
         }
