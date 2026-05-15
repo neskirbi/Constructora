@@ -91,6 +91,11 @@
                     <span class="submenu-text">Reporte Destajo</span>
                 </a>
 
+                <a href="{{url('reportes/ps')}}" class="submenu-item">
+                    <i class="fas fa-file-alt submenu-icon"></i>
+                    <span class="submenu-text">Reporte Productos</span>
+                </a>
+
                 
              
                 <!-- Puedes agregar más reportes aquí -->

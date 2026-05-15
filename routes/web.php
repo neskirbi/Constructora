@@ -171,6 +171,12 @@ Route::prefix('reportes')->middleware(['auth:administradores'])->group(function 
         
     Route::post('/compra/exportar', [App\Http\Controllers\Reportes\ReporteCompraController::class, 'exportar'])
         ->name('reportes.compra.exportar');
+
+    Route::get('/ps', [App\Http\Controllers\Reportes\ReportePSController::class, 'index'])
+        ->name('reportes.ps');
+        
+    Route::post('/ps/exportar', [App\Http\Controllers\Reportes\ReportePSController::class, 'exportar'])
+        ->name('reportes.ps.exportar');
     
 });
 
