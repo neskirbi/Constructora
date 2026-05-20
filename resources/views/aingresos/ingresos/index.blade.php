@@ -433,7 +433,7 @@
                                                     <div class="row">
                                                         <div class="col-md-6">
                                                             <small>Importe Contrato</small>
-                                                            <h5>${{ number_format($contrato->total ?? 0, 2) }}</h5>
+                                                            <h5>${{ number_format($contrato->total_contrato ?? 0, 2) }}</h5>
                                                         </div>
                                                         <div class="col-md-6">
                                                             <small>Importe Facturado</small>
@@ -441,7 +441,7 @@
                                                         </div>
                                                         <div class="col-md-12 mt-2">
                                                             <small>Importe por Facturar</small>
-                                                            <h5>${{ number_format(($contrato->total ?? 0) - ($contrato->total_facturado ?? 0), 2) }}</h5>
+                                                            <h5>${{ number_format(($contrato->total_contrato  ?? 0) - ($contrato->total_facturado ?? 0), 2) }}</h5>
                                                         </div>
                                                     </div>
                                                 </div>
