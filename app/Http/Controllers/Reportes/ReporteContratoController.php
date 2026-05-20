@@ -12,8 +12,8 @@ class ReporteContratoController extends Controller
 {
     public function index()
     {
-        $contratos = Contrato::select('id', 'refinterna', 'obra', 'contrato_no')
-            ->orderBy('refinterna')
+        $contratos = Contrato::select('id', 'consecutivo', 'obra', 'contrato_no')
+            ->orderBy('consecutivo')
             ->get();
         
         return view('reportes.contratos.contrato', compact('contratos'));

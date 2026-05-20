@@ -13,6 +13,7 @@ use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
 class ContratosExport implements 
     FromCollection, 
@@ -38,94 +39,83 @@ class ContratosExport implements
     {
         $query = DB::table('contratos as c')
             ->select(
+                'c.id',
                 'c.consecutivo',
-                'c.refinterna as referencia_interna',
+                'c.empresa',
                 'c.contrato_no',
                 'c.frente',
                 'c.gerencia',
                 'c.cliente',
                 'c.obra',
                 'c.lugar',
-                'c.concepto',
-                'c.subtotal',
-                'c.iva',
-                'c.total',
-                'c.porcentaje_anticipo',
+                'c.subtotal as contrato_subtotal',
+                'c.iva as contrato_iva',
+                'c.total as contrato_total',
                 'c.monto_anticipo',
-                DB::raw('c.total + COALESCE(c.monto_anticipo, 0) as total_mas_anticipo'),
                 'c.duracion',
-                'c.fecha_contrato',
                 'c.fecha_inicio_obra',
                 'c.fecha_terminacion_obra',
-                'c.observaciones',
-                'c.razon_social',
-                'c.rfc',
-                'c.calle_numero',
-                'c.colonia',
-                'c.codigo_postal',
-                'c.entidad',
-                'c.alcaldia_municipio',
-                'c.telefono',
-                'c.banco',
-                'c.no_cuenta',
-                'c.sucursal',
-                'c.clabe_interbancaria',
-                'c.mail_facturas',
-                'c.representante_legal',
-                'c.created_at',
-                'c.updated_at'
+                'c.observaciones'
             )
             ->whereBetween('c.fecha_contrato', [$this->fechaInicio, $this->fechaFin])
             ->orderBy('c.fecha_contrato', 'asc')
             ->orderBy('c.consecutivo', 'asc');
 
-        // Si hay contrato específico, filtrar por él
         if ($this->contratoId) {
             $query->where('c.id', $this->contratoId);
         }
 
-        return $query->get();
+        $contratos = $query->get();
+
+        foreach ($contratos as $contrato) {
+            $ampliaciones = DB::table('ampliacionesmonto')
+                ->where('id_contrato', $contrato->id)
+                ->select(
+                    DB::raw('COALESCE(SUM(subtotal), 0) as total_subtotal'),
+                    DB::raw('COALESCE(SUM(iva), 0) as total_iva'),
+                    DB::raw('COALESCE(SUM(total), 0) as total_total')
+                )
+                ->first();
+
+            $contrato->importe_ampliacion = $ampliaciones->total_subtotal ?? 0;
+            $contrato->iva_ampliacion = $ampliaciones->total_iva ?? 0;
+            $contrato->total_ampliacion = $ampliaciones->total_total ?? 0;
+            
+            $contrato->importe_suma = ($contrato->contrato_subtotal ?? 0) + ($contrato->importe_ampliacion ?? 0);
+            $contrato->iva_suma = ($contrato->contrato_iva ?? 0) + ($contrato->iva_ampliacion ?? 0);
+            $contrato->total_suma = ($contrato->contrato_total ?? 0) + ($contrato->total_ampliacion ?? 0);
+        }
+
+        return $contratos;
     }
 
     public function headings(): array
     {
+        // Primera fila (agrupadores) - se manejará en registerEvents
+        // Segunda fila (nombres de columnas)
         return [
-            'CONSECUTIVO',
-            'REFERENCIA INTERNA',
-            'CONTRATO No.',
+            'CONSEC',
+            'Empresa',
+            'Contrato No.',
             'FRENTE',
-            'GERENCIA',
-            'CLIENTE',
-            'OBRA',
-            'LUGAR',
-            'CONCEPTO',
-            'SUBTOTAL',
+            'Gerencia',
+            'Cliente',
+            'Obra',
+            'Lugar',
+            'Importe',
             'IVA',
-            'TOTAL CONTRATO',
-            '% ANTICIPO',
-            'MONTO ANTICIPO',
-            'TOTAL + ANTICIPO',
-            'DURACIÓN',
-            'FECHA CONTRATO',
-            'FECHA INICIO OBRA',
-            'FECHA TERMINACIÓN',
-            'OBSERVACIONES',
-            'RAZÓN SOCIAL',
-            'RFC',
-            'CALLE Y NÚMERO',
-            'COLONIA',
-            'CÓDIGO POSTAL',
-            'ENTIDAD',
-            'ALCALDÍA/MUNICIPIO',
-            'TELÉFONO',
-            'BANCO',
-            'No. CUENTA',
-            'SUCURSAL',
-            'CLABE INTERBANCARIA',
-            'EMAIL FACTURAS',
-            'REPRESENTANTE LEGAL',
-            'FECHA CREACIÓN',
-            'FECHA ACTUALIZACIÓN'
+            'Total',
+            'Importe',
+            'IVA',
+            'Total',
+            'Importe',
+            'IVA',
+            'Total',
+            'Anticipo',
+            'Duración',
+            'Inicio de Obra',
+            'Terminación',
+            'Observación'
         ];
     }
 
@@ -133,48 +123,34 @@ class ContratosExport implements
     {
         return [
             $contrato->consecutivo ?? '',
-            $contrato->referencia_interna ?? '',
+            $contrato->empresa ?? '',
             $contrato->contrato_no ?? '',
             $contrato->frente ?? '',
             $contrato->gerencia ?? '',
             $contrato->cliente ?? '',
             $contrato->obra ?? '',
             $contrato->lugar ?? '',
-            $contrato->concepto ?? '',
-            $contrato->subtotal ?? 0,
-            $contrato->iva ?? 0,
-            $contrato->total ?? 0,
-            $contrato->porcentaje_anticipo ?? 0,
+            $contrato->contrato_subtotal ?? 0,
+            $contrato->contrato_iva ?? 0,
+            $contrato->contrato_total ?? 0,
+            $contrato->importe_ampliacion ?? 0,
+            $contrato->iva_ampliacion ?? 0,
+            $contrato->total_ampliacion ?? 0,
+            $contrato->importe_suma ?? 0,
+            $contrato->iva_suma ?? 0,
+            $contrato->total_suma ?? 0,
             $contrato->monto_anticipo ?? 0,
-            $contrato->total_mas_anticipo ?? 0,
             $contrato->duracion ?? '',
-            $contrato->fecha_contrato ? date('d/m/Y', strtotime($contrato->fecha_contrato)) : '',
             $contrato->fecha_inicio_obra ? date('d/m/Y', strtotime($contrato->fecha_inicio_obra)) : '',
             $contrato->fecha_terminacion_obra ? date('d/m/Y', strtotime($contrato->fecha_terminacion_obra)) : '',
             $contrato->observaciones ?? '',
-            $contrato->razon_social ?? '',
-            $contrato->rfc ?? '',
-            $contrato->calle_numero ?? '',
-            $contrato->colonia ?? '',
-            $contrato->codigo_postal ?? '',
-            $contrato->entidad ?? '',
-            $contrato->alcaldia_municipio ?? '',
-            $contrato->telefono ?? '',
-            $contrato->banco ?? '',
-            $contrato->no_cuenta ?? '',
-            $contrato->sucursal ?? '',
-            $contrato->clabe_interbancaria ?? '',
-            $contrato->mail_facturas ?? '',
-            $contrato->representante_legal ?? '',
-            $contrato->created_at ? date('d/m/Y H:i', strtotime($contrato->created_at)) : '',
-            $contrato->updated_at ? date('d/m/Y H:i', strtotime($contrato->updated_at)) : '',
         ];
     }
 
     public function styles(Worksheet $sheet)
     {
         return [
-            1 => [
+            2 => [ // Segunda fila (encabezados de columna)
                 'font' => [
                     'bold' => true,
                     'color' => ['rgb' => 'FFFFFF'],
@@ -185,8 +161,8 @@ class ContratosExport implements
                     'startColor' => ['rgb' => '4472C4'],
                 ],
                 'alignment' => [
-                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_CENTER,
                 ],
             ],
         ];
@@ -195,18 +171,20 @@ class ContratosExport implements
     public function columnFormats(): array
     {
         return [
-            'J' => '"$"#,##0.00',  // SUBTOTAL
-            'K' => '"$"#,##0.00',  // IVA
-            'L' => '"$"#,##0.00',  // TOTAL CONTRATO
-            'M' => '0.00"% "',     // % ANTICIPO (con símbolo %)
-            'N' => '"$"#,##0.00',  // MONTO ANTICIPO
-            'O' => '"$"#,##0.00',  // TOTAL + ANTICIPO (columna destacada)
-            'P' => '@',             // DURACIÓN (texto)
-            'Q' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // FECHA CONTRATO
-            'R' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // FECHA INICIO OBRA
-            'S' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // FECHA TERMINACIÓN
-            'AG' => NumberFormat::FORMAT_DATE_DDMMYYYY . ' H:MM',  // FECHA CREACIÓN
-            'AH' => NumberFormat::FORMAT_DATE_DDMMYYYY . ' H:MM',  // FECHA ACTUALIZACIÓN
+            'I' => '"$"#,##0.00',
+            'J' => '"$"#,##0.00',
+            'K' => '"$"#,##0.00',
+            'L' => '"$"#,##0.00',
+            'M' => '"$"#,##0.00',
+            'N' => '"$"#,##0.00',
+            'O' => '"$"#,##0.00',
+            'P' => '"$"#,##0.00',
+            'Q' => '"$"#,##0.00',
+            'R' => '"$"#,##0.00',
+            'S' => '@',
+            'T' => NumberFormat::FORMAT_DATE_DDMMYYYY,
+            'U' => NumberFormat::FORMAT_DATE_DDMMYYYY,
+            'V' => '@',
         ];
     }
 
@@ -215,9 +193,70 @@ class ContratosExport implements
         return [
             AfterSheet::class => function(AfterSheet $event) {
                 $sheet = $event->sheet;
+                
+                // Insertar una nueva fila al inicio para los títulos agrupadores
+                $sheet->insertNewRowBefore(1, 1);
+                
+                // Escribir los títulos agrupadores en la primera fila
+                // Columnas A-H no tienen agrupador (se dejan vacías o se combinan?)
+                $sheet->setCellValue('A1', '');
+                $sheet->setCellValue('B1', '');
+                $sheet->setCellValue('C1', '');
+                $sheet->setCellValue('D1', '');
+                $sheet->setCellValue('E1', '');
+                $sheet->setCellValue('F1', '');
+                $sheet->setCellValue('G1', '');
+                $sheet->setCellValue('H1', '');
+                
+                // TOTAL CONTRATO (columnas I, J, K)
+                $sheet->mergeCells('I1:K1');
+                $sheet->setCellValue('I1', 'TOTAL CONTRATO');
+                
+                // CONVENIO AMPLIACION (columnas L, M, N)
+                $sheet->mergeCells('L1:N1');
+                $sheet->setCellValue('L1', 'CONVENIO AMPLIACION');
+                
+                // TOTAL A COBRAR (columnas O, P, Q)
+                $sheet->mergeCells('O1:Q1');
+                $sheet->setCellValue('O1', 'TOTAL A COBRAR');
+                
+                // Columnas R en adelante sin agrupador
+                $sheet->setCellValue('R1', '');
+                $sheet->setCellValue('S1', '');
+                $sheet->setCellValue('T1', '');
+                $sheet->setCellValue('U1', '');
+                $sheet->setCellValue('V1', '');
+                
+                // Estilo para la primera fila (títulos agrupadores)
+                $sheet->getStyle('A1:V1')->applyFromArray([
+                    'font' => [
+                        'bold' => true,
+                        'size' => 12,
+                    ],
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'startColor' => ['rgb' => '5B9BD5'],
+                    ],
+                    'alignment' => [
+                        'horizontal' => Alignment::HORIZONTAL_CENTER,
+                        'vertical' => Alignment::VERTICAL_CENTER,
+                    ],
+                ]);
+                
+                // Limitar altura de filas a 300 px máximo
+                $highestRow = $sheet->getHighestRow();
+                for ($row = 1; $row <= $highestRow; $row++) {
+                    $currentHeight = $sheet->getRowDimension($row)->getRowHeight();
+                    if ($currentHeight > 300) {
+                        $sheet->getRowDimension($row)->setRowHeight(300);
+                    }
+                    // Habilitar wrap text para que el contenido no se desborde
+                    $sheet->getStyle('A' . $row . ':V' . $row)->getAlignment()->setWrapText(true);
+                }
+                
                 $lastRow = $sheet->getHighestRow();
-                $lastColumn = $sheet->getHighestColumn();
-
+                $lastColumn = 'V';
+                
                 // Bordes para toda la tabla
                 $sheet->getStyle('A1:' . $lastColumn . $lastRow)->applyFromArray([
                     'borders' => [
@@ -227,39 +266,26 @@ class ContratosExport implements
                         ],
                     ],
                 ]);
-
+                
                 // Estilo para filas de datos
-                $sheet->getStyle('A2:' . $lastColumn . $lastRow)->applyFromArray([
+                $sheet->getStyle('A3:' . $lastColumn . $lastRow)->applyFromArray([
                     'alignment' => [
-                        'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                        'vertical' => Alignment::VERTICAL_CENTER,
                     ],
                     'font' => ['size' => 11],
                 ]);
-
-                // Alineaciones específicas
-                $sheet->getStyle('A2:A' . $lastRow)->getAlignment()->setHorizontal('center'); // Consecutivo
-                $sheet->getStyle('Q2:S' . $lastRow)->getAlignment()->setHorizontal('center'); // Fechas
-                $sheet->getStyle('AG2:AH' . $lastRow)->getAlignment()->setHorizontal('center'); // Fechas creación
-                $sheet->getStyle('J2:P' . $lastRow)->getAlignment()->setHorizontal('right');  // Números
                 
-                // Destacar la columna "TOTAL + ANTICIPO" con color de fondo
-                $sheet->getStyle('O2:O' . $lastRow)->applyFromArray([
-                    'font' => [
-                        'bold' => true,
-                        'color' => ['rgb' => '000000'],
-                    ],
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => ['rgb' => 'E2F0D9'], // Verde claro
-                    ],
-                ]);
-
-                // Encabezado centrado
-                $sheet->getStyle('A1:' . $lastColumn . '1')->getAlignment()->setHorizontal('center');
-                $sheet->getRowDimension('1')->setRowHeight(25);
-
-                // Zebra striping (filas alternadas)
-                for ($row = 2; $row <= $lastRow; $row++) {
+                // Alineaciones específicas
+                $sheet->getStyle('A3:A' . $lastRow)->getAlignment()->setHorizontal('center');
+                $sheet->getStyle('T3:U' . $lastRow)->getAlignment()->setHorizontal('center');
+                $sheet->getStyle('I3:R' . $lastRow)->getAlignment()->setHorizontal('right');
+                
+                // Encabezados centrados
+                $sheet->getStyle('A2:V2')->getAlignment()->setHorizontal('center');
+                $sheet->getRowDimension('2')->setRowHeight(25);
+                
+                // Zebra striping
+                for ($row = 3; $row <= $lastRow; $row++) {
                     if ($row % 2 == 0) {
                         $sheet->getStyle('A' . $row . ':' . $lastColumn . $row)->applyFromArray([
                             'fill' => [
@@ -269,66 +295,9 @@ class ContratosExport implements
                         ]);
                     }
                 }
-
-                // Información del filtro
-                $filaInfo = $lastRow + 2;
-                $sheet->setCellValue('A' . $filaInfo, 'Filtro aplicado:');
-                $sheet->setCellValue('B' . $filaInfo, 'Fecha contrato: ' . $this->fechaInicio . ' - ' . $this->fechaFin);
                 
-                // Información del contrato específico
-                if ($this->contratoId) {
-                    $contrato = DB::table('contratos')->where('id', $this->contratoId)->first();
-                    $sheet->setCellValue('C' . $filaInfo, 'Contrato: ' . ($contrato->refinterna ?? $contrato->contrato_no ?? ''));
-                } else {
-                    $sheet->setCellValue('C' . $filaInfo, 'Contrato: TODOS');
-                }
-                $sheet->getStyle('A' . $filaInfo . ':C' . $filaInfo)->applyFromArray([
-                    'font' => ['bold' => true],
-                ]);
-
-                // Totales generales
-                $filaTotales = $filaInfo + 2;
-                
-                // Totales de SUBTOTAL
-                $sheet->setCellValue('I' . $filaTotales, 'SUBTOTAL GENERAL:');
-                $sheet->setCellValue('J' . $filaTotales, '=SUM(J2:J' . $lastRow . ')');
-                
-                // Totales de IVA
-                $sheet->setCellValue('I' . ($filaTotales + 1), 'IVA GENERAL:');
-                $sheet->setCellValue('J' . ($filaTotales + 1), '=SUM(K2:K' . $lastRow . ')');
-                
-                // Totales de TOTAL CONTRATO
-                $sheet->setCellValue('I' . ($filaTotales + 2), 'TOTAL CONTRATOS GENERAL:');
-                $sheet->setCellValue('J' . ($filaTotales + 2), '=SUM(L2:L' . $lastRow . ')');
-                
-                // Totales de MONTO ANTICIPO
-                $sheet->setCellValue('I' . ($filaTotales + 3), 'TOTAL ANTICIPOS:');
-                $sheet->setCellValue('J' . ($filaTotales + 3), '=SUM(N2:N' . $lastRow . ')');
-                
-                // Totales de TOTAL + ANTICIPO
-                $sheet->setCellValue('I' . ($filaTotales + 4), 'TOTAL + ANTICIPO GENERAL:');
-                $sheet->setCellValue('J' . ($filaTotales + 4), '=SUM(O2:O' . $lastRow . ')');
-                
-                // Estilo para los títulos de totales
-                $sheet->getStyle('I' . $filaTotales . ':I' . ($filaTotales + 4))->applyFromArray([
-                    'font' => ['bold' => true],
-                ]);
-                
-                // Estilo para las celdas de totales
-                $sheet->getStyle('J' . $filaTotales . ':J' . ($filaTotales + 4))->applyFromArray([
-                    'font' => ['bold' => true],
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => ['rgb' => 'FFD700'], // Dorado
-                    ],
-                ]);
-                
-                // Formato moneda para los totales
-                $sheet->getStyle('J' . $filaTotales . ':J' . ($filaTotales + 4))->getNumberFormat()
-                    ->setFormatCode('"$"#,##0.00');
-
-                // Congelar paneles (encabezado)
-                $sheet->freezePane('A2');
+                // Congelar paneles (primeras dos filas y primera columna)
+                $sheet->freezePane('B3');
             },
         ];
     }

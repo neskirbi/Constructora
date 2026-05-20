@@ -134,7 +134,7 @@
                                     <option value="">-- Todos los contratos --</option>
                                     @foreach($contratos as $contrato)
                                         <option value="{{ $contrato->id }}">
-                                            {{ $contrato->refinterna }} - {{ $contrato->obra }}
+                                            {{ $contrato->consecutivo }} - {{ $contrato->obra }}
                                         </option>
                                     @endforeach
                                 </select>
