@@ -345,7 +345,7 @@
                                                 Estado: {{ ucfirst($ingreso->status) }}
                                             </span>
                                             @endif
-                                             @if(ucfirst($ingreso->status) === "Pagado")
+                                             @if(ucfirst($ingreso->status) === "Cobrado")
                                             <span class="fecha-badge ms-2" style="background: #e7f5ff; color: #0d6efd;">
                                                 <i class="fas fa-info-circle me-1"></i>
                                                 Fecha Cobro: {{ optional($ingreso->fecha_cobro)->format('Y-m-d')}}
