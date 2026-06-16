@@ -1,5 +1,13 @@
-agregar decuento en compras: debe ser por porcentaje o por cantidad 
-Hacer que los select de proveedor y de prductos se cargue en tiempo real(en compras y destajo)
-revisar por que en el create de destajo y de compras el producto no sale la pura clave 
+Usuarios 
 
-bajar la fila de descuento a la par de subtotal 
+Gerente Obras
+Residentes
+
+
+usuarios residente y gerente de obra: recidente genera y el gerente aprueba y da de alta residentes 
+
+
+Para El modulo de obras:
+Considerar notificaciones (Preparar la DB)
+Se debe cargar un excel con el programa de obra(Un solo contrato puede tener varias programaciones)
+Nota: Para hacer match entre comnpras y el programa que se carga , se podria hacer con un campo que se llame semana y el año y con eso podria hacer un match de cumplimiento del programa
