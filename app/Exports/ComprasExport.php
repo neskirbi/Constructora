@@ -83,7 +83,7 @@ class ComprasExport implements
                     $fila->consecutivo = $compra->consecutivo;
                     $fila->fecha = $compra->created_at;
                     $fila->obra = $compra->contrato_obra;
-                    $fila->no_obra = $compra->contrato_refinterna;
+                    $fila->no_obra = $compra->consecutivo;
                     $fila->frente = $compra->contrato_frente;
                     $fila->clave_proveedor = $compra->proveedor_clave;
                     $fila->proveedor = $compra->proveedor_nombre;
