@@ -41,6 +41,7 @@ class ComprasExport implements
             ->select(
                 'c.id',
                 'c.consecutivo',
+                'ct.consecutivo as cons',
                 'c.created_at',
                 'c.referencia',
                 'c.costo_operado',
@@ -83,7 +84,7 @@ class ComprasExport implements
                     $fila->consecutivo = $compra->consecutivo;
                     $fila->fecha = $compra->created_at;
                     $fila->obra = $compra->contrato_obra;
-                    $fila->no_obra = $compra->consecutivo;
+                    $fila->no_obra = $compra->cons;
                     $fila->frente = $compra->contrato_frente;
                     $fila->clave_proveedor = $compra->proveedor_clave;
                     $fila->proveedor = $compra->proveedor_nombre;
@@ -114,7 +115,7 @@ class ComprasExport implements
                 $fila->consecutivo = $compra->consecutivo;
                 $fila->fecha = $compra->created_at;
                 $fila->obra = $compra->contrato_obra;
-                $fila->no_obra = $compra->consecutivo;
+                $fila->no_obra = $compra->cons;
                 $fila->frente = $compra->contrato_frente;
                 $fila->clave_proveedor = $compra->proveedor_clave;
                 $fila->proveedor = $compra->proveedor_nombre;
