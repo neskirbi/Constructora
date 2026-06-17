@@ -45,7 +45,12 @@ class ComprasExport implements
                 'c.created_at',
                 'c.referencia',
                 'c.costo_operado',
-                DB::raw('(c.costo_operado * c.iva / 100) as iva'),
+                DB::raw("
+                    CASE 
+                        WHEN c.iva > 20 THEN c.iva 
+                        ELSE (c.costo_operado * c.iva / 100) 
+                    END as iva
+                "),
                 'c.total',
                 'c.verificado',
                 'ct.refinterna as contrato_refinterna',
