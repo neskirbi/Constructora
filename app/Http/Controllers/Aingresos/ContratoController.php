@@ -84,7 +84,7 @@ class ContratoController extends Controller
             'obra' => 'nullable|string',
             'refinterna' => 'nullable|string',
             'empresa' => 'nullable|string|max:255',
-            'contrato_no' => 'required|string|max:255|unique:contratos',
+            'contrato_no' => 'required|string|max:255',
             'frente' => 'nullable|string|max:255',
             'gerencia' => 'nullable|string|max:255',
             'cliente' => 'nullable|string|max:255',
@@ -287,7 +287,7 @@ class ContratoController extends Controller
             'obra' => 'nullable|string',
             'refinterna' => 'nullable|string',
             'empresa' => 'nullable|string|max:255',
-            'contrato_no' => 'required|string|max:255|unique:contratos,contrato_no,' . $id . ',id',
+            'contrato_no' => 'required|string|max:255,contrato_no,' . $id . ',id',
             'frente' => 'nullable|string|max:255',
             'gerencia' => 'nullable|string|max:255',
             'cliente' => 'nullable|string|max:255',
@@ -341,7 +341,6 @@ class ContratoController extends Controller
             'puesto_representante_legal' => 'nullable|string|max:255',
         ], [
             'contrato_no.required' => 'El número de contrato es obligatorio',
-            'contrato_no.unique' => 'Este número de contrato ya existe',
             'mail_facturas.email' => 'El correo electrónico no es válido',
         ]);
 
