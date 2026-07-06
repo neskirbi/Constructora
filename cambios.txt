@@ -5,4 +5,6 @@
     c)Corregir la base de datos cambiar de pagado a cobrado los resgistros anteriores 
     d)revisar por que hay unos que dice : no especificado en status de ingresos
 
-3.Reporte Compras: revisar formato de fecha y de montos
+3.Reporte Compras: revisar formato de fecha y de montos y agregar filtros de proveedor y el consecutivo que se va a poner
+4.Filtro para sacar reporte de compras agregfar filtro por proveedor
+5.- poner un consecutivo para compras (ej. si son 100  empezar del 1 - 100)
