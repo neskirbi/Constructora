@@ -64,7 +64,7 @@ class ComprasExport implements
             ->leftJoin('contratos as ct', 'c.id_contrato', '=', 'ct.id')
             ->leftJoin('proveedores_servicios as p', 'c.id_proveedor', '=', 'p.id')
             ->whereBetween('c.created_at', [$this->fechaInicio . ' 00:00:00', $this->fechaFin . ' 23:59:59'])
-            ->orderBy('c.consecutivo', 'asc');
+            ->orderBy('c.created_at', 'asc');
 
         // Si hay contrato específico, filtrar por él
         if ($this->contratoId && $this->contratoId !== 'todos') {
