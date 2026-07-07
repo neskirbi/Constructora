@@ -9,10 +9,10 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
 class ComprasExport implements 
     FromCollection, 
@@ -98,18 +98,18 @@ class ComprasExport implements
                     $fila->clave_producto = $detalle->clave;
                     $fila->descripcion = $detalle->descripcion;
                     $fila->unidad = $detalle->unidades;
-                    $fila->cantidad = $detalle->cantidad;
-                    $fila->precio_unitario = $detalle->ult_costo;
-                    $fila->subtotal = $detalle->cantidad * $detalle->ult_costo;
+                    $fila->cantidad = (float) $detalle->cantidad; // Convertir a float
+                    $fila->precio_unitario = (float) $detalle->ult_costo; // Convertir a float
+                    $fila->subtotal = (float) ($detalle->cantidad * $detalle->ult_costo); // Convertir a float
                     
                     // Solo mostrar IVA y TOTAL en el primer detalle de cada compra
                     if ($primerDetalle) {
-                        $fila->iva_compra = $compra->iva;
-                        $fila->total = $compra->total;
+                        $fila->iva_compra = (float) $compra->iva; // Convertir a float
+                        $fila->total = (float) $compra->total; // Convertir a float
                         $primerDetalle = false;
                     } else {
-                        $fila->iva_compra = '';
-                        $fila->total = '';
+                        $fila->iva_compra = null;
+                        $fila->total = null;
                     }
                     
                     $filas->push($fila);
@@ -132,8 +132,8 @@ class ComprasExport implements
                 $fila->cantidad = 0;
                 $fila->precio_unitario = 0;
                 $fila->subtotal = 0;
-                $fila->iva_compra = $compra->iva;
-                $fila->total = $compra->total;
+                $fila->iva_compra = (float) $compra->iva;
+                $fila->total = (float) $compra->total;
                 
                 $filas->push($fila);
             }
@@ -169,7 +169,7 @@ class ComprasExport implements
     {
         return [
             $fila->consecutivo ?? '',
-            $fila->fecha ? date('d/m/Y', strtotime($fila->fecha)) : '',
+            $fila->fecha ?? '', // Sin formatear
             $fila->obra ?? '',
             $fila->no_obra ?? '',
             $fila->frente ?? '',
@@ -180,11 +180,23 @@ class ComprasExport implements
             $fila->clave_producto ?? '',
             $fila->descripcion ?? '',
             $fila->unidad ?? '',
-            $fila->cantidad ?? 0,
-            $fila->precio_unitario ?? 0,
-            $fila->subtotal ?? 0,
-            $fila->iva_compra ?? '',
-            $fila->total ?? '',
+            $fila->cantidad ?? 0, // Valor numérico sin formato
+            $fila->precio_unitario ?? 0, // Valor numérico sin formato
+            $fila->subtotal ?? 0, // Valor numérico sin formato
+            $fila->iva_compra ?? '', // Valor numérico sin formato
+            $fila->total ?? '', // Valor numérico sin formato
+        ];
+    }
+
+    public function columnFormats(): array
+    {
+        return [
+            'B' => NumberFormat::FORMAT_DATE_DDMMYYYY, // Fecha
+            'M' => '#,##0.00', // Cantidad
+            'N' => '#,##0.00', // Precio unitario
+            'O' => '#,##0.00', // Subtotal
+            'P' => '#,##0.00', // IVA de la compra
+            'Q' => '#,##0.00', // Total
         ];
     }
 
@@ -206,18 +218,6 @@ class ComprasExport implements
                     'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
                 ],
             ],
-        ];
-    }
-
-    public function columnFormats(): array
-    {
-        return [
-            'B' => NumberFormat::FORMAT_DATE_DDMMYYYY,      // Fecha
-            'M' => '#,##0.00',                              // Cantidad
-            'N' => '"$"#,##0.00',                           // Precio unitario
-            'O' => '"$"#,##0.00',                           // Subtotal
-            'P' => '"$"#,##0.00',                           // IVA de la compra
-            'Q' => '"$"#,##0.00',                           // Total
         ];
     }
 
@@ -300,8 +300,9 @@ class ComprasExport implements
                     ],
                 ]);
                 
-                $sheet->getStyle('P' . $filaTotales)->getNumberFormat()->setFormatCode('"$"#,##0.00');
-                $sheet->getStyle('Q' . ($filaTotales + 1))->getNumberFormat()->setFormatCode('"$"#,##0.00');
+                // Aplicar formato de número a los totales
+                $sheet->getStyle('P' . $filaTotales)->getNumberFormat()->setFormatCode('#,##0.00');
+                $sheet->getStyle('Q' . ($filaTotales + 1))->getNumberFormat()->setFormatCode('#,##0.00');
 
                 // Congelar paneles
                 $sheet->freezePane('A2');

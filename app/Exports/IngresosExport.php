@@ -10,13 +10,15 @@ use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles, WithColumnWidths, WithEvents, ShouldAutoSize
+class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles, WithColumnWidths, WithEvents, ShouldAutoSize, WithColumnFormatting
 {
     protected $idContrato;
     
@@ -87,132 +89,141 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
     }
     
     public function headings(): array
-{
-    return [
-        'N° obra',
-        'Empresa',
-        'Numero de Contrato',
-        'Descripcion según contrato',
-        'Referencia interna',
-        'Cliente',
-        'AREA',
-        'Fecha Firma de Contrato',
-        'Fecha Inicio de Obra',
-        'Fecha Terminación de Obra',
-        'Importe de Anticipo c/IVA',
-        'Importe de Contrato c/IVA',
-        'Convenio Apliacion de monto c/IVA',
-        'Total a cobrar contrato c/IVA',
-        '# Estimación',
-        'del',
-        'al',
-        'N° Factura',
-        'Fecha',
-        'Importe de Estimación',
-        'I.V.A.',
-        'Total Estimacion con IVA',
-        'Fecha Elaboracion',
-        '3.5 % Cargos Adicionales',
-        'Retencion 5 al millar',
-        'Sancion atrazo presntacion estimacion',
-        'Sancion atraso de obra',
-        'Sancion por obra mal ejecutada',
-        'Retencion por atraso en programa de obra',
-        'Amortización anticipo',
-        'Amortización con I.V.A.',
-        'Total deducciones',
-        'Importe Facturado',
-        'Líquido a cobrar',      // ← estimado_menos_deducciones
-        'Líquido Cobrado',       // ← liquido_cobrado (INTERCAMBIADO)
-        'Líquido por cobrar',    // ← estimado_menos_deducciones - liquido_cobrado (INTERCAMBIADO)
-        'Fecha Cobro',
-        'Status'
-    ];
-}
+    {
+        return [
+            'N° obra',
+            'Empresa',
+            'Numero de Contrato',
+            'Descripcion según contrato',
+            'Referencia interna',
+            'Cliente',
+            'AREA',
+            'Fecha Firma de Contrato',
+            'Fecha Inicio de Obra',
+            'Fecha Terminación de Obra',
+            'Importe de Anticipo c/IVA',
+            'Importe de Contrato c/IVA',
+            'Convenio Apliacion de monto c/IVA',
+            'Total a cobrar contrato c/IVA',
+            '# Estimación',
+            'del',
+            'al',
+            'N° Factura',
+            'Fecha',
+            'Importe de Estimación',
+            'I.V.A.',
+            'Total Estimacion con IVA',
+            'Fecha Elaboracion',
+            '3.5 % Cargos Adicionales',
+            'Retencion 5 al millar',
+            'Sancion atrazo presntacion estimacion',
+            'Sancion atraso de obra',
+            'Sancion por obra mal ejecutada',
+            'Retencion por atraso en programa de obra',
+            'Amortización anticipo',
+            'Amortización con I.V.A.',
+            'Total deducciones',
+            'Importe Facturado',
+            'Líquido a cobrar',
+            'Líquido Cobrado',
+            'Líquido por cobrar',
+            'Fecha Cobro',
+            'Status'
+        ];
+    }
         
     public function map($row): array
-{
-    // Total a cobrar contrato c/IVA = Importe Contrato + Convenio Aplicación
-    $totalACobrar = $row->importe_contrato + ($row->convenio_aplicacion_monto ?? 0);
-    
-    // Importe Facturado = Total Estimacion con IVA - Total Deducciones
-    $importeFacturado = $row->total_estimacion_con_iva - $row->total_deducciones;
-    
-    // Líquido a cobrar = estimado_menos_deducciones
-    $liquidoACobrar = $row->estimado_menos_deducciones ?? 0;
-    
-    // Líquido Cobrado = liquido_cobrado
-    $liquidoCobrado = $row->liquido_cobrado ?? 0;
-    
-    // Líquido por cobrar = estimado_menos_deducciones - liquido_cobrado
-    $liquidoPorCobrar = ($row->estimado_menos_deducciones ?? 0) - ($row->liquido_cobrado ?? 0);
-    
-    return [
-        $row->n_obra ?? '',
-        $row->empresa ?? '',
-        $row->numero_contrato ?? '',
-        $row->descripcion_segun_contrato ?? '',
-        $row->referencia_interna ?? '',
-        $row->cliente ?? '',
-        'Ingresos',
-        $this->formatDate($row->fecha_contrato),
-        $this->formatDate($row->fecha_inicio_obra),
-        $this->formatDate($row->fecha_terminacion_obra),
-        $this->formatNumber($row->monto_anticipo),
-        $this->formatNumber($row->importe_contrato),
-        $this->formatNumber($row->convenio_aplicacion_monto),
-        $this->formatNumber($totalACobrar),
-        $row->no_estimacion ?? '',
-        $this->formatDate($row->periodo_del),
-        $this->formatDate($row->periodo_al),
-        $row->n_factura ?? '',
-        $this->formatDate($row->fecha_factura),
-        $this->formatNumber($row->importe_estimacion),
-        $this->formatPercent($row->iva),
-        $this->formatNumber($row->total_estimacion_con_iva),
-        $this->formatDate($row->fecha_elaboracion),
-        $this->formatNumber($row->cargos_adicionales_3_5),
-        $this->formatNumber($row->retencion_5_al_millar),
-        $this->formatNumber($row->sancion_atrazo_presentacion_estimacion),
-        $this->formatNumber($row->sancion_atraso_de_obra),
-        $this->formatNumber($row->sancion_por_obra_mal_ejecutada),
-        $this->formatNumber($row->retencion_por_atraso_en_programa_obra),
-        $this->formatNumber($row->amortizacion_anticipo),
-        $this->formatNumber($row->amortizacion_con_iva),
-        $this->formatNumber($row->total_deducciones),
-        $this->formatNumber($importeFacturado),
-        $this->formatNumber($liquidoACobrar),      // Líquido a cobrar
-        $this->formatNumber($liquidoCobrado),      // Líquido Cobrado (INTERCAMBIADO)
-        $this->formatNumber($liquidoPorCobrar),    // Líquido por cobrar (INTERCAMBIADO)
-        $this->formatDate($row->fecha_cobro),
-        $row->status ?? '',
-    ];
-}
-    
-    private function formatDate($date)
     {
-        if (!$date) return '';
-        try {
-            return date('d/m/Y', strtotime($date));
-        } catch (\Exception $e) {
-            return $date;
-        }
+        // Total a cobrar contrato c/IVA = Importe Contrato + Convenio Aplicación
+        $totalACobrar = $row->importe_contrato + ($row->convenio_aplicacion_monto ?? 0);
+        
+        // Importe Facturado = Total Estimacion con IVA - Total Deducciones
+        $importeFacturado = $row->total_estimacion_con_iva - $row->total_deducciones;
+        
+        // Líquido a cobrar = estimado_menos_deducciones
+        $liquidoACobrar = $row->estimado_menos_deducciones ?? 0;
+        
+        // Líquido Cobrado = liquido_cobrado
+        $liquidoCobrado = $row->liquido_cobrado ?? 0;
+        
+        // Líquido por cobrar = estimado_menos_deducciones - liquido_cobrado
+        $liquidoPorCobrar = ($row->estimado_menos_deducciones ?? 0) - ($row->liquido_cobrado ?? 0);
+        
+        return [
+            $row->n_obra ?? '',
+            $row->empresa ?? '',
+            $row->numero_contrato ?? '',
+            $row->descripcion_segun_contrato ?? '',
+            $row->referencia_interna ?? '',
+            $row->cliente ?? '',
+            'Ingresos',
+            $row->fecha_contrato,  // Valor sin formatear
+            $row->fecha_inicio_obra, // Valor sin formatear
+            $row->fecha_terminacion_obra, // Valor sin formatear
+            $row->monto_anticipo ?? 0, // Valor numérico
+            $row->importe_contrato ?? 0, // Valor numérico
+            $row->convenio_aplicacion_monto ?? 0, // Valor numérico
+            $totalACobrar, // Valor numérico
+            $row->no_estimacion ?? '',
+            $row->periodo_del, // Valor sin formatear
+            $row->periodo_al, // Valor sin formatear
+            $row->n_factura ?? '',
+            $row->fecha_factura, // Valor sin formatear
+            $row->importe_estimacion ?? 0, // Valor numérico
+            $row->iva ?? 0, // Valor numérico
+            $row->total_estimacion_con_iva ?? 0, // Valor numérico
+            $row->fecha_elaboracion, // Valor sin formatear
+            $row->cargos_adicionales_3_5 ?? 0, // Valor numérico
+            $row->retencion_5_al_millar ?? 0, // Valor numérico
+            $row->sancion_atrazo_presentacion_estimacion ?? 0, // Valor numérico
+            $row->sancion_atraso_de_obra ?? 0, // Valor numérico
+            $row->sancion_por_obra_mal_ejecutada ?? 0, // Valor numérico
+            $row->retencion_por_atraso_en_programa_obra ?? 0, // Valor numérico
+            $row->amortizacion_anticipo ?? 0, // Valor numérico
+            $row->amortizacion_con_iva ?? 0, // Valor numérico
+            $row->total_deducciones ?? 0, // Valor numérico
+            $importeFacturado, // Valor numérico
+            $liquidoACobrar, // Valor numérico
+            $liquidoCobrado, // Valor numérico
+            $liquidoPorCobrar, // Valor numérico
+            $row->fecha_cobro, // Valor sin formatear
+            $row->status ?? '',
+        ];
     }
     
-    private function formatNumber($number)
+    // Método para formatear columnas
+    public function columnFormats(): array
     {
-        if ($number === null || $number === '') {
-            return '0.00';
-        }
-        return number_format((float)$number, 2, '.', ',');
-    }
-    
-    private function formatPercent($number)
-    {
-        if ($number === null || $number === '') {
-            return '0.00';
-        }
-        return number_format((float)$number, 2, '.', ',');
+        return [
+            'H' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Fecha Firma de Contrato
+            'I' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Fecha Inicio de Obra
+            'J' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Fecha Terminación de Obra
+            'K' => '#,##0.00',                          // Importe de Anticipo
+            'L' => '#,##0.00',                          // Importe de Contrato
+            'M' => '#,##0.00',                          // Convenio Aplicación
+            'N' => '#,##0.00',                          // Total a cobrar
+            'P' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Periodo del
+            'Q' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Periodo al
+            'S' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Fecha Factura
+            'T' => '#,##0.00',                          // Importe de Estimación
+            'U' => '#,##0.00',                          // IVA
+            'V' => '#,##0.00',                          // Total Estimación con IVA
+            'W' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Fecha Elaboración
+            'X' => '#,##0.00',                          // 3.5 % Cargos Adicionales
+            'Y' => '#,##0.00',                          // Retención 5 al millar
+            'Z' => '#,##0.00',                          // Sanción atraso presentación
+            'AA' => '#,##0.00',                         // Sanción atraso de obra
+            'AB' => '#,##0.00',                         // Sanción por obra mal ejecutada
+            'AC' => '#,##0.00',                         // Retención por atraso
+            'AD' => '#,##0.00',                         // Amortización anticipo
+            'AE' => '#,##0.00',                         // Amortización con IVA
+            'AF' => '#,##0.00',                         // Total deducciones
+            'AG' => '#,##0.00',                         // Importe Facturado
+            'AH' => '#,##0.00',                         // Líquido a cobrar
+            'AI' => '#,##0.00',                         // Líquido Cobrado
+            'AJ' => '#,##0.00',                         // Líquido por cobrar
+            'AK' => NumberFormat::FORMAT_DATE_DDMMYYYY, // Fecha Cobro
+        ];
     }
     
     public function columnWidths(): array
@@ -257,20 +268,13 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
         
         $sheet->getRowDimension(1)->setRowHeight(40);
         
-        // Formato número SIN símbolo de moneda
-        $currencyColumns = ['K', 'L', 'M', 'N', 'T', 'U', 'V', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM'];
+        // Aplicar formato de número a todas las columnas numéricas
+        // Esto complementa el formato de columnas
+        $currencyColumns = ['K', 'L', 'M', 'N', 'T', 'U', 'V', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ'];
         foreach ($currencyColumns as $col) {
             $sheet->getStyle($col . '2:' . $col . '1000')
                   ->getNumberFormat()
                   ->setFormatCode('#,##0.00');
-        }
-        
-        // Formato fecha
-        $dateColumns = ['H', 'I', 'J', 'P', 'Q', 'S', 'W', 'AH'];
-        foreach ($dateColumns as $col) {
-            $sheet->getStyle($col . '2:' . $col . '1000')
-                  ->getNumberFormat()
-                  ->setFormatCode('dd/mm/yyyy');
         }
     }
     
