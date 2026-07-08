@@ -791,12 +791,11 @@
                                             <label for="status" class="form-label-custom">
                                                 Status
                                             </label>
-                                            <select class="form-control form-control-custom" 
+                                           <select class="form-control form-control-custom" 
                                                     id="status" 
-                                                    name="status" 
-                                                    readonly>
+                                                    name="status">
                                                 <option value="">Seleccionar status...</option>
-                                                <option value="Cobrado" {{ old('status', $ultimoIngreso->status ?? 'en_tramite') == 'Cobrado' ? 'selected' : '' }}>Cobrado</option>
+                                                <option value="cobrado" {{ old('status', $ultimoIngreso->status ?? 'cobrado') == 'cobrado' ? 'selected' : '' }}>Cobrado</option>
                                                 <option value="en_tramite" {{ old('status', $ultimoIngreso->status ?? 'en_tramite') == 'en_tramite' ? 'selected' : '' }}>En Trámite</option>
                                             </select>
                                         </div>

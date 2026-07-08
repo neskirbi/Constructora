@@ -676,8 +676,8 @@
                                     <div class="form-group-custom">
                                         <label class="form-label-custom">Status</label>
                                         <div class="info-display">
-                                            @if($ingreso->status == 'pagado')
-                                                <span class=" ">Pagado</span>
+                                            @if($ingreso->status == 'cobrado')
+                                                <span class=" ">Cobrado</span>
                                             @elseif($ingreso->status == 'en_tramite')
                                                 <span class=" ">En Trámite</span>
                                             @else

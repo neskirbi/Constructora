@@ -1112,8 +1112,8 @@
                                                 id="status" 
                                                 name="status">
                                             <option value="">Seleccionar status...</option>
-                                            <option value="Cobrado" {{ old('status', $ingreso->status) == 'Cobrado' ? 'selected' : '' }}>Cobrado</option>
-                                            <option value="en_tramite" {{ old('status', $ingreso->status) == 'en_tramite' ? 'selected' : '' }}>En Trámite</option>
+                                            <option value="cobrado" {{ $ingreso->status == 'cobrado' ? 'selected' : '' }}>Cobrado</option>
+                                            <option value="en_tramite" {{ $ingreso->status == 'en_tramite' ? 'selected' : '' }}>En Trámite</option>
                                         </select>
                                     </div>
                                 </div>
