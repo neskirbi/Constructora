@@ -36,7 +36,6 @@ class ComprasExport implements
 
     public function collection()
     {
-        // Construir consulta base
         $query = DB::table('compras as c')
             ->select(
                 'c.id',
@@ -66,18 +65,14 @@ class ComprasExport implements
             ->whereBetween('c.created_at', [$this->fechaInicio . ' 00:00:00', $this->fechaFin . ' 23:59:59'])
             ->orderBy('c.created_at', 'asc');
 
-        // Si hay contrato específico, filtrar por él
         if ($this->contratoId && $this->contratoId !== 'todos') {
             $query->where('c.id_contrato', $this->contratoId);
         }
 
         $compras = $query->get();
-        
-        // Array para almacenar todas las filas
         $filas = collect();
         
         foreach ($compras as $compra) {
-            // Obtener detalles de esta compra
             $detalles = DB::table('compradetalle')
                 ->where('id_compra', $compra->id)
                 ->get();
@@ -87,7 +82,7 @@ class ComprasExport implements
                 foreach ($detalles as $detalle) {
                     $fila = new \stdClass();
                     $fila->consecutivo = $compra->consecutivo;
-                    $fila->fecha = $compra->created_at;
+                    $fila->fecha = $this->getDateOnly($compra->created_at); // Solo fecha, sin hora
                     $fila->obra = $compra->contrato_obra;
                     $fila->no_obra = $compra->cons;
                     $fila->frente = $compra->contrato_frente;
@@ -98,14 +93,13 @@ class ComprasExport implements
                     $fila->clave_producto = $detalle->clave;
                     $fila->descripcion = $detalle->descripcion;
                     $fila->unidad = $detalle->unidades;
-                    $fila->cantidad = (float) $detalle->cantidad; // Convertir a float
-                    $fila->precio_unitario = (float) $detalle->ult_costo; // Convertir a float
-                    $fila->subtotal = (float) ($detalle->cantidad * $detalle->ult_costo); // Convertir a float
+                    $fila->cantidad = (float) $detalle->cantidad;
+                    $fila->precio_unitario = (float) $detalle->ult_costo;
+                    $fila->subtotal = (float) ($detalle->cantidad * $detalle->ult_costo);
                     
-                    // Solo mostrar IVA y TOTAL en el primer detalle de cada compra
                     if ($primerDetalle) {
-                        $fila->iva_compra = (float) $compra->iva; // Convertir a float
-                        $fila->total = (float) $compra->total; // Convertir a float
+                        $fila->iva_compra = (float) $compra->iva;
+                        $fila->total = (float) $compra->total;
                         $primerDetalle = false;
                     } else {
                         $fila->iva_compra = null;
@@ -115,10 +109,9 @@ class ComprasExport implements
                     $filas->push($fila);
                 }
             } else {
-                // Compra sin detalles
                 $fila = new \stdClass();
                 $fila->consecutivo = $compra->consecutivo;
-                $fila->fecha = $compra->created_at;
+                $fila->fecha = $this->getDateOnly($compra->created_at); // Solo fecha, sin hora
                 $fila->obra = $compra->contrato_obra;
                 $fila->no_obra = $compra->cons;
                 $fila->frente = $compra->contrato_frente;
@@ -140,6 +133,22 @@ class ComprasExport implements
         }
         
         return $filas;
+    }
+
+    /**
+     * Extraer solo la fecha (sin hora) y devolverla como fecha Excel
+     */
+    private function getDateOnly($date)
+    {
+        if (!$date) return null;
+        try {
+            if (is_string($date) && strpos($date, ' ') !== false) {
+                $date = explode(' ', $date)[0]; // "2025-01-27 10:30:00" → "2025-01-27"
+            }
+            return $date;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     public function headings(): array
@@ -169,7 +178,7 @@ class ComprasExport implements
     {
         return [
             $fila->consecutivo ?? '',
-            $fila->fecha ?? '', // Sin formatear
+            $fila->fecha ?? '', // Solo fecha, sin hora
             $fila->obra ?? '',
             $fila->no_obra ?? '',
             $fila->frente ?? '',
@@ -180,18 +189,18 @@ class ComprasExport implements
             $fila->clave_producto ?? '',
             $fila->descripcion ?? '',
             $fila->unidad ?? '',
-            $fila->cantidad ?? 0, // Valor numérico sin formato
-            $fila->precio_unitario ?? 0, // Valor numérico sin formato
-            $fila->subtotal ?? 0, // Valor numérico sin formato
-            $fila->iva_compra ?? '', // Valor numérico sin formato
-            $fila->total ?? '', // Valor numérico sin formato
+            $fila->cantidad ?? 0,
+            $fila->precio_unitario ?? 0,
+            $fila->subtotal ?? 0,
+            $fila->iva_compra ?? '',
+            $fila->total ?? '',
         ];
     }
 
     public function columnFormats(): array
     {
         return [
-            'B' => NumberFormat::FORMAT_DATE_DDMMYYYY, // Fecha
+            'B' => NumberFormat::FORMAT_DATE_DDMMYYYY, // Fecha (solo fecha, sin hora)
             'M' => '#,##0.00', // Cantidad
             'N' => '#,##0.00', // Precio unitario
             'O' => '#,##0.00', // Subtotal
@@ -229,7 +238,6 @@ class ComprasExport implements
                 $lastRow = $sheet->getHighestRow();
                 $lastColumn = $sheet->getHighestColumn();
 
-                // Bordes para toda la tabla
                 $sheet->getStyle('A1:' . $lastColumn . $lastRow)->applyFromArray([
                     'borders' => [
                         'allBorders' => [
@@ -239,7 +247,6 @@ class ComprasExport implements
                     ],
                 ]);
 
-                // Estilo para filas de datos
                 $sheet->getStyle('A2:' . $lastColumn . $lastRow)->applyFromArray([
                     'alignment' => [
                         'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
@@ -247,19 +254,16 @@ class ComprasExport implements
                     'font' => ['size' => 11],
                 ]);
 
-                // Alineaciones específicas
-                $sheet->getStyle('A2:A' . $lastRow)->getAlignment()->setHorizontal('center'); // Consecutivo
-                $sheet->getStyle('B2:B' . $lastRow)->getAlignment()->setHorizontal('center'); // Fecha
-                $sheet->getStyle('C2:C' . $lastRow)->getAlignment()->setHorizontal('left');   // Obra
-                $sheet->getStyle('D2:I' . $lastRow)->getAlignment()->setHorizontal('left');   // Texto
-                $sheet->getStyle('J2:L' . $lastRow)->getAlignment()->setHorizontal('left');   // Producto
-                $sheet->getStyle('M2:Q' . $lastRow)->getAlignment()->setHorizontal('right');  // Números
+                $sheet->getStyle('A2:A' . $lastRow)->getAlignment()->setHorizontal('center');
+                $sheet->getStyle('B2:B' . $lastRow)->getAlignment()->setHorizontal('center');
+                $sheet->getStyle('C2:C' . $lastRow)->getAlignment()->setHorizontal('left');
+                $sheet->getStyle('D2:I' . $lastRow)->getAlignment()->setHorizontal('left');
+                $sheet->getStyle('J2:L' . $lastRow)->getAlignment()->setHorizontal('left');
+                $sheet->getStyle('M2:Q' . $lastRow)->getAlignment()->setHorizontal('right');
 
-                // Encabezado centrado
                 $sheet->getStyle('A1:' . $lastColumn . '1')->getAlignment()->setHorizontal('center');
                 $sheet->getRowDimension('1')->setRowHeight(25);
 
-                // Zebra striping
                 for ($row = 2; $row <= $lastRow; $row++) {
                     if ($row % 2 == 0) {
                         $sheet->getStyle('A' . $row . ':' . $lastColumn . $row)->applyFromArray([
@@ -271,7 +275,6 @@ class ComprasExport implements
                     }
                 }
 
-                // Información del filtro
                 $filaInfo = $lastRow + 2;
                 $sheet->setCellValue('A' . $filaInfo, 'Filtro aplicado:');
                 $sheet->setCellValue('B' . $filaInfo, $this->fechaInicio . ' - ' . $this->fechaFin);
@@ -285,7 +288,6 @@ class ComprasExport implements
                     'font' => ['bold' => true],
                 ]);
 
-                // Totales
                 $filaTotales = $filaInfo + 2;
                 $sheet->setCellValue('O' . $filaTotales, 'SUBTOTAL GENERAL:');
                 $sheet->setCellValue('P' . $filaTotales, '=SUM(O2:O' . $lastRow . ')');
@@ -300,11 +302,9 @@ class ComprasExport implements
                     ],
                 ]);
                 
-                // Aplicar formato de número a los totales
                 $sheet->getStyle('P' . $filaTotales)->getNumberFormat()->setFormatCode('#,##0.00');
                 $sheet->getStyle('Q' . ($filaTotales + 1))->getNumberFormat()->setFormatCode('#,##0.00');
 
-                // Congelar paneles
                 $sheet->freezePane('A2');
             },
         ];

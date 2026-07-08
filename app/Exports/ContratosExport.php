@@ -9,11 +9,13 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
 class ContratosExport implements 
     FromCollection, 
@@ -91,8 +93,6 @@ class ContratosExport implements
 
     public function headings(): array
     {
-        // Primera fila (agrupadores) - se manejará en registerEvents
-        // Segunda fila (nombres de columnas)
         return [
             'CONSEC',
             'Empresa',
@@ -141,23 +141,39 @@ class ContratosExport implements
             $contrato->total_suma ?? 0,
             $contrato->monto_anticipo ?? 0,
             $contrato->duracion ?? '',
-            $contrato->fecha_inicio_obra ? date('d/m/Y', strtotime($contrato->fecha_inicio_obra)) : '',
-            $contrato->fecha_terminacion_obra ? date('d/m/Y', strtotime($contrato->fecha_terminacion_obra)) : '',
+            $this->getDateOnly($contrato->fecha_inicio_obra),      // Solo fecha, sin formato
+            $this->getDateOnly($contrato->fecha_terminacion_obra), // Solo fecha, sin formato
             $contrato->observaciones ?? '',
         ];
+    }
+
+    /**
+     * Extraer solo la fecha (sin hora)
+     */
+    private function getDateOnly($date)
+    {
+        if (!$date) return null;
+        try {
+            if (is_string($date) && strpos($date, ' ') !== false) {
+                $date = explode(' ', $date)[0];
+            }
+            return $date;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     public function styles(Worksheet $sheet)
     {
         return [
-            2 => [ // Segunda fila (encabezados de columna)
+            2 => [
                 'font' => [
                     'bold' => true,
                     'color' => ['rgb' => 'FFFFFF'],
                     'size' => 12,
                 ],
                 'fill' => [
-                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                    'fillType' => Fill::FILL_SOLID,
                     'startColor' => ['rgb' => '4472C4'],
                 ],
                 'alignment' => [
@@ -171,20 +187,18 @@ class ContratosExport implements
     public function columnFormats(): array
     {
         return [
-            'I' => '"$"#,##0.00',
-            'J' => '"$"#,##0.00',
-            'K' => '"$"#,##0.00',
-            'L' => '"$"#,##0.00',
-            'M' => '"$"#,##0.00',
-            'N' => '"$"#,##0.00',
-            'O' => '"$"#,##0.00',
-            'P' => '"$"#,##0.00',
-            'Q' => '"$"#,##0.00',
-            'R' => '"$"#,##0.00',
-            'S' => '@',
-            'T' => NumberFormat::FORMAT_DATE_DDMMYYYY,
-            'U' => NumberFormat::FORMAT_DATE_DDMMYYYY,
-            'V' => '@',
+            'I' => '#,##0.00',  // Importe (sin símbolo de moneda)
+            'J' => '#,##0.00',  // IVA
+            'K' => '#,##0.00',  // Total
+            'L' => '#,##0.00',  // Importe Ampliación
+            'M' => '#,##0.00',  // IVA Ampliación
+            'N' => '#,##0.00',  // Total Ampliación
+            'O' => '#,##0.00',  // Importe Suma
+            'P' => '#,##0.00',  // IVA Suma
+            'Q' => '#,##0.00',  // Total Suma
+            'R' => '#,##0.00',  // Anticipo
+            'T' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Inicio de Obra
+            'U' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Terminación
         ];
     }
 
@@ -194,11 +208,8 @@ class ContratosExport implements
             AfterSheet::class => function(AfterSheet $event) {
                 $sheet = $event->sheet;
                 
-                // Insertar una nueva fila al inicio para los títulos agrupadores
                 $sheet->insertNewRowBefore(1, 1);
                 
-                // Escribir los títulos agrupadores en la primera fila
-                // Columnas A-H no tienen agrupador (se dejan vacías o se combinan?)
                 $sheet->setCellValue('A1', '');
                 $sheet->setCellValue('B1', '');
                 $sheet->setCellValue('C1', '');
@@ -208,33 +219,28 @@ class ContratosExport implements
                 $sheet->setCellValue('G1', '');
                 $sheet->setCellValue('H1', '');
                 
-                // TOTAL CONTRATO (columnas I, J, K)
                 $sheet->mergeCells('I1:K1');
                 $sheet->setCellValue('I1', 'TOTAL CONTRATO');
                 
-                // CONVENIO AMPLIACION (columnas L, M, N)
                 $sheet->mergeCells('L1:N1');
                 $sheet->setCellValue('L1', 'CONVENIO AMPLIACION');
                 
-                // TOTAL A COBRAR (columnas O, P, Q)
                 $sheet->mergeCells('O1:Q1');
                 $sheet->setCellValue('O1', 'TOTAL A COBRAR');
                 
-                // Columnas R en adelante sin agrupador
                 $sheet->setCellValue('R1', '');
                 $sheet->setCellValue('S1', '');
                 $sheet->setCellValue('T1', '');
                 $sheet->setCellValue('U1', '');
                 $sheet->setCellValue('V1', '');
                 
-                // Estilo para la primera fila (títulos agrupadores)
                 $sheet->getStyle('A1:V1')->applyFromArray([
                     'font' => [
                         'bold' => true,
                         'size' => 12,
                     ],
                     'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'fillType' => Fill::FILL_SOLID,
                         'startColor' => ['rgb' => '5B9BD5'],
                     ],
                     'alignment' => [
@@ -243,31 +249,27 @@ class ContratosExport implements
                     ],
                 ]);
                 
-                // Limitar altura de filas a 300 px máximo
                 $highestRow = $sheet->getHighestRow();
                 for ($row = 1; $row <= $highestRow; $row++) {
                     $currentHeight = $sheet->getRowDimension($row)->getRowHeight();
                     if ($currentHeight > 300) {
                         $sheet->getRowDimension($row)->setRowHeight(300);
                     }
-                    // Habilitar wrap text para que el contenido no se desborde
                     $sheet->getStyle('A' . $row . ':V' . $row)->getAlignment()->setWrapText(true);
                 }
                 
                 $lastRow = $sheet->getHighestRow();
                 $lastColumn = 'V';
                 
-                // Bordes para toda la tabla
                 $sheet->getStyle('A1:' . $lastColumn . $lastRow)->applyFromArray([
                     'borders' => [
                         'allBorders' => [
-                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'borderStyle' => Border::BORDER_THIN,
                             'color' => ['rgb' => '000000'],
                         ],
                     ],
                 ]);
                 
-                // Estilo para filas de datos
                 $sheet->getStyle('A3:' . $lastColumn . $lastRow)->applyFromArray([
                     'alignment' => [
                         'vertical' => Alignment::VERTICAL_CENTER,
@@ -275,28 +277,24 @@ class ContratosExport implements
                     'font' => ['size' => 11],
                 ]);
                 
-                // Alineaciones específicas
                 $sheet->getStyle('A3:A' . $lastRow)->getAlignment()->setHorizontal('center');
                 $sheet->getStyle('T3:U' . $lastRow)->getAlignment()->setHorizontal('center');
                 $sheet->getStyle('I3:R' . $lastRow)->getAlignment()->setHorizontal('right');
                 
-                // Encabezados centrados
                 $sheet->getStyle('A2:V2')->getAlignment()->setHorizontal('center');
                 $sheet->getRowDimension('2')->setRowHeight(25);
                 
-                // Zebra striping
                 for ($row = 3; $row <= $lastRow; $row++) {
                     if ($row % 2 == 0) {
                         $sheet->getStyle('A' . $row . ':' . $lastColumn . $row)->applyFromArray([
                             'fill' => [
-                                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                                'fillType' => Fill::FILL_SOLID,
                                 'startColor' => ['rgb' => 'F2F2F2'],
                             ],
                         ]);
                     }
                 }
                 
-                // Congelar paneles (primeras dos filas y primera columna)
                 $sheet->freezePane('B3');
             },
         ];

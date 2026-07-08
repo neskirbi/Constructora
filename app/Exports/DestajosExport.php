@@ -9,10 +9,13 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
 class DestajosExport implements 
     FromCollection, 
@@ -71,11 +74,11 @@ class DestajosExport implements
                     $fila->clave = $detalle->clave;
                     $fila->descripcion = $detalle->descripcion;
                     $fila->clave_por = $destajo->clave_proveedor;
-                    $fila->fecha = $destajo->fecha;
+                    $fila->fecha = $this->getDateOnly($destajo->fecha);  // Solo fecha, sin hora
                     $fila->almacen = $destajo->almacen;
-                    $fila->costo_unitario = $detalle->ult_costo;
-                    $fila->cantidad = $detalle->cantidad;
-                    $fila->costo_operado = $detalle->cantidad * $detalle->ult_costo;
+                    $fila->costo_unitario = (float) $detalle->ult_costo;
+                    $fila->cantidad = (float) $detalle->cantidad;
+                    $fila->costo_operado = (float) ($detalle->cantidad * $detalle->ult_costo);
                     $fila->unidad = $detalle->unidades;
                     $fila->referencia = $destajo->referencia;
                     $fila->nombre_proveedor = $destajo->proveedor;
@@ -89,7 +92,7 @@ class DestajosExport implements
                 $fila->clave = 'SIN DATOS';
                 $fila->descripcion = 'SIN DATOS';
                 $fila->clave_por = $destajo->clave_proveedor;
-                $fila->fecha = $destajo->fecha;
+                $fila->fecha = $this->getDateOnly($destajo->fecha);  // Solo fecha, sin hora
                 $fila->almacen = $destajo->almacen;
                 $fila->costo_unitario = 0;
                 $fila->cantidad = 0;
@@ -104,6 +107,22 @@ class DestajosExport implements
         }
         
         return $filas;
+    }
+
+    /**
+     * Extraer solo la fecha (sin hora)
+     */
+    private function getDateOnly($date)
+    {
+        if (!$date) return null;
+        try {
+            if (is_string($date) && strpos($date, ' ') !== false) {
+                $date = explode(' ', $date)[0];
+            }
+            return $date;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     public function headings(): array
@@ -132,7 +151,7 @@ class DestajosExport implements
             $fila->clave ?? '',
             $fila->descripcion ?? '',
             $fila->clave_por ?? '',
-            $fila->fecha ? date('d/m/Y', strtotime($fila->fecha)) : '',
+            $fila->fecha ?? '',  // Ya viene sin hora
             $fila->almacen ?? '',
             $fila->costo_unitario ?? 0,
             $fila->cantidad ?? 0,
@@ -149,8 +168,8 @@ class DestajosExport implements
         return [
             1 => [
                 'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF'], 'size' => 12],
-                'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => '4472C4']],
-                'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER, 'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '4472C4']],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
             ],
         ];
     }
@@ -158,8 +177,10 @@ class DestajosExport implements
     public function columnFormats(): array
     {
         return [
-            'E' => NumberFormat::FORMAT_DATE_DDMMYYYY,   // Fecha
-            'H' => '#,##0.00',                           // Cantidad
+            'E' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Fecha
+            'G' => '#,##0.00',  // Costo Unitario
+            'H' => '#,##0.00',  // Cantidad
+            'I' => '#,##0.00',  // Costo operado
         ];
     }
 
@@ -172,11 +193,11 @@ class DestajosExport implements
                 $lastColumn = $sheet->getHighestColumn();
 
                 $sheet->getStyle('A1:' . $lastColumn . $lastRow)->applyFromArray([
-                    'borders' => ['allBorders' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN, 'color' => ['rgb' => '000000']]],
+                    'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']]],
                 ]);
 
                 $sheet->getStyle('A2:' . $lastColumn . $lastRow)->applyFromArray([
-                    'alignment' => ['vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER],
+                    'alignment' => ['vertical' => Alignment::VERTICAL_CENTER],
                     'font' => ['size' => 11],
                 ]);
 
@@ -190,7 +211,7 @@ class DestajosExport implements
                 for ($row = 2; $row <= $lastRow; $row++) {
                     if ($row % 2 == 0) {
                         $sheet->getStyle('A' . $row . ':' . $lastColumn . $row)->applyFromArray([
-                            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F2F2F2']],
+                            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F2F2F2']],
                         ]);
                     }
                 }

@@ -15,7 +15,6 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Border;
-use Carbon\Carbon;
 
 class ProductosServiciosExport implements 
     FromCollection, 
@@ -52,22 +51,36 @@ class ProductosServiciosExport implements
 
     public function map($producto): array
     {
-        // Función para ajustar texto largo con saltos de línea cada ~60 caracteres
         $descripcion = $this->ajustarTexto($producto->descripcion ?? '', 60);
         
         return [
             $producto->clave ?? '',
             $descripcion,
             $producto->unidades ?? '',
-            $producto->ult_costo ?? 0,
-            $producto->created_at ? Carbon::parse($producto->created_at)->format('d/m/Y H:i:s') : '',
-            $producto->updated_at ? Carbon::parse($producto->updated_at)->format('d/m/Y H:i:s') : '',
+            $producto->ult_costo ?? 0,  // Valor numérico sin formato
+            $this->getDateOnly($producto->created_at),  // Solo fecha, sin hora
+            $this->getDateOnly($producto->updated_at),  // Solo fecha, sin hora
         ];
     }
 
     /**
+     * Extraer solo la fecha (sin hora)
+     */
+    private function getDateOnly($date)
+    {
+        if (!$date) return null;
+        try {
+            if (is_string($date) && strpos($date, ' ') !== false) {
+                $date = explode(' ', $date)[0];
+            }
+            return $date;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
      * Ajusta un texto largo agregando saltos de línea cada N caracteres
-     * respetando espacios en blanco
      */
     private function ajustarTexto($texto, $longitudMaxima = 60)
     {
@@ -80,7 +93,6 @@ class ProductosServiciosExport implements
         $lineaActual = '';
         
         foreach ($palabras as $palabra) {
-            // Si la palabra es muy larga, dividirla
             if (strlen($palabra) > $longitudMaxima) {
                 if (!empty($lineaActual)) {
                     $lineas[] = $lineaActual;
@@ -123,9 +135,9 @@ class ProductosServiciosExport implements
     public function columnFormats(): array
     {
         return [
-            'D' => '#,##0.00',  // Último costo
-            'E' => NumberFormat::FORMAT_DATE_DDMMYYYY . ' HH:MM:SS',  // Fecha creación
-            'F' => NumberFormat::FORMAT_DATE_DDMMYYYY . ' HH:MM:SS',  // Fecha modificación
+            'D' => '#,##0.00',                          // Último costo
+            'E' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Fecha creación (solo fecha)
+            'F' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Fecha modificación (solo fecha)
         ];
     }
 
@@ -137,54 +149,43 @@ class ProductosServiciosExport implements
                 $lastRow = $sheet->getHighestRow();
                 $lastColumn = $sheet->getHighestColumn();
 
-                // Configurar ancho de columnas
-                $sheet->getColumnDimension('A')->setWidth(15);  // CLAVE
-                $sheet->getColumnDimension('B')->setWidth(55);  // DESCRIPCIÓN (aproximadamente 350-400px)
-                $sheet->getColumnDimension('C')->setWidth(12);  // UNIDADES
-                $sheet->getColumnDimension('D')->setWidth(18);  // ÚLTIMO COSTO
-                $sheet->getColumnDimension('E')->setWidth(20);  // FECHA CREACIÓN
-                $sheet->getColumnDimension('F')->setWidth(20);  // FECHA MODIFICACIÓN
+                $sheet->getColumnDimension('A')->setWidth(15);
+                $sheet->getColumnDimension('B')->setWidth(55);
+                $sheet->getColumnDimension('C')->setWidth(12);
+                $sheet->getColumnDimension('D')->setWidth(18);
+                $sheet->getColumnDimension('E')->setWidth(18);
+                $sheet->getColumnDimension('F')->setWidth(18);
 
-                // Habilitar ajuste de texto para la columna DESCRIPCIÓN
                 $sheet->getStyle('B2:B' . $lastRow)->getAlignment()
                     ->setWrapText(true)
                     ->setVertical(Alignment::VERTICAL_TOP);
 
-                // Bordes para toda la tabla
                 $sheet->getStyle('A1:' . $lastColumn . $lastRow)->applyFromArray([
                     'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '000000']]],
                 ]);
 
-                // Estilo para las celdas de datos
                 $sheet->getStyle('A2:' . $lastColumn . $lastRow)->applyFromArray([
                     'alignment' => ['vertical' => Alignment::VERTICAL_CENTER],
                     'font' => ['size' => 11],
                 ]);
 
-                // Centrar CLAVE, UNIDADES y fechas
                 $sheet->getStyle('A2:A' . $lastRow)->getAlignment()->setHorizontal('center');
                 $sheet->getStyle('C2:C' . $lastRow)->getAlignment()->setHorizontal('center');
                 $sheet->getStyle('E2:F' . $lastRow)->getAlignment()->setHorizontal('center');
-
-                // Alinear a la derecha el ÚLTIMO COSTO
                 $sheet->getStyle('D2:D' . $lastRow)->getAlignment()->setHorizontal('right');
 
-                // Encabezado centrado y altura
                 $sheet->getStyle('A1:' . $lastColumn . '1')->getAlignment()->setHorizontal('center');
                 $sheet->getRowDimension('1')->setRowHeight(25);
 
-                // Filas zebra (colores alternados)
                 for ($row = 2; $row <= $lastRow; $row++) {
                     if ($row % 2 == 0) {
                         $sheet->getStyle('A' . $row . ':' . $lastColumn . $row)->applyFromArray([
                             'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F2F2F2']],
                         ]);
                     }
-                    // Ajustar altura de fila automáticamente según el contenido
                     $sheet->getRowDimension($row)->setRowHeight(-1);
                 }
 
-                // Congelar primera fila
                 $sheet->freezePane('A2');
             },
         ];

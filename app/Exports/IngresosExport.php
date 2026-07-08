@@ -36,7 +36,6 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
                      ->whereRaw('ampliacionesmonto.created_at = (SELECT MAX(created_at) FROM ampliacionesmonto WHERE id_contrato = contratos.id)');
             })
             ->select(
-                // CONTRATOS
                 'contratos.consecutivo as n_obra',
                 'contratos.empresa',
                 'contratos.contrato_no as numero_contrato',
@@ -48,11 +47,7 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
                 'contratos.fecha_terminacion_obra',
                 'contratos.monto_anticipo',
                 'contratos.total as importe_contrato',
-                
-                // AMPLIACIONES
                 'ampliacionesmonto.total as convenio_aplicacion_monto',
-                
-                // INGRESOS
                 'ingresos.no_estimacion',
                 'ingresos.periodo_del',
                 'ingresos.periodo_al',
@@ -134,19 +129,10 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
         
     public function map($row): array
     {
-        // Total a cobrar contrato c/IVA = Importe Contrato + Convenio Aplicación
         $totalACobrar = $row->importe_contrato + ($row->convenio_aplicacion_monto ?? 0);
-        
-        // Importe Facturado = Total Estimacion con IVA - Total Deducciones
         $importeFacturado = $row->total_estimacion_con_iva - $row->total_deducciones;
-        
-        // Líquido a cobrar = estimado_menos_deducciones
         $liquidoACobrar = $row->estimado_menos_deducciones ?? 0;
-        
-        // Líquido Cobrado = liquido_cobrado
         $liquidoCobrado = $row->liquido_cobrado ?? 0;
-        
-        // Líquido por cobrar = estimado_menos_deducciones - liquido_cobrado
         $liquidoPorCobrar = ($row->estimado_menos_deducciones ?? 0) - ($row->liquido_cobrado ?? 0);
         
         return [
@@ -157,41 +143,57 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             $row->referencia_interna ?? '',
             $row->cliente ?? '',
             'Ingresos',
-            $row->fecha_contrato,  // Valor sin formatear
-            $row->fecha_inicio_obra, // Valor sin formatear
-            $row->fecha_terminacion_obra, // Valor sin formatear
-            $row->monto_anticipo ?? 0, // Valor numérico
-            $row->importe_contrato ?? 0, // Valor numérico
-            $row->convenio_aplicacion_monto ?? 0, // Valor numérico
-            $totalACobrar, // Valor numérico
+            $this->getDateOnly($row->fecha_contrato),    // Solo fecha, sin hora
+            $this->getDateOnly($row->fecha_inicio_obra), // Solo fecha, sin hora
+            $this->getDateOnly($row->fecha_terminacion_obra), // Solo fecha, sin hora
+            $row->monto_anticipo ?? 0,
+            $row->importe_contrato ?? 0,
+            $row->convenio_aplicacion_monto ?? 0,
+            $totalACobrar,
             $row->no_estimacion ?? '',
-            $row->periodo_del, // Valor sin formatear
-            $row->periodo_al, // Valor sin formatear
+            $this->getDateOnly($row->periodo_del),       // Solo fecha, sin hora
+            $this->getDateOnly($row->periodo_al),        // Solo fecha, sin hora
             $row->n_factura ?? '',
-            $row->fecha_factura, // Valor sin formatear
-            $row->importe_estimacion ?? 0, // Valor numérico
-            $row->iva ?? 0, // Valor numérico
-            $row->total_estimacion_con_iva ?? 0, // Valor numérico
-            $row->fecha_elaboracion, // Valor sin formatear
-            $row->cargos_adicionales_3_5 ?? 0, // Valor numérico
-            $row->retencion_5_al_millar ?? 0, // Valor numérico
-            $row->sancion_atrazo_presentacion_estimacion ?? 0, // Valor numérico
-            $row->sancion_atraso_de_obra ?? 0, // Valor numérico
-            $row->sancion_por_obra_mal_ejecutada ?? 0, // Valor numérico
-            $row->retencion_por_atraso_en_programa_obra ?? 0, // Valor numérico
-            $row->amortizacion_anticipo ?? 0, // Valor numérico
-            $row->amortizacion_con_iva ?? 0, // Valor numérico
-            $row->total_deducciones ?? 0, // Valor numérico
-            $importeFacturado, // Valor numérico
-            $liquidoACobrar, // Valor numérico
-            $liquidoCobrado, // Valor numérico
-            $liquidoPorCobrar, // Valor numérico
-            $row->fecha_cobro, // Valor sin formatear
+            $this->getDateOnly($row->fecha_factura),     // Solo fecha, sin hora
+            $row->importe_estimacion ?? 0,
+            $row->iva ?? 0,
+            $row->total_estimacion_con_iva ?? 0,
+            $this->getDateOnly($row->fecha_elaboracion), // Solo fecha, sin hora
+            $row->cargos_adicionales_3_5 ?? 0,
+            $row->retencion_5_al_millar ?? 0,
+            $row->sancion_atrazo_presentacion_estimacion ?? 0,
+            $row->sancion_atraso_de_obra ?? 0,
+            $row->sancion_por_obra_mal_ejecutada ?? 0,
+            $row->retencion_por_atraso_en_programa_obra ?? 0,
+            $row->amortizacion_anticipo ?? 0,
+            $row->amortizacion_con_iva ?? 0,
+            $row->total_deducciones ?? 0,
+            $importeFacturado,
+            $liquidoACobrar,
+            $liquidoCobrado,
+            $liquidoPorCobrar,
+            $this->getDateOnly($row->fecha_cobro),       // Solo fecha, sin hora
             $row->status ?? '',
         ];
     }
     
-    // Método para formatear columnas
+    /**
+     * Extraer solo la fecha (sin hora) y devolverla como fecha Excel
+     */
+    private function getDateOnly($date)
+    {
+        if (!$date) return null;
+        try {
+            // Si es string con hora, extraer solo la parte de fecha
+            if (is_string($date) && strpos($date, ' ') !== false) {
+                $date = explode(' ', $date)[0]; // "2025-01-27 10:30:00" → "2025-01-27"
+            }
+            return $date;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+    
     public function columnFormats(): array
     {
         return [
@@ -242,7 +244,6 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
     
     public function styles(Worksheet $sheet)
     {
-        // Estilo para encabezados
         $sheet->getStyle('A1:AM1')->applyFromArray([
             'font' => [
                 'bold' => true,
@@ -267,15 +268,6 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
         ]);
         
         $sheet->getRowDimension(1)->setRowHeight(40);
-        
-        // Aplicar formato de número a todas las columnas numéricas
-        // Esto complementa el formato de columnas
-        $currencyColumns = ['K', 'L', 'M', 'N', 'T', 'U', 'V', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ'];
-        foreach ($currencyColumns as $col) {
-            $sheet->getStyle($col . '2:' . $col . '1000')
-                  ->getNumberFormat()
-                  ->setFormatCode('#,##0.00');
-        }
     }
     
     public function registerEvents(): array
