@@ -96,6 +96,11 @@
                     <span class="submenu-text">Reporte Productos</span>
                 </a>
 
+                <a href="{{url('reportes/proveedores')}}" class="submenu-item">
+                    <i class="fas fa-file-alt submenu-icon"></i>
+                    <span class="submenu-text">Repote Proveedores</span>
+                </a>
+
                 
              
                 <!-- Puedes agregar más reportes aquí -->

@@ -165,18 +165,26 @@ Route::prefix('reportes')->middleware(['auth:administradores'])->group(function 
     Route::post('/destajo/exportar', [App\Http\Controllers\Reportes\ReporteDestajoController::class, 'exportar'])
         ->name('reportes.destajo.exportar');
     
-    // Reporte de Compras (para agregar después)
+    // Reporte de Compras 
     Route::get('/compra', [App\Http\Controllers\Reportes\ReporteCompraController::class, 'index'])
         ->name('reportes.compra');
         
     Route::post('/compra/exportar', [App\Http\Controllers\Reportes\ReporteCompraController::class, 'exportar'])
         ->name('reportes.compra.exportar');
 
+    // Reporte de Productos y servicios 
     Route::get('/ps', [App\Http\Controllers\Reportes\ReportePSController::class, 'index'])
         ->name('reportes.ps');
         
     Route::post('/ps/exportar', [App\Http\Controllers\Reportes\ReportePSController::class, 'exportar'])
         ->name('reportes.ps.exportar');
+
+        // Reporte de Proveedores
+    Route::get('/proveedores', [App\Http\Controllers\Reportes\ReporteProveedoresController::class, 'index'])
+        ->name('reportes.proveedores');
+
+    Route::post('/proveedores/exportar', [App\Http\Controllers\Reportes\ReporteProveedoresController::class, 'exportar'])
+    ->name('reportes.proveedores.exportar');
     
 });
 
