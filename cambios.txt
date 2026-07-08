@@ -1,7 +1,7 @@
 1.  reporte de proveedores : filtrar like por nombre,clave o activo o inactivo 
 2. En reporte de ingresos :
     a)Revisar los formatos de fechas y montos, los toma como texto 
-    b)Agregar al reporte los 3 campos que se agregaron en captura de ingresos : derechos supervicion aportacion cmi y delegacion estado de mexico
+    b)Agregar al reporte los 3 campos que se agregaron en captura de ingresos : derechos supervicion, aportacion cmi y delegacion estado de mexico
     c)Corregir la base de datos cambiar de pagado a cobrado los resgistros anteriores 
     d)revisar por que hay unos que dice : no especificado en status de ingresos
 

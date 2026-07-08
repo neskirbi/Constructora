@@ -71,7 +71,11 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
                 'ingresos.fecha_cobro',
                 'ingresos.por_estimar',
                 'ingresos.status',
-                'ingresos.estimado_menos_deducciones'
+                'ingresos.estimado_menos_deducciones',
+                // 🔽 NUEVOS CAMPOS AGREGADOS 🔽
+                'ingresos.derechos_supervision',
+                'ingresos.aportacion_cmic',
+                'ingresos.delegacion_icic'
             )
             ->orderBy('contratos.consecutivo')
             ->orderBy('ingresos.factura');
@@ -123,7 +127,11 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             'Líquido Cobrado',
             'Líquido por cobrar',
             'Fecha Cobro',
-            'Status'
+            'Status',
+            // 🔽 NUEVOS ENCABEZADOS AGREGADOS 🔽
+            'Derechos Supervisión',
+            'Aportación CMIC',
+            'Delegación ICIC (Edo. México)'
         ];
     }
         
@@ -143,22 +151,22 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             $row->referencia_interna ?? '',
             $row->cliente ?? '',
             'Ingresos',
-            $this->getDateOnly($row->fecha_contrato),    // Solo fecha, sin hora
-            $this->getDateOnly($row->fecha_inicio_obra), // Solo fecha, sin hora
-            $this->getDateOnly($row->fecha_terminacion_obra), // Solo fecha, sin hora
+            $this->getDateOnly($row->fecha_contrato),
+            $this->getDateOnly($row->fecha_inicio_obra),
+            $this->getDateOnly($row->fecha_terminacion_obra),
             $row->monto_anticipo ?? 0,
             $row->importe_contrato ?? 0,
             $row->convenio_aplicacion_monto ?? 0,
             $totalACobrar,
             $row->no_estimacion ?? '',
-            $this->getDateOnly($row->periodo_del),       // Solo fecha, sin hora
-            $this->getDateOnly($row->periodo_al),        // Solo fecha, sin hora
+            $this->getDateOnly($row->periodo_del),
+            $this->getDateOnly($row->periodo_al),
             $row->n_factura ?? '',
-            $this->getDateOnly($row->fecha_factura),     // Solo fecha, sin hora
+            $this->getDateOnly($row->fecha_factura),
             $row->importe_estimacion ?? 0,
             $row->iva ?? 0,
             $row->total_estimacion_con_iva ?? 0,
-            $this->getDateOnly($row->fecha_elaboracion), // Solo fecha, sin hora
+            $this->getDateOnly($row->fecha_elaboracion),
             $row->cargos_adicionales_3_5 ?? 0,
             $row->retencion_5_al_millar ?? 0,
             $row->sancion_atrazo_presentacion_estimacion ?? 0,
@@ -172,8 +180,12 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             $liquidoACobrar,
             $liquidoCobrado,
             $liquidoPorCobrar,
-            $this->getDateOnly($row->fecha_cobro),       // Solo fecha, sin hora
+            $this->getDateOnly($row->fecha_cobro),
             $row->status ?? '',
+            // 🔽 NUEVOS CAMPOS AGREGADOS 🔽
+            $row->derechos_supervision ?? 0,
+            $row->aportacion_cmic ?? 0,
+            $row->delegacion_icic ?? 0,
         ];
     }
     
@@ -184,9 +196,8 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
     {
         if (!$date) return null;
         try {
-            // Si es string con hora, extraer solo la parte de fecha
             if (is_string($date) && strpos($date, ' ') !== false) {
-                $date = explode(' ', $date)[0]; // "2025-01-27 10:30:00" → "2025-01-27"
+                $date = explode(' ', $date)[0];
             }
             return $date;
         } catch (\Exception $e) {
@@ -225,6 +236,10 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             'AI' => '#,##0.00',                         // Líquido Cobrado
             'AJ' => '#,##0.00',                         // Líquido por cobrar
             'AK' => NumberFormat::FORMAT_DATE_DDMMYYYY, // Fecha Cobro
+            // 🔽 NUEVOS FORMATOS AGREGADOS 🔽
+            'AM' => '#,##0.00',                         // Derechos Supervisión
+            'AN' => '#,##0.00',                         // Aportación CMIC
+            'AO' => '#,##0.00',                         // Delegación ICIC
         ];
     }
     
@@ -238,13 +253,17 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             'U' => 15, 'V' => 22, 'W' => 18, 'X' => 25, 'Y' => 22,
             'Z' => 30, 'AA' => 22, 'AB' => 30, 'AC' => 25, 'AD' => 22,
             'AE' => 22, 'AF' => 22, 'AG' => 22, 'AH' => 22, 'AI' => 22,
-            'AJ' => 22, 'AK' => 22, 'AL' => 15, 'AM' => 15
+            'AJ' => 22, 'AK' => 22, 'AL' => 15,
+            // 🔽 NUEVOS ANCHOS AGREGADOS 🔽
+            'AM' => 22, // Derechos Supervisión
+            'AN' => 22, // Aportación CMIC
+            'AO' => 25, // Delegación ICIC
         ];
     }
     
     public function styles(Worksheet $sheet)
     {
-        $sheet->getStyle('A1:AM1')->applyFromArray([
+        $sheet->getStyle('A1:AO1')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'size' => 11,
@@ -275,7 +294,7 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
         return [
             AfterSheet::class => function(AfterSheet $event) {
                 $event->sheet->freezePane('A2');
-                $event->sheet->setAutoFilter('A1:AM1');
+                $event->sheet->setAutoFilter('A1:AO1');
             },
         ];
     }
