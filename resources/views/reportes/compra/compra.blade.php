@@ -99,7 +99,7 @@
 
                 <div class="card">
                     <div class="info-box">
-                        <p><strong>Nota:</strong> Seleccione un periodo de fechas para exportar las compras. Puede filtrar por contrato específico o exportar todas las compras del periodo. El archivo se abrirá en una nueva pestaña.</p>
+                        <p><strong>Nota:</strong> Seleccione un periodo de fechas para exportar las compras. Puede filtrar por contrato específico, por clave de proveedor o exportar todas las compras del periodo. El archivo se abrirá en una nueva pestaña.</p>
                     </div>
 
                     <form action="{{ route('reportes.compra.exportar') }}" method="POST" id="exportForm" target="_blank">
@@ -128,7 +128,7 @@
                         </div>
 
                         <div class="row mb-4">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <label class="form-label">Contrato (Opcional)</label>
                                 <select name="contrato_id" class="form-select">
                                     <option value="">-- Todos los contratos --</option>
@@ -139,6 +139,17 @@
                                     @endforeach
                                 </select>
                                 <small class="text-muted">Deje en blanco para exportar todas las compras del periodo</small>
+                            </div>
+                            
+                            <!-- NUEVO CAMPO: Clave de proveedor -->
+                            <div class="col-md-6">
+                                <label class="form-label">Clave de Proveedor (Opcional)</label>
+                                <input type="text" 
+                                       name="clave_proveedor" 
+                                       class="form-control" 
+                                       placeholder="Ej: PROV-001"
+                                       value="{{ old('clave_proveedor') }}">
+                                <small class="text-muted">Ingrese la clave del proveedor para filtrar (búsqueda parcial)</small>
                             </div>
                         </div>
 

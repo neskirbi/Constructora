@@ -26,15 +26,17 @@ class ReporteCompraController extends Controller
         $request->validate([
             'fecha_inicio' => 'required|date',
             'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
-            'contrato_id' => 'nullable|exists:contratos,id'
+            'contrato_id' => 'nullable|exists:contratos,id',
+            'clave_proveedor' => 'nullable|string|max:100' // NUEVA VALIDACIÓN
         ]);
 
         $fechaInicio = $request->fecha_inicio;
         $fechaFin = $request->fecha_fin;
         $contratoId = $request->contrato_id;
+        $claveProveedor = $request->clave_proveedor; // NUEVO PARÁMETRO
 
         return Excel::download(
-            new ComprasExport($fechaInicio, $fechaFin, $contratoId), 
+            new ComprasExport($fechaInicio, $fechaFin, $contratoId, $claveProveedor), 
             'reporte_compras_' . date('Y-m-d') . '.xlsx'
         );
     }

@@ -1,10 +1,9 @@
-1.  reporte de proveedores : filtrar like por nombre,clave o activo o inactivo 
+1.  reporte de proveedores : filtrar like por nombre,clave o activo o inactivo - Listo
 2. En reporte de ingresos :
-    a)Revisar los formatos de fechas y montos, los toma como texto 
-    b)Agregar al reporte los 3 campos que se agregaron en captura de ingresos : derechos supervicion, aportacion cmi y delegacion estado de mexico
-    c)Corregir la base de datos cambiar de pagado a cobrado los resgistros anteriores 
-    d)revisar por que hay unos que dice : no especificado en status de ingresos
+    a)Revisar los formatos de fechas y montos, los toma como texto - Listo
+    b)Agregar al reporte los 3 campos que se agregaron en captura de ingresos : derechos supervicion, aportacion cmi y delegacion estado de mexico - Listo
+    c)Corregir la base de datos cambiar de pagado a cobrado los resgistros anteriores  -Listo
+    d)revisar por que hay unos que dice : no especificado en status de ingresos - Listo
 
 3.Reporte Compras: revisar formato de fecha y de montos y agregar filtros de proveedor y el consecutivo que se va a poner
-4.Filtro para sacar reporte de compras agregfar filtro por proveedor
 5.- poner un consecutivo para compras (ej. si son 100  empezar del 1 - 100)

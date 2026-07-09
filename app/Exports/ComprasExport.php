@@ -26,12 +26,14 @@ class ComprasExport implements
     protected $fechaInicio;
     protected $fechaFin;
     protected $contratoId;
+    protected $claveProveedor; // NUEVA PROPIEDAD
 
-    public function __construct($fechaInicio, $fechaFin, $contratoId = null)
+    public function __construct($fechaInicio, $fechaFin, $contratoId = null, $claveProveedor = null)
     {
         $this->fechaInicio = $fechaInicio;
         $this->fechaFin = $fechaFin;
         $this->contratoId = $contratoId;
+        $this->claveProveedor = $claveProveedor; // NUEVO PARÁMETRO
     }
 
     public function collection()
@@ -69,6 +71,11 @@ class ComprasExport implements
             $query->where('c.id_contrato', $this->contratoId);
         }
 
+        // NUEVO FILTRO POR CLAVE DE PROVEEDOR
+        if ($this->claveProveedor) {
+            $query->where('p.clave', 'LIKE', '%' . $this->claveProveedor . '%');
+        }
+
         $compras = $query->get();
         $filas = collect();
         
@@ -82,7 +89,7 @@ class ComprasExport implements
                 foreach ($detalles as $detalle) {
                     $fila = new \stdClass();
                     $fila->consecutivo = $compra->consecutivo;
-                    $fila->fecha = $this->getDateOnly($compra->created_at); // Solo fecha, sin hora
+                    $fila->fecha = $this->getDateOnly($compra->created_at);
                     $fila->obra = $compra->contrato_obra;
                     $fila->no_obra = $compra->cons;
                     $fila->frente = $compra->contrato_frente;
@@ -111,7 +118,7 @@ class ComprasExport implements
             } else {
                 $fila = new \stdClass();
                 $fila->consecutivo = $compra->consecutivo;
-                $fila->fecha = $this->getDateOnly($compra->created_at); // Solo fecha, sin hora
+                $fila->fecha = $this->getDateOnly($compra->created_at);
                 $fila->obra = $compra->contrato_obra;
                 $fila->no_obra = $compra->cons;
                 $fila->frente = $compra->contrato_frente;
@@ -143,7 +150,7 @@ class ComprasExport implements
         if (!$date) return null;
         try {
             if (is_string($date) && strpos($date, ' ') !== false) {
-                $date = explode(' ', $date)[0]; // "2025-01-27 10:30:00" → "2025-01-27"
+                $date = explode(' ', $date)[0];
             }
             return $date;
         } catch (\Exception $e) {
@@ -178,7 +185,7 @@ class ComprasExport implements
     {
         return [
             $fila->consecutivo ?? '',
-            $fila->fecha ?? '', // Solo fecha, sin hora
+            $fila->fecha ?? '',
             $fila->obra ?? '',
             $fila->no_obra ?? '',
             $fila->frente ?? '',
@@ -200,12 +207,12 @@ class ComprasExport implements
     public function columnFormats(): array
     {
         return [
-            'B' => NumberFormat::FORMAT_DATE_DDMMYYYY, // Fecha (solo fecha, sin hora)
-            'M' => '#,##0.00', // Cantidad
-            'N' => '#,##0.00', // Precio unitario
-            'O' => '#,##0.00', // Subtotal
-            'P' => '#,##0.00', // IVA de la compra
-            'Q' => '#,##0.00', // Total
+            'B' => NumberFormat::FORMAT_DATE_DDMMYYYY,
+            'M' => '#,##0.00',
+            'N' => '#,##0.00',
+            'O' => '#,##0.00',
+            'P' => '#,##0.00',
+            'Q' => '#,##0.00',
         ];
     }
 
@@ -278,15 +285,21 @@ class ComprasExport implements
                 $filaInfo = $lastRow + 2;
                 $sheet->setCellValue('A' . $filaInfo, 'Filtro aplicado:');
                 $sheet->setCellValue('B' . $filaInfo, $this->fechaInicio . ' - ' . $this->fechaFin);
+                
+                $columnaActual = 'C';
                 if ($this->contratoId && $this->contratoId !== 'todos') {
                     $contrato = DB::table('contratos')->where('id', $this->contratoId)->first();
-                    $sheet->setCellValue('C' . $filaInfo, 'Contrato: ' . ($contrato->refinterna ?? $contrato->contrato_no ?? ''));
+                    $sheet->setCellValue($columnaActual . $filaInfo, 'Contrato: ' . ($contrato->refinterna ?? $contrato->contrato_no ?? ''));
+                    $columnaActual = chr(ord($columnaActual) + 1);
                 } else {
-                    $sheet->setCellValue('C' . $filaInfo, 'Contrato: TODOS');
+                    $sheet->setCellValue($columnaActual . $filaInfo, 'Contrato: TODOS');
+                    $columnaActual = chr(ord($columnaActual) + 1);
                 }
-                $sheet->getStyle('A' . $filaInfo . ':C' . $filaInfo)->applyFromArray([
-                    'font' => ['bold' => true],
-                ]);
+                
+                // NUEVO: Mostrar filtro de clave de proveedor
+                if ($this->claveProveedor) {
+                    $sheet->setCellValue($columnaActual . $filaInfo, 'Clave Proveedor: ' . $this->claveProveedor);
+                }
 
                 $filaTotales = $filaInfo + 2;
                 $sheet->setCellValue('O' . $filaTotales, 'SUBTOTAL GENERAL:');
