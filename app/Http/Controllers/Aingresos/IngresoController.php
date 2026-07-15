@@ -227,7 +227,7 @@ public function updateFacturacion(Request $request, $id)
         // Facturación
         'factura' => 'nullable|string|max:255',
         'fecha_factura' => 'nullable|date',
-        'status' => 'nullable|string|in:Cobrado,en_tramite',
+        'status' => 'nullable|string|in:cobrado,en_tramite',
         
         // Cobros
         'liquido_cobrado' => 'nullable|numeric|min:0',
