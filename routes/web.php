@@ -211,38 +211,34 @@ Route::resource('destajos', 'App\Http\Controllers\Adestajos\DestajoController')
 Route::resource('compras', 'App\Http\Controllers\Acompras\CompraController')
 ->middleware(['auth:acompras']);
 
-use App\Http\Controllers\Compras\CarritoCompraController;
-// Rutas para el carrito de compras
-Route::get('carrito', [CarritoCompraController::class, 'index'])
-    ->name('compras.carrito.index')
+// routes/web.php
+
+Route::get('requisiciones', [App\Http\Controllers\Acompras\RequisicionController::class, 'index'])
+    ->name('compras.requisiciones.index')
     ->middleware(['auth:acompras']);
 
-Route::post('carrito/procesar-excel', [CarritoCompraController::class, 'procesarExcel'])
-    ->name('compras.carrito.procesar-excel')
+Route::get('requisiciones/create', [App\Http\Controllers\Acompras\RequisicionController::class, 'create'])
+    ->name('compras.requisiciones.create')
     ->middleware(['auth:acompras']);
 
-Route::post('carrito/asignar-contrato', [CarritoCompraController::class, 'asignarContrato'])
-    ->name('compras.carrito.asignar-contrato')
+Route::get('requisiciones/show/{contratoId}', [App\Http\Controllers\Acompras\RequisicionController::class, 'show'])
+    ->name('compras.requisiciones.show')
     ->middleware(['auth:acompras']);
 
-Route::post('carrito/buscar-precios', [CarritoCompraController::class, 'buscarPreciosCatalogo'])
-    ->name('compras.carrito.buscar-precios')
+Route::post('requisiciones/procesar-excel', [App\Http\Controllers\Acompras\RequisicionController::class, 'procesarExcel'])
+    ->name('compras.requisiciones.procesar-excel')
     ->middleware(['auth:acompras']);
 
-Route::post('carrito/actualizar-precio/{id}', [CarritoCompraController::class, 'actualizarPrecio'])
-    ->name('compras.carrito.actualizar-precio')
+Route::post('requisiciones/eliminar', [App\Http\Controllers\Acompras\RequisicionController::class, 'eliminarItem'])
+    ->name('compras.requisiciones.eliminar')
     ->middleware(['auth:acompras']);
 
-Route::delete('carrito/eliminar/{id}', [CarritoCompraController::class, 'eliminarItem'])
-    ->name('compras.carrito.eliminar')
+Route::post('requisiciones/borrar-grupo/{contratoId}', [App\Http\Controllers\Acompras\RequisicionController::class, 'borrarGrupo'])
+    ->name('compras.requisiciones.borrar-grupo')
     ->middleware(['auth:acompras']);
 
-Route::post('carrito/vaciar', [CarritoCompraController::class, 'vaciarCarrito'])
-    ->name('compras.carrito.vaciar')
-    ->middleware(['auth:acompras']);
-
-Route::post('carrito/confirmar', [CarritoCompraController::class, 'confirmarCompra'])
-    ->name('compras.carrito.confirmar')
+Route::post('requisiciones/confirmar/{contratoId}', [App\Http\Controllers\Acompras\RequisicionController::class, 'confirmarCompraPorContrato'])
+    ->name('compras.requisiciones.confirmar')
     ->middleware(['auth:acompras']);
 
 /**

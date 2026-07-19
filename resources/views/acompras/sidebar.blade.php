@@ -23,15 +23,10 @@
             <span class="menu-text">Compras</span>
         </a>
 
-        <a href="{{ url('carrito') }}" class="menu-item">
-            <i class="fas fa-shopping-cart menu-icon"></i>
-            <span class="menu-text">Carrito de Compras</span>
-            @php
-                $countCarrito = \App\Models\CarritoCompra::where('session_id', session()->getId())->count();
-            @endphp
-            @if($countCarrito > 0)
-            <span class="menu-badge">{{ $countCarrito }}</span>
-            @endif
+       <a href="{{ url('requisiciones') }}" class="menu-item">
+            <i class="fas fa-clipboard-list menu-icon"></i>
+            <span class="menu-text">Requisiciones</span>
+           
         </a>
     </div>
     
