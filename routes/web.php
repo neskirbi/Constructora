@@ -241,6 +241,14 @@ Route::post('requisiciones/confirmar/{contratoId}', [App\Http\Controllers\Acompr
     ->name('compras.requisiciones.confirmar')
     ->middleware(['auth:acompras']);
 
+    Route::post('requisiciones/agregar-proveedor', [App\Http\Controllers\Acompras\RequisicionController::class, 'agregarProveedor'])
+    ->name('compras.requisiciones.agregar-proveedor')
+    ->middleware(['auth:acompras']);
+
+Route::delete('requisiciones/eliminar-proveedor/{id}', [App\Http\Controllers\Acompras\RequisicionController::class, 'eliminarProveedor'])
+    ->name('compras.requisiciones.eliminar-proveedor')
+    ->middleware(['auth:acompras']);
+
 /**
  * Generales
  */

@@ -8,11 +8,13 @@ use App\Models\Contrato;
 use App\Models\Compra;
 use App\Models\CompraDetalle;
 use App\Models\ProductoServicio;
+use App\Models\RequisicionProveedor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\ProveedorSer;
+use App\Services\GeminiExcelService;
 
 class RequisicionController extends Controller
 {
@@ -53,19 +55,25 @@ class RequisicionController extends Controller
     }
 
     public function show($contratoId)
-    {
-        $sessionId = GetId();
-        
-        $items = Requisicion::where('session_id', $sessionId)
-            ->where('contrato_id', $contratoId)
-            ->with('contrato')
-            ->get();
-        
-        $contrato = Contrato::find($contratoId);
-        $proveedores = ProveedorSer::orderBy('clave')->get();
-        
-        return view('acompras.requisiciones.show', compact('items', 'contrato', 'contratoId', 'proveedores'));
-    }
+{
+    $sessionId = GetId();
+    
+    $items = Requisicion::where('session_id', $sessionId)
+        ->where('contrato_id', $contratoId)
+        ->with('contrato')
+        ->get();
+    
+    $contrato = Contrato::find($contratoId);
+    $proveedores = ProveedorSer::orderBy('clave')->get();
+    
+    // Obtener proveedores de las requisiciones
+    $requisicionIds = $items->pluck('id')->toArray();
+    $requisicionProveedores = RequisicionProveedor::whereIn('requisicion_id', $requisicionIds)
+        ->with('proveedor')
+        ->get();
+    
+    return view('acompras.requisiciones.show', compact('items', 'contrato', 'contratoId', 'proveedores', 'requisicionProveedores'));
+}
 
     public function borrarGrupo($contratoId)
     {
@@ -75,7 +83,7 @@ class RequisicionController extends Controller
         
         return response()->json(['success' => true]);
     }
-    
+
     public function procesarExcel(Request $request)
     {
         $request->validate([
@@ -85,13 +93,116 @@ class RequisicionController extends Controller
         
         $sessionId = GetId();
         $contratoId = $request->contrato_id;
+        $usarIA = $request->has('usar_ia') && $request->usar_ia == 1;
+        
+        // Si el usuario activó la IA, intentar con Gemini
+        if ($usarIA) {
+            try {
+                $geminiService = new GeminiExcelService();
+                $items = $geminiService->procesarExcel($request->file('archivo_excel'));
+                
+                if (!empty($items)) {
+                    return $this->guardarItems($items, $sessionId, $contratoId, 'IA (Gemini)');
+                }
+            } catch (\Exception $e) {
+                Log::error('Error con Gemini: ' . $e->getMessage());
+                return redirect()->route('compras.requisiciones.index')
+                    ->with('error', 'Error con IA: ' . $e->getMessage());
+            }
+        }
+        
+        // Si no usa IA o falló, método tradicional
+        return $this->procesarExcelTradicional($request);
+    }
+
+    private function guardarItems($items, $sessionId, $contratoId, $metodo = 'tradicional')
+    {
+        $itemsAgregados = 0;
+        $itemsErroneos = 0;
+        $errores = [];
+        
+        foreach ($items as $item) {
+            $clave = $item['clave'] ?? '';
+            $descripcion = $item['descripcion'] ?? '';
+            $unidad = $item['unidad'] ?? '';
+            $cantidad = floatval($item['cantidad'] ?? 0);
+            $link = $item['link'] ?? '';
+            $observaciones = $item['observaciones'] ?? '';
+            
+            if ($clave == 'N/A' || empty($clave)) {
+                $producto = ProductoServicio::where('descripcion', 'LIKE', '%' . $descripcion . '%')->first();
+                if ($producto) {
+                    $clave = $producto->clave;
+                }
+            }
+            
+            if (empty($clave) || empty($descripcion) || empty($unidad) || $cantidad <= 0) {
+                $itemsErroneos++;
+                $errores[] = "Datos incompletos: " . json_encode($item);
+                continue;
+            }
+            
+            $precio = 0;
+            $catalogo = ProductoServicio::where('clave', $clave)->first();
+            if ($catalogo) {
+                $precio = $catalogo->ult_costo ?? 0;
+            }
+            
+            $requisicion = Requisicion::create([
+                'id' => GetUuid(),
+                'session_id' => $sessionId,
+                'contrato_id' => $contratoId,
+                'clave' => $clave,
+                'descripcion' => $descripcion,
+                'unidad' => $unidad,
+                'cantidad' => $cantidad,
+                'precio_unitario' => $precio,
+                'observaciones' => $observaciones,
+                'link' => $link,
+            ]);
+            
+            if ($precio > 0) {
+                $requisicion->subtotal = $cantidad * $precio;
+                $requisicion->iva = $requisicion->subtotal * 0.16;
+                $requisicion->total = $requisicion->subtotal + $requisicion->iva;
+                $requisicion->save();
+            }
+            
+            $itemsAgregados++;
+        }
+        
+        $mensaje = "Excel procesado con $metodo. Se agregaron $itemsAgregados items.";
+        if ($itemsErroneos > 0) {
+            $mensaje .= " $itemsErroneos items con errores.";
+        }
+        
+        return redirect()->route('compras.requisiciones.index')
+            ->with('success', $mensaje)
+            ->with('itemsErroneos', $errores);
+    }
+
+    private function procesarExcelTradicional($request)
+    {
+        $sessionId = GetId();
+        $contratoId = $request->contrato_id;
         $itemsAgregados = 0;
         $itemsErroneos = 0;
         $errores = [];
         
         try {
-            return $data = Excel::toArray([], $request->file('archivo_excel'));
+            $data = Excel::toArray([], $request->file('archivo_excel'));
             $rows = isset($data[1]) ? $data[1] : $data[0];
+            
+            // Limpiar filas vacías
+            $rows = array_filter($rows, function($row) {
+                foreach ($row as $celda) {
+                    if (!empty(trim($celda ?? ''))) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+            $rows = array_values($rows);
             
             for ($i = 0; $i < count($rows); $i++) {
                 $row = $rows[$i];
@@ -124,7 +235,7 @@ class RequisicionController extends Controller
                     $precio = $catalogo->ult_costo ?? 0;
                 }
                 
-                $item = Requisicion::create([
+                $requisicion = Requisicion::create([
                     'id' => GetUuid(),
                     'session_id' => $sessionId,
                     'contrato_id' => $contratoId,
@@ -139,10 +250,10 @@ class RequisicionController extends Controller
                 ]);
                 
                 if ($precio > 0) {
-                    $item->subtotal = $cantidad * $precio;
-                    $item->iva = $item->subtotal * 0.16;
-                    $item->total = $item->subtotal + $item->iva;
-                    $item->save();
+                    $requisicion->subtotal = $cantidad * $precio;
+                    $requisicion->iva = $requisicion->subtotal * 0.16;
+                    $requisicion->total = $requisicion->subtotal + $requisicion->iva;
+                    $requisicion->save();
                 }
                 
                 $itemsAgregados++;
@@ -284,4 +395,41 @@ class RequisicionController extends Controller
                 ->with('error', 'Error al crear la compra: ' . $e->getMessage());
         }
     }
+    
+
+
+    public function agregarProveedor(Request $request)
+{
+    $request->validate([
+    'requisicion_id' => 'required|exists:requisiciones,id',
+    'proveedor_id' => 'required|exists:proveedores_servicios,id', // <--- Cambia aquí
+    'monto' => 'required|numeric|min:0',
+]);
+    
+    $requisicionProveedor = RequisicionProveedor::create([
+        'id' => GetUuid(),
+        'requisicion_id' => $request->requisicion_id,
+        'proveedor_id' => $request->proveedor_id,
+        'monto' => $request->monto,
+    ]);
+    
+    $proveedor = ProveedorSer::find($request->proveedor_id);
+    
+    return response()->json([
+        'success' => true,
+        'data' => [
+            'id' => $requisicionProveedor->id,
+            'proveedor' => $proveedor->clave . ' - ' . $proveedor->nombre,
+            'monto' => $requisicionProveedor->monto,
+        ]
+    ]);
+}
+
+public function eliminarProveedor($id)
+{
+    $requisicionProveedor = RequisicionProveedor::findOrFail($id);
+    $requisicionProveedor->delete();
+    
+    return response()->json(['success' => true]);
+}
 }

@@ -42,6 +42,14 @@
             background: #dc3545;
             color: white;
         }
+        .fila-nueva-proveedor td {
+            padding: 8px;
+            vertical-align: middle;
+        }
+        .fila-nueva-proveedor .form-select-sm, 
+        .fila-nueva-proveedor .form-control-sm {
+            font-size: 0.875rem;
+        }
     </style>
 </head>
 <body>
@@ -112,6 +120,50 @@
                                 </div>
                             </div>
                             @endforeach
+                        </div>
+                    </div>
+
+                    <!-- Sección de Proveedores -->
+                    <div class="card shadow-sm mt-4">
+                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">
+                                <i class="fas fa-users text-primary me-2"></i>
+                                Proveedores
+                            </h6>
+                            <button class="btn btn-sm btn-primary" onclick="agregarFilaProveedor()">
+                                <i class="fas fa-plus me-1"></i> Agregar Proveedor
+                            </button>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Proveedor</th>
+                                        <th class="text-end">Monto</th>
+                                        <th class="text-center" style="width: 120px;">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaProveedores">
+                                    @foreach($requisicionProveedores as $rp)
+                                    <tr id="proveedor-row-{{ $rp->id }}">
+                                        <td>{{ $rp->proveedor->clave ?? '' }} - {{ $rp->proveedor->nombre ?? 'N/A' }}</td>
+                                        <td class="text-end">${{ number_format($rp->monto, 2) }}</td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-outline-danger" onclick="eliminarProveedor('{{ $rp->id }}')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th>Total Proveedores</th>
+                                        <th class="text-end" id="totalProveedores">${{ number_format($requisicionProveedores->sum('monto'), 2) }}</th>
+                                        <th></th>
+                                    </tr>
+                                </tfoot>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -186,6 +238,122 @@
                     }
                 });
             }
+        }
+
+        function agregarFilaProveedor() {
+            var row = `
+                <tr class="fila-nueva-proveedor">
+                    <td>
+                        <select class="form-select form-select-sm proveedor-select" style="width: 100%;">
+                            <option value="">Seleccionar proveedor</option>
+                            @foreach($proveedores as $proveedor)
+                            <option value="{{ $proveedor->id }}">{{ $proveedor->clave }} - {{ $proveedor->nombre }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" class="form-control form-control-sm monto-input" step="0.01" min="0" placeholder="0.00" style="text-align: right;">
+                    </td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-success" onclick="guardarFilaProveedor(this)">
+                            <i class="fas fa-save"></i>
+                        </button>
+                        <button class="btn btn-sm btn-secondary" onclick="cancelarFilaProveedor(this)">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            $('#tablaProveedores').append(row);
+        }
+
+        function guardarFilaProveedor(btn) {
+            var row = $(btn).closest('tr');
+            var proveedorId = row.find('.proveedor-select').val();
+            var monto = row.find('.monto-input').val();
+            
+            if (!proveedorId) {
+                alert('Selecciona un proveedor');
+                return;
+            }
+            
+            if (!monto || monto <= 0) {
+                alert('Ingresa un monto válido');
+                return;
+            }
+            
+            var requisicionId = $('.requisicion-item:first').data('id');
+            
+            $.ajax({
+                url: '{{ url("requisiciones/agregar-proveedor") }}',
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    requisicion_id: requisicionId,
+                    proveedor_id: proveedorId,
+                    monto: monto
+                },
+                success: function(response) {
+                    if (response.success) {
+                        row.attr('id', 'proveedor-row-' + response.data.id);
+                        row.removeClass('fila-nueva-proveedor');
+                        row.html(`
+                            <td>${response.data.proveedor}</td>
+                            <td class="text-end">$${parseFloat(response.data.monto).toFixed(2)}</td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-outline-danger" onclick="eliminarProveedor('${response.data.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        `);
+                        actualizarTotalProveedores();
+                    }
+                },
+                error: function(xhr) {
+                    alert('Error: ' + (xhr.responseJSON?.message || 'Error al guardar'));
+                }
+            });
+        }
+
+        function cancelarFilaProveedor(btn) {
+            $(btn).closest('tr').remove();
+        }
+
+        function eliminarProveedor(id) {
+            if (confirm('¿Eliminar este proveedor?')) {
+                $.ajax({
+                    url: '{{ url("requisiciones/eliminar-proveedor") }}/' + id,
+                    type: 'DELETE',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#proveedor-row-' + id).fadeOut(300, function() {
+                                $(this).remove();
+                                actualizarTotalProveedores();
+                            });
+                        }
+                    },
+                    error: function() {
+                        alert('Error al eliminar proveedor');
+                    }
+                });
+            }
+        }
+
+        function actualizarTotalProveedores() {
+            var total = 0;
+            $('#tablaProveedores tr:not(.fila-nueva-proveedor)').each(function() {
+                var montoText = $(this).find('td:eq(1)').text();
+                if (montoText) {
+                    var monto = parseFloat(montoText.replace('$', '').replace(/,/g, ''));
+                    if (!isNaN(monto)) {
+                        total += monto;
+                    }
+                }
+            });
+            $('#totalProveedores').text('$' + total.toFixed(2));
         }
     </script>
 </body>

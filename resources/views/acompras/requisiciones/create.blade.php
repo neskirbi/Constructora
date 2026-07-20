@@ -69,7 +69,7 @@
                                             <p class="mb-1"><strong>Arrastra tu archivo Excel aquí</strong></p>
                                             <p class="text-muted small mb-2">o haz clic para seleccionarlo</p>
                                             <input type="file" name="archivo_excel" id="archivo_excel" 
-                                                   accept=".xlsx,.xls,.csv" style="display:none;" required>
+                                                accept=".xlsx,.xls,.csv" style="display:none;" required>
                                             <span id="nombreArchivo" class="text-primary fw-bold"></span>
                                         </div>
                                     </div>
@@ -90,6 +90,20 @@
                                         <button type="submit" class="btn btn-info w-100">
                                             <i class="fas fa-upload me-1"></i> Cargar
                                         </button>
+                                    </div>
+                                </div>
+
+                                <!-- SWITCH IA -->
+                                <div class="row mt-3">
+                                    <div class="col-md-12">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" name="usar_ia" id="usar_ia" value="1" checked>
+                                            <label class="form-check-label" for="usar_ia">
+                                                <i class="fas fa-brain text-primary me-1"></i>
+                                                Usar IA para procesar el Excel (Gemini)
+                                                <small class="text-muted d-block">La IA puede reconocer automáticamente el formato del Excel</small>
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </form>
