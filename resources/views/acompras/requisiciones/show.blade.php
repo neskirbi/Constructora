@@ -50,6 +50,13 @@
         .fila-nueva-proveedor .form-control-sm {
             font-size: 0.875rem;
         }
+        .badge-procesada {
+            background: #28a745;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
     </style>
 </head>
 <body>
@@ -67,21 +74,35 @@
                         <h4>
                             <i class="fas fa-file-contract text-primary me-2"></i>
                             Detalle Requisición
+                            @if($requisicion->procesada == 1)
+                                <span class="badge-procesada"><i class="fas fa-check-circle me-1"></i> Procesada</span>
+                            @endif
                         </h4>
                         <div>
+                            @if($requisicion->procesada == 0)
                             <button class="btn btn-success me-2" onclick="confirmarCompra()">
                                 <i class="fas fa-check me-1"></i> Realizar Compra
                             </button>
-                            <a href="{{ route('compras.requisiciones.index') }}" class="btn btn-outline-secondary">
+                            @endif
+                            <a href="{{ url('requisiciones') }}" class="btn btn-outline-secondary">
                                 <i class="fas fa-arrow-left me-1"></i> Volver
                             </a>
                         </div>
                     </div>
 
-                    <!-- Header del contrato -->
+                    <!-- Header de la requisición -->
                     <div class="header-detalle">
                         <div class="row">
-                            <div class="col-md-8">
+                            <div class="col-md-3">
+                                <strong># Requisición:</strong> {{ $requisicion->consecutivo ?? 'N/A' }}
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Frente:</strong> {{ $requisicion->frente ?? 'N/A' }}
+                            </div>
+                            <div class="col-md-3">
+                                <strong>Empresa:</strong> {{ $requisicion->empresa ?? 'N/A' }}
+                            </div>
+                            <div class="col-md-3">
                                 <strong>Contrato:</strong> 
                                 @if($contrato)
                                     {{ $contrato->refinterna }} ({{ $contrato->contrato_no }})
@@ -89,8 +110,32 @@
                                     <span class="text-warning">Sin contrato</span>
                                 @endif
                             </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-4">
+                                <strong>Proyecto:</strong> {{ $requisicion->proyecto ?? 'N/A' }}
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Cliente:</strong> {{ $requisicion->cliente ?? 'N/A' }}
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Contratista:</strong> {{ $requisicion->contratista ?? 'N/A' }}
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-4">
+                                <strong>Partida:</strong> {{ $requisicion->partida ?? 'N/A' }}
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Fecha Solicitud:</strong> {{ $requisicion->created_at ? \Carbon\Carbon::parse($requisicion->created_at)->format('d/m/Y') : 'N/A' }}
+                            </div>
                             <div class="col-md-4 text-end">
-                                <strong>Items:</strong> <span id="totalItems">{{ $items->count() }}</span>
+                                <strong>Total:</strong> <span class="text-success fw-bold">${{ number_format($items->sum('total'), 2) }}</span>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <strong>Dirección de entrega:</strong> {{ $requisicion->direccion_entrega ?? 'N/A' }}
                             </div>
                         </div>
                     </div>
@@ -110,12 +155,22 @@
                                     <div class="col-md-2">
                                         <strong>{{ $item->clave }}</strong>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         {{ $item->descripcion }}
                                     </div>
                                     <div class="col-md-2">
                                         <span class="badge bg-secondary">{{ $item->unidad }}</span>
                                         <span class="ms-2">{{ number_format($item->cantidad, 2) }}</span>
+                                    </div>
+                                    <div class="col-md-2 text-end">
+                                        @if($item->precio_unitario > 0)
+                                        ${{ number_format($item->precio_unitario, 2) }}
+                                        @else
+                                        <span class="text-danger">Sin precio</span>
+                                        @endif
+                                    </div>
+                                    <div class="col-md-2 text-end">
+                                        <span class="fw-bold">${{ number_format($item->subtotal ?? 0, 2) }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -130,9 +185,11 @@
                                 <i class="fas fa-users text-primary me-2"></i>
                                 Proveedores
                             </h6>
+                            @if($requisicion->procesada == 0)
                             <button class="btn btn-sm btn-primary" onclick="agregarFilaProveedor()">
                                 <i class="fas fa-plus me-1"></i> Agregar Proveedor
                             </button>
+                            @endif
                         </div>
                         <div class="card-body p-0">
                             <table class="table table-striped mb-0">
@@ -207,14 +264,14 @@
     <script>
         function confirmarCompra() {
             const form = document.getElementById('confirmarCompraForm');
-            form.action = '{{ url("requisiciones/confirmar") }}/{{ $contratoId }}';
+            form.action = '{{ url("requisiciones/confirmar") }}/{{ $requisicion->id }}';
             new bootstrap.Modal(document.getElementById('confirmarCompraModal')).show();
         }
 
         function eliminarItem(id, clave, element) {
             if (confirm('¿Eliminar ' + clave + '?')) {
                 $.ajax({
-                    url: '{{ url("requisiciones/eliminar") }}',
+                    url: '{{ url("requisiciones/eliminar-item") }}',
                     type: 'POST',
                     data: {
                         id: id,
@@ -226,7 +283,6 @@
                             item.fadeOut(300, function() {
                                 $(this).remove();
                                 var totalItems = $('.requisicion-item').length;
-                                $('#totalItems').text(totalItems);
                                 if (totalItems === 0) {
                                     location.reload();
                                 }
@@ -282,7 +338,7 @@
                 return;
             }
             
-            var requisicionId = $('.requisicion-item:first').data('id');
+            var requisicionId = '{{ $requisicion->id }}';
             
             $.ajax({
                 url: '{{ url("requisiciones/agregar-proveedor") }}',

@@ -63,7 +63,7 @@
                                 @csrf
                                 
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-8">
                                         <div class="drop-zone" id="dropZone">
                                             <i class="fas fa-cloud-upload-alt"></i>
                                             <p class="mb-1"><strong>Arrastra tu archivo Excel aquí</strong></p>
@@ -73,37 +73,10 @@
                                             <span id="nombreArchivo" class="text-primary fw-bold"></span>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="mb-3">
-                                            <label for="contrato_id_carga" class="form-label">Contrato:</label>
-                                            <select name="contrato_id" id="contrato_id_carga" class="form-select" required>
-                                                <option value="">Seleccionar contrato</option>
-                                                @foreach($contratos as $contrato)
-                                                <option value="{{ $contrato->id }}" {{ request('contrato') == $contrato->id ? 'selected' : '' }}>
-                                                    {{ $contrato->consecutivo }} - {{ $contrato->contrato_no }}
-                                                </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2 d-flex align-items-end">
+                                    <div class="col-md-4 d-flex align-items-end">
                                         <button type="submit" class="btn btn-info w-100">
                                             <i class="fas fa-upload me-1"></i> Cargar
                                         </button>
-                                    </div>
-                                </div>
-
-                                <!-- SWITCH IA -->
-                                <div class="row mt-3">
-                                    <div class="col-md-12">
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" name="usar_ia" id="usar_ia" value="1" checked>
-                                            <label class="form-check-label" for="usar_ia">
-                                                <i class="fas fa-brain text-primary me-1"></i>
-                                                Usar IA para procesar el Excel (Gemini)
-                                                <small class="text-muted d-block">La IA puede reconocer automáticamente el formato del Excel</small>
-                                            </label>
-                                        </div>
                                     </div>
                                 </div>
                             </form>
@@ -175,11 +148,6 @@
                 nombreArchivo.textContent = this.files[0].name;
             }
         });
-
-        // Si viene con contrato seleccionado por URL
-        @if(request('contrato'))
-        document.getElementById('contrato_id_carga').value = '{{ request("contrato") }}';
-        @endif
     </script>
 </body>
 </html>

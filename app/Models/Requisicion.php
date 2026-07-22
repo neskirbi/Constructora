@@ -13,27 +13,24 @@ class Requisicion extends Model
     
     protected $fillable = [
         'id',
-        'session_id',
+        'consecutivo',
+        'fecha_solicitud',
+        'fecha_entrega',
+        'frente',
         'contrato_id',
-        'clave',
-        'descripcion',
-        'unidad',
-        'cantidad',
-        'precio_unitario',
-        'subtotal',
-        'iva',
-        'total',
-        'observaciones',
-        'link',
-        'fila_excel'
+        'empresa',
+        'proyecto',
+        'cliente',
+        'especialidad',
+        'direccion_entrega',
+        'contratista',
+        'partida',
+        'session_id',
     ];
     
     protected $casts = [
-        'cantidad' => 'decimal:2',
-        'precio_unitario' => 'decimal:2',
-        'subtotal' => 'decimal:2',
-        'iva' => 'decimal:2',
-        'total' => 'decimal:2',
+        'fecha_solicitud' => 'date',
+        'fecha_entrega' => 'date',
     ];
     
     public function contrato()
@@ -41,13 +38,13 @@ class Requisicion extends Model
         return $this->belongsTo(Contrato::class, 'contrato_id');
     }
     
-    public function calcularTotales()
+    public function detalles()
     {
-        if ($this->precio_unitario && $this->cantidad) {
-            $this->subtotal = $this->cantidad * $this->precio_unitario;
-            $this->iva = $this->subtotal * 0.16;
-            $this->total = $this->subtotal + $this->iva;
-        }
-        return $this;
+        return $this->hasMany(RequisicionDetalle::class, 'requisicion_id');
+    }
+    
+    public function proveedores()
+    {
+        return $this->hasMany(RequisicionProveedor::class, 'requisicion_id');
     }
 }

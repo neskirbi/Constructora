@@ -3,53 +3,6 @@
 <head>
     @include('header')
     <title>{{Empresa()}} | Requisiciones</title>
-    <style>
-        .grupo-contrato {
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            background: white;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-        .grupo-contrato:hover {
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-        }
-        .grupo-contrato .header-grupo {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .grupo-contrato .header-grupo .badge-items {
-            background: #0d6efd;
-            color: white;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-        }
-        .btn-borrar-grupo {
-            background: none;
-            border: none;
-            color: #dc3545;
-            cursor: pointer;
-            font-size: 0.9rem;
-            padding: 4px 8px;
-            border-radius: 4px;
-            transition: all 0.2s;
-            opacity: 0.5;
-        }
-        .btn-borrar-grupo:hover {
-            opacity: 1;
-            background: #dc3545;
-            color: white;
-        }
-        .resumen-items {
-            font-size: 0.9rem;
-            color: #6c757d;
-            margin-top: 8px;
-        }
-    </style>
 </head>
 <body>
     <div class="main-container">
@@ -66,57 +19,63 @@
                         <h4>
                             <i class="fas fa-clipboard-list text-primary me-2"></i>
                             Requisiciones
-                            <span class="badge bg-primary ms-2" id="contadorItems">{{ $requisiciones->count() }} items</span>
+                            <span class="badge bg-primary ms-2">{{ $requisiciones->count() }} requisiciones</span>
                         </h4>
                         <a href="{{ url('requisiciones/create') }}" class="btn btn-primary">
                             <i class="fas fa-plus me-1"></i> Nueva Requisición
                         </a>
                     </div>
 
-                    <!-- Lista de requisiciones agrupadas por contrato -->
+                    <!-- Lista de requisiciones -->
                     <div id="listaRequisiciones">
                         @if($requisiciones->count() > 0)
-                            @php
-                                $agrupado = $requisiciones->groupBy('contrato_id');
-                            @endphp
-
-                            @foreach($agrupado as $contratoId => $items)
-                                @php
-                                    $primerItem = $items->first();
-                                @endphp
-                                <div class="grupo-contrato" onclick="window.location='{{ url('requisiciones/show/' . $contratoId) }}'">
-                                    <div class="header-grupo">
-                                        <div>
-                                            <strong>
-                                                @if($contratoId && $primerItem->contrato)
-                                                    <i class="fas fa-file-contract me-1"></i>
-                                                    {{ $primerItem->contrato->refinterna }}
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th># Requisición</th>
+                                            <th>Frente</th>
+                                            <th>Empresa</th>
+                                            <th>Contrato</th>
+                                            <th>Items</th>
+                                            <th>Total</th>
+                                            <th>Fecha</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($requisiciones as $requisicion)
+                                        <tr>
+                                            <td>
+                                                <a href="{{ url('requisiciones/show/' . $requisicion->id) }}">
+                                                    {{ $requisicion->consecutivo ?? 'N/A' }}
+                                                </a>
+                                            </td>
+                                            <td>{{ $requisicion->frente ?? 'N/A' }}</td>
+                                            <td>{{ $requisicion->empresa ?? 'N/A' }}</td>
+                                            <td>
+                                                @if($requisicion->contrato)
+                                                    {{ $requisicion->contrato->refinterna }}
                                                 @else
-                                                    <i class="fas fa-exclamation-triangle text-warning me-1"></i>
-                                                    Sin contrato
+                                                    <span class="text-muted">Sin contrato</span>
                                                 @endif
-                                            </strong>
-                                            <span class="badge-items ms-2">{{ $items->count() }} items</span>
-                                        </div>
-                                        <div>
-                                            <span class="fw-bold text-success me-3">
-                                                ${{ number_format($items->sum('total'), 2) }}
-                                            </span>
-                                            <button class="btn-borrar-grupo" onclick="event.stopPropagation(); borrarGrupo('{{ $contratoId }}')" title="Eliminar requisición">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="resumen-items">
-                                        @foreach($items->take(3) as $item)
-                                            <span class="badge bg-light text-dark me-1">{{ $item->clave }}</span>
+                                            </td>
+                                            <td>{{ $requisicion->detalles->count() ?? 0 }}</td>
+                                            <td>${{ number_format($requisicion->detalles->sum('total') ?? 0, 2) }}</td>
+                                            <td>{{ $requisicion->created_at ? \Carbon\Carbon::parse($requisicion->created_at)->format('d/m/Y') : 'N/A' }}</td>
+                                            <td>
+                                                <a href="{{ url('requisiciones/show/' . $requisicion->id) }}" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <button class="btn btn-sm btn-danger" onclick="eliminarRequisicion('{{ $requisicion->id }}')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
                                         @endforeach
-                                        @if($items->count() > 3)
-                                            <span class="badge bg-secondary">+{{ $items->count() - 3 }} más</span>
-                                        @endif
-                                    </div>
-                                </div>
-                            @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         @else
                         <div class="text-center py-5">
                             <i class="fas fa-clipboard-list" style="font-size: 4rem; color: #dee2e6;"></i>
@@ -133,11 +92,11 @@
     @include('footer')
 
     <script>
-        function borrarGrupo(contratoId) {
-            if (confirm('¿Eliminar todas las requisiciones de este contrato?')) {
+        function eliminarRequisicion(id) {
+            if (confirm('¿Eliminar esta requisición?')) {
                 $.ajax({
-                    url: '{{ url("requisiciones/borrar-grupo") }}/' + contratoId,
-                    type: 'POST',
+                    url: '{{ url("requisiciones/eliminar-requisicion") }}/' + id,
+                    type: 'DELETE',
                     data: {
                         _token: '{{ csrf_token() }}'
                     },

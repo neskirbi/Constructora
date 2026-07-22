@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\Log;
 class GeminiExcelService
 {
     protected $apiKey;
-    protected $apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+    protected $apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent';
+    protected $logs = [];
 
     public function __construct()
     {
@@ -22,13 +23,14 @@ class GeminiExcelService
 
     public function procesarExcel($archivoExcel)
     {
-        Log::info('=== INICIO GEMINI ===');
+        $this->logs = [];
+        $this->addLog('=== INICIO GEMINI ===');
         
         // Leer el Excel
         $data = Excel::toArray([], $archivoExcel);
         $rows = isset($data[1]) ? $data[1] : $data[0];
         
-        Log::info('Filas leídas: ' . count($rows));
+        $this->addLog('Filas leídas: ' . count($rows));
         
         // Limitar filas
         $rows = array_slice($rows, 0, 100);
@@ -36,7 +38,7 @@ class GeminiExcelService
         // Convertir a CSV
         $csv = $this->arrayToCsv($rows);
         
-        Log::info('CSV generado, longitud: ' . strlen($csv));
+        $this->addLog('CSV generado, longitud: ' . strlen($csv));
         
         // Enviar a Gemini
         $response = Http::withHeaders([
@@ -46,27 +48,28 @@ class GeminiExcelService
                 [
                     'parts' => [
                         [
-                            'text' => "Extrae los datos de este Excel y devuelve SOLO un JSON válido.
+                            'text' => "Eres un asistente que extrae datos de Excel. Analiza el archivo y devuelve SOLO un JSON válido.
 
-                            El JSON debe tener este formato exacto:
+                            El JSON debe tener esta estructura:
                             {
+                                \"contrato_no\": \"495010\",
+                                \"partida\": \"ELECTRICIDAD\",
+                                \"contratista\": \"ALEJANDRO VILLA LOPEZ\",
                                 \"items\": [
                                     {
-                                        \"clave\": \"codigo del producto\",
-                                        \"descripcion\": \"descripcion del producto\",
-                                        \"unidad\": \"unidad de medida\",
-                                        \"cantidad\": 0,
-                                        \"link\": \"url opcional\",
-                                        \"observaciones\": \"texto opcional\"
+                                        \"clave\": \"CABLE-8\",
+                                        \"cantidad\": 1,
+                                        \"link\": \"http://...\",
+                                        \"observaciones\": \"INSTALACION ELECTRICA\"
                                     }
                                 ]
                             }
 
-                            REGLAS IMPORTANTES:
-                            1. Las columnas del Excel son: Clave, Descripción, Unidad, Cantidad
-                            2. Si una fila tiene 'N/A' como clave, usa la descripción para identificar el producto
-                            3. Ignora filas vacías o que sean encabezados
-                            4. Ignora filas donde la clave sea un número (1, 2, 3...)
+                            REGLAS:
+                            1. Busca el número de contrato en las primeras filas (etiqueta: N° Contrato)
+                            2. Busca Partida y Contratista
+                            3. Los items están en la tabla con columnas: Clave, Cantidad, Link, Observaciones
+                            4. La descripción y unidad se obtienen de la base de datos usando la clave
                             5. Devuelve SOLO el JSON, sin texto adicional
 
                             Datos del Excel:
@@ -81,43 +84,35 @@ class GeminiExcelService
             ]
         ]);
 
-        Log::info('Respuesta de Gemini - Status: ' . $response->status());
+        $this->addLog('Respuesta de Gemini - Status: ' . $response->status());
 
         if (!$response->successful()) {
-            Log::error('Error en Gemini: ' . $response->body());
+            $this->addLog('Error en Gemini: ' . $response->body());
             throw new \Exception('Error en la API de Gemini: ' . $response->body());
         }
 
         $data = $response->json();
-        Log::info('Respuesta JSON: ' . json_encode($data));
+        $this->addLog('Respuesta recibida correctamente');
         
         $text = $data['candidates'][0]['content']['parts'][0]['text'] ?? '';
-        Log::info('Texto extraído: ' . $text);
+        $this->addLog('Texto extraído: ' . $text);
         
         // Extraer JSON del texto
         preg_match('/\{.*\}/s', $text, $matches);
         $jsonText = $matches[0] ?? $text;
-        Log::info('JSON extraído: ' . $jsonText);
+        
+        $this->addLog('JSON extraído: ' . $jsonText);
         
         $resultado = json_decode($jsonText, true);
         
         if (json_last_error() !== JSON_ERROR_NONE) {
-            Log::error('Error al decodificar JSON: ' . json_last_error_msg());
+            $this->addLog('Error al decodificar JSON: ' . json_last_error_msg());
             throw new \Exception('Error al decodificar JSON: ' . json_last_error_msg());
         }
         
-        if (isset($resultado['items']) && is_array($resultado['items'])) {
-            Log::info('Items encontrados: ' . count($resultado['items']));
-            return $resultado['items'];
-        }
+        $this->addLog('=== FIN GEMINI ===');
         
-        if (is_array($resultado) && !isset($resultado['items'])) {
-            Log::info('Resultado sin items, devolviendo array completo');
-            return $resultado;
-        }
-        
-        Log::warning('No se encontraron items en la respuesta');
-        return [];
+        return $resultado;
     }
 
     private function arrayToCsv($rows)
@@ -143,5 +138,16 @@ class GeminiExcelService
         }
         
         return $csv;
+    }
+
+    private function addLog($mensaje)
+    {
+        $this->logs[] = $mensaje;
+        Log::info($mensaje);
+    }
+
+    public function getLogs()
+    {
+        return $this->logs;
     }
 }

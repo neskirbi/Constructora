@@ -29,6 +29,6 @@ class RequisicionProveedor extends Model
     
     public function proveedor()
     {
-        return $this->belongsTo(ProveedorSer::class, 'proveedor_id');
+        return $this->belongsTo(Proveedor::class, 'proveedor_id');
     }
 }
