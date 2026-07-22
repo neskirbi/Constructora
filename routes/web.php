@@ -249,6 +249,19 @@ Route::delete('requisiciones/eliminar-proveedor/{id}', [App\Http\Controllers\Aco
     ->name('compras.requisiciones.eliminar-proveedor')
     ->middleware(['auth:acompras']);
 
+    // Rutas para requisiciones
+Route::post('requisiciones/guardar-item-completo', [App\Http\Controllers\Acompras\RequisicionController::class, 'guardarItemCompleto'])
+    ->name('compras.requisiciones.guardar-item-completo')
+    ->middleware(['auth:acompras']);
+
+Route::delete('requisiciones/eliminar-proveedor-item/{id}', [App\Http\Controllers\Acompras\RequisicionController::class, 'eliminarProveedorItem'])
+    ->name('compras.requisiciones.eliminar-proveedor-item')
+    ->middleware(['auth:acompras']);
+
+Route::get('requisiciones/resumen/{id}', [App\Http\Controllers\Acompras\RequisicionController::class, 'resumen'])
+    ->name('compras.requisiciones.resumen')
+    ->middleware(['auth:acompras']);
+
 /**
  * Generales
  */

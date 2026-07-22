@@ -8,35 +8,52 @@ use App\Models\Contrato;
 use App\Models\Compra;
 use App\Models\CompraDetalle;
 use App\Models\ProductoServicio;
-use App\Models\RequisicionProveedor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\ProveedorSer;
+use App\Models\Proveedor;
 use App\Services\GeminiExcelService;
 use App\Models\Inventario;
+use App\Models\RequisicionDetalle;
+use App\Models\ProductoProveedor;
 
 class RequisicionController extends Controller
 {
-    public function index()
-    {
-        $sessionId = GetId();
-        
-        $requisiciones = Requisicion::where('session_id', $sessionId)
-            ->with('contrato', 'detalles')
-            ->orderBy('created_at', 'desc')
-            ->get();
-        
-        $contratos = Contrato::orderBy('consecutivo', 'desc')
-            ->select('id', 'consecutivo', 'contrato_no', 'refinterna', 'obra')
-            ->limit(100)
-            ->get();
-        
-        $proveedores = ProveedorSer::orderBy('clave')->get();
-        
-        return view('acompras.requisiciones.index', compact('requisiciones', 'contratos', 'proveedores'));
+    public function index(Request $request)
+{
+    $sessionId = GetId();
+    
+    $query = Requisicion::where('session_id', $sessionId)
+        ->with('contrato', 'detalles');
+    
+    // Búsqueda
+    $search = $request->search;
+    if (!empty($search)) {
+        $query->where(function($q) use ($search) {
+            $q->where('consecutivo', 'LIKE', "%{$search}%")
+              ->orWhere('frente', 'LIKE', "%{$search}%")
+              ->orWhere('empresa', 'LIKE', "%{$search}%")
+              ->orWhereHas('contrato', function($sub) use ($search) {
+                  $sub->where('consecutivo', 'LIKE', "%{$search}%")
+                      ->orWhere('refinterna', 'LIKE', "%{$search}%");
+              });
+        });
     }
+    
+    $requisiciones = $query->orderBy('created_at', 'desc')
+        ->paginate(10);
+    
+    $contratos = Contrato::orderBy('consecutivo', 'desc')
+        ->select('id', 'consecutivo', 'contrato_no', 'refinterna', 'obra')
+        ->limit(100)
+        ->get();
+    
+    $proveedores = ProveedorSer::orderBy('clave')->get();
+    
+    return view('acompras.requisiciones.index', compact('requisiciones', 'contratos', 'proveedores', 'search'));
+}
 
     public function create()
     {
@@ -48,25 +65,21 @@ class RequisicionController extends Controller
         return view('acompras.requisiciones.create', compact('contratos'));
     }
 
-    public function show($id)
-    {
-        $sessionId = GetId();
-        
-        $requisicion = Requisicion::where('session_id', $sessionId)
-            ->where('id', $id)
-            ->with('contrato', 'detalles')
-            ->firstOrFail();
-        
-        $contrato = $requisicion->contrato;
-        $items = $requisicion->detalles;
-        $proveedores = ProveedorSer::orderBy('clave')->get();
-        
-        $requisicionProveedores = RequisicionProveedor::where('requisicion_id', $id)
-            ->with('proveedor')
-            ->get();
-        
-        return view('acompras.requisiciones.show', compact('requisicion', 'contrato', 'items', 'proveedores', 'requisicionProveedores'));
-    }
+   public function show($id)
+{
+    $sessionId = GetId();
+    
+    $requisicion = Requisicion::where('session_id', $sessionId)
+        ->where('id', $id)
+        ->with('contrato', 'detalles')
+        ->firstOrFail();
+    
+    $contrato = $requisicion->contrato;
+    $items = $requisicion->detalles()->with('proveedores')->get();
+    $proveedores = Proveedor::orderBy('clave')->get();
+    
+    return view('acompras.requisiciones.show', compact('requisicion', 'contrato', 'items', 'proveedores'));
+}
 
     public function procesarExcel(Request $request)
 {
@@ -379,4 +392,115 @@ class RequisicionController extends Controller
         
         return response()->json(['success' => true]);
     }
+
+
+    public function guardarItemCompleto(Request $request)
+{
+    try {
+        $sessionId = GetId();
+        
+        // Actualizar la cantidad del item
+        $detalle = RequisicionDetalle::where('id', $request->id)
+            ->whereHas('requisicion', function($q) use ($sessionId) {
+                $q->where('session_id', $sessionId);
+            })
+            ->firstOrFail();
+        
+        $detalle->cantidad = $request->cantidad;
+        $detalle->save();
+        
+        // Guardar proveedores
+        $proveedoresGuardados = [];
+        foreach ($request->proveedores as $proveedorData) {
+            // Verificar si el proveedor ya existe
+            $existente = ProductoProveedor::where('detalle_id', $request->id)
+                ->where('proveedor_id', $proveedorData['proveedor_id'])
+                ->first();
+            
+            if ($existente) {
+                // Actualizar existente
+                $existente->precio = $proveedorData['precio'];
+                $existente->descuento = $proveedorData['descuento'];
+                $existente->save();
+                $proveedoresGuardados[] = $existente;
+            } else {
+                // Crear nuevo
+                $nuevo = ProductoProveedor::create([
+                    'id' => GetUuid(),
+                    'detalle_id' => $request->id,
+                    'proveedor_id' => $proveedorData['proveedor_id'],
+                    'precio' => $proveedorData['precio'],
+                    'descuento' => $proveedorData['descuento'],
+                ]);
+                $proveedoresGuardados[] = $nuevo;
+            }
+        }
+        
+        // Recalcular totales del detalle
+        $mejorPrecio = $detalle->proveedores()->orderBy('precio', 'asc')->first();
+        if ($mejorPrecio) {
+            $detalle->precio_unitario = $mejorPrecio->precio;
+            $detalle->descuento = $mejorPrecio->descuento;
+            $detalle->subtotal = $detalle->cantidad * $mejorPrecio->precio;
+            $detalle->descuento_monto = ($detalle->subtotal * $mejorPrecio->descuento) / 100;
+            $detalle->iva = ($detalle->subtotal - $detalle->descuento_monto) * 0.16;
+            $detalle->total = ($detalle->subtotal - $detalle->descuento_monto) + $detalle->iva;
+            $detalle->save();
+        }
+        
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'proveedores' => $proveedoresGuardados
+            ]
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 500);
+    }
+}
+
+public function eliminarProveedorItem($id)
+{
+    try {
+        $proveedor = ProductoProveedor::findOrFail($id);
+        $proveedor->delete();
+        
+        return response()->json(['success' => true]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 500);
+    }
+}
+
+public function resumen($id)
+{
+    try {
+        $sessionId = GetId();
+        
+        $requisicion = Requisicion::where('id', $id)
+            ->where('session_id', $sessionId)
+            ->with('detalles')
+            ->firstOrFail();
+        
+        $items = $requisicion->detalles;
+        
+        return response()->json([
+            'subtotal' => $items->sum('subtotal'),
+            'descuento' => $items->sum('descuento_monto'),
+            'iva' => $items->sum('iva'),
+            'total' => $items->sum('total')
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage()
+        ], 500);
+    }
+}
 }

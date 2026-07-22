@@ -4,18 +4,6 @@
     @include('header')
     <title>{{Empresa()}} | Detalle Requisición</title>
     <style>
-        .requisicion-item {
-            background: white;
-            border-radius: 8px;
-            padding: 12px 40px 12px 15px;
-            margin-bottom: 8px;
-            border: 1px solid #e9ecef;
-            position: relative;
-            transition: all 0.3s;
-        }
-        .requisicion-item:hover {
-            background: #f8f9fa;
-        }
         .header-detalle {
             background: white;
             border-radius: 8px;
@@ -23,39 +11,187 @@
             border: 1px solid #dee2e6;
             margin-bottom: 20px;
         }
-        .btn-eliminar-item {
-            background: none;
-            border: none;
-            color: #dc3545;
-            font-size: 0.9rem;
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 4px;
-            transition: all 0.2s;
-            opacity: 0.3;
-            position: absolute;
-            top: 8px;
-            right: 8px;
-        }
-        .btn-eliminar-item:hover {
-            opacity: 1;
-            background: #dc3545;
-            color: white;
-        }
-        .fila-nueva-proveedor td {
-            padding: 8px;
-            vertical-align: middle;
-        }
-        .fila-nueva-proveedor .form-select-sm, 
-        .fila-nueva-proveedor .form-control-sm {
-            font-size: 0.875rem;
-        }
         .badge-procesada {
             background: #28a745;
             color: white;
             padding: 5px 15px;
             border-radius: 20px;
             font-size: 0.8rem;
+        }
+        .card-item {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 12px;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            transition: all 0.3s;
+            position: relative;
+        }
+        .card-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: #dee2e6;
+        }
+        .card-item .btn-eliminar {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            color: #dc3545;
+            font-size: 1.1rem;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: all 0.2s;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .card-item .btn-eliminar:hover {
+            opacity: 1;
+            background: #dc3545;
+            color: white;
+        }
+        .card-item .clave {
+            font-weight: 700;
+            color: #0d6efd;
+            font-size: 1.1rem;
+        }
+        .card-item .descripcion {
+            color: #495057;
+            font-size: 0.95rem;
+        }
+        .card-item .unidad-badge {
+            background: #e9ecef;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #495057;
+        }
+        .card-item .input-cantidad {
+            width: 100px;
+            text-align: right;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        .card-item .input-cantidad:focus {
+            border-color: #0d6efd;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(13,110,253,0.15);
+        }
+        .card-item .label-campo {
+            font-size: 0.7rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        .card-item .fila-proveedores {
+            margin-top: 10px;
+            border-top: 1px solid #e9ecef;
+            padding-top: 10px;
+        }
+        .card-item .fila-proveedores .proveedor-row {
+            padding: 6px 0;
+            border-bottom: 1px solid #f1f3f5;
+        }
+        .card-item .fila-proveedores .proveedor-row:last-child {
+            border-bottom: none;
+        }
+        .card-item .fila-proveedores .proveedor-row .select-proveedor {
+            width: 100%;
+            font-size: 0.85rem;
+            padding: 5px 8px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+        .card-item .fila-proveedores .proveedor-row .input-precio,
+        .card-item .fila-proveedores .proveedor-row .input-descuento {
+            width: 100%;
+            text-align: right;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 5px 8px;
+            font-size: 0.85rem;
+        }
+        .card-item .fila-proveedores .proveedor-row .btn-eliminar-proveedor {
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            opacity: 0.5;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+        .card-item .fila-proveedores .proveedor-row .btn-eliminar-proveedor:hover {
+            opacity: 1;
+            background: #dc3545;
+            color: white;
+        }
+        .card-item .btn-agregar-proveedor {
+            margin-top: 10px;
+            padding: 4px 14px;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            background: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .card-item .btn-agregar-proveedor:hover {
+            background: #218838;
+        }
+        .card-item .btn-agregar-proveedor i {
+            margin-right: 4px;
+        }
+        .card-item .btn-guardar-item {
+            margin-top: 10px;
+            padding: 6px 30px;
+            font-size: 0.9rem;
+            border-radius: 4px;
+            background: #0d6efd;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            float: right;
+        }
+        .card-item .btn-guardar-item:hover {
+            background: #0b5ed7;
+        }
+        .resumen-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+        }
+        .resumen-card .label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        .resumen-card .valor {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        .resumen-card .valor.total {
+            color: #198754;
+            font-size: 1.4rem;
+        }
+        @media (max-width: 768px) {
+            .card-item .fila-proveedores .proveedor-row .select-proveedor,
+            .card-item .fila-proveedores .proveedor-row .input-precio,
+            .card-item .fila-proveedores .proveedor-row .input-descuento {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -79,7 +215,7 @@
                             @endif
                         </h4>
                         <div>
-                            @if($requisicion->procesada == 0)
+                            @if(0)
                             <button class="btn btn-success me-2" onclick="confirmarCompra()">
                                 <i class="fas fa-check me-1"></i> Realizar Compra
                             </button>
@@ -90,139 +226,96 @@
                         </div>
                     </div>
 
-                    <!-- Header de la requisición -->
+                    <!-- Header -->
                     <div class="header-detalle">
                         <div class="row">
-                            <div class="col-md-3">
-                                <strong># Requisición:</strong> {{ $requisicion->consecutivo ?? 'N/A' }}
-                            </div>
-                            <div class="col-md-3">
-                                <strong>Frente:</strong> {{ $requisicion->frente ?? 'N/A' }}
-                            </div>
-                            <div class="col-md-3">
-                                <strong>Empresa:</strong> {{ $requisicion->empresa ?? 'N/A' }}
-                            </div>
-                            <div class="col-md-3">
-                                <strong>Contrato:</strong> 
-                                @if($contrato)
-                                    {{ $contrato->refinterna }} ({{ $contrato->contrato_no }})
-                                @else
-                                    <span class="text-warning">Sin contrato</span>
-                                @endif
-                            </div>
+                            <div class="col-md-3"><strong># Requisición:</strong> {{ $requisicion->consecutivo ?? 'N/A' }}</div>
+                            <div class="col-md-3"><strong>Frente:</strong> {{ $requisicion->frente ?? 'N/A' }}</div>
+                            <div class="col-md-3"><strong>Empresa:</strong> {{ $requisicion->empresa ?? 'N/A' }}</div>
+                            <div class="col-md-3"><strong>Contrato:</strong> {{ $contrato->consecutivo ?? 'N/A' }}</div>
                         </div>
                         <div class="row mt-2">
-                            <div class="col-md-4">
-                                <strong>Proyecto:</strong> {{ $requisicion->proyecto ?? 'N/A' }}
-                            </div>
-                            <div class="col-md-4">
-                                <strong>Cliente:</strong> {{ $requisicion->cliente ?? 'N/A' }}
-                            </div>
-                            <div class="col-md-4">
-                                <strong>Contratista:</strong> {{ $requisicion->contratista ?? 'N/A' }}
-                            </div>
+                            <div class="col-md-4"><strong>Proyecto:</strong> {{ $requisicion->proyecto ?? 'N/A' }}</div>
+                            <div class="col-md-4"><strong>Cliente:</strong> {{ $requisicion->cliente ?? 'N/A' }}</div>
+                            <div class="col-md-4"><strong>Contratista:</strong> {{ $requisicion->contratista ?? 'N/A' }}</div>
                         </div>
                         <div class="row mt-2">
-                            <div class="col-md-4">
-                                <strong>Partida:</strong> {{ $requisicion->partida ?? 'N/A' }}
-                            </div>
-                            <div class="col-md-4">
-                                <strong>Fecha Solicitud:</strong> {{ $requisicion->created_at ? \Carbon\Carbon::parse($requisicion->created_at)->format('d/m/Y') : 'N/A' }}
-                            </div>
-                            <div class="col-md-4 text-end">
-                                <strong>Total:</strong> <span class="text-success fw-bold">${{ number_format($items->sum('total'), 2) }}</span>
-                            </div>
+                            <div class="col-md-4"><strong>Partida:</strong> {{ $requisicion->partida ?? 'N/A' }}</div>
+                            <div class="col-md-4"><strong>Fecha:</strong> {{ $requisicion->created_at ? \Carbon\Carbon::parse($requisicion->created_at)->format('d/m/Y') : 'N/A' }}</div>
                         </div>
                         <div class="row mt-2">
-                            <div class="col-md-12">
-                                <strong>Dirección de entrega:</strong> {{ $requisicion->direccion_entrega ?? 'N/A' }}
-                            </div>
+                            <div class="col-md-12"><strong>Dirección:</strong> {{ $requisicion->direccion_entrega ?? 'N/A' }}</div>
                         </div>
                     </div>
 
-                    <!-- Lista de items -->
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-white py-3">
-                            <h6 class="mb-0"><i class="fas fa-list me-2"></i> Productos / Servicios</h6>
+                    <!-- Lista de items como tarjetas -->
+                    @foreach($items as $item)
+                    <div class="card-item" data-id="{{ $item->id }}">
+                        <button class="btn-eliminar" onclick="eliminarItem('{{ $item->id }}', '{{ $item->clave }}', this)" title="Eliminar">
+                            <i class="fas fa-times"></i>
+                        </button>
+
+                        <!-- Fila 1: Clave, Descripción, Unidad y Cantidad -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <span class="clave">{{ $item->clave }}</span>
+                                <span class="descripcion ms-2">{{ $item->descripcion }}</span>
+                                <span class="unidad-badge ms-2">{{ $item->unidad }}</span>
+                                <span class="ms-3">
+                                    <span class="label-campo">Cantidad:</span>
+                                    <input type="number" class="input-cantidad" value="{{ $item->cantidad }}" 
+                                           step="0.01" min="0" id="cantidad-{{ $item->id }}"
+                                           noformat>
+                                </span>
+                            </div>
                         </div>
-                        <div class="card-body p-0">
-                            @foreach($items as $item)
-                            <div class="requisicion-item" data-id="{{ $item->id }}">
-                                <button class="btn-eliminar-item" onclick="eliminarItem('{{ $item->id }}', '{{ $item->clave }}', this)" title="Eliminar">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                                <div class="row align-items-center">
-                                    <div class="col-md-2">
-                                        <strong>{{ $item->clave }}</strong>
+
+                        <!-- Fila 2: Proveedores -->
+                        <div class="fila-proveedores" id="proveedores-{{ $item->id }}">
+                            @foreach($item->proveedores as $proveedor)
+                            <div class="proveedor-row" data-id="{{ $proveedor->id }}">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <span class="label-campo">Proveedor</span>
+                                        <select class="select-proveedor">
+                                            <option value="">Sin proveedor</option>
+                                            @foreach($proveedores as $p)
+                                            <option value="{{ $p->id }}" {{ $proveedor->proveedor_id == $p->id ? 'selected' : '' }}>
+                                                {{ $p->clave }} - {{ $p->nombre }}
+                                            </option>
+                                            @endforeach
+                                        </select>
                                     </div>
-                                    <div class="col-md-4">
-                                        {{ $item->descripcion }}
+                                    <div class="col-3">
+                                        <span class="label-campo">Precio</span>
+                                        <input type="number" class="input-precio" value="{{ $proveedor->precio }}" step="0.01" min="0" placeholder="0.00">
                                     </div>
-                                    <div class="col-md-2">
-                                        <span class="badge bg-secondary">{{ $item->unidad }}</span>
-                                        <span class="ms-2">{{ number_format($item->cantidad, 2) }}</span>
+                                    <div class="col-3">
+                                        <span class="label-campo">Descuento </span>
+                                        <input type="number" class="input-descuento" value="{{ $proveedor->descuento }}" step="0.01" min="0" max="100" placeholder="0">
                                     </div>
-                                    <div class="col-md-2 text-end">
-                                        @if($item->precio_unitario > 0)
-                                        ${{ number_format($item->precio_unitario, 2) }}
-                                        @else
-                                        <span class="text-danger">Sin precio</span>
-                                        @endif
-                                    </div>
-                                    <div class="col-md-2 text-end">
-                                        <span class="fw-bold">${{ number_format($item->subtotal ?? 0, 2) }}</span>
+                                    <div class="col-2 text-end">
+                                        <span class="label-campo">&nbsp;</span>
+                                        <button class="btn-eliminar-proveedor" onclick="eliminarProveedor(this, '{{ $proveedor->id }}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
                             @endforeach
                         </div>
-                    </div>
 
-                    <!-- Sección de Proveedores -->
-                    <div class="card shadow-sm mt-4">
-                        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                            <h6 class="mb-0">
-                                <i class="fas fa-users text-primary me-2"></i>
-                                Proveedores
-                            </h6>
-                            @if($requisicion->procesada == 0)
-                            <button class="btn btn-sm btn-primary" onclick="agregarFilaProveedor()">
-                                <i class="fas fa-plus me-1"></i> Agregar Proveedor
+                        <!-- Botones: Agregar Proveedor y Guardar Item -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                            <button class="btn-agregar-proveedor" onclick="agregarFilaProveedor('{{ $item->id }}')">
+                                <i class="fas fa-user-plus"></i> Agregar Proveedor
                             </button>
-                            @endif
-                        </div>
-                        <div class="card-body p-0">
-                            <table class="table table-striped mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Proveedor</th>
-                                        <th class="text-end">Monto</th>
-                                        <th class="text-center" style="width: 120px;">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tablaProveedores">
-                                    @foreach($requisicionProveedores as $rp)
-                                    <tr id="proveedor-row-{{ $rp->id }}">
-                                        <td>{{ $rp->proveedor->clave ?? '' }} - {{ $rp->proveedor->nombre ?? 'N/A' }}</td>
-                                        <td class="text-end">${{ number_format($rp->monto, 2) }}</td>
-                                        <td class="text-center">
-                                            <button class="btn btn-sm btn-outline-danger" onclick="eliminarProveedor('{{ $rp->id }}')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <th>Total Proveedores</th>
-                                        <th class="text-end" id="totalProveedores">${{ number_format($requisicionProveedores->sum('monto'), 2) }}</th>
-                                        <th></th>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                            <button class="btn-guardar-item" onclick="guardarItem('{{ $item->id }}')">
+                                <i class="fas fa-save"></i> Guardar
+                            </button>
                         </div>
                     </div>
+                    @endforeach
                 </div>
             </div>
         </main>
@@ -241,8 +334,8 @@
                     <div class="modal-body">
                         <p>¿Crear compra con los items de esta requisición?</p>
                         <div class="mt-3">
-                            <label for="id_proveedor" class="form-label">Proveedor:</label>
-                            <select name="id_proveedor" id="id_proveedor" class="form-select" required>
+                            <label for="id_proveedor" class="form-label">Proveedor General:</label>
+                            <select name="id_proveedor" id="id_proveedor" class="form-select">
                                 <option value="">Seleccionar proveedor</option>
                                 @foreach($proveedores as $proveedor)
                                 <option value="{{ $proveedor->id }}">{{ $proveedor->clave }} - {{ $proveedor->nombre }}</option>
@@ -279,13 +372,8 @@
                     },
                     success: function(response) {
                         if (response.success) {
-                            var item = $(element).closest('.requisicion-item');
-                            item.fadeOut(300, function() {
+                            $(element).closest('.card-item').fadeOut(300, function() {
                                 $(this).remove();
-                                var totalItems = $('.requisicion-item').length;
-                                if (totalItems === 0) {
-                                    location.reload();
-                                }
                             });
                         }
                     },
@@ -296,98 +384,56 @@
             }
         }
 
-        function agregarFilaProveedor() {
+        function agregarFilaProveedor(itemId) {
+            var container = $('#proveedores-' + itemId);
             var row = `
-                <tr class="fila-nueva-proveedor">
-                    <td>
-                        <select class="form-select form-select-sm proveedor-select" style="width: 100%;">
-                            <option value="">Seleccionar proveedor</option>
-                            @foreach($proveedores as $proveedor)
-                            <option value="{{ $proveedor->id }}">{{ $proveedor->clave }} - {{ $proveedor->nombre }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td>
-                        <input type="number" class="form-control form-control-sm monto-input" step="0.01" min="0" placeholder="0.00" style="text-align: right;">
-                    </td>
-                    <td class="text-center">
-                        <button class="btn btn-sm btn-success" onclick="guardarFilaProveedor(this)">
-                            <i class="fas fa-save"></i>
-                        </button>
-                        <button class="btn btn-sm btn-secondary" onclick="cancelarFilaProveedor(this)">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </td>
-                </tr>
+                <div class="proveedor-row" data-id="nuevo">
+                    <div class="row">
+                        <div class="col-4">
+                            <span class="label-campo">Proveedor</span>
+                            <select class="select-proveedor">
+                                <option value="">Sin proveedor</option>
+                                @foreach($proveedores as $proveedor)
+                                <option value="{{ $proveedor->id }}">{{ $proveedor->clave }} - {{ $proveedor->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-3">
+                            <span class="label-campo">Precio</span>
+                            <input type="number" class="input-precio" step="0.01" min="0" placeholder="0.00">
+                        </div>
+                        <div class="col-3">
+                            <span class="label-campo">Descuento </span>
+                            <input type="number" class="input-descuento" step="0.01" min="0" max="100" placeholder="0">
+                        </div>
+                        <div class="col-2 text-end">
+                            <span class="label-campo">&nbsp;</span>
+                            <button class="btn-eliminar-proveedor" onclick="eliminarFilaProveedor(this)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             `;
-            $('#tablaProveedores').append(row);
+            container.append(row);
         }
 
-        function guardarFilaProveedor(btn) {
-            var row = $(btn).closest('tr');
-            var proveedorId = row.find('.proveedor-select').val();
-            var monto = row.find('.monto-input').val();
-            
-            if (!proveedorId) {
-                alert('Selecciona un proveedor');
-                return;
-            }
-            
-            if (!monto || monto <= 0) {
-                alert('Ingresa un monto válido');
-                return;
-            }
-            
-            var requisicionId = '{{ $requisicion->id }}';
-            
-            $.ajax({
-                url: '{{ url("requisiciones/agregar-proveedor") }}',
-                type: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    requisicion_id: requisicionId,
-                    proveedor_id: proveedorId,
-                    monto: monto
-                },
-                success: function(response) {
-                    if (response.success) {
-                        row.attr('id', 'proveedor-row-' + response.data.id);
-                        row.removeClass('fila-nueva-proveedor');
-                        row.html(`
-                            <td>${response.data.proveedor}</td>
-                            <td class="text-end">$${parseFloat(response.data.monto).toFixed(2)}</td>
-                            <td class="text-center">
-                                <button class="btn btn-sm btn-outline-danger" onclick="eliminarProveedor('${response.data.id}')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        `);
-                        actualizarTotalProveedores();
-                    }
-                },
-                error: function(xhr) {
-                    alert('Error: ' + (xhr.responseJSON?.message || 'Error al guardar'));
-                }
-            });
+        function eliminarFilaProveedor(btn) {
+            $(btn).closest('.proveedor-row').remove();
         }
 
-        function cancelarFilaProveedor(btn) {
-            $(btn).closest('tr').remove();
-        }
-
-        function eliminarProveedor(id) {
+        function eliminarProveedor(btn, proveedorId) {
             if (confirm('¿Eliminar este proveedor?')) {
                 $.ajax({
-                    url: '{{ url("requisiciones/eliminar-proveedor") }}/' + id,
+                    url: '{{ url("requisiciones/eliminar-proveedor-item") }}/' + proveedorId,
                     type: 'DELETE',
                     data: {
                         _token: '{{ csrf_token() }}'
                     },
                     success: function(response) {
                         if (response.success) {
-                            $('#proveedor-row-' + id).fadeOut(300, function() {
+                            $(btn).closest('.proveedor-row').fadeOut(300, function() {
                                 $(this).remove();
-                                actualizarTotalProveedores();
                             });
                         }
                     },
@@ -398,18 +444,63 @@
             }
         }
 
-        function actualizarTotalProveedores() {
-            var total = 0;
-            $('#tablaProveedores tr:not(.fila-nueva-proveedor)').each(function() {
-                var montoText = $(this).find('td:eq(1)').text();
-                if (montoText) {
-                    var monto = parseFloat(montoText.replace('$', '').replace(/,/g, ''));
-                    if (!isNaN(monto)) {
-                        total += monto;
-                    }
+        function guardarItem(itemId) {
+            var cantidad = $('#cantidad-' + itemId).val();
+            
+            var proveedores = [];
+            var container = $('#proveedores-' + itemId);
+            container.find('.proveedor-row').each(function() {
+                var row = $(this);
+                var proveedorId = row.find('.select-proveedor').val();
+                var precio = row.find('.input-precio').val();
+                var descuento = row.find('.input-descuento').val();
+                var rowId = row.data('id');
+                
+                if (proveedorId) {
+                    proveedores.push({
+                        id: rowId,
+                        proveedor_id: proveedorId,
+                        precio: precio || 0,
+                        descuento: descuento || 0
+                    });
                 }
             });
-            $('#totalProveedores').text('$' + total.toFixed(2));
+
+            if (proveedores.length === 0) {
+                alert('Agrega al menos un proveedor');
+                return;
+            }
+
+            $.ajax({
+                url: '{{ url("requisiciones/guardar-item-completo") }}',
+                type: 'POST',
+                data: {
+                    id: itemId,
+                    cantidad: cantidad,
+                    proveedores: proveedores,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        $.each(response.data.proveedores, function(index, prov) {
+                            var row = $('#proveedores-' + itemId).find('.proveedor-row[data-id="nuevo"]');
+                            if (row.length > 0) {
+                                row.data('id', prov.id);
+                                row.find('.btn-eliminar-proveedor').attr('onclick', 'eliminarProveedor(this, "' + prov.id + '")');
+                            }
+                        });
+                        var btn = $('.card-item[data-id="' + itemId + '"] .btn-guardar-item');
+                        var originalText = btn.html();
+                        btn.html('<i class="fas fa-check"></i> Guardado');
+                        setTimeout(function() {
+                            btn.html(originalText);
+                        }, 1500);
+                    }
+                },
+                error: function() {
+                    alert('Error al guardar item');
+                }
+            });
         }
     </script>
 </body>
