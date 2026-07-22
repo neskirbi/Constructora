@@ -1,9 +1,16 @@
-1.  reporte de proveedores : filtrar like por nombre,clave o activo o inactivo - Listo
-2. En reporte de ingresos :
-    a)Revisar los formatos de fechas y montos, los toma como texto - Listo
-    b)Agregar al reporte los 3 campos que se agregaron en captura de ingresos : derechos supervicion, aportacion cmi y delegacion estado de mexico - Listo
-    c)Corregir la base de datos cambiar de pagado a cobrado los resgistros anteriores  -Listo
-    d)revisar por que hay unos que dice : no especificado en status de ingresos - Listo
 
-3.Reporte Compras: revisar formato de fecha y de montos y agregar filtros de proveedor y el consecutivo que se va a poner
-5.- poner un consecutivo para compras (ej. si son 100  empezar del 1 - 100)
+Revisar las fechas del excel , fehca de elaboracion , fecha de carga al sistema , y fecha de entrega(esa se va a compras)
+Requicision 
+1.Compras captura las 3 opciones y selecciona a quien se le va a comprar usar checkbox , agregar fecha de entraga por proveedor y por producto
+2.Gerente compras revisa y aprueba para revision de "Julian"
+3.Julian aprueba la orden de compra y se debe generar orden de pago para tesoreria 
+4.Tesoreria confirma pago y deberia llegar alerta a compras 
+
+Nota: todo esto lleva alertas 
+
+
+
+
+
+Nota Para mi: Quitar inventario y usar productosyservicios pero agregarle el stock
+y tambien usar 	proveedores_servicios en lugar de proveedores .Sera mas facil emptar con lo que ya esta de compras 
