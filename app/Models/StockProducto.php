@@ -4,16 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class InventarioStock extends Model
+class StockProducto extends Model
 {
-    protected $table = 'inventario_stock';
+    protected $table = 'stock_productos';
     
     protected $keyType = 'string';
     public $incrementing = false;
     
     protected $fillable = [
         'id',
-        'inventario_id',
+        'producto_id',
         'cantidad',
         'minimo',
         'maximo',
@@ -26,8 +26,8 @@ class InventarioStock extends Model
         'maximo' => 'decimal:2',
     ];
     
-    public function inventario()
+    public function producto()
     {
-        return $this->belongsTo(Inventario::class, 'inventario_id');
+        return $this->belongsTo(ProductoServicio::class, 'producto_id');
     }
 }

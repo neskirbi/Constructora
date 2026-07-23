@@ -24,4 +24,14 @@ class ProductoServicio extends Model
         'unidades',
         'ult_costo'
     ];
+
+    public function stock()
+    {
+        return $this->hasOne(StockProducto::class, 'producto_id');
+    }
+
+    public function detallesRequisicion()
+    {
+        return $this->hasMany(RequisicionDetalle::class, 'producto_id');
+    }
 }

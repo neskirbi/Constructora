@@ -17,11 +17,15 @@ class ProductoProveedor extends Model
         'proveedor_id',
         'precio',
         'descuento',
+        'seleccionado', 
+        'fecha_entrega',
     ];
     
     protected $casts = [
         'precio' => 'decimal:2',
         'descuento' => 'decimal:2',
+        'seleccionado' => 'boolean',
+        'fecha_entrega' => 'date',  // <--- Agregar
     ];
     
     public function detalle()
@@ -31,6 +35,6 @@ class ProductoProveedor extends Model
     
     public function proveedor()
     {
-        return $this->belongsTo(Proveedor::class, 'proveedor_id');
+        return $this->belongsTo(ProveedorSer::class, 'proveedor_id');
     }
 }

@@ -78,4 +78,9 @@ class ProveedorSer extends Model
             }
         });
     }
+
+    public function productosProveedores()
+    {
+        return $this->hasMany(ProductoProveedor::class, 'proveedor_id');
+    }
 }

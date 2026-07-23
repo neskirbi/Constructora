@@ -82,12 +82,26 @@
             outline: none;
             box-shadow: 0 0 0 3px rgba(13,110,253,0.15);
         }
+        .card-item .input-fecha {
+            width: 100%;
+            font-size: 0.85rem;
+            padding: 5px 8px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+        .card-item .input-fecha:focus {
+            border-color: #0d6efd;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(13,110,253,0.15);
+        }
         .card-item .label-campo {
             font-size: 0.7rem;
             color: #6c757d;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-weight: 600;
+            display: block;
+            margin-bottom: 4px;
         }
         .card-item .fila-proveedores {
             margin-top: 10px;
@@ -133,6 +147,12 @@
             background: #dc3545;
             color: white;
         }
+        .card-item .fila-proveedores .proveedor-row .form-check-input {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            margin-top: 0;
+        }
         .card-item .btn-agregar-proveedor {
             margin-top: 10px;
             padding: 4px 14px;
@@ -165,31 +185,38 @@
         .card-item .btn-guardar-item:hover {
             background: #0b5ed7;
         }
-        .resumen-card {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
-            border: 1px solid #dee2e6;
+        .card-item .btn-guardar-item.guardando {
+            background: #ffc107;
+            color: #212529;
+            pointer-events: none;
+            opacity: 0.7;
         }
-        .resumen-card .label {
-            font-size: 0.8rem;
-            color: #6c757d;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 600;
+        .card-item .btn-guardar-item.guardando i {
+            animation: spin 1s linear infinite;
         }
-        .resumen-card .valor {
-            font-size: 1.2rem;
-            font-weight: 700;
+        .card-item .btn-agregar-proveedor.guardando {
+            background: #ffc107;
+            color: #212529;
+            pointer-events: none;
+            opacity: 0.7;
         }
-        .resumen-card .valor.total {
-            color: #198754;
-            font-size: 1.4rem;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .d-flex-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .h-100 {
+            min-height: 38px;
         }
         @media (max-width: 768px) {
             .card-item .fila-proveedores .proveedor-row .select-proveedor,
             .card-item .fila-proveedores .proveedor-row .input-precio,
-            .card-item .fila-proveedores .proveedor-row .input-descuento {
+            .card-item .fila-proveedores .proveedor-row .input-descuento,
+            .card-item .fila-proveedores .proveedor-row .input-fecha {
                 width: 100%;
             }
         }
@@ -215,11 +242,6 @@
                             @endif
                         </h4>
                         <div>
-                            @if(0)
-                            <button class="btn btn-success me-2" onclick="confirmarCompra()">
-                                <i class="fas fa-check me-1"></i> Realizar Compra
-                            </button>
-                            @endif
                             <a href="{{ url('requisiciones') }}" class="btn btn-outline-secondary">
                                 <i class="fas fa-arrow-left me-1"></i> Volver
                             </a>
@@ -241,7 +263,7 @@
                         </div>
                         <div class="row mt-2">
                             <div class="col-md-4"><strong>Partida:</strong> {{ $requisicion->partida ?? 'N/A' }}</div>
-                            <div class="col-md-4"><strong>Fecha:</strong> {{ $requisicion->created_at ? \Carbon\Carbon::parse($requisicion->created_at)->format('d/m/Y') : 'N/A' }}</div>
+                            <div class="col-md-4"><strong>Fecha Solicitud:</strong> {{ $requisicion->fecha_solicitud ? \Carbon\Carbon::parse($requisicion->fecha_solicitud)->format('d/m/Y') : 'N/A' }}</div>
                         </div>
                         <div class="row mt-2">
                             <div class="col-md-12"><strong>Dirección:</strong> {{ $requisicion->direccion_entrega ?? 'N/A' }}</div>
@@ -251,7 +273,7 @@
                     <!-- Lista de items como tarjetas -->
                     @foreach($items as $item)
                     <div class="card-item" data-id="{{ $item->id }}">
-                        <button class="btn-eliminar" onclick="eliminarItem('{{ $item->id }}', '{{ $item->clave }}', this)" title="Eliminar">
+                        <button class="btn-eliminar" onclick="eliminarItem('{{ $item->id }}', '{{ $item->clave }}', this)" title="Eliminar" {{ $requisicion->procesada == 1 ? 'disabled' : '' }}>
                             <i class="fas fa-times"></i>
                         </button>
 
@@ -265,7 +287,7 @@
                                     <span class="label-campo">Cantidad:</span>
                                     <input type="number" class="input-cantidad" value="{{ $item->cantidad }}" 
                                            step="0.01" min="0" id="cantidad-{{ $item->id }}"
-                                           noformat>
+                                           {{ $requisicion->procesada == 1 ? 'disabled' : '' }}>
                                 </span>
                             </div>
                         </div>
@@ -274,10 +296,18 @@
                         <div class="fila-proveedores" id="proveedores-{{ $item->id }}">
                             @foreach($item->proveedores as $proveedor)
                             <div class="proveedor-row" data-id="{{ $proveedor->id }}">
-                                <div class="row">
-                                    <div class="col-4">
+                                <div class="row align-items-center">
+                                    <div class="col-1">
+                                        <div class="d-flex-center h-100">
+                                            <input class="form-check-input" type="checkbox" 
+                                                id="check-{{ $proveedor->id }}" 
+                                                {{ $proveedor->seleccionado ? 'checked' : '' }}
+                                                {{ $requisicion->procesada == 1 ? 'disabled' : '' }}>
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
                                         <span class="label-campo">Proveedor</span>
-                                        <select class="select-proveedor">
+                                        <select class="select-proveedor" id="proveedor-select-{{ $proveedor->id }}" {{ $requisicion->procesada == 1 ? 'disabled' : '' }}>
                                             <option value="">Sin proveedor</option>
                                             @foreach($proveedores as $p)
                                             <option value="{{ $p->id }}" {{ $proveedor->proveedor_id == $p->id ? 'selected' : '' }}>
@@ -286,19 +316,33 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="col-3">
+                                    <div class="col-2">
                                         <span class="label-campo">Precio</span>
-                                        <input type="number" class="input-precio" value="{{ $proveedor->precio }}" step="0.01" min="0" placeholder="0.00">
+                                        <input type="number" class="input-precio" value="{{ $proveedor->precio }}" 
+                                               step="0.01" min="0" placeholder="0.00"
+                                               id="precio-{{ $proveedor->id }}"
+                                               {{ $requisicion->procesada == 1 ? 'disabled' : '' }}>
                                     </div>
-                                    <div class="col-3">
-                                        <span class="label-campo">Descuento </span>
-                                        <input type="number" class="input-descuento" value="{{ $proveedor->descuento }}" step="0.01" min="0" max="100" placeholder="0">
+                                    <div class="col-2">
+                                        <span class="label-campo">Descuento</span>
+                                        <input type="number" class="input-descuento" value="{{ $proveedor->descuento }}" 
+                                               step="0.01" min="0" placeholder="0.00"
+                                               id="descuento-{{ $proveedor->id }}"
+                                               {{ $requisicion->procesada == 1 ? 'disabled' : '' }}>
+                                    </div>
+                                    <div class="col-2">
+                                        <span class="label-campo">Fecha Entrega</span>
+                                        <input type="date" class="input-fecha" 
+                                               value="{{ $proveedor->fecha_entrega ? \Carbon\Carbon::parse($proveedor->fecha_entrega)->format('Y-m-d') : '' }}"
+                                               id="fecha-{{ $proveedor->id }}"
+                                               {{ $requisicion->procesada == 1 ? 'disabled' : '' }}>
                                     </div>
                                     <div class="col-2 text-end">
-                                        <span class="label-campo">&nbsp;</span>
-                                        <button class="btn-eliminar-proveedor" onclick="eliminarProveedor(this, '{{ $proveedor->id }}')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
+                                        <div class="h-100 d-flex align-items-center justify-content-end">
+                                            <button class="btn-eliminar-proveedor" onclick="eliminarProveedor(this, '{{ $proveedor->id }}')" {{ $requisicion->procesada == 1 ? 'disabled' : '' }}>
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -306,90 +350,93 @@
                         </div>
 
                         <!-- Botones: Agregar Proveedor y Guardar Item -->
+                        @if($requisicion->procesada != 1)
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-                            <button class="btn-agregar-proveedor" onclick="agregarFilaProveedor('{{ $item->id }}')">
+                            <button class="btn-agregar-proveedor" onclick="agregarFilaProveedor('{{ $item->id }}', this)">
                                 <i class="fas fa-user-plus"></i> Agregar Proveedor
                             </button>
-                            <button class="btn-guardar-item" onclick="guardarItem('{{ $item->id }}')">
+                            <button class="btn-guardar-item" onclick="guardarItem('{{ $item->id }}', this)">
                                 <i class="fas fa-save"></i> Guardar
                             </button>
                         </div>
+                        @endif
                     </div>
                     @endforeach
+
+                    <!-- Botón Generar Compras -->
+                    @if($requisicion->procesada != 1)
+                    <div class="d-flex justify-content-end mt-4">
+                        <button class="btn btn-success btn-lg" onclick="generarCompras()">
+                            <i class="fas fa-file-invoice me-2"></i> Generar Compras
+                        </button>
+                    </div>
+                    @endif
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Modal Confirmar Compra -->
-    <div class="modal fade" id="confirmarCompraModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <form id="confirmarCompraForm" method="POST">
-                    @csrf
-                    <div class="modal-header">
-                        <h5 class="modal-title">Confirmar Compra</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>¿Crear compra con los items de esta requisición?</p>
-                        <div class="mt-3">
-                            <label for="id_proveedor" class="form-label">Proveedor General:</label>
-                            <select name="id_proveedor" id="id_proveedor" class="form-select">
-                                <option value="">Seleccionar proveedor</option>
-                                @foreach($proveedores as $proveedor)
-                                <option value="{{ $proveedor->id }}">{{ $proveedor->clave }} - {{ $proveedor->nombre }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-success">Confirmar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     @include('footer')
 
-    <script>
-        function confirmarCompra() {
-            const form = document.getElementById('confirmarCompraForm');
-            form.action = '{{ url("requisiciones/confirmar") }}/{{ $requisicion->id }}';
-            new bootstrap.Modal(document.getElementById('confirmarCompraModal')).show();
-        }
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <script>
         function eliminarItem(id, clave, element) {
-            if (confirm('¿Eliminar ' + clave + '?')) {
-                $.ajax({
-                    url: '{{ url("requisiciones/eliminar-item") }}',
-                    type: 'POST',
-                    data: {
-                        id: id,
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            $(element).closest('.card-item').fadeOut(300, function() {
-                                $(this).remove();
+            Swal.fire({
+                title: '¿Eliminar ' + clave + '?',
+                text: 'Esta acción no se puede deshacer',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '{{ url("requisiciones/eliminar-item") }}',
+                        type: 'POST',
+                        data: {
+                            id: id,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                $(element).closest('.card-item').fadeOut(300, function() {
+                                    $(this).remove();
+                                });
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Eliminado',
+                                    text: 'El item fue eliminado correctamente',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                            }
+                        },
+                        error: function() {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Error al eliminar el item'
                             });
                         }
-                    },
-                    error: function() {
-                        alert('Error al eliminar');
-                    }
-                });
-            }
+                    });
+                }
+            });
         }
 
-        function agregarFilaProveedor(itemId) {
+        function agregarFilaProveedor(itemId, btn) {
             var container = $('#proveedores-' + itemId);
             var row = `
                 <div class="proveedor-row" data-id="nuevo">
-                    <div class="row">
-                        <div class="col-4">
+                    <div class="row align-items-center">
+                        <div class="col-1">
+                            <div class="d-flex-center h-100">
+                                <input class="form-check-input" type="checkbox" id="check-nuevo-${Date.now()}">
+                            </div>
+                        </div>
+                        <div class="col-3">
                             <span class="label-campo">Proveedor</span>
                             <select class="select-proveedor">
                                 <option value="">Sin proveedor</option>
@@ -398,19 +445,24 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-3">
+                        <div class="col-2">
                             <span class="label-campo">Precio</span>
                             <input type="number" class="input-precio" step="0.01" min="0" placeholder="0.00">
                         </div>
-                        <div class="col-3">
-                            <span class="label-campo">Descuento </span>
-                            <input type="number" class="input-descuento" step="0.01" min="0" max="100" placeholder="0">
+                        <div class="col-2">
+                            <span class="label-campo">Descuento</span>
+                            <input type="number" class="input-descuento" step="0.01" min="0" placeholder="0.00">
+                        </div>
+                        <div class="col-2">
+                            <span class="label-campo">Fecha Entrega</span>
+                            <input type="date" class="input-fecha">
                         </div>
                         <div class="col-2 text-end">
-                            <span class="label-campo">&nbsp;</span>
-                            <button class="btn-eliminar-proveedor" onclick="eliminarFilaProveedor(this)">
-                                <i class="fas fa-times"></i>
-                            </button>
+                            <div class="h-100 d-flex align-items-center justify-content-end">
+                                <button class="btn-eliminar-proveedor" onclick="eliminarFilaProveedor(this)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -423,82 +475,296 @@
         }
 
         function eliminarProveedor(btn, proveedorId) {
-            if (confirm('¿Eliminar este proveedor?')) {
-                $.ajax({
-                    url: '{{ url("requisiciones/eliminar-proveedor-item") }}/' + proveedorId,
-                    type: 'DELETE',
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            $(btn).closest('.proveedor-row').fadeOut(300, function() {
-                                $(this).remove();
+            Swal.fire({
+                title: '¿Eliminar este proveedor?',
+                text: 'Esta acción no se puede deshacer',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '{{ url("requisiciones/eliminar-proveedor-item") }}/' + proveedorId,
+                        type: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                $(btn).closest('.proveedor-row').fadeOut(300, function() {
+                                    $(this).remove();
+                                });
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Eliminado',
+                                    text: 'Proveedor eliminado correctamente',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                });
+                            }
+                        },
+                        error: function() {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Error al eliminar proveedor'
                             });
                         }
-                    },
-                    error: function() {
-                        alert('Error al eliminar proveedor');
-                    }
-                });
-            }
-        }
-
-        function guardarItem(itemId) {
-            var cantidad = $('#cantidad-' + itemId).val();
-            
-            var proveedores = [];
-            var container = $('#proveedores-' + itemId);
-            container.find('.proveedor-row').each(function() {
-                var row = $(this);
-                var proveedorId = row.find('.select-proveedor').val();
-                var precio = row.find('.input-precio').val();
-                var descuento = row.find('.input-descuento').val();
-                var rowId = row.data('id');
-                
-                if (proveedorId) {
-                    proveedores.push({
-                        id: rowId,
-                        proveedor_id: proveedorId,
-                        precio: precio || 0,
-                        descuento: descuento || 0
                     });
                 }
             });
+        }
 
-            if (proveedores.length === 0) {
-                alert('Agrega al menos un proveedor');
-                return;
+        $(document).on('change', '.form-check-input', function() {
+            var container = $(this).closest('.fila-proveedores');
+            
+            if ($(this).is(':checked')) {
+                container.find('.form-check-input').not(this).prop('checked', false);
             }
+        });
 
-            $.ajax({
-                url: '{{ url("requisiciones/guardar-item-completo") }}',
-                type: 'POST',
-                data: {
-                    id: itemId,
-                    cantidad: cantidad,
-                    proveedores: proveedores,
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function(response) {
-                    if (response.success) {
-                        $.each(response.data.proveedores, function(index, prov) {
-                            var row = $('#proveedores-' + itemId).find('.proveedor-row[data-id="nuevo"]');
-                            if (row.length > 0) {
-                                row.data('id', prov.id);
-                                row.find('.btn-eliminar-proveedor').attr('onclick', 'eliminarProveedor(this, "' + prov.id + '")');
-                            }
-                        });
-                        var btn = $('.card-item[data-id="' + itemId + '"] .btn-guardar-item');
-                        var originalText = btn.html();
-                        btn.html('<i class="fas fa-check"></i> Guardado');
-                        setTimeout(function() {
-                            btn.html(originalText);
-                        }, 1500);
+        function guardarItem(itemId, btn) {
+    var btnOriginal = $(btn);
+    var btnHtml = btnOriginal.html();
+    
+    btnOriginal.addClass('guardando');
+    btnOriginal.html('<i class="fas fa-spinner"></i> Guardando...');
+    
+    var cantidad = $('#cantidad-' + itemId).val();
+    
+    var proveedores = [];
+    var container = $('#proveedores-' + itemId);
+    var seleccionados = 0;
+    var errores = [];
+    var filasConError = 0;
+    
+    container.find('.proveedor-row').each(function() {
+        var row = $(this);
+        var proveedorId = row.find('.select-proveedor').val();
+        var precio = row.find('.input-precio').val();
+        var descuento = row.find('.input-descuento').val();
+        var fechaEntrega = row.find('.input-fecha').val();
+        var rowId = row.data('id');
+        var seleccionado = row.find('.form-check-input').is(':checked') ? 1 : 0;
+        
+        // Validar cada fila independientemente
+        var tieneError = false;
+        
+        if (!proveedorId || proveedorId === '') {
+            if (seleccionado) {
+                errores.push('La fila seleccionada no tiene proveedor');
+                tieneError = true;
+            }
+        }
+        
+        if (seleccionado) {
+            seleccionados++;
+            
+            if (!precio || precio <= 0) {
+                errores.push('El proveedor seleccionado no tiene precio');
+                tieneError = true;
+            }
+            if (!fechaEntrega) {
+                errores.push('El proveedor seleccionado no tiene fecha de entrega');
+                tieneError = true;
+            }
+        }
+        
+        if (tieneError) {
+            filasConError++;
+        }
+        
+        if (proveedorId) {
+            proveedores.push({
+                id: rowId,
+                proveedor_id: proveedorId,
+                precio: precio || 0,
+                descuento: descuento || 0,
+                seleccionado: seleccionado,
+                fecha_entrega: fechaEntrega || null
+            });
+        }
+    });
+
+    // Validar que haya al menos un proveedor agregado (con select)
+    var proveedoresConSelect = proveedores.filter(p => p.proveedor_id);
+    if (proveedoresConSelect.length === 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Sin proveedores',
+            text: 'Agrega al menos un proveedor (selecciona uno en el select)',
+            confirmButtonColor: '#0d6efd',
+            confirmButtonText: 'Entendido'
+        });
+        btnOriginal.removeClass('guardando');
+        btnOriginal.html(btnHtml);
+        return;
+    }
+
+    // Validar que solo se pueda seleccionar un proveedor
+    if (seleccionados > 1) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Selección única',
+            text: 'Solo puedes seleccionar un proveedor por producto',
+            confirmButtonColor: '#0d6efd',
+            confirmButtonText: 'Entendido'
+        });
+        btnOriginal.removeClass('guardando');
+        btnOriginal.html(btnHtml);
+        return;
+    }
+
+    // Validar que haya un proveedor seleccionado
+    if (seleccionados === 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Selecciona un proveedor',
+            text: 'Debes seleccionar un proveedor para este producto',
+            confirmButtonColor: '#0d6efd',
+            confirmButtonText: 'Entendido'
+        });
+        btnOriginal.removeClass('guardando');
+        btnOriginal.html(btnHtml);
+        return;
+    }
+
+    // Validar errores del proveedor seleccionado
+    if (errores.length > 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Datos incompletos',
+            text: errores.join('<br>'),
+            confirmButtonColor: '#0d6efd',
+            confirmButtonText: 'Entendido'
+        });
+        btnOriginal.removeClass('guardando');
+        btnOriginal.html(btnHtml);
+        return;
+    }
+
+    // Validar que todas las filas tengan precio y fecha (aunque no estén seleccionadas)
+    var todasLasFilas = container.find('.proveedor-row');
+    var erroresGlobales = [];
+    
+    todasLasFilas.each(function() {
+        var row = $(this);
+        var proveedorId = row.find('.select-proveedor').val();
+        var precio = row.find('.input-precio').val();
+        var fechaEntrega = row.find('.input-fecha').val();
+        
+        if (proveedorId && proveedorId !== '') {
+            if (!precio || precio <= 0) {
+                erroresGlobales.push('La fila con proveedor ' + proveedorId + ' no tiene precio');
+            }
+            if (!fechaEntrega) {
+                erroresGlobales.push('La fila con proveedor ' + proveedorId + ' no tiene fecha de entrega');
+            }
+        }
+    });
+
+    if (erroresGlobales.length > 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Datos incompletos en filas',
+            text: erroresGlobales.join('<br>'),
+            confirmButtonColor: '#0d6efd',
+            confirmButtonText: 'Entendido'
+        });
+        btnOriginal.removeClass('guardando');
+        btnOriginal.html(btnHtml);
+        return;
+    }
+
+    $.ajax({
+        url: '{{ url("requisiciones/guardar-item-completo") }}',
+        type: 'POST',
+        data: {
+            id: itemId,
+            cantidad: cantidad,
+            proveedores: proveedores,
+            _token: '{{ csrf_token() }}'
+        },
+        success: function(response) {
+            if (response.success) {
+                $.each(response.data.proveedores, function(index, prov) {
+                    var row = $('#proveedores-' + itemId).find('.proveedor-row[data-id="nuevo"]');
+                    if (row.length > 0) {
+                        row.data('id', prov.id);
+                        row.find('.btn-eliminar-proveedor').attr('onclick', 'eliminarProveedor(this, "' + prov.id + '")');
+                        row.find('.form-check-input').attr('id', 'check-' + prov.id);
                     }
-                },
-                error: function() {
-                    alert('Error al guardar item');
+                });
+                
+                btnOriginal.removeClass('guardando');
+                btnOriginal.html('<i class="fas fa-check"></i> Guardado');
+                setTimeout(function() {
+                    btnOriginal.html(btnHtml);
+                }, 1500);
+            }
+        },
+        error: function() {
+            btnOriginal.removeClass('guardando');
+            btnOriginal.html(btnHtml);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Error al guardar el item'
+            });
+        }
+    });
+}
+
+        function generarCompras() {
+            Swal.fire({
+                title: '¿Generar compras?',
+                text: 'Se crearán las órdenes de compra según los proveedores seleccionados',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Sí, generar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Generando compras...',
+                        text: 'Por favor espera',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    $.ajax({
+                        url: '{{ url("requisiciones/generar-compras") }}/{{ $requisicion->id }}',
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: '¡Compras generadas!',
+                                    text: 'Se crearon ' + response.total_compras + ' órdenes de compra',
+                                    confirmButtonColor: '#28a745'
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: xhr.responseJSON?.message || 'Error al generar compras'
+                            });
+                        }
+                    });
                 }
             });
         }

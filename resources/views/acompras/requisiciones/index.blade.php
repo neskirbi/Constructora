@@ -88,9 +88,11 @@
                                                 <a href="{{ url('requisiciones/show/' . $requisicion->id) }}" class="btn btn-sm btn-info">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
+                                                @if($requisicion->procesada != 1)
                                                 <button class="btn btn-sm btn-danger" onclick="eliminarRequisicion('{{ $requisicion->id }}')">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
+                                                @endif
                                             </td>
                                         </tr>
                                         @endforeach

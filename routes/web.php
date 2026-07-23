@@ -229,26 +229,6 @@ Route::post('requisiciones/procesar-excel', [App\Http\Controllers\Acompras\Requi
     ->name('compras.requisiciones.procesar-excel')
     ->middleware(['auth:acompras']);
 
-Route::post('requisiciones/eliminar', [App\Http\Controllers\Acompras\RequisicionController::class, 'eliminarItem'])
-    ->name('compras.requisiciones.eliminar')
-    ->middleware(['auth:acompras']);
-
-Route::post('requisiciones/borrar-grupo/{contratoId}', [App\Http\Controllers\Acompras\RequisicionController::class, 'borrarGrupo'])
-    ->name('compras.requisiciones.borrar-grupo')
-    ->middleware(['auth:acompras']);
-
-Route::post('requisiciones/confirmar/{contratoId}', [App\Http\Controllers\Acompras\RequisicionController::class, 'confirmarCompraPorContrato'])
-    ->name('compras.requisiciones.confirmar')
-    ->middleware(['auth:acompras']);
-
-    Route::post('requisiciones/agregar-proveedor', [App\Http\Controllers\Acompras\RequisicionController::class, 'agregarProveedor'])
-    ->name('compras.requisiciones.agregar-proveedor')
-    ->middleware(['auth:acompras']);
-
-Route::delete('requisiciones/eliminar-proveedor/{id}', [App\Http\Controllers\Acompras\RequisicionController::class, 'eliminarProveedor'])
-    ->name('compras.requisiciones.eliminar-proveedor')
-    ->middleware(['auth:acompras']);
-
     // Rutas para requisiciones
 Route::post('requisiciones/guardar-item-completo', [App\Http\Controllers\Acompras\RequisicionController::class, 'guardarItemCompleto'])
     ->name('compras.requisiciones.guardar-item-completo')
@@ -260,6 +240,18 @@ Route::delete('requisiciones/eliminar-proveedor-item/{id}', [App\Http\Controller
 
 Route::get('requisiciones/resumen/{id}', [App\Http\Controllers\Acompras\RequisicionController::class, 'resumen'])
     ->name('compras.requisiciones.resumen')
+    ->middleware(['auth:acompras']);
+
+    Route::delete('requisiciones/eliminar-requisicion/{id}', [App\Http\Controllers\Acompras\RequisicionController::class, 'eliminarRequisicion'])
+    ->name('compras.requisiciones.eliminar-requisicion')
+    ->middleware(['auth:acompras']);
+
+    Route::post('requisiciones/generar-compras/{id}', [App\Http\Controllers\Acompras\RequisicionController::class, 'generarCompras'])
+    ->name('compras.requisiciones.generar-compras')
+    ->middleware(['auth:acompras']);
+
+    Route::post('requisiciones/eliminar-item', [App\Http\Controllers\Acompras\RequisicionController::class, 'eliminarItem'])
+    ->name('compras.requisiciones.eliminar-item')
     ->middleware(['auth:acompras']);
 
 /**

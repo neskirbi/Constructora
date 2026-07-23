@@ -14,45 +14,31 @@ class RequisicionDetalle extends Model
     protected $fillable = [
         'id',
         'requisicion_id',
+        'producto_id',
         'clave',
         'descripcion',
         'unidad',
         'cantidad',
-        'precio_unitario',
-        'subtotal',
-        'iva',
-        'total',
         'observaciones',
         'link',
-    'proveedor_id',      // <--- Agrega
-    'descuento',         // <--- Agrega
-    'descuento_monto',   // <--- Agrega
     ];
     
     protected $casts = [
-    'cantidad' => 'decimal:2',
-    'precio_unitario' => 'decimal:2',
-    'subtotal' => 'decimal:2',
-    'iva' => 'decimal:2',
-    'total' => 'decimal:2',
-    'descuento' => 'decimal:2',
-    'descuento_monto' => 'decimal:2',
-];
+        'cantidad' => 'decimal:2',
+    ];
     
     public function requisicion()
     {
         return $this->belongsTo(Requisicion::class, 'requisicion_id');
     }
-
+    
+    public function producto()
+    {
+        return $this->belongsTo(ProductoServicio::class, 'producto_id');
+    }
+    
     public function proveedores()
     {
         return $this->hasMany(ProductoProveedor::class, 'detalle_id');
     }
-
-    public function proveedorSeleccionado()
-    {
-        return $this->belongsTo(Proveedor::class, 'proveedor_id');
-    }
-
-    
 }

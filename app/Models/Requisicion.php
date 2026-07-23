@@ -38,13 +38,19 @@ class Requisicion extends Model
         return $this->belongsTo(Contrato::class, 'contrato_id');
     }
     
+    public function proveedores()
+    {
+        return $this->hasMany(RequisicionProveedor::class, 'requisicion_id');
+    }
+
     public function detalles()
     {
         return $this->hasMany(RequisicionDetalle::class, 'requisicion_id');
     }
-    
-    public function proveedores()
+
+    // Si necesitas acceder directamente a los productos:
+    public function productos()
     {
-        return $this->hasMany(RequisicionProveedor::class, 'requisicion_id');
+        return $this->hasManyThrough(ProductoServicio::class, RequisicionDetalle::class, 'requisicion_id', 'id', 'id', 'producto_id');
     }
 }

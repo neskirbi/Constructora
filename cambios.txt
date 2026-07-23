@@ -1,16 +1,18 @@
 
-Revisar las fechas del excel , fehca de elaboracion , fecha de carga al sistema , y fecha de entrega(esa se va a compras)
+Revisar las fechas del excel , fecha de elaboracion , fecha de carga al sistema 
 Requicision 
-1.Compras captura las 3 opciones y selecciona a quien se le va a comprar usar checkbox , agregar fecha de entraga por proveedor y por producto
-2.Gerente compras revisa y aprueba para revision de "Julian"
+1.Compras captura las 3 opciones y selecciona a quien se le va a comprar usar checkbox ,
+ agregar fecha de entrega por proveedor y por producto y genera la orden de compra despues de tener las opciones de proveedor
+2.Gerente compras revisa y aprueba orden de compra para revision de "Julian"
 3.Julian aprueba la orden de compra y se debe generar orden de pago para tesoreria 
 4.Tesoreria confirma pago y deberia llegar alerta a compras 
 
 Nota: todo esto lleva alertas 
+Nota: Agregar inventario  y considerar para la compra final lo que hay en stock
 
 
 
 
 
 Nota Para mi: Quitar inventario y usar productosyservicios pero agregarle el stock
-y tambien usar 	proveedores_servicios en lugar de proveedores .Sera mas facil emptar con lo que ya esta de compras 
+y tambien usar 	proveedores_servicios en lugar de proveedores. Sera mas facil emptar con lo que ya esta de compras 
