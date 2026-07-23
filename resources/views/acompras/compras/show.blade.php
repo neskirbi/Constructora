@@ -181,7 +181,7 @@
                             
                             <div class="card-title">
                                 <h5 class="mb-0">
-                                <i class="fa fa-pencil" aria-hidden="true"></i> Editar Compra: {{ $compra->consecutivo }}
+                                <i class="fa fa-pencil" aria-hidden="true"></i> Editar Compra: {{ $compra->numeracion }}
                             </h5>
                             </div>
                             <div class="card-tools">
@@ -229,23 +229,7 @@
                                 
                                 <!-- Información General editable -->
                                 <div class="row mb-4">
-                                    <div class="col-md-3">
-                                        <div class="mb-3">
-                                            <label for="consecutivo" class="form-label required-label">Consecutivo</label>
-                                            <input type="text" 
-                                                   class="form-control form-control-sm readonly-field @error('consecutivo') is-invalid @enderror" 
-                                                   id="consecutivo" 
-                                                   name="consecutivo" 
-                                                   value="{{ old('consecutivo', $compra->consecutivo) }}"
-                                                   required
-                                                   readonly
-                                                   noformat
-                                                   style="height: 38px;">
-                                            @error('consecutivo')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
+                                    
                                     
                                     <div class="col-md-3">
                                         <div class="mb-3">
@@ -304,10 +288,10 @@
                                             @error('id_proveedor')
                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                             @enderror
-                                            <button type="button" class="btn btn-success btn-block btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#nuevoProveedorModal">
+                                            <!--<button type="button" class="btn btn-success btn-block btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#nuevoProveedorModal">
                                                 <i class="fas fa-plus-circle me-2"></i>
                                                 Nuevo Proveedor
-                                            </button>
+                                            </button>-->
                                         </div>
                                     </div>
                                 </div>

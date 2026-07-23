@@ -249,7 +249,7 @@
                                     <div class="compra-header">
                                         <div class="compra-header-left">
                                             <div class="compra-consecutivo">
-                                                Compra 
+                                                Compra {{$compra->numeracion}}
                                                 {{ $compra->consecutivo }}
                                             </div>
                                         </div>

@@ -190,7 +190,7 @@
                             
                             <div class="card-title">
                                 <h5 class="mb-0">
-                                <i class="fa fa-pencil" aria-hidden="true"></i> Compra: {{ $compra->consecutivo }}
+                                <i class="fa fa-pencil" aria-hidden="true"></i> Compra: {{ $compra->numeracion }}
                             </h5>
                             </div>
                             <div class="card-tools">

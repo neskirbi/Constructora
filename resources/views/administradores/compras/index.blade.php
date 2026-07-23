@@ -247,7 +247,7 @@
                                     <div class="compra-header">
                                         <div class="compra-header-left">
                                             <div class="compra-consecutivo">
-                                                Compra {{ $compra->consecutivo }}
+                                                Compra {{ $compra->numeracion }}
                                             </div>
                                         </div>
                                         
