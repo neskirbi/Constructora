@@ -179,10 +179,16 @@
                     <div class="card">
                         <div class="card-header">
                             
-                            <div class="card-title">
+                          <div class="card-title">
                                 <h5 class="mb-0">
-                                <i class="fa fa-pencil" aria-hidden="true"></i> Editar Compra: {{ $compra->numeracion }}
-                            </h5>
+                                    <i class="fa fa-pencil" aria-hidden="true"></i> Editar Compra: 
+                                    @if(isset($compra->metodo_pago) && strtolower($compra->metodo_pago) == 'efectivo')
+                                        E-
+                                    @elseif(isset($compra->metodo_pago) && strtolower($compra->metodo_pago) == 'transferencia')
+                                        T-
+                                    @endif
+                                    {{ $compra->numeracion }}
+                                </h5>
                             </div>
                             <div class="card-tools">
                                 @php
@@ -605,18 +611,29 @@
                                     </div>
                                 </div>
 
-                                <div class="row mt-4">
-                                    <div class="col-12">
-                                        <div class="d-flex justify-content-end gap-2">
-                                            <a href="{{ route('compras.index') }}" class="btn btn-secondary btn-sm">
-                                                Cancelar
-                                            </a>
+                              <div class="row mt-4">
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <!-- Botón Generar Orden de Compra (solo si tiene método de pago) -->
+                                        @if($compra->metodo_pago)
+                                            <button type="button" class="btn btn-success btn-sm" onclick="confirmarGenerarOrden()">
+                                                <i class="fas fa-print me-1"></i> Generar Orden de Compra
+                                            </button>
+                                        @endif
+                                        
+                                        <!-- Botón Guardar/Actualizar -->
+                                        @if($compra->metodo_pago)
                                             <button type="submit" class="btn btn-warning btn-sm">
                                                 <i class="fas fa-save me-1"></i> Actualizar Compra
                                             </button>
-                                        </div>
+                                        @else
+                                            <button type="submit" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-save me-1"></i> Guardar Compra
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
+                            </div>
                             </form>
                         </div>
                     </div>
@@ -627,6 +644,28 @@
 
     @include('general.modals.modalPS')
     @include('general.modals.modalProveedores')
+
+    <!-- Modal de confirmación para generar orden -->
+<div class="modal fade" id="modalConfirmarOrden" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Generación de Orden</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas generar la orden de compra?</p>
+                <p class="text-muted small">Se generará el documento PDF de la orden de compra.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <a href="{{ route('compras.imprimir-orden', $compra->id) }}" class="btn btn-success" target="_blank">
+                    <i class="fas fa-check me-1"></i> Sí, generar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
     
     @include('footer')
     <!-- INCLUIR SCRIPT COMÚN -->
@@ -645,6 +684,10 @@
 
         
     });
+
+     function confirmarGenerarOrden() {
+        new bootstrap.Modal(document.getElementById('modalConfirmarOrden')).show();
+    }
     </script>
     @include('general.modals.scripts')
 </body>

@@ -277,18 +277,38 @@
                             <i class="fas fa-times"></i>
                         </button>
 
-                        <!-- Fila 1: Clave, Descripción, Unidad y Cantidad -->
                         <div class="row">
                             <div class="col-md-12">
                                 <span class="clave">{{ $item->clave }}</span>
                                 <span class="descripcion ms-2">{{ $item->descripcion }}</span>
                                 <span class="unidad-badge ms-2">{{ $item->unidad }}</span>
-                                <span class="ms-3">
-                                    <span class="label-campo">Cantidad:</span>
-                                    <input type="number" class="input-cantidad" value="{{ $item->cantidad }}" 
-                                           step="0.01" min="0" id="cantidad-{{ $item->id }}"
-                                           {{ $requisicion->procesada == 1 ? 'disabled' : '' }}>
-                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Campos horizontales debajo -->
+                        <div class="row mt-2">
+                            <div class="col-md-3">
+                                <span class="label-campo" style="font-size: 0.65rem; color: #6c757d; display: block;">Cant. Requisición</span>
+                                <input type="number" class="input-cantidad" value="{{ $item->cantidad }}" 
+                                    step="0.01" min="0" id="cantidad-{{ $item->id }}"
+                                    style="width: 100%; text-align: right; border: 1px solid #dee2e6; border-radius: 4px; padding: 4px 6px;"
+                                    {{ $requisicion->procesada == 1 ? 'disabled' : '' }}>
+                            </div>
+                            <div class="col-md-3">
+                                <span class="label-campo" style="font-size: 0.65rem; color: #6c757d; display: block;">Cant. Inventario</span>
+                                <input type="number" class="input-inventario" 
+                                    value="{{ $item->stock ? $item->stock->cantidad : 0 }}" 
+                                    step="0.01" min="0" id="inventario-{{ $item->id }}"
+                                    style="width: 100%; text-align: right; border: 1px solid #dee2e6; border-radius: 4px; padding: 4px 6px; background: #e9ecef;"
+                                    disabled>
+                            </div>
+                            <div class="col-md-3">
+                                <span class="label-campo" style="font-size: 0.65rem; color: #6c757d; display: block;">Cant. a Comprar</span>
+                                <input type="number" class="input-comprar" 
+                                    value="{{ max(0, $item->cantidad - ($item->stock ? $item->stock->cantidad : 0)) }}"
+                                    step="0.01" min="0" id="comprar-{{ $item->id }}"
+                                    style="width: 100%; text-align: right; border: 1px solid #dee2e6; border-radius: 4px; padding: 4px 6px; background: #fff3cd; font-weight: 600;"
+                                    {{ $requisicion->procesada == 1 ? 'disabled' : '' }}>
                             </div>
                         </div>
 
@@ -768,6 +788,15 @@
                 }
             });
         }
+
+        // Agregar evento para actualizar "Cant. a Comprar"
+        $(document).on('change', '.input-cantidad, .input-inventario', function() {
+            var row = $(this).closest('.row');
+            var cantidad = parseFloat(row.find('.input-cantidad').val()) || 0;
+            var inventario = parseFloat(row.find('.input-inventario').val()) || 0;
+            var comprar = Math.max(0, cantidad - inventario);
+            row.find('.input-comprar').val(comprar.toFixed(2));
+        });
     </script>
 </body>
 </html>

@@ -254,6 +254,10 @@ Route::get('requisiciones/resumen/{id}', [App\Http\Controllers\Acompras\Requisic
     ->name('compras.requisiciones.eliminar-item')
     ->middleware(['auth:acompras']);
 
+    Route::get('compras/imprimir-orden/{id}', [App\Http\Controllers\Acompras\CompraController::class, 'imprimirOrden'])
+    ->name('compras.imprimir-orden')
+    ->middleware(['auth:acompras']);
+
 /**
  * Generales
  */

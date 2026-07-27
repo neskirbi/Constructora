@@ -11,6 +11,7 @@ use App\Models\Contrato;
 use App\Models\ProductosYServicios;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log; 
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class CompraController extends Controller
 {
@@ -106,7 +107,7 @@ class CompraController extends Controller
     public function store(Request $request)
 {
     $request->validate([
-        'consecutivo' => 'required|alpha_num|min:1',
+        
         'id_contrato' => 'required|string|exists:contratos,id',
         'id_proveedor' => 'required|string|exists:proveedores_servicios,id',
         'referencia' => 'required|string|max:1500',
@@ -312,6 +313,7 @@ class CompraController extends Controller
 
     public function update(Request $request, $id)
 {
+    //
     // Verificar si la compra existe
     $compra = DB::table('compras')
         ->where('id', $id)
@@ -322,7 +324,7 @@ class CompraController extends Controller
     }
     
     $request->validate([
-        'consecutivo' => 'required|alpha_num|min:1',
+        
         'id_contrato' => 'required|string|exists:contratos,id',
         'id_proveedor' => 'required|string|exists:proveedores_servicios,id',
         'referencia' => 'required|string|max:1500',
@@ -491,5 +493,34 @@ class CompraController extends Controller
             return redirect()->route('compras.index')
                 ->with('error', 'Error al eliminar la compra: ' . $e->getMessage());
         }
+    }
+
+    public function imprimirOrden($id)
+    {
+        $compra = Compra::findOrFail($id);
+        $contrato = Contrato::find($compra->id_contrato);
+        $proveedor = ProveedorSer::find($compra->id_proveedor);
+        $detalles = DB::table('compradetalle')->where('id_compra', $id)->get();
+        
+        $prefijo = '';
+        if ($compra->metodo_pago && strtolower($compra->metodo_pago) == 'efectivo') {
+            $prefijo = 'E-';
+        } elseif ($compra->metodo_pago && strtolower($compra->metodo_pago) == 'transferencia') {
+            $prefijo = 'T-';
+        }
+        
+        $data = [
+            'compra' => $compra,
+            'detalles' => $detalles,
+            'contrato' => $contrato,
+            'proveedor' => $proveedor,
+            'prefijo' => $prefijo,
+        ];
+        
+        $pdf = Pdf::loadView('acompras.compras.orden_pdf', $data);
+        $pdf->setPaper('letter', 'portrait');
+        
+        // Stream para visualizar (abre en el navegador)
+        return $pdf->stream('orden_compra_' . $prefijo . $compra->numeracion . '.pdf');
     }
 }

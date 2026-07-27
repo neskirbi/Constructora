@@ -249,8 +249,18 @@
                                     <div class="compra-header">
                                         <div class="compra-header-left">
                                             <div class="compra-consecutivo">
-                                                Compra {{$compra->numeracion}}
-                                                {{ $compra->consecutivo }}
+                                                Compra: 
+                                                @php
+                                                    $prefijo = '';
+                                                    if (isset($compra->metodo_pago)) {
+                                                        if (strtolower($compra->metodo_pago) == 'efectivo') {
+                                                            $prefijo = 'E-';
+                                                        } elseif (strtolower($compra->metodo_pago) == 'transferencia') {
+                                                            $prefijo = 'T-';
+                                                        }
+                                                    }
+                                                @endphp
+                                                {{ $prefijo }}{{ $compra->numeracion }}
                                             </div>
                                         </div>
                                         
