@@ -123,6 +123,19 @@ class RequisicionController extends Controller
                     ->with('logs', $logs);
             }
             
+            // Armar la dirección completa desde los campos del contrato
+            $direccion = trim(
+                ($contrato->calle_numero ?? '') . ' ' .
+                ($contrato->colonia ?? '') . ', ' .
+                ($contrato->codigo_postal ?? '') . ' ' .
+                ($contrato->alcaldia_municipio ?? '') . ', ' .
+                ($contrato->entidad ?? '')
+            );
+
+            // Limpiar espacios y comas extras
+            $direccion = preg_replace('/\s+/', ' ', $direccion);
+            $direccion = trim($direccion, ', ');
+
             $requisicion = Requisicion::create([
                 'id' => GetUuid(),
                 'session_id' => $sessionId,
@@ -136,7 +149,7 @@ class RequisicionController extends Controller
                 'cliente' => $contrato->cliente ?? null,
                 'contratista' => $resultado['contratista'] ?? null,
                 'partida' => $resultado['partida'] ?? null,
-                'direccion_entrega' => $contrato->lugar ?? null,
+                'direccion_entrega' => $direccion ?: null,
             ]);
             
             $itemsAgregados = 0;
