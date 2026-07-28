@@ -378,47 +378,47 @@
                                             </small>
                                         </div>
                                         <div class="d-flex gap-2 flex-wrap">
-    <!-- Botón Factura - SOLO SI verificado = 1 -->
-    @if(isset($compra->verificado) && $compra->verificado == 1)
-        @if(isset($compra->factura) && $compra->factura == 1)
-            <!-- Cambiar Factura -->
-            <button type="button" 
-                    class="btn btn-warning btn-sm"
-                    onclick="cargarFactura('{{ $compra->id }}', '{{ $compra->consecutivo }}')">
-                <i class="fas fa-upload"></i> Cambiar Factura
-            </button>
-            
-            <!-- Ver Factura -->
-            <a href="{{ route('compras.verFactura', $compra->id) }}" 
-               target="_blank"
-               class="btn btn-success btn-sm">
-                <i class="fas fa-file-pdf"></i> Ver Factura
-            </a>
-        @else
-            <!-- Cargar Factura -->
-            <button type="button" 
-                    class="btn btn-default btn-sm"
-                    onclick="cargarFactura('{{ $compra->id }}', '{{ $compra->consecutivo }}')">
-                <i class="fas fa-file-upload"></i> Cargar Factura
-            </button>
-        @endif
-    @endif
+                                        <!-- Botón Factura - SOLO SI verificado = 1 -->
+                                        @if(isset($compra->verificado) && $compra->verificado == 1)
+                                            @if(isset($compra->factura) && $compra->factura == 1)
+                                                <!-- Cambiar Factura -->
+                                                <button type="button" 
+                                                        class="btn btn-warning "
+                                                        onclick="cargarFactura('{{ $compra->id }}', '{{ $compra->consecutivo }}')">
+                                                    <i class="fas fa-upload"></i> Cambiar Factura
+                                                </button>
+                                                
+                                                <!-- Ver Factura -->
+                                                <a href="{{ route('compras.verFactura', $compra->id) }}" 
+                                                target="_blank"
+                                                class="btn btn-success ">
+                                                    <i class="fas fa-file-pdf"></i> Ver Factura
+                                                </a>
+                                            @else
+                                                <!-- Cargar Factura -->
+                                                <button type="button" 
+                                                        class="btn btn-default "
+                                                        onclick="cargarFactura('{{ $compra->id }}', '{{ $compra->consecutivo }}')">
+                                                    <i class="fas fa-file-upload"></i> Cargar Factura
+                                                </button>
+                                            @endif
+                                        @endif
 
-    <!-- Ver - SIEMPRE visible -->
-    <a href="{{ route('compras.show', $compra->id) }}" 
-       class="btn btn-info btn-sm">
-        <i class="fas fa-eye"></i> Ver
-    </a>
-    
-    <!-- Eliminar - SOLO si verificado = 1 -->
-    @if(isset($compra->verificado) && $compra->verificado == 1)
-    <button type="button" 
-            class="btn btn-danger btn-sm"
-            onclick="confirmDelete('{{ $compra->id }}', 'Compra #{{ $compra->consecutivo }}')">
-        <i class="fas fa-trash"></i> Eliminar
-    </button>
-    @endif
-</div>
+                                        <!-- Ver - SIEMPRE visible -->
+                                        <a href="{{ route('compras.show', $compra->id) }}" 
+                                        class="btn btn-info ">
+                                            <i class="fas fa-eye"></i> Ver
+                                        </a>
+                                        
+                                        <!-- Eliminar - SOLO si verificado = 1 -->
+                                        @if(isset($compra->verificado) && $compra->verificado == 1)
+                                        <button type="button" 
+                                                class="btn btn-danger "
+                                                onclick="confirmDelete('{{ $compra->id }}', 'Compra #{{ $compra->consecutivo }}')">
+                                            <i class="fas fa-trash"></i> Eliminar
+                                        </button>
+                                        @endif
+                                    </div>
                                     </div>
                                 </div>
                                 @endforeach
