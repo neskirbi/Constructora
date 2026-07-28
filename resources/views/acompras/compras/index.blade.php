@@ -377,20 +377,48 @@
                                                 Creado: {{ \Carbon\Carbon::parse($compra->created_at)->format('d/m/Y H:i') }}
                                             </small>
                                         </div>
-                                        <div class="d-flex gap-2">
-                                            <a href="{{ route('compras.show', $compra->id) }}" 
-                                               class="btn-action btn-ver">
-                                                <i class="fas fa-eye"></i> Ver
-                                            </a>
-                                            
-                                            @if(isset($compra->verificado) && $compra->verificado == 1)
-                                            <button type="button" 
-                                                    class="btn-action btn-eliminar"
-                                                    onclick="confirmDelete('{{ $compra->id }}', 'Compra #{{ $compra->consecutivo }}')">
-                                                <i class="fas fa-trash"></i> Eliminar
-                                            </button>
-                                            @endif
-                                        </div>
+                                        <div class="d-flex gap-2 flex-wrap">
+    <!-- Botón Factura - SOLO SI verificado = 1 -->
+    @if(isset($compra->verificado) && $compra->verificado == 1)
+        @if(isset($compra->factura) && $compra->factura == 1)
+            <!-- Cambiar Factura -->
+            <button type="button" 
+                    class="btn btn-warning btn-sm"
+                    onclick="cargarFactura('{{ $compra->id }}', '{{ $compra->consecutivo }}')">
+                <i class="fas fa-upload"></i> Cambiar Factura
+            </button>
+            
+            <!-- Ver Factura -->
+            <a href="{{ route('compras.verFactura', $compra->id) }}" 
+               target="_blank"
+               class="btn btn-success btn-sm">
+                <i class="fas fa-file-pdf"></i> Ver Factura
+            </a>
+        @else
+            <!-- Cargar Factura -->
+            <button type="button" 
+                    class="btn btn-default btn-sm"
+                    onclick="cargarFactura('{{ $compra->id }}', '{{ $compra->consecutivo }}')">
+                <i class="fas fa-file-upload"></i> Cargar Factura
+            </button>
+        @endif
+    @endif
+
+    <!-- Ver - SIEMPRE visible -->
+    <a href="{{ route('compras.show', $compra->id) }}" 
+       class="btn btn-info btn-sm">
+        <i class="fas fa-eye"></i> Ver
+    </a>
+    
+    <!-- Eliminar - SOLO si verificado = 1 -->
+    @if(isset($compra->verificado) && $compra->verificado == 1)
+    <button type="button" 
+            class="btn btn-danger btn-sm"
+            onclick="confirmDelete('{{ $compra->id }}', 'Compra #{{ $compra->consecutivo }}')">
+        <i class="fas fa-trash"></i> Eliminar
+    </button>
+    @endif
+</div>
                                     </div>
                                 </div>
                                 @endforeach
@@ -438,6 +466,70 @@
     </div>
 
     @include('footer')
+
+    <!-- Modal para cargar factura -->
+<div class="modal fade" id="modalCargarFactura" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalFacturaTitle">Cargar Factura</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formCargarFactura" enctype="multipart/form-data">
+                @csrf
+                <input type="hidden" id="compra_id" name="compra_id">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="factura_file" class="form-label">Archivo de Factura</label>
+                                <input type="file" 
+                                       class="form-control" 
+                                       id="factura_file" 
+                                       name="factura_file" 
+                                       accept=".pdf,.jpg,.jpeg,.png,.gif" 
+                                       required>
+                                <div class="form-text">Tamaño máximo: 5MB. Formatos permitidos: PDF, JPG, PNG, GIF</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="numero_factura" class="form-label">Número de Factura</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="numero_factura" 
+                                       name="numero_factura" 
+                                       placeholder="Ej: F-2026-001">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Previsualización -->
+                    <div id="previewFactura" class="mt-2" style="display: none;">
+                        <div class="alert alert-info">
+                            <i class="fas fa-file"></i> 
+                            <span id="nombreArchivo"></span>
+                            <span id="tamanoArchivo" class="badge bg-secondary ms-2"></span>
+                        </div>
+                    </div>
+
+                    <!-- Vista previa de imagen -->
+                    <div id="previewImagen" style="display: none;" class="mt-2">
+                        <div class="text-center">
+                            <img id="imagenPrevia" src="#" alt="Vista previa" style="max-height: 300px; max-width: 100%;">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btnGuardarFactura">
+                        <i class="fas fa-save"></i> Guardar Factura
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
     
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -489,6 +581,124 @@
             @endif
         });
     </script>
+
+    <script>
+$(document).ready(function() {
+    // Función global para abrir modal
+    window.cargarFactura = function(id, consecutivo) {
+        // Determinar si es cambio o carga nueva desde el botón que llamó
+        var esCambio = false;
+        var btn = event.target.closest('button');
+        if (btn && btn.innerText.includes('Cambiar')) {
+            esCambio = true;
+        }
+        
+        // Actualizar título del modal
+        var titulo = esCambio ? 'Cambiar Factura' : 'Cargar Factura';
+        $('#modalFacturaTitle').text(titulo + ' - Compra #' + consecutivo);
+        
+        // Limpiar formulario
+        $('#formCargarFactura')[0].reset();
+        $('#previewFactura').hide();
+        $('#previewImagen').hide();
+        $('#numero_factura').val('');
+        
+        // Guardar ID en el campo oculto
+        $('#compra_id').val(id);
+        
+        // Mostrar modal
+        $('#modalCargarFactura').modal('show');
+    };
+
+    // Previsualización del archivo
+    $('#factura_file').on('change', function() {
+        var file = this.files[0];
+        if (file) {
+            var sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+            $('#nombreArchivo').text(file.name);
+            $('#tamanoArchivo').text(sizeInMB + ' MB');
+            $('#previewFactura').show();
+            
+            if (file.type.startsWith('image/')) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#imagenPrevia').attr('src', e.target.result);
+                    $('#previewImagen').show();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                $('#previewImagen').hide();
+            }
+        } else {
+            $('#previewFactura').hide();
+            $('#previewImagen').hide();
+        }
+    });
+
+    // Envío del formulario
+    $('#formCargarFactura').on('submit', function(e) {
+        e.preventDefault();
+        
+        var formData = new FormData(this);
+        var btnGuardar = $('#btnGuardarFactura');
+        var textoOriginal = btnGuardar.html();
+        
+        btnGuardar.prop('disabled', true);
+        btnGuardar.html('<i class="fas fa-spinner fa-spin"></i> Guardando...');
+        
+        $.ajax({
+            url: '{{ route("compras.cargarFactura") }}',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    
+                    $('#modalCargarFactura').modal('hide');
+                    
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message
+                    });
+                }
+            },
+            error: function(xhr) {
+                var errorMsg = 'Ocurrió un error al procesar la solicitud';
+                
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMsg = xhr.responseJSON.message;
+                }
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: errorMsg
+                });
+            },
+            complete: function() {
+                btnGuardar.prop('disabled', false);
+                btnGuardar.html(textoOriginal);
+            }
+        });
+    });
+});
+</script>
 </body>
 </html>
 

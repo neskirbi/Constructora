@@ -208,9 +208,16 @@ Route::resource('destajos', 'App\Http\Controllers\Adestajos\DestajoController')
  */
 
 
-Route::resource('compras', 'App\Http\Controllers\Acompras\CompraController')
-->middleware(['auth:acompras']);
+    Route::resource('compras', 'App\Http\Controllers\Acompras\CompraController')
+    ->middleware(['auth:acompras']);
 
+    Route::get('compras/imprimir-orden/{id}', [App\Http\Controllers\Acompras\CompraController::class, 'imprimirOrden'])
+    ->name('compras.imprimir-orden')
+    ->middleware(['auth:acompras']);
+
+    // Rutas para facturas
+Route::post('/compras/cargar-factura', [App\Http\Controllers\Acompras\CompraController::class, 'cargarFactura'])->name('compras.cargarFactura');
+Route::get('/compras/ver-factura/{id}', [App\Http\Controllers\Acompras\CompraController::class, 'verFactura'])->name('compras.verFactura');
 // routes/web.php
 
 Route::get('requisiciones', [App\Http\Controllers\Acompras\RequisicionController::class, 'index'])
@@ -252,10 +259,6 @@ Route::get('requisiciones/resumen/{id}', [App\Http\Controllers\Acompras\Requisic
 
     Route::post('requisiciones/eliminar-item', [App\Http\Controllers\Acompras\RequisicionController::class, 'eliminarItem'])
     ->name('compras.requisiciones.eliminar-item')
-    ->middleware(['auth:acompras']);
-
-    Route::get('compras/imprimir-orden/{id}', [App\Http\Controllers\Acompras\CompraController::class, 'imprimirOrden'])
-    ->name('compras.imprimir-orden')
     ->middleware(['auth:acompras']);
 
 /**

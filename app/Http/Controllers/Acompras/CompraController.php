@@ -12,6 +12,7 @@ use App\Models\ProductosYServicios;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log; 
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Storage; 
 
 class CompraController extends Controller
 {
@@ -523,4 +524,94 @@ class CompraController extends Controller
         // Stream para visualizar (abre en el navegador)
         return $pdf->stream('orden_compra_' . $prefijo . $compra->numeracion . '.pdf');
     }
+
+
+    /**
+ * Cargar una factura para una compra específica
+ */
+public function cargarFactura(Request $request)
+{
+    try {
+        $request->validate([
+            'compra_id' => 'required|exists:compras,id',
+            'factura_file' => 'required|file|max:5120|mimes:pdf',
+            'numero_factura' => 'nullable|string|max:50'
+        ]);
+
+        $compra = DB::table('compras')->where('id', $request->compra_id)->first();
+        
+        if (!$compra) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Compra no encontrada'
+            ]);
+        }
+
+        // Eliminar factura anterior si existe
+        $path = 'facturas/' . $compra->id . '.pdf';
+        if (Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+        }
+
+        // Guardar nuevo archivo con nombre id_compra.pdf
+        $file = $request->file('factura_file');
+        $file->storeAs('facturas', $compra->id . '.pdf', 'public');
+
+        // Actualizar registro
+        $dataUpdate = [
+            'factura' => 1,
+            'numero_factura' => $request->numero_factura,
+            'updated_at' => now()
+        ];
+
+        DB::table('compras')
+            ->where('id', $request->compra_id)
+            ->update($dataUpdate);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Factura cargada exitosamente'
+        ]);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error de validación',
+            'errors' => $e->errors()
+        ], 422);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error al cargar la factura: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+/**
+ * Ver factura de una compra
+ */
+public function verFactura($id)
+{
+    try {
+        $compra = DB::table('compras')->where('id', $id)->first();
+        
+        if (!$compra || $compra->factura != 1) {
+            abort(404, 'Factura no encontrada');
+        }
+
+        $path = storage_path('app/public/facturas/' . $compra->id . '.pdf');
+        
+        if (!file_exists($path)) {
+            abort(404, 'El archivo de factura no existe en el servidor');
+        }
+
+        return response()->file($path, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="factura_' . $compra->id . '.pdf"'
+        ]);
+
+    } catch (\Exception $e) {
+        abort(404, 'Error al mostrar la factura');
+    }
+}
 }
