@@ -14,7 +14,7 @@ class ReporteCompraController extends Controller
 {
     public function index()
     {
-        $contratos = Contrato::select('id', 'refinterna', 'obra')
+        $contratos = Contrato::select('id', 'refinterna', 'obra','consecutivo')
             ->orderBy('refinterna')
             ->get();
         
