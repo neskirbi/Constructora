@@ -12,7 +12,9 @@ Nota: Agregar inventario  y considerar para la compra final lo que hay en stock
 
 
 
+Casar compra con numero de requisicion
+Considerar hacer un catalogo de: unidades , producto, partidas , marca
 
-
-Nota Para mi: Quitar inventario y usar productosyservicios pero agregarle el stock
-y tambien usar 	proveedores_servicios en lugar de proveedores. Sera mas facil emptar con lo que ya esta de compras 
+Separar por partidas la requisiciones
+En la orden de compra agregar No.requicicion(la numeracion va dependiendo al contrato )
+Boton imprimir Solicitud de Cotizacion dentro de la requisicion 
