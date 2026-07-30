@@ -152,7 +152,9 @@ class ComprasExport implements
             if (is_string($date) && strpos($date, ' ') !== false) {
                 $date = explode(' ', $date)[0];
             }
-            return $date;
+            $timestamp = strtotime($date);
+            if ($timestamp === false) return null;
+            return ($timestamp / 86400) + 25569;
         } catch (\Exception $e) {
             return null;
         }
@@ -207,7 +209,7 @@ class ComprasExport implements
     public function columnFormats(): array
     {
         return [
-            'B' => NumberFormat::FORMAT_DATE_DDMMYYYY,
+            'B' => 'dd/mm/yyyy',  // ESTA LÍNEA CAMBIA
             'M' => '#,##0.00',
             'N' => '#,##0.00',
             'O' => '#,##0.00',
