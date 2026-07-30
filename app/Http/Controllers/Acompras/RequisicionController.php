@@ -724,4 +724,15 @@ class RequisicionController extends Controller
             ], 500);
         }
     }
+
+
+    public function solicitudCotizacion($id)
+    {   
+        $requisicion = Requisicion::with(['contrato', 'detalles'])->findOrFail($id);
+        
+        $pdf = \PDF::loadView('acompras.requisiciones.solicitud_cotizacion_pdf', compact('requisicion'));
+        $pdf->setPaper('letter', 'portrait');
+        
+        return $pdf->stream('Solicitud_Cotizacion_' . $requisicion->consecutivo . '.pdf');
+    }
 }

@@ -49,56 +49,86 @@
                         </div>
                     </div>
 
-                    <!-- Lista de requisiciones -->
+                    <!-- Lista de requisiciones en tarjetas -->
                     <div id="listaRequisiciones">
                         @if($requisiciones->count() > 0)
-                            <div class="table-responsive">
-                                <table class="table table-striped table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th># Requisición</th>
-                                            <th>Frente</th>
-                                            <th>Empresa</th>
-                                            <th>Contrato</th>
-                                            <th>Items</th>
-                                            <th>Fecha</th>
-                                            <th>Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($requisiciones as $requisicion)
-                                        <tr>
-                                            <td>
-                                                <a href="{{ url('requisiciones/show/' . $requisicion->id) }}">
-                                                    {{ $requisicion->consecutivo ?? 'N/A' }}
-                                                </a>
-                                            </td>
-                                            <td>{{ $requisicion->frente ?? 'N/A' }}</td>
-                                            <td>{{ $requisicion->empresa ?? 'N/A' }}</td>
-                                            <td>
+                            @foreach($requisiciones as $requisicion)
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h5 class="card-title mb-0">
+                                            <a href="{{ url('requisiciones/show/' . $requisicion->id) }}" class="text-decoration-none">
+                                                #{{ $requisicion->consecutivo ?? 'N/A' }}
+                                            </a>
+                                        </h5>
+                                        <div>
+                                            <small class="text-muted">
+                                                <i class="far fa-calendar-alt me-1"></i>
+                                                {{ $requisicion->created_at ? \Carbon\Carbon::parse($requisicion->created_at)->format('d/m/Y') : 'N/A' }}
+                                            </small>
+                                            @if($requisicion->procesada == 1)
+                                                <span class="badge bg-success ms-2">Procesada</span>
+                                            @else
+                                                <span class="badge bg-warning text-dark ms-2">Pendiente</span>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <small class="text-muted d-block">Frente</small>
+                                            <span>{{ $requisicion->frente ?? 'N/A' }}</span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small class="text-muted d-block">Empresa</small>
+                                            <span>{{ $requisicion->empresa ?? 'N/A' }}</span>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small class="text-muted d-block">Contrato</small>
+                                            <span>
                                                 @if($requisicion->contrato)
                                                     {{ $requisicion->contrato->consecutivo }}
                                                 @else
                                                     <span class="text-muted">Sin contrato</span>
                                                 @endif
-                                            </td>
-                                            <td>{{ $requisicion->detalles->count() ?? 0 }}</td>
-                                            <td>{{ $requisicion->created_at ? \Carbon\Carbon::parse($requisicion->created_at)->format('d/m/Y') : 'N/A' }}</td>
-                                            <td>
-                                                <a href="{{ url('requisiciones/show/' . $requisicion->id) }}" class="btn btn-sm btn-info">
-                                                    <i class="fas fa-eye"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                                        <div>
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-box me-1"></i>
+                                                {{ $requisicion->detalles->count() ?? 0 }} items
+                                            </span>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <a href="{{ url('requisiciones/show/' . $requisicion->id) }}" 
+                                            class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i> Ver
+                                            </a>
+                                            
+                                            @if($requisicion->procesada != 1)
+                                                <a href="{{ url('requisiciones/solicitud-cotizacion/' . $requisicion->id) }}" 
+                                                class="btn btn-sm btn-success" 
+                                                target="_blank">
+                                                    <i class="fas fa-file-pdf"></i> Solicitar Cotización
                                                 </a>
-                                                @if($requisicion->procesada != 1)
-                                                <button class="btn btn-sm btn-danger" onclick="eliminarRequisicion('{{ $requisicion->id }}')">
-                                                    <i class="fas fa-trash"></i>
+                                                
+                                                <button class="btn btn-sm btn-danger" 
+                                                        onclick="eliminarRequisicion('{{ $requisicion->id }}')">
+                                                    <i class="fas fa-trash"></i> Eliminar
                                                 </button>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                            @else
+                                                <span class="text-muted align-self-center">
+                                                    <i class="fas fa-check-circle text-success"></i> Procesada
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                            @endforeach
 
                             <!-- Paginación -->
                             @if($requisiciones->hasPages())

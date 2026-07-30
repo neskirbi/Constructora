@@ -261,6 +261,10 @@ Route::get('requisiciones/resumen/{id}', [App\Http\Controllers\Acompras\Requisic
     ->name('compras.requisiciones.eliminar-item')
     ->middleware(['auth:acompras']);
 
+    Route::get('requisiciones/solicitud-cotizacion/{id}', [App\Http\Controllers\Acompras\RequisicionController::class, 'solicitudCotizacion'])
+    ->name('compras.requisiciones.solicitud-cotizacion')
+    ->middleware(['auth:acompras']);
+
 /**
  * Generales
  */
