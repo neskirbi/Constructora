@@ -199,7 +199,9 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             if (is_string($date) && strpos($date, ' ') !== false) {
                 $date = explode(' ', $date)[0];
             }
-            return $date;
+            $timestamp = strtotime($date);
+            if ($timestamp === false) return null;
+            return ($timestamp / 86400) + 25569;
         } catch (\Exception $e) {
             return null;
         }
@@ -208,20 +210,20 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
     public function columnFormats(): array
     {
         return [
-            'H' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Fecha Firma de Contrato
-            'I' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Fecha Inicio de Obra
-            'J' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Fecha Terminación de Obra
+            'H' => 'dd/mm/yyyy',  // Fecha Firma de Contrato
+            'I' => 'dd/mm/yyyy',  // Fecha Inicio de Obra
+            'J' => 'dd/mm/yyyy',  // Fecha Terminación de Obra
             'K' => '#,##0.00',                          // Importe de Anticipo
             'L' => '#,##0.00',                          // Importe de Contrato
             'M' => '#,##0.00',                          // Convenio Aplicación
             'N' => '#,##0.00',                          // Total a cobrar
-            'P' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Periodo del
-            'Q' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Periodo al
-            'S' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Fecha Factura
+            'P' => 'dd/mm/yyyy',  // Periodo del
+            'Q' => 'dd/mm/yyyy',  // Periodo al
+            'S' => 'dd/mm/yyyy',  // Fecha Factura
             'T' => '#,##0.00',                          // Importe de Estimación
             'U' => '#,##0.00',                          // IVA
             'V' => '#,##0.00',                          // Total Estimación con IVA
-            'W' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Fecha Elaboración
+            'W' => 'dd/mm/yyyy',  // Fecha Elaboración
             'X' => '#,##0.00',                          // 3.5 % Cargos Adicionales
             'Y' => '#,##0.00',                          // Retención 5 al millar
             'Z' => '#,##0.00',                          // Sanción atraso presentación
@@ -235,7 +237,7 @@ class IngresosExport implements FromQuery, WithHeadings, WithMapping, WithStyles
             'AH' => '#,##0.00',                         // Líquido a cobrar
             'AI' => '#,##0.00',                         // Líquido Cobrado
             'AJ' => '#,##0.00',                         // Líquido por cobrar
-            'AK' => NumberFormat::FORMAT_DATE_DDMMYYYY, // Fecha Cobro
+            'AK' => 'dd/mm/yyyy', // Fecha Cobro
             // 🔽 NUEVOS FORMATOS AGREGADOS 🔽
             'AM' => '#,##0.00',                         // Derechos Supervisión
             'AN' => '#,##0.00',                         // Aportación CMIC

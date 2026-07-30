@@ -157,7 +157,9 @@ class ContratosExport implements
             if (is_string($date) && strpos($date, ' ') !== false) {
                 $date = explode(' ', $date)[0];
             }
-            return $date;
+            $timestamp = strtotime($date);
+            if ($timestamp === false) return null;
+            return ($timestamp / 86400) + 25569;
         } catch (\Exception $e) {
             return null;
         }
@@ -197,8 +199,8 @@ class ContratosExport implements
             'P' => '#,##0.00',  // IVA Suma
             'Q' => '#,##0.00',  // Total Suma
             'R' => '#,##0.00',  // Anticipo
-            'T' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Inicio de Obra
-            'U' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Terminación
+            'T' => 'dd/mm/yyyy',
+            'U' => 'dd/mm/yyyy',
         ];
     }
 

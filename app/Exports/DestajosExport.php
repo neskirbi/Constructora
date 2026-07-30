@@ -119,7 +119,9 @@ class DestajosExport implements
             if (is_string($date) && strpos($date, ' ') !== false) {
                 $date = explode(' ', $date)[0];
             }
-            return $date;
+            $timestamp = strtotime($date);
+            if ($timestamp === false) return null;
+            return ($timestamp / 86400) + 25569;
         } catch (\Exception $e) {
             return null;
         }
@@ -177,7 +179,7 @@ class DestajosExport implements
     public function columnFormats(): array
     {
         return [
-            'E' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Fecha
+            'E' => 'dd/mm/yyyy',
             'G' => '#,##0.00',  // Costo Unitario
             'H' => '#,##0.00',  // Cantidad
             'I' => '#,##0.00',  // Costo operado

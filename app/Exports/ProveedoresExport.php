@@ -87,7 +87,9 @@ class ProveedoresExport implements
             if (is_string($date) && strpos($date, ' ') !== false) {
                 $date = explode(' ', $date)[0];
             }
-            return $date;
+            $timestamp = strtotime($date);
+            if ($timestamp === false) return null;
+            return ($timestamp / 86400) + 25569;
         } catch (\Exception $e) {
             return null;
         }
@@ -150,8 +152,8 @@ class ProveedoresExport implements
     {
         return [
             'A' => NumberFormat::FORMAT_NUMBER_00,      // Clave con 2 decimales
-            'H' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Fecha creación
-            'I' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Fecha modificación
+            'H' => 'dd/mm/yyyy',  // Fecha creación
+            'I' => 'dd/mm/yyyy',  // Fecha modificación
         ];
     }
 

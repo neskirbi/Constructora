@@ -73,7 +73,9 @@ class ProductosServiciosExport implements
             if (is_string($date) && strpos($date, ' ') !== false) {
                 $date = explode(' ', $date)[0];
             }
-            return $date;
+            $timestamp = strtotime($date);
+            if ($timestamp === false) return null;
+            return ($timestamp / 86400) + 25569;
         } catch (\Exception $e) {
             return null;
         }
@@ -136,8 +138,8 @@ class ProductosServiciosExport implements
     {
         return [
             'D' => '#,##0.00',                          // Último costo
-            'E' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Fecha creación (solo fecha)
-            'F' => NumberFormat::FORMAT_DATE_DDMMYYYY,  // Fecha modificación (solo fecha)
+            'E' => 'dd/mm/yyyy',  // Fecha creación (solo fecha)
+            'F' => 'dd/mm/yyyy',  // Fecha modificación (solo fecha)
         ];
     }
 
