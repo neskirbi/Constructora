@@ -3,6 +3,9 @@
 <head>
     @include('header')
     <title>{{Empresa()}} | Detalle Requisición</title>
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
     <style>
         .header-detalle {
             background: white;
@@ -66,33 +69,6 @@
             border-radius: 20px;
             font-size: 0.8rem;
             color: #495057;
-        }
-        .card-item .input-cantidad {
-            width: 100px;
-            text-align: right;
-            border: 1px solid #dee2e6;
-            border-radius: 6px;
-            padding: 4px 8px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            display: inline-block;
-        }
-        .card-item .input-cantidad:focus {
-            border-color: #0d6efd;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(13,110,253,0.15);
-        }
-        .card-item .input-fecha {
-            width: 100%;
-            font-size: 0.85rem;
-            padding: 5px 8px;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-        }
-        .card-item .input-fecha:focus {
-            border-color: #0d6efd;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(13,110,253,0.15);
         }
         .card-item .label-campo {
             font-size: 0.7rem;
@@ -175,15 +151,18 @@
             padding: 6px 30px;
             font-size: 0.9rem;
             border-radius: 4px;
-            background: #0d6efd;
-            color: white;
             border: none;
             cursor: pointer;
             transition: all 0.2s;
             float: right;
         }
-        .card-item .btn-guardar-item:hover {
-            background: #0b5ed7;
+        .card-item .btn-guardar-item.guardado {
+            background: #28a745;
+            color: white;
+        }
+        .card-item .btn-guardar-item.pendiente {
+            background: #ffc107;
+            color: #212529;
         }
         .card-item .btn-guardar-item.guardando {
             background: #ffc107;
@@ -211,6 +190,51 @@
         }
         .h-100 {
             min-height: 38px;
+        }
+        .select2-container .select2-selection--single {
+            height: 38px !important;
+            padding: 5px 8px !important;
+        }
+        .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {
+            line-height: 28px !important;
+        }
+        .input-cantidad-requerida {
+            width: 100%;
+            text-align: right;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 4px 6px;
+            font-weight: 600;
+        }
+        .input-inventario {
+            width: 100%;
+            text-align: right;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 4px 6px;
+            background: #e9ecef;
+        }
+        .input-comprar {
+            width: 100%;
+            text-align: right;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 4px 6px;
+            background: #fff3cd;
+            font-weight: 600;
+        }
+        .input-unidad-compra {
+            width: 100%;
+            text-align: left;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 4px 6px;
+        }
+        .select-unidad {
+            width: 100%;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 4px 6px;
         }
         @media (max-width: 768px) {
             .card-item .fila-proveedores .proveedor-row .select-proveedor,
@@ -264,6 +288,7 @@
                         <div class="row mt-2">
                             <div class="col-md-4"><strong>Partida:</strong> {{ $requisicion->partida ?? 'N/A' }}</div>
                             <div class="col-md-4"><strong>Fecha Solicitud:</strong> {{ $requisicion->fecha_solicitud ? \Carbon\Carbon::parse($requisicion->fecha_solicitud)->format('d/m/Y') : 'N/A' }}</div>
+                            <div class="col-md-4"><strong>No. Obra:</strong> {{ $requisicion->no_obra ?? 'N/A' }}</div>
                         </div>
                         <div class="row mt-2">
                             <div class="col-md-12"><strong>Dirección:</strong> {{ $requisicion->direccion_entrega ?? 'N/A' }}</div>
@@ -281,6 +306,7 @@
                             <div class="col-md-12">
                                 <span class="clave">{{ $item->clave }}</span>
                                 <span class="descripcion ms-2">{{ $item->descripcion }}</span>
+                                <span class="badge bg-primary ms-2">{{ $item->cantidad }}</span>
                                 <span class="unidad-badge ms-2">{{ $item->unidad }}</span>
                             </div>
                         </div>
@@ -288,28 +314,37 @@
                         <!-- Campos horizontales debajo -->
                         <div class="row mt-2">
                             <div class="col-md-3">
-                                <span class="label-campo" style="font-size: 0.65rem; color: #6c757d; display: block;">Cant. Requisición</span>
-                                <input type="number" class="input-cantidad" value="{{ $item->cantidad }}" 
-                                    step="0.01" min="0" id="cantidad-{{ $item->id }}"
-                                    style="width: 100%; text-align: right; border: 1px solid #dee2e6; border-radius: 4px; padding: 4px 6px;"
+                                <span class="label-campo">Cantidad Requerida</span>
+                                <input type="number" class="input-cantidad-requerida" 
+                                    value="{{ $item->cantidad }}" 
+                                    step="0.01" min="0" id="cantidad-requerida-{{ $item->id }}"
                                     {{ $requisicion->procesada == 1 ? 'disabled' : '' }}>
                             </div>
                             <div class="col-md-3">
-                                <span class="label-campo" style="font-size: 0.65rem; color: #6c757d; display: block;">Cant. Inventario</span>
+                                <span class="label-campo">Inventario</span>
                                 <input type="number" class="input-inventario" 
-                                    value="{{ $item->stock ? $item->stock->cantidad : 0 }}" 
+                                    value="{{ $item->inventario ?? 0 }}" 
                                     step="0.01" min="0" id="inventario-{{ $item->id }}"
-                                    style="width: 100%; text-align: right; border: 1px solid #dee2e6; border-radius: 4px; padding: 4px 6px; background: #e9ecef;"
-                                    disabled>
-                            </div>
-                            <div class="col-md-3">
-                                <span class="label-campo" style="font-size: 0.65rem; color: #6c757d; display: block;">Cant. a Comprar</span>
-                                <input type="number" class="input-comprar" 
-                                    value="{{ max(0, $item->cantidad - ($item->stock ? $item->stock->cantidad : 0)) }}"
-                                    step="0.01" min="0" id="comprar-{{ $item->id }}"
-                                    style="width: 100%; text-align: right; border: 1px solid #dee2e6; border-radius: 4px; padding: 4px 6px; background: #fff3cd; font-weight: 600;"
                                     {{ $requisicion->procesada == 1 ? 'disabled' : '' }}>
                             </div>
+                            <div class="col-md-3">
+                                <span class="label-campo">Cant. a Comprar</span>
+                                <input type="number" class="input-comprar" 
+                                    value="{{ $item->cantidad_comprar ?? max(0, $item->cantidad - ($item->inventario ?? 0)) }}"
+                                    step="0.01" min="0" id="comprar-{{ $item->id }}"
+                                    {{ $requisicion->procesada == 1 ? 'disabled' : '' }}>
+                            </div>
+                           <div class="col-md-3">
+    <span class="label-campo">Unidad de Compra</span>
+    <select class="form-select select-unidad-compra" id="unidad-compra-{{ $item->id }}" {{ $requisicion->procesada == 1 ? 'disabled' : '' }}>
+        <option value="{{ $item->unidad_compra ?? $item->unidad }}" selected>{{ $item->unidad_compra ?? $item->unidad }}</option>
+        @foreach($unidades as $unidad)
+            @if($unidad != ($item->unidad_compra ?? $item->unidad))
+            <option value="{{ $unidad }}">{{ $unidad }}</option>
+            @endif
+        @endforeach
+    </select>
+</div>
                         </div>
 
                         <!-- Fila 2: Proveedores -->
@@ -352,10 +387,11 @@
                                     </div>
                                     <div class="col-2">
                                         <span class="label-campo">Fecha Entrega</span>
-                                        <input type="date" class="input-fecha" 
-                                               value="{{ $proveedor->fecha_entrega ? \Carbon\Carbon::parse($proveedor->fecha_entrega)->format('Y-m-d') : '' }}"
-                                               id="fecha-{{ $proveedor->id }}"
-                                               {{ $requisicion->procesada == 1 ? 'disabled' : '' }}>
+                                       <input type="date" class="form-control input-fecha" 
+                                            value="{{ $proveedor->fecha_entrega ? \Carbon\Carbon::parse($proveedor->fecha_entrega)->format('Y-m-d') : '' }}"
+                                            id="fecha-{{ $proveedor->id }}"
+                                            style="font-size: 0.85rem; padding: 5px 8px; border: 1px solid #dee2e6; border-radius: 4px; width: 100%;"
+                                            {{ $requisicion->procesada == 1 ? 'disabled' : '' }}>
                                     </div>
                                     <div class="col-2 text-end">
                                         <div class="h-100 d-flex align-items-center justify-content-end">
@@ -375,8 +411,8 @@
                             <button class="btn-agregar-proveedor" onclick="agregarFilaProveedor('{{ $item->id }}', this)">
                                 <i class="fas fa-user-plus"></i> Agregar Proveedor
                             </button>
-                            <button class="btn-guardar-item" onclick="guardarItem('{{ $item->id }}', this)">
-                                <i class="fas fa-save"></i> Guardar
+                            <button class="btn-guardar-item guardado" onclick="guardarItem('{{ $item->id }}', this)">
+                                <i class="fas fa-check"></i> Guardado
                             </button>
                         </div>
                         @endif
@@ -398,9 +434,59 @@
 
     @include('footer')
 
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        $(document).ready(function() {
+            // Inicializar Select2 en todos los select de proveedores
+            $('.select-proveedor').select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Selecciona un proveedor',
+                allowClear: true,
+                width: '100%'
+            });
+
+            // Marcar como pendiente cuando cambia cualquier input
+            $(document).on('change', '.input-cantidad-requerida, .input-inventario, .input-comprar, .input-unidad-compra, .input-precio, .input-descuento, .input-fecha, .select-proveedor, .form-check-input', function() {
+                var card = $(this).closest('.card-item');
+                var btnGuardar = card.find('.btn-guardar-item');
+                if (!btnGuardar.hasClass('pendiente')) {
+                    btnGuardar.removeClass('guardado');
+                    btnGuardar.addClass('pendiente');
+                    btnGuardar.html('<i class="fas fa-exclamation-triangle"></i> Pendiente de Guardar');
+                }
+            });
+
+            // Marcar como pendiente cuando se agrega un proveedor
+            $(document).on('click', '.btn-agregar-proveedor', function() {
+                var card = $(this).closest('.card-item');
+                var btnGuardar = card.find('.btn-guardar-item');
+                btnGuardar.removeClass('guardado');
+                btnGuardar.addClass('pendiente');
+                btnGuardar.html('<i class="fas fa-exclamation-triangle"></i> Pendiente de Guardar');
+            });
+
+            // Marcar como pendiente cuando se elimina un proveedor
+            $(document).on('click', '.btn-eliminar-proveedor', function() {
+                var card = $(this).closest('.card-item');
+                var btnGuardar = card.find('.btn-guardar-item');
+                btnGuardar.removeClass('guardado');
+                btnGuardar.addClass('pendiente');
+                btnGuardar.html('<i class="fas fa-exclamation-triangle"></i> Pendiente de Guardar');
+            });
+
+            // Actualizar cantidad a comprar automáticamente
+            $(document).on('change', '.input-cantidad-requerida, .input-inventario', function() {
+                var row = $(this).closest('.row');
+                var cantidadRequerida = parseFloat(row.find('.input-cantidad-requerida').val()) || 0;
+                var inventario = parseFloat(row.find('.input-inventario').val()) || 0;
+                var comprar = Math.max(0, cantidadRequerida - inventario);
+                row.find('.input-comprar').val(comprar.toFixed(2));
+            });
+        });
+
         function eliminarItem(id, clave, element) {
             Swal.fire({
                 title: '¿Eliminar ' + clave + '?',
@@ -448,17 +534,18 @@
 
         function agregarFilaProveedor(itemId, btn) {
             var container = $('#proveedores-' + itemId);
+            var timestamp = Date.now();
             var row = `
-                <div class="proveedor-row" data-id="nuevo">
+                <div class="proveedor-row" data-id="nuevo-${timestamp}">
                     <div class="row align-items-center">
                         <div class="col-1">
                             <div class="d-flex-center h-100">
-                                <input class="form-check-input" type="checkbox" id="check-nuevo-${Date.now()}">
+                                <input class="form-check-input" type="checkbox" id="check-${timestamp}">
                             </div>
                         </div>
                         <div class="col-3">
                             <span class="label-campo">Proveedor</span>
-                            <select class="select-proveedor">
+                            <select class="select-proveedor select2-nuevo-${timestamp}">
                                 <option value="">Sin proveedor</option>
                                 @foreach($proveedores as $proveedor)
                                 <option value="{{ $proveedor->id }}">{{ $proveedor->clave }} - {{ $proveedor->nombre }}</option>
@@ -475,7 +562,9 @@
                         </div>
                         <div class="col-2">
                             <span class="label-campo">Fecha Entrega</span>
-                            <input type="date" class="input-fecha">
+                            <input type="date" class="input-fecha" 
+                                style="width: 100%; font-size: 0.85rem; padding: 5px 8px; border: 1px solid #dee2e6; border-radius: 4px;"
+                                id="fecha-${timestamp}">
                         </div>
                         <div class="col-2 text-end">
                             <div class="h-100 d-flex align-items-center justify-content-end">
@@ -488,10 +577,32 @@
                 </div>
             `;
             container.append(row);
+            
+            // Inicializar Select2 para el nuevo select
+            $(`.select2-nuevo-${timestamp}`).select2({
+                theme: 'bootstrap-5',
+                placeholder: 'Selecciona un proveedor',
+                allowClear: true,
+                width: '100%'
+            });
+
+            // Marcar como pendiente
+            var card = $(btn).closest('.card-item');
+            var btnGuardar = card.find('.btn-guardar-item');
+            btnGuardar.removeClass('guardado');
+            btnGuardar.addClass('pendiente');
+            btnGuardar.html('<i class="fas fa-exclamation-triangle"></i> Pendiente de Guardar');
         }
 
         function eliminarFilaProveedor(btn) {
             $(btn).closest('.proveedor-row').remove();
+            
+            // Marcar como pendiente
+            var card = $(btn).closest('.card-item');
+            var btnGuardar = card.find('.btn-guardar-item');
+            btnGuardar.removeClass('guardado');
+            btnGuardar.addClass('pendiente');
+            btnGuardar.html('<i class="fas fa-exclamation-triangle"></i> Pendiente de Guardar');
         }
 
         function eliminarProveedor(btn, proveedorId) {
@@ -524,6 +635,12 @@
                                     timer: 1500,
                                     showConfirmButton: false
                                 });
+                                // Marcar como pendiente
+                                var card = $(btn).closest('.card-item');
+                                var btnGuardar = card.find('.btn-guardar-item');
+                                btnGuardar.removeClass('guardado');
+                                btnGuardar.addClass('pendiente');
+                                btnGuardar.html('<i class="fas fa-exclamation-triangle"></i> Pendiente de Guardar');
                             }
                         },
                         error: function() {
@@ -547,196 +664,142 @@
         });
 
         function guardarItem(itemId, btn) {
-    var btnOriginal = $(btn);
-    var btnHtml = btnOriginal.html();
-    
-    btnOriginal.addClass('guardando');
-    btnOriginal.html('<i class="fas fa-spinner"></i> Guardando...');
-    
-    var cantidad = $('#cantidad-' + itemId).val();
-    
-    var proveedores = [];
-    var container = $('#proveedores-' + itemId);
-    var seleccionados = 0;
-    var errores = [];
-    var filasConError = 0;
-    
-    container.find('.proveedor-row').each(function() {
-        var row = $(this);
-        var proveedorId = row.find('.select-proveedor').val();
-        var precio = row.find('.input-precio').val();
-        var descuento = row.find('.input-descuento').val();
-        var fechaEntrega = row.find('.input-fecha').val();
-        var rowId = row.data('id');
-        var seleccionado = row.find('.form-check-input').is(':checked') ? 1 : 0;
-        
-        // Validar cada fila independientemente
-        var tieneError = false;
-        
-        if (!proveedorId || proveedorId === '') {
-            if (seleccionado) {
-                errores.push('La fila seleccionada no tiene proveedor');
-                tieneError = true;
-            }
-        }
-        
-        if (seleccionado) {
-            seleccionados++;
+            var btnOriginal = $(btn);
+            var btnHtml = btnOriginal.html();
             
-            if (!precio || precio <= 0) {
-                errores.push('El proveedor seleccionado no tiene precio');
-                tieneError = true;
-            }
-            if (!fechaEntrega) {
-                errores.push('El proveedor seleccionado no tiene fecha de entrega');
-                tieneError = true;
-            }
-        }
-        
-        if (tieneError) {
-            filasConError++;
-        }
-        
-        if (proveedorId) {
-            proveedores.push({
-                id: rowId,
-                proveedor_id: proveedorId,
-                precio: precio || 0,
-                descuento: descuento || 0,
-                seleccionado: seleccionado,
-                fecha_entrega: fechaEntrega || null
-            });
-        }
-    });
-
-    // Validar que haya al menos un proveedor agregado (con select)
-    var proveedoresConSelect = proveedores.filter(p => p.proveedor_id);
-    if (proveedoresConSelect.length === 0) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Sin proveedores',
-            text: 'Agrega al menos un proveedor (selecciona uno en el select)',
-            confirmButtonColor: '#0d6efd',
-            confirmButtonText: 'Entendido'
-        });
-        btnOriginal.removeClass('guardando');
-        btnOriginal.html(btnHtml);
-        return;
-    }
-
-    // Validar que solo se pueda seleccionar un proveedor
-    if (seleccionados > 1) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Selección única',
-            text: 'Solo puedes seleccionar un proveedor por producto',
-            confirmButtonColor: '#0d6efd',
-            confirmButtonText: 'Entendido'
-        });
-        btnOriginal.removeClass('guardando');
-        btnOriginal.html(btnHtml);
-        return;
-    }
-
-    // Validar que haya un proveedor seleccionado
-    if (seleccionados === 0) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Selecciona un proveedor',
-            text: 'Debes seleccionar un proveedor para este producto',
-            confirmButtonColor: '#0d6efd',
-            confirmButtonText: 'Entendido'
-        });
-        btnOriginal.removeClass('guardando');
-        btnOriginal.html(btnHtml);
-        return;
-    }
-
-    // Validar errores del proveedor seleccionado
-    if (errores.length > 0) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Datos incompletos',
-            text: errores.join('<br>'),
-            confirmButtonColor: '#0d6efd',
-            confirmButtonText: 'Entendido'
-        });
-        btnOriginal.removeClass('guardando');
-        btnOriginal.html(btnHtml);
-        return;
-    }
-
-    // Validar que todas las filas tengan precio y fecha (aunque no estén seleccionadas)
-    var todasLasFilas = container.find('.proveedor-row');
-    var erroresGlobales = [];
-    
-    todasLasFilas.each(function() {
-        var row = $(this);
-        var proveedorId = row.find('.select-proveedor').val();
-        var precio = row.find('.input-precio').val();
-        var fechaEntrega = row.find('.input-fecha').val();
-        
-        if (proveedorId && proveedorId !== '') {
-            if (!precio || precio <= 0) {
-                erroresGlobales.push('La fila con proveedor ' + proveedorId + ' no tiene precio');
-            }
-            if (!fechaEntrega) {
-                erroresGlobales.push('La fila con proveedor ' + proveedorId + ' no tiene fecha de entrega');
-            }
-        }
-    });
-
-    if (erroresGlobales.length > 0) {
-        Swal.fire({
-            icon: 'warning',
-            title: 'Datos incompletos en filas',
-            text: erroresGlobales.join('<br>'),
-            confirmButtonColor: '#0d6efd',
-            confirmButtonText: 'Entendido'
-        });
-        btnOriginal.removeClass('guardando');
-        btnOriginal.html(btnHtml);
-        return;
-    }
-
-    $.ajax({
-        url: '{{ url("requisiciones/guardar-item-completo") }}',
-        type: 'POST',
-        data: {
-            id: itemId,
-            cantidad: cantidad,
-            proveedores: proveedores,
-            _token: '{{ csrf_token() }}'
-        },
-        success: function(response) {
-            if (response.success) {
-                $.each(response.data.proveedores, function(index, prov) {
-                    var row = $('#proveedores-' + itemId).find('.proveedor-row[data-id="nuevo"]');
-                    if (row.length > 0) {
-                        row.data('id', prov.id);
-                        row.find('.btn-eliminar-proveedor').attr('onclick', 'eliminarProveedor(this, "' + prov.id + '")');
-                        row.find('.form-check-input').attr('id', 'check-' + prov.id);
-                    }
-                });
+            btnOriginal.removeClass('guardado pendiente');
+            btnOriginal.addClass('guardando');
+            btnOriginal.html('<i class="fas fa-spinner"></i> Guardando...');
+            
+            var cantidadRequerida = $('#cantidad-requerida-' + itemId).val();
+            var inventario = $('#inventario-' + itemId).val();
+            var cantidadComprar = $('#comprar-' + itemId).val();
+            var unidadCompra = $('#unidad-compra-' + itemId).val();
+            
+            var proveedores = [];
+            var container = $('#proveedores-' + itemId);
+            var seleccionados = 0;
+            var errores = [];
+            
+            container.find('.proveedor-row').each(function() {
+                var row = $(this);
+                var proveedorId = row.find('.select-proveedor').val();
+                var precio = row.find('.input-precio').val();
+                var descuento = row.find('.input-descuento').val();
+                var fechaEntrega = row.find('.input-fecha').val();
+                var rowId = row.data('id');
+                var seleccionado = row.find('.form-check-input').is(':checked') ? 1 : 0;
                 
+                if (seleccionado) {
+                    seleccionados++;
+                    
+                    if (!proveedorId || proveedorId === '') {
+                        errores.push('El proveedor seleccionado no tiene proveedor asignado');
+                    }
+                    if (!precio || precio <= 0) {
+                        errores.push('El proveedor seleccionado no tiene precio');
+                    }
+                    if (!fechaEntrega) {
+                        errores.push('El proveedor seleccionado no tiene fecha de entrega');
+                    }
+                }
+                
+                if (proveedorId) {
+                    proveedores.push({
+                        id: rowId,
+                        proveedor_id: proveedorId,
+                        precio: precio || 0,
+                        descuento: descuento || 0,
+                        seleccionado: seleccionado,
+                        fecha_entrega: fechaEntrega || null
+                    });
+                }
+            });
+
+            var proveedoresConSelect = proveedores.filter(p => p.proveedor_id);
+            if (proveedoresConSelect.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Sin proveedores',
+                    text: 'Agrega al menos un proveedor (selecciona uno en el select)',
+                    confirmButtonColor: '#0d6efd',
+                    confirmButtonText: 'Entendido'
+                });
                 btnOriginal.removeClass('guardando');
+                btnOriginal.addClass('guardado');
                 btnOriginal.html('<i class="fas fa-check"></i> Guardado');
-                setTimeout(function() {
-                    btnOriginal.html(btnHtml);
-                }, 1500);
+                return;
             }
-        },
-        error: function() {
-            btnOriginal.removeClass('guardando');
-            btnOriginal.html(btnHtml);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Error al guardar el item'
+
+            if (seleccionados === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Selecciona un proveedor',
+                    text: 'Debes seleccionar un proveedor para este producto',
+                    confirmButtonColor: '#0d6efd',
+                    confirmButtonText: 'Entendido'
+                });
+                btnOriginal.removeClass('guardando');
+                btnOriginal.addClass('guardado');
+                btnOriginal.html('<i class="fas fa-check"></i> Guardado');
+                return;
+            }
+
+            if (errores.length > 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Datos incompletos',
+                    text: errores.join('<br>'),
+                    confirmButtonColor: '#0d6efd',
+                    confirmButtonText: 'Entendido'
+                });
+                btnOriginal.removeClass('guardando');
+                btnOriginal.addClass('guardado');
+                btnOriginal.html('<i class="fas fa-check"></i> Guardado');
+                return;
+            }
+
+            $.ajax({
+                url: '{{ url("requisiciones/guardar-item-completo") }}',
+                type: 'POST',
+                data: {
+                    id: itemId,
+                    cantidad: cantidadRequerida,
+                    inventario: inventario,
+                    cantidad_comprar: cantidadComprar,
+                    unidad_compra: unidadCompra,
+                    proveedores: proveedores,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        btnOriginal.removeClass('guardando');
+                        btnOriginal.addClass('guardado');
+                        btnOriginal.html('<i class="fas fa-check"></i> Guardado');
+                        
+                        // Actualizar IDs de proveedores nuevos
+                        $.each(response.data.proveedores, function(index, prov) {
+                            var row = $('#proveedores-' + itemId).find('.proveedor-row[data-id="nuevo-' + Date.now() + '"]');
+                            if (row.length > 0) {
+                                row.data('id', prov.id);
+                                row.find('.btn-eliminar-proveedor').attr('onclick', 'eliminarProveedor(this, "' + prov.id + '")');
+                                row.find('.form-check-input').attr('id', 'check-' + prov.id);
+                            }
+                        });
+                    }
+                },
+                error: function() {
+                    btnOriginal.removeClass('guardando');
+                    btnOriginal.addClass('pendiente');
+                    btnOriginal.html('<i class="fas fa-exclamation-triangle"></i> Pendiente de Guardar');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Error al guardar el item'
+                    });
+                }
             });
         }
-    });
-}
 
         function generarCompras() {
             Swal.fire({
@@ -788,15 +851,6 @@
                 }
             });
         }
-
-        // Agregar evento para actualizar "Cant. a Comprar"
-        $(document).on('change', '.input-cantidad, .input-inventario', function() {
-            var row = $(this).closest('.row');
-            var cantidad = parseFloat(row.find('.input-cantidad').val()) || 0;
-            var inventario = parseFloat(row.find('.input-inventario').val()) || 0;
-            var comprar = Math.max(0, cantidad - inventario);
-            row.find('.input-comprar').val(comprar.toFixed(2));
-        });
     </script>
 </body>
 </html>

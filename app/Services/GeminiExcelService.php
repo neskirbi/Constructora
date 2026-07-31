@@ -52,25 +52,28 @@ class GeminiExcelService
 
                             El JSON debe tener esta estructura:
                             {
-                                \"contrato_no\": \"495010\",
-                                \"partida\": \"ELECTRICIDAD\",
+                                \"no_obra\": \"495.01\",
                                 \"contratista\": \"ALEJANDRO VILLA LOPEZ\",
+                                \"fecha_entrega\": \"2025-01-15\",
                                 \"items\": [
                                     {
                                         \"clave\": \"CABLE-8\",
                                         \"cantidad\": 1,
+                                        \"unidad\": \"CAJA\",
                                         \"link\": \"http://...\",
-                                        \"observaciones\": \"INSTALACION ELECTRICA\"
+                                        \"observaciones\": \"INSTALACION ELECTRICA\",
+                                        \"partida\": \"ELECTRICIDAD\"
                                     }
                                 ]
                             }
 
                             REGLAS:
-                            1. Busca el número de contrato en las primeras filas (etiqueta: N° Contrato)
-                            2. Busca Partida y Contratista
-                            3. Los items están en la tabla con columnas: Clave, Cantidad, Link, Observaciones
-                            4. La descripción y unidad se obtienen de la base de datos usando la clave
-                            5. Devuelve SOLO el JSON, sin texto adicional
+                            1. Busca el número de obra (etiqueta: No Obra)
+                            2. Busca el contratista
+                            3. Busca la fecha de entrega (etiqueta: Fecha de entrega)
+                            4. Los items están en la tabla con columnas: Clave, Cantidad, Unidad, Partida, Link, Observaciones
+                            5. Cada item debe tener su partida individual
+                            6. Devuelve SOLO el JSON, sin texto adicional
 
                             Datos del Excel:
                             $csv"

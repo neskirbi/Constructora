@@ -18,7 +18,11 @@ class RequisicionDetalle extends Model
         'clave',
         'descripcion',
         'unidad',
+        'partida',
         'cantidad',
+        'cantidad_comprar',
+        'inventario',
+        'unidad_compra',
         'observaciones',
         'link',
     ];

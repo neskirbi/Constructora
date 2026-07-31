@@ -75,15 +75,15 @@
                                     </div>
 
                                     <div class="row">
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <small class="text-muted d-block">Frente</small>
                                             <span>{{ $requisicion->frente ?? 'N/A' }}</span>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <small class="text-muted d-block">Empresa</small>
                                             <span>{{ $requisicion->empresa ?? 'N/A' }}</span>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <small class="text-muted d-block">Contrato</small>
                                             <span>
                                                 @if($requisicion->contrato)
@@ -92,6 +92,10 @@
                                                     <span class="text-muted">Sin contrato</span>
                                                 @endif
                                             </span>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <small class="text-muted d-block">Partida</small>
+                                            <span>{{ $requisicion->partida ?? 'N/A' }}</span>
                                         </div>
                                     </div>
 
@@ -104,14 +108,14 @@
                                         </div>
                                         <div class="d-flex gap-2">
                                             <a href="{{ url('requisiciones/show/' . $requisicion->id) }}" 
-                                            class="btn btn-sm btn-info">
+                                               class="btn btn-sm btn-info">
                                                 <i class="fas fa-eye"></i> Ver
                                             </a>
                                             
                                             @if($requisicion->procesada != 1)
                                                 <a href="{{ url('requisiciones/solicitud-cotizacion/' . $requisicion->id) }}" 
-                                                class="btn btn-sm btn-success" 
-                                                target="_blank">
+                                                   class="btn btn-sm btn-success" 
+                                                   target="_blank">
                                                     <i class="fas fa-file-pdf"></i> Solicitar Cotización
                                                 </a>
                                                 
