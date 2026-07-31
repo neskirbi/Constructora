@@ -100,28 +100,10 @@
             <span class="label">Contrato:</span>
             <span class="value">{{ $requisicion->contrato->refinterna ?? 'N/A' }}</span>
         </div>
-        <div class="item">
-            <span class="label">Empresa:</span>
-            <span class="value">{{ $requisicion->contrato->empresa ?? 'N/A' }}</span>
-        </div>
-        <div class="item">
-            <span class="label">Frente:</span>
-            <span class="value">{{ $requisicion->contrato->frente ?? 'N/A' }}</span>
-        </div>
-        <div class="item">
-            <span class="label">Cliente:</span>
-            <span class="value">{{ $requisicion->contrato->cliente ?? 'N/A' }}</span>
-        </div>
         <div class="item" style="grid-column: span 2;">
             <span class="label">Dirección de Entrega:</span>
             <span class="value">{{ $requisicion->direccion_entrega ?? $requisicion->contrato->lugar ?? 'N/A' }}</span>
         </div>
-        @if($requisicion->contratista)
-        <div class="item" style="grid-column: span 2;">
-            <span class="label">Contratista:</span>
-            <span class="value">{{ $requisicion->contratista }}</span>
-        </div>
-        @endif
     </div>
 
     <table>
