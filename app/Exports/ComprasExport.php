@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -99,7 +100,7 @@ class ComprasExport implements
                     $fila->clave_proveedor = $compra->proveedor_clave;
                     $fila->proveedor = $compra->proveedor_nombre;
                     $fila->clave_producto = $detalle->clave;
-                    $fila->descripcion = $detalle->descripcion;
+                    $fila->descripcion = Str::limit($detalle->descripcion, 30, '...');
                     $fila->unidad = $detalle->unidades;
                     $fila->cantidad = (float) $detalle->cantidad;
                     $fila->precio_unitario = (float) $detalle->ult_costo;
