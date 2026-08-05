@@ -58,16 +58,17 @@ class ComprasExport implements
                 'c.metodo_pago',
                 'c.empresa_pago',
                 'c.factura',
-                'ct.refinterna as contrato_refinterna',
                 'ct.frente as contrato_frente',
                 'ct.contrato_no',
                 'ct.obra as contrato_obra',
                 'p.clave as proveedor_clave',
                 'p.nombre as proveedor_nombre',
-                'p.clasificacion as proveedor_clasificacion'
+                'p.clasificacion as proveedor_clasificacion',
+                DB::raw("CONCAT(a.nombres, ' ', a.apellidos) as comprador_nombre")
             )
             ->leftJoin('contratos as ct', 'c.id_contrato', '=', 'ct.id')
             ->leftJoin('proveedores_servicios as p', 'c.id_proveedor', '=', 'p.id')
+            ->leftJoin('acompras as a', 'c.id_usuario', '=', 'a.id')
             ->whereBetween('c.created_at', [$this->fechaInicio . ' 00:00:00', $this->fechaFin . ' 23:59:59'])
             ->orderBy('c.created_at', 'asc');
 
@@ -108,7 +109,7 @@ class ComprasExport implements
                     $fila->observaciones = $compra->referencia;
                     $fila->tipo_pago = $compra->metodo_pago;
                     $fila->empresa_pagadora = $compra->empresa_pago;
-                    $fila->comprador = 'COMPRADOR';
+                    $fila->comprador = $compra->comprador_nombre ?? 'Desconocido';
                     $fila->entrega = $detalle->tipo_entrega ?? null;
                     $fila->fecha_entrega = $detalle->fecha_entrega ?? null;
                     $fila->obs_entrega = $detalle->comentarios ?? null;
@@ -136,7 +137,7 @@ class ComprasExport implements
                 $fila->observaciones = $compra->referencia;
                 $fila->tipo_pago = $compra->metodo_pago;
                 $fila->empresa_pagadora = $compra->empresa_pago;
-                $fila->comprador = 'COMPRADOR';
+                $fila->comprador = $compra->comprador_nombre ?? 'Desconocido';
                 $fila->entrega = null;
                 $fila->fecha_entrega = null;
                 $fila->obs_entrega = null;
