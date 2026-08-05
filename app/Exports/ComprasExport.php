@@ -90,6 +90,7 @@ class ComprasExport implements
                 ->get();
             
             if ($detalles->count() > 0) {
+                $primerDetalle = true;
                 foreach ($detalles as $detalle) {
                     $fila = new \stdClass();
                     $fila->consecutivo = $compra->numeracion;
@@ -105,8 +106,17 @@ class ComprasExport implements
                     $fila->cantidad = (float) $detalle->cantidad;
                     $fila->precio_unitario = (float) $detalle->ult_costo;
                     $fila->subtotal = (float) ($detalle->cantidad * $detalle->ult_costo);
-                    $fila->iva_compra = (float) $compra->iva;
-                    $fila->total = (float) $compra->total;
+                    
+                    // IVA y TOTAL solo en el primer detalle de la compra
+                    if ($primerDetalle) {
+                        $fila->iva_compra = (float) $compra->iva;
+                        $fila->total = (float) $compra->total;
+                        $primerDetalle = false;
+                    } else {
+                        $fila->iva_compra = null;
+                        $fila->total = null;
+                    }
+                    
                     $fila->observaciones = $compra->referencia;
                     $fila->tipo_pago = $compra->metodo_pago;
                     $fila->empresa_pagadora = $compra->empresa_pago;
@@ -211,8 +221,8 @@ class ComprasExport implements
             $fila->cantidad ?? 0,
             $fila->precio_unitario ?? 0,
             $fila->subtotal ?? 0,
-            $fila->iva_compra ?? 0,
-            $fila->total ?? 0,
+            $fila->iva_compra ?? '',
+            $fila->total ?? '',
             $fila->observaciones ?? '',
             $fila->tipo_pago ?? '',
             $fila->empresa_pagadora ?? '',
