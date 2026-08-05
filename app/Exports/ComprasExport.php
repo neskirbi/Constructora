@@ -88,7 +88,6 @@ class ComprasExport implements
                 ->get();
             
             if ($detalles->count() > 0) {
-                $primerDetalle = true;
                 foreach ($detalles as $detalle) {
                     $fila = new \stdClass();
                     $fila->consecutivo = $compra->numeracion;
@@ -109,7 +108,7 @@ class ComprasExport implements
                     $fila->observaciones = $compra->referencia;
                     $fila->tipo_pago = $compra->metodo_pago;
                     $fila->empresa_pagadora = $compra->empresa_pago;
-                    $fila->comprador = null;
+                    $fila->comprador = 'COMPRADOR';
                     $fila->entrega = $detalle->tipo_entrega ?? null;
                     $fila->fecha_entrega = $detalle->fecha_entrega ?? null;
                     $fila->obs_entrega = $detalle->comentarios ?? null;
@@ -137,7 +136,7 @@ class ComprasExport implements
                 $fila->observaciones = $compra->referencia;
                 $fila->tipo_pago = $compra->metodo_pago;
                 $fila->empresa_pagadora = $compra->empresa_pago;
-                $fila->comprador = null;
+                $fila->comprador = 'COMPRADOR';
                 $fila->entrega = null;
                 $fila->fecha_entrega = null;
                 $fila->obs_entrega = null;
@@ -145,16 +144,6 @@ class ComprasExport implements
                 
                 $filas->push($fila);
             }
-        }
-
-        // Obtener nombres de compradores
-        foreach ($filas as $fila) {
-            $comprador = DB::table('compras as c')
-                ->join('usuarios as u', 'c.id_usuario', '=', 'u.id')
-                ->where('c.numeracion', $fila->consecutivo)
-                ->select(DB::raw("CONCAT(u.nombres, ' ', u.apellidos) as comprador_nombre"))
-                ->first();
-            $fila->comprador = $comprador->comprador_nombre ?? 'Desconocido';
         }
         
         return $filas;
