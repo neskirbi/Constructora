@@ -112,7 +112,7 @@
         .payment-section {
             background-color: #f8f9fa;
             border-radius: 8px;
-            padding: 20px;
+            padding: 15px 20px;
             margin-bottom: 20px;
             border: 1px solid #dee2e6;
         }
@@ -230,15 +230,12 @@
                                 @csrf
                                 @method('PUT')
                                 
-                                <!-- Proveedor (solo visual, no editable en formulario) -->
-                                
-                                
                                 <!-- Información General editable -->
                                 <div class="row mb-4">
 
                                     <div class="col-md-3">
                                         <div class="mb-3">
-                                            <label for="consecutivo" class="form-label required-label">Consecutivo</label>
+                                            <label for="consecutivo" class="form-label required-label">Requisición</label>
                                             <input type="text" 
                                                     class="form-control form-control-sm @error('consecutivo') is-invalid @enderror" 
                                                     id="consecutivo" 
@@ -318,7 +315,54 @@
                                     </div>
                                 </div>
 
-                                
+                                <!-- Sección de Método de Pago (SUBIDA - ahora va aquí) -->
+                                <div class="payment-section">
+                                    <h6>
+                                        <i class="fas fa-credit-card me-2"></i>
+                                        Información de Pago
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="metodo_pago" class="form-label required-label">Método de Pago</label>
+                                                <select class="form-select form-select-sm @error('metodo_pago') is-invalid @enderror" 
+                                                        id="metodo_pago" 
+                                                        name="metodo_pago"
+                                                        required
+                                                        style="height: 38px;">
+                                                    <option value="">Seleccione un método</option>
+                                                    <option value="efectivo" {{ old('metodo_pago', $compra->metodo_pago ?? '') == 'efectivo' ? 'selected' : '' }}>
+                                                        <i class="fas fa-money-bill-wave me-2"></i> Efectivo
+                                                    </option>
+                                                    <option value="transferencia" {{ old('metodo_pago', $compra->metodo_pago ?? '') == 'transferencia' ? 'selected' : '' }}>
+                                                        <i class="fas fa-exchange-alt me-2"></i> Transferencia
+                                                    </option>
+                                                </select>
+                                                @error('metodo_pago')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-8">
+                                            <div class="mb-3">
+                                                <label for="empresa_pago" class="form-label">Empresa</label>
+                                                <input type="text" 
+                                                    class="form-control form-control-sm @error('empresa_pago') is-invalid @enderror" 
+                                                    id="empresa_pago" 
+                                                    name="empresa_pago" 
+                                                    value="{{ old('empresa_pago', $compra->empresa_pago ?? '') }}"
+                                                    placeholder="Ej: Banco XYZ, Transferencia #123, o nombre de la empresa"
+                                                    maxlength="255"
+                                                    style="height: 38px;">
+                                                <small class="text-muted">Especifique el banco, número de transferencia o empresa relacionada</small>
+                                                @error('empresa_pago')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <!-- Sección de Productos/Servicios editable -->
                                 <div class="row mb-3">
@@ -578,54 +622,8 @@
                                 <input type="hidden" name="total" id="total_hidden" value="{{ $compra->total }}">
 
                                
-                                <!-- Sección de Método de Pago -->
-                                <div class="payment-section">
-                                    <h6>
-                                        <i class="fas fa-credit-card me-2"></i>
-                                        Información de Pago
-                                    </h6>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="mb-3">
-                                                <label for="metodo_pago" class="form-label required-label">Método de Pago</label>
-                                                <select class="form-select form-select-sm @error('metodo_pago') is-invalid @enderror" 
-                                                        id="metodo_pago" 
-                                                        name="metodo_pago"
-                                                        required
-                                                        style="height: 38px;">
-                                                    <option value="">Seleccione un método</option>
-                                                    <option value="efectivo" {{ old('metodo_pago', $compra->metodo_pago ?? '') == 'efectivo' ? 'selected' : '' }}>
-                                                        <i class="fas fa-money-bill-wave me-2"></i> Efectivo
-                                                    </option>
-                                                    <option value="transferencia" {{ old('metodo_pago', $compra->metodo_pago ?? '') == 'transferencia' ? 'selected' : '' }}>
-                                                        <i class="fas fa-exchange-alt me-2"></i> Transferencia
-                                                    </option>
-                                                </select>
-                                                @error('metodo_pago')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="col-md-8">
-                                            <div class="mb-3">
-                                                <label for="empresa_pago" class="form-label">Empresa</label>
-                                                <input type="text" 
-                                                    class="form-control form-control-sm @error('empresa_pago') is-invalid @enderror" 
-                                                    id="empresa_pago" 
-                                                    name="empresa_pago" 
-                                                    value="{{ old('empresa_pago', $compra->empresa_pago ?? '') }}"
-                                                    placeholder="Ej: Banco XYZ, Transferencia #123, o nombre de la empresa"
-                                                    maxlength="255"
-                                                    style="height: 38px;">
-                                                <small class="text-muted">Especifique el banco, número de transferencia o empresa relacionada</small>
-                                                @error('empresa_pago')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <!-- Sección de Método de Pago (ELIMINADA de aquí - ahora está arriba) -->
+                                <!-- La sección de pago ahora está después de Información General -->
 
                               <div class="row mt-4">
                                 <div class="col-12">

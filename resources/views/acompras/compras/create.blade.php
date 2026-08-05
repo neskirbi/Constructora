@@ -82,41 +82,54 @@
             text-align: right;
         }
 
+        /* Hacer más grande el dropdown (contenedor de opciones) */
+        .select2-dropdown {
+            font-size: 1rem;
+            min-width: 400px;
+            width: auto !important;
+        }
 
-    /* Hacer más grande el dropdown (contenedor de opciones) */
-.select2-dropdown {
-    font-size: 1rem;  /* Texto más grande */
-    min-width: 400px;  /* Ancho mínimo más grande */
-    width: auto !important;  /* Ancho automático */
-}
+        /* Agrandar el campo de búsqueda dentro del dropdown */
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            height: 45px;
+            padding: 0.5rem 0.75rem;
+            font-size: 1rem;
+        }
 
-/* Agrandar el campo de búsqueda dentro del dropdown */
-.select2-container--default .select2-search--dropdown .select2-search__field {
-    height: 45px;  /* Más alto */
-    padding: 0.5rem 0.75rem;
-    font-size: 1rem;  /* Texto más grande */
-}
+        /* Agrandar las opciones del dropdown */
+        .select2-container--default .select2-results__option {
+            padding: 12px 15px;
+            font-size: 1rem;
+            min-height: 45px;
+        }
 
-/* Agrandar las opciones del dropdown */
-.select2-container--default .select2-results__option {
-    padding: 12px 15px;  /* Más padding vertical y horizontal */
-    font-size: 1rem;  /* Texto más grande */
-    min-height: 45px;  /* Altura mínima más grande */
-}
+        /* Agrandar el contenedor de resultados */
+        .select2-container--default .select2-results > .select2-results__options {
+            max-height: 400px;
+        }
 
-/* Agrandar el contenedor de resultados */
-.select2-container--default .select2-results > .select2-results__options {
-    max-height: 400px;  /* Altura máxima más grande (opcional) */
-}
+        /* Opcional: hacer más ancho el dropdown en general */
+        .select2-container {
+            width: 100% !important;
+        }
 
-/* Opcional: hacer más ancho el dropdown en general */
-.select2-container {
-    width: 100% !important;
-}
+        .select2-container--open .select2-dropdown {
+            min-width: 350px;
+        }
 
-.select2-container--open .select2-dropdown {
-    min-width: 350px;  /* Ancho mínimo del dropdown desplegado */
-}
+        /* Estilos para la sección de pago */
+        .payment-section {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+        }
+        .payment-section h6 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -151,13 +164,12 @@
 
                                     <div class="col-md-3">
                                         <div class="mb-3">
-                                            <label for="consecutivo" class="form-label required-label">Orden de Compra</label>
+                                            <label for="consecutivo" class="form-label required-label">Requisición</label>
                                             <input type="text" 
                                                 class="form-control form-control-sm @error('consecutivo') is-invalid @enderror" 
                                                 id="consecutivo" 
                                                 name="consecutivo" 
                                                 value="{{ old('consecutivo', $siguienteConsecutivo) }}"
-                                                
                                                 required
                                                 noformat
                                                 style="height: 38px;">
@@ -167,8 +179,6 @@
                                         </div>
                                     </div>
 
-                                  
-                                    
                                     <div class="col-md-3">
                                         <div class="mb-3">
                                             <label for="referencia" class="form-label required-label">Referencia</label>
@@ -226,15 +236,58 @@
                                             @error('id_proveedor')
                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                             @enderror
-                                            <!--<button type="button" class="btn btn-success btn-block btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#nuevoProveedorModal">
-                                                <i class="fas fa-plus-circle me-2"></i>
-                                                Nuevo Proveedor
-                                            </button>-->
                                         </div>
                                     </div>
                                 </div>
 
-                                
+                                <!-- Sección de Método de Pago -->
+                                <div class="payment-section">
+                                    <h6>
+                                        <i class="fas fa-credit-card me-2"></i>
+                                        Información de Pago
+                                    </h6>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="metodo_pago" class="form-label required-label">Método de Pago</label>
+                                                <select class="form-select form-select-sm @error('metodo_pago') is-invalid @enderror" 
+                                                        id="metodo_pago" 
+                                                        name="metodo_pago"
+                                                        required
+                                                        style="height: 38px;">
+                                                    <option value="">Seleccione un método</option>
+                                                    <option value="efectivo" {{ old('metodo_pago') == 'efectivo' ? 'selected' : '' }}>
+                                                        <i class="fas fa-money-bill-wave me-2"></i> Efectivo
+                                                    </option>
+                                                    <option value="transferencia" {{ old('metodo_pago') == 'transferencia' ? 'selected' : '' }}>
+                                                        <i class="fas fa-exchange-alt me-2"></i> Transferencia
+                                                    </option>
+                                                </select>
+                                                @error('metodo_pago')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-8">
+                                            <div class="mb-3">
+                                                <label for="empresa_pago" class="form-label">Empresa</label>
+                                                <input type="text" 
+                                                    class="form-control form-control-sm @error('empresa_pago') is-invalid @enderror" 
+                                                    id="empresa_pago" 
+                                                    name="empresa_pago" 
+                                                    value="{{ old('empresa_pago') }}"
+                                                    placeholder="Ej: Banco XYZ, Transferencia #123, o nombre de la empresa"
+                                                    maxlength="255"
+                                                    style="height: 38px;">
+                                                <small class="text-muted">Especifique el banco, número de transferencia o empresa relacionada</small>
+                                                @error('empresa_pago')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <!-- Sección de Productos/Servicios -->
                                 <div class="row mb-3">
@@ -288,8 +341,7 @@
                                                                step="0.01"
                                                                min="0"
                                                                noformat
-                                                               style="height: 38px;"
-                                                               noformat>
+                                                               style="height: 38px;">
                                                         <span class="input-group-text" style="height: 38px;">%</span>
                                                     </div>
                                                 </div>
@@ -364,7 +416,3 @@
     @include('general.modals.scripts')
 </body>
 </html>
-
-<!--Cambios 
-Que la alta de proveedor no refesque la pagina y la de material o servicio se cargue
-revisar por que no se agrega la especialidad-->

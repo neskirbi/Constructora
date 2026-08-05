@@ -26,14 +26,14 @@ class ComprasExport implements
     protected $fechaInicio;
     protected $fechaFin;
     protected $contratoId;
-    protected $claveProveedor; // NUEVA PROPIEDAD
+    protected $claveProveedor;
 
     public function __construct($fechaInicio, $fechaFin, $contratoId = null, $claveProveedor = null)
     {
         $this->fechaInicio = $fechaInicio;
         $this->fechaFin = $fechaFin;
         $this->contratoId = $contratoId;
-        $this->claveProveedor = $claveProveedor; // NUEVO PARÁMETRO
+        $this->claveProveedor = $claveProveedor;
     }
 
     public function collection()
@@ -41,6 +41,7 @@ class ComprasExport implements
         $query = DB::table('compras as c')
             ->select(
                 'c.id',
+                'c.numeracion',
                 'c.consecutivo',
                 'ct.consecutivo as cons',
                 'c.created_at',
@@ -54,6 +55,9 @@ class ComprasExport implements
                 "),
                 'c.total',
                 'c.verificado',
+                'c.metodo_pago',
+                'c.empresa_pago',
+                'c.factura',
                 'ct.refinterna as contrato_refinterna',
                 'ct.frente as contrato_frente',
                 'ct.contrato_no',
@@ -71,7 +75,6 @@ class ComprasExport implements
             $query->where('c.id_contrato', $this->contratoId);
         }
 
-        // NUEVO FILTRO POR CLAVE DE PROVEEDOR
         if ($this->claveProveedor) {
             $query->where('p.clave', 'LIKE', '%' . $this->claveProveedor . '%');
         }
@@ -88,44 +91,41 @@ class ComprasExport implements
                 $primerDetalle = true;
                 foreach ($detalles as $detalle) {
                     $fila = new \stdClass();
-                    $fila->consecutivo = $compra->consecutivo;
+                    $fila->consecutivo = $compra->numeracion;
                     $fila->fecha = $this->getDateOnly($compra->created_at);
-                    $fila->obra = $compra->contrato_obra;
+                    $fila->requisicion = $compra->consecutivo;
                     $fila->no_obra = $compra->cons;
                     $fila->frente = $compra->contrato_frente;
                     $fila->clave_proveedor = $compra->proveedor_clave;
                     $fila->proveedor = $compra->proveedor_nombre;
-                    $fila->clasificacion = $compra->proveedor_clasificacion;
-                    $fila->referencia = $compra->referencia;
                     $fila->clave_producto = $detalle->clave;
                     $fila->descripcion = $detalle->descripcion;
                     $fila->unidad = $detalle->unidades;
                     $fila->cantidad = (float) $detalle->cantidad;
                     $fila->precio_unitario = (float) $detalle->ult_costo;
                     $fila->subtotal = (float) ($detalle->cantidad * $detalle->ult_costo);
-                    
-                    if ($primerDetalle) {
-                        $fila->iva_compra = (float) $compra->iva;
-                        $fila->total = (float) $compra->total;
-                        $primerDetalle = false;
-                    } else {
-                        $fila->iva_compra = null;
-                        $fila->total = null;
-                    }
+                    $fila->iva_compra = (float) $compra->iva;
+                    $fila->total = (float) $compra->total;
+                    $fila->observaciones = $compra->referencia;
+                    $fila->tipo_pago = $compra->metodo_pago;
+                    $fila->empresa_pagadora = $compra->empresa_pago;
+                    $fila->comprador = null;
+                    $fila->entrega = $detalle->tipo_entrega ?? null;
+                    $fila->fecha_entrega = $detalle->fecha_entrega ?? null;
+                    $fila->obs_entrega = $detalle->comentarios ?? null;
+                    $fila->factura = $compra->factura;
                     
                     $filas->push($fila);
                 }
             } else {
                 $fila = new \stdClass();
-                $fila->consecutivo = $compra->consecutivo;
+                $fila->consecutivo = $compra->numeracion;
                 $fila->fecha = $this->getDateOnly($compra->created_at);
-                $fila->obra = $compra->contrato_obra;
+                $fila->requisicion = $compra->consecutivo;
                 $fila->no_obra = $compra->cons;
                 $fila->frente = $compra->contrato_frente;
                 $fila->clave_proveedor = $compra->proveedor_clave;
                 $fila->proveedor = $compra->proveedor_nombre;
-                $fila->clasificacion = $compra->proveedor_clasificacion;
-                $fila->referencia = $compra->referencia;
                 $fila->clave_producto = 'SIN DETALLES';
                 $fila->descripcion = 'SIN DETALLES';
                 $fila->unidad = '';
@@ -134,17 +134,32 @@ class ComprasExport implements
                 $fila->subtotal = 0;
                 $fila->iva_compra = (float) $compra->iva;
                 $fila->total = (float) $compra->total;
+                $fila->observaciones = $compra->referencia;
+                $fila->tipo_pago = $compra->metodo_pago;
+                $fila->empresa_pagadora = $compra->empresa_pago;
+                $fila->comprador = null;
+                $fila->entrega = null;
+                $fila->fecha_entrega = null;
+                $fila->obs_entrega = null;
+                $fila->factura = $compra->factura;
                 
                 $filas->push($fila);
             }
+        }
+
+        // Obtener nombres de compradores
+        foreach ($filas as $fila) {
+            $comprador = DB::table('compras as c')
+                ->join('usuarios as u', 'c.id_usuario', '=', 'u.id')
+                ->where('c.numeracion', $fila->consecutivo)
+                ->select(DB::raw("CONCAT(u.nombres, ' ', u.apellidos) as comprador_nombre"))
+                ->first();
+            $fila->comprador = $comprador->comprador_nombre ?? 'Desconocido';
         }
         
         return $filas;
     }
 
-    /**
-     * Extraer solo la fecha (sin hora) y devolverla como fecha Excel
-     */
     private function getDateOnly($date)
     {
         if (!$date) return null;
@@ -164,22 +179,28 @@ class ComprasExport implements
     {
         return [
             'CONSECUTIVO',
-            'FECHA',
-            'OBRA',
+            'FECHA DE TRÁMITE',
+            'REQUISICIÓN',
             'NO DE OBRA',
             'FRENTE',
-            'CLAVE PROVEEDOR',
+            'CLAVE PROVEDOR',
             'PROVEEDOR',
-            'CLASIFICACIÓN',
-            'REFERENCIA',
             'CLAVE PRODUCTO',
-            'DESCRIPCIÓN',
+            'DESCRIPCION',
             'UNIDAD',
             'CANTIDAD',
             'PRECIO UNITARIO',
             'SUBTOTAL',
             'IVA DE LA COMPRA',
-            'TOTAL'
+            'TOTAL',
+            'OBSERVACIONES',
+            'TIPO DE PAGO',
+            'EMPRESA PAGADORA',
+            'COMPRADOR',
+            'ENTREGA',
+            'FECHA DE ENTREGA',
+            'OBSERVACIONES DE ENTREGA',
+            'FACTURA'
         ];
     }
 
@@ -188,33 +209,40 @@ class ComprasExport implements
         return [
             $fila->consecutivo ?? '',
             $fila->fecha ?? '',
-            $fila->obra ?? '',
+            $fila->requisicion ?? '',
             $fila->no_obra ?? '',
             $fila->frente ?? '',
             $fila->clave_proveedor ?? '',
             $fila->proveedor ?? '',
-            $fila->clasificacion ?? '',
-            $fila->referencia ?? '',
             $fila->clave_producto ?? '',
             $fila->descripcion ?? '',
             $fila->unidad ?? '',
             $fila->cantidad ?? 0,
             $fila->precio_unitario ?? 0,
             $fila->subtotal ?? 0,
-            $fila->iva_compra ?? '',
-            $fila->total ?? '',
+            $fila->iva_compra ?? 0,
+            $fila->total ?? 0,
+            $fila->observaciones ?? '',
+            $fila->tipo_pago ?? '',
+            $fila->empresa_pagadora ?? '',
+            $fila->comprador ?? '',
+            $fila->entrega ?? '',
+            $fila->fecha_entrega ?? '',
+            $fila->obs_entrega ?? '',
+            $fila->factura ?? '',
         ];
     }
 
     public function columnFormats(): array
     {
         return [
-            'B' => 'dd/mm/yyyy',  // ESTA LÍNEA CAMBIA
+            'B' => 'dd/mm/yyyy',
+            'K' => '#,##0.00',
+            'L' => '#,##0.00',
             'M' => '#,##0.00',
             'N' => '#,##0.00',
             'O' => '#,##0.00',
-            'P' => '#,##0.00',
-            'Q' => '#,##0.00',
+            'U' => 'dd/mm/yyyy',
         ];
     }
 
@@ -265,10 +293,17 @@ class ComprasExport implements
 
                 $sheet->getStyle('A2:A' . $lastRow)->getAlignment()->setHorizontal('center');
                 $sheet->getStyle('B2:B' . $lastRow)->getAlignment()->setHorizontal('center');
-                $sheet->getStyle('C2:C' . $lastRow)->getAlignment()->setHorizontal('left');
-                $sheet->getStyle('D2:I' . $lastRow)->getAlignment()->setHorizontal('left');
-                $sheet->getStyle('J2:L' . $lastRow)->getAlignment()->setHorizontal('left');
-                $sheet->getStyle('M2:Q' . $lastRow)->getAlignment()->setHorizontal('right');
+                $sheet->getStyle('C2:I' . $lastRow)->getAlignment()->setHorizontal('left');
+                $sheet->getStyle('J2:J' . $lastRow)->getAlignment()->setHorizontal('left');
+                $sheet->getStyle('K2:O' . $lastRow)->getAlignment()->setHorizontal('right');
+                $sheet->getStyle('P2:P' . $lastRow)->getAlignment()->setHorizontal('left');
+                $sheet->getStyle('Q2:Q' . $lastRow)->getAlignment()->setHorizontal('left');
+                $sheet->getStyle('R2:R' . $lastRow)->getAlignment()->setHorizontal('left');
+                $sheet->getStyle('S2:S' . $lastRow)->getAlignment()->setHorizontal('left');
+                $sheet->getStyle('T2:T' . $lastRow)->getAlignment()->setHorizontal('left');
+                $sheet->getStyle('U2:U' . $lastRow)->getAlignment()->setHorizontal('center');
+                $sheet->getStyle('V2:V' . $lastRow)->getAlignment()->setHorizontal('left');
+                $sheet->getStyle('W2:W' . $lastRow)->getAlignment()->setHorizontal('left');
 
                 $sheet->getStyle('A1:' . $lastColumn . '1')->getAlignment()->setHorizontal('center');
                 $sheet->getRowDimension('1')->setRowHeight(25);
@@ -298,18 +333,17 @@ class ComprasExport implements
                     $columnaActual = chr(ord($columnaActual) + 1);
                 }
                 
-                // NUEVO: Mostrar filtro de clave de proveedor
                 if ($this->claveProveedor) {
                     $sheet->setCellValue($columnaActual . $filaInfo, 'Clave Proveedor: ' . $this->claveProveedor);
                 }
 
                 $filaTotales = $filaInfo + 2;
-                $sheet->setCellValue('O' . $filaTotales, 'SUBTOTAL GENERAL:');
-                $sheet->setCellValue('P' . $filaTotales, '=SUM(O2:O' . $lastRow . ')');
-                $sheet->setCellValue('Q' . $filaTotales, 'TOTAL GENERAL:');
-                $sheet->setCellValue('Q' . ($filaTotales + 1), '=SUM(Q2:Q' . $lastRow . ')');
+                $sheet->setCellValue('M' . $filaTotales, 'SUBTOTAL GENERAL:');
+                $sheet->setCellValue('N' . $filaTotales, '=SUM(M2:M' . $lastRow . ')');
+                $sheet->setCellValue('O' . $filaTotales, 'TOTAL GENERAL:');
+                $sheet->setCellValue('O' . ($filaTotales + 1), '=SUM(O2:O' . $lastRow . ')');
                 
-                $sheet->getStyle('O' . $filaTotales . ':Q' . ($filaTotales + 1))->applyFromArray([
+                $sheet->getStyle('M' . $filaTotales . ':O' . ($filaTotales + 1))->applyFromArray([
                     'font' => ['bold' => true],
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
@@ -317,8 +351,8 @@ class ComprasExport implements
                     ],
                 ]);
                 
-                $sheet->getStyle('P' . $filaTotales)->getNumberFormat()->setFormatCode('#,##0.00');
-                $sheet->getStyle('Q' . ($filaTotales + 1))->getNumberFormat()->setFormatCode('#,##0.00');
+                $sheet->getStyle('N' . $filaTotales)->getNumberFormat()->setFormatCode('#,##0.00');
+                $sheet->getStyle('O' . ($filaTotales + 1))->getNumberFormat()->setFormatCode('#,##0.00');
 
                 $sheet->freezePane('A2');
             },
