@@ -84,11 +84,19 @@
 <body>
     <div class="main-container">
         @include('toast.toasts')
-        @include('administradores.sidebar')
+        @if(auth()->guard('administradores')->check())
+                @include('administradores.sidebar')
+            @elseif(auth()->guard('acompras')->check())
+                @include('acompras.sidebar')
+            @endif
 
         <!-- Contenido principal -->
         <main class="main-content" id="mainContent">
-            @include('administradores.navbar')
+            @if(auth()->guard('administradores')->check())
+                @include('administradores.navbar')
+            @elseif(auth()->guard('acompras')->check())
+                @include('acompras.navbar')
+            @endif
 
             <!-- Área de contenido -->
             <div class="content-area">

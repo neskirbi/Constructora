@@ -138,7 +138,7 @@ Route::put('/ingresos/{id}/facturacion', [App\Http\Controllers\Aingresos\Ingreso
  * Reportes de Ingresos
  * IMPORTANTE: Añade el middleware correspondiente según quién debe acceder
  */
-Route::prefix('reportes')->middleware(['auth:administradores'])->group(function () {
+Route::prefix('reportes')->middleware(['auth:administradores,acompras'])->group(function () {
     
 
 // Reporte de Ingresos
