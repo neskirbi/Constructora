@@ -93,6 +93,29 @@
                                                 <small class="text-muted">Ej: PZA, M2, LTS</small>
                                             </div>
 
+                                            <!-- Precio -->
+                                            <div class="col-md-4">
+                                                <label class="form-label">
+                                                    <i class="fas fa-dollar-sign me-1 text-primary"></i>
+                                                    Precio <span class="text-danger">*</span>
+                                                </label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">$</span>
+                                                    <input type="number" 
+                                                           class="form-control @error('precio') is-invalid @enderror" 
+                                                           name="precio" 
+                                                           value="{{ old('precio', $producto->precio ?? 0) }}"
+                                                           step="0.01"
+                                                           min="0"
+                                                           placeholder="0.00"
+                                                           required>
+                                                    @error('precio')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                                <small class="text-muted">Costo unitario actual</small>
+                                            </div>
+
                                             <!-- Descripción -->
                                             <div class="col-12">
                                                 <label class="form-label">

@@ -22,7 +22,8 @@ class ProductoServicio extends Model
         'clave',
         'descripcion',
         'unidades',
-        'ult_costo'
+        'ult_costo',
+        'precio'
     ];
 
     public function stock()

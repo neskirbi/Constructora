@@ -95,6 +95,33 @@
                                                     Ej: PZA, M2, LTS, KG
                                                 </small>
                                             </div>
+
+                                            <!-- Precio -->
+                                            <div class="col-md-4">
+                                                <label class="form-label">
+                                                    Precio <span class="text-danger">*</span>
+                                                </label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">$</span>
+                                                    <input type="number" 
+                                                           class="form-control @error('precio') is-invalid @enderror" 
+                                                           name="precio" 
+                                                           id="precio"
+                                                           value="{{ old('precio') }}"
+                                                           step="0.01"
+                                                           min="0"
+                                                           placeholder="0.00"
+                                                           required>
+                                                    @error('precio')
+                                                    <div class="invalid-feedback">
+                                                        {{ $message }}
+                                                    </div>
+                                                    @enderror
+                                                </div>
+                                                <small class="text-muted">
+                                                    Costo unitario del producto
+                                                </small>
+                                            </div>
                                             
 
                                             <!-- Descripción (ocupa toda la fila) -->
@@ -161,10 +188,10 @@
                                                 <div class="mb-3">
                                                     <small class="text-muted d-block mb-2">
                                                         <i class="fas fa-dollar-sign me-1"></i>
-                                                        Costo:
+                                                        Precio:
                                                     </small>
                                                     <p class="small text-muted mb-0">
-                                                        Ingresa el costo unitario actual del producto o servicio. 
+                                                        Ingresa el precio unitario actual del producto o servicio. 
                                                         Este valor puede actualizarse después.
                                                     </p>
                                                 </div>
@@ -224,8 +251,8 @@
                 this.value = this.value.toUpperCase();
             });
 
-            // Validar que el costo no sea negativo mientras se escribe
-            document.getElementById('ult_costo').addEventListener('input', function(e) {
+            // Validar que el precio no sea negativo mientras se escribe
+            document.getElementById('precio').addEventListener('input', function(e) {
                 if (this.value < 0) {
                     this.value = 0;
                 }
@@ -234,4 +261,3 @@
     </script>
 </body>
 </html>
-
