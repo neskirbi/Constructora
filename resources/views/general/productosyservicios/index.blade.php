@@ -75,6 +75,7 @@
                                             <th style="white-space: nowrap;">Clave</th>
                                             <th style="white-space: nowrap;">Descripción</th>
                                             <th style="white-space: nowrap;">Unidades</th>
+                                            <th style="white-space: nowrap;" class="text-end">Precio</th>
                                             <th style="white-space: nowrap;" class="text-end">Último costo</th>
                                             <th style="white-space: nowrap;" class="text-center" colspan="2">Opciones</th>
                                         </tr>
@@ -92,6 +93,11 @@
                                             
                                             <!-- Unidades - sin wrap -->
                                             <td style="white-space: nowrap;">{{ $producto->unidades }}</td>
+                                            
+                                            <!-- Precio - sin wrap, alineado a la derecha -->
+                                            <td style="white-space: nowrap;" class="text-end fw-bold text-primary">
+                                                ${{ number_format($producto->precio ?? 0, 2) }}
+                                            </td>
                                             
                                             <!-- Último costo - sin wrap, alineado a la derecha -->
                                             <td style="white-space: nowrap;" class="text-end fw-bold text-success">
@@ -116,7 +122,7 @@
                                         </tr>
                                         @empty
                                         <tr>
-                                            <td colspan="5" class="text-center py-5">
+                                            <td colspan="6" class="text-center py-5">
                                                 <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
                                                 <h5 class="text-muted">No hay productos o servicios registrados</h5>
                                                 <p class="text-muted mb-4">
@@ -223,11 +229,3 @@
     </script>
 </body>
 </html>
-
-
-<!--
-ListaDeseos
-Que se pueda exportar por busqueda 
-de clave Por decir  14i , todos los que tengan 14i
-
--->
