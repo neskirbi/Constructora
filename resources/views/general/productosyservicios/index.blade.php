@@ -77,6 +77,7 @@
                                             <th style="white-space: nowrap;">Unidades</th>
                                             <th style="white-space: nowrap;" class="text-end">Precio</th>
                                             <th style="white-space: nowrap;" class="text-end">Último costo</th>
+                                            <th style="white-space: nowrap;" class="text-center">Última actualización</th>
                                             <th style="white-space: nowrap;" class="text-center" colspan="2">Opciones</th>
                                         </tr>
                                     </thead>
@@ -104,6 +105,19 @@
                                                 ${{ number_format($producto->ult_costo, 2) }}
                                             </td>
                                             
+                                            <!-- Última actualización -->
+                                            <td style="white-space: nowrap;" class="text-center">
+                                                @if($producto->updated_at)
+                                                    <span class="badge bg-light text-dark">
+                                                        {{ $producto->updated_at->format('d/m/Y h:i A') }}
+                                                    </span>
+                                                    <br>
+                                                    <small class="text-muted">{{ $producto->updated_at->diffForHumans() }}</small>
+                                                @else
+                                                    <span class="text-muted small">Sin registro</span>
+                                                @endif
+                                            </td>
+                                            
                                             <!-- Opciones - sin wrap, centrado -->
                                              <td style="white-space: nowrap;" class="text-center">
                                                 <a type="button"
@@ -122,7 +136,7 @@
                                         </tr>
                                         @empty
                                         <tr>
-                                            <td colspan="6" class="text-center py-5">
+                                            <td colspan="7" class="text-center py-5">
                                                 <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
                                                 <h5 class="text-muted">No hay productos o servicios registrados</h5>
                                                 <p class="text-muted mb-4">
