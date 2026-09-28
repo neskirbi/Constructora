@@ -15,12 +15,12 @@ class ProductosServiciosController extends Controller
      */
     private function carpetaPdf(): string
     {
-        return public_path('productosyservicios/pdf');
+        return public_path('pdf/productosyservicios');
     }
 
     /**
-     * Guarda un PDF en public/productosyservicios/pdf y regresa
-     * la ruta relativa (ej: productosyservicios/pdf/archivo.pdf).
+     * Guarda un PDF en public/pdf/productosyservicios y regresa
+     * la ruta relativa (ej: pdf/productosyservicios/archivo.pdf).
      */
     private function guardarPdf($archivo): ?string
     {
@@ -38,11 +38,11 @@ class ProductosServiciosController extends Controller
         // Nombre único para no pisar archivos
         $nombre = uniqid('pdf_', true) . '_' . time() . '.' . $archivo->getClientOriginalExtension();
 
-        // Mueve el archivo a public/productosyservicios/pdf
+        // Mueve el archivo a public/pdf/productosyservicios
         $archivo->move($carpeta, $nombre);
 
         // Regresa la ruta relativa (para guardar en BD)
-        return 'productosyservicios/pdf/' . $nombre;
+        return 'pdf/productosyservicios/' . $nombre;
     }
 
     /**
