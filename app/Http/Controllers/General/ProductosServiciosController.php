@@ -6,9 +6,55 @@ use App\Http\Controllers\Controller;
 use App\Models\ProductoServicio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 
 class ProductosServiciosController extends Controller
 {
+    /**
+     * Carpeta base (dentro de public/) donde se guardan los PDF.
+     */
+    private function carpetaPdf(): string
+    {
+        return public_path('productosyservicios/pdf');
+    }
+
+    /**
+     * Guarda un PDF en public/productosyservicios/pdf y regresa
+     * la ruta relativa (ej: productosyservicios/pdf/archivo.pdf).
+     */
+    private function guardarPdf($archivo): ?string
+    {
+        if (!$archivo) {
+            return null;
+        }
+
+        $carpeta = $this->carpetaPdf();
+
+        // Crea la carpeta si no existe
+        if (!File::exists($carpeta)) {
+            File::makeDirectory($carpeta, 0755, true, true);
+        }
+
+        // Nombre único para no pisar archivos
+        $nombre = uniqid('pdf_', true) . '_' . time() . '.' . $archivo->getClientOriginalExtension();
+
+        // Mueve el archivo a public/productosyservicios/pdf
+        $archivo->move($carpeta, $nombre);
+
+        // Regresa la ruta relativa (para guardar en BD)
+        return 'productosyservicios/pdf/' . $nombre;
+    }
+
+    /**
+     * Borra un PDF físico si existe.
+     */
+    private function borrarPdf(?string $ruta): void
+    {
+        if ($ruta && File::exists(public_path($ruta))) {
+            File::delete(public_path($ruta));
+        }
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -21,7 +67,7 @@ class ProductosServiciosController extends Controller
                              ->orWhere('descripcion', 'LIKE', "%{$search}%");
             })
             ->orderBy('clave')
-            ->paginate(12); // 12 items por página (3 columnas x 4 filas)
+            ->paginate(12);
         
         return view('general.productosyservicios.index', compact('productos', 'search'));
     }
@@ -31,7 +77,6 @@ class ProductosServiciosController extends Controller
      */
     public function create()
     {
-        
         return view('general.productosyservicios.create');
     }
 
@@ -44,11 +89,17 @@ class ProductosServiciosController extends Controller
             'clave' => 'required|string|max:32|unique:productosyservicios,clave',
             'descripcion' => 'required|string',
             'unidades' => 'required|string|max:10',
-            'precio' => 'nullable|numeric|min:0'
+            'precio' => 'nullable|numeric|min:0',
+            'archivo_pdf_1' => 'nullable|file|mimes:pdf|max:10240',
+            'archivo_pdf_2' => 'nullable|file|mimes:pdf|max:10240',
         ]);
 
         try {
             DB::beginTransaction();
+
+            // Guardar PDFs (si vienen)
+            $rutaPdf1 = $this->guardarPdf($request->file('archivo_pdf_1'));
+            $rutaPdf2 = $this->guardarPdf($request->file('archivo_pdf_2'));
             
             $producto = ProductoServicio::create([
                 'id' => GetUuid(),
@@ -56,7 +107,9 @@ class ProductosServiciosController extends Controller
                 'descripcion' => $request->descripcion,
                 'unidades' => $request->unidades,
                 'ult_costo' => 0.0,
-                'precio' => $request->precio ?? 0.0
+                'precio' => $request->precio ?? 0.0,
+                'archivo_pdf_1' => $rutaPdf1,
+                'archivo_pdf_2' => $rutaPdf2,
             ]);
 
             DB::commit();
@@ -107,7 +160,6 @@ class ProductosServiciosController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //return $request;
         $producto = ProductoServicio::find($id);
         
         if (!$producto) {
@@ -115,17 +167,30 @@ class ProductosServiciosController extends Controller
                 ->with('error', 'Producto no encontrado');
         }
 
-        
-
         try {
             DB::beginTransaction();
-            
-            $producto->update([
+
+            // Datos base
+            $datos = [
                 'clave' => $request->clave,
                 'descripcion' => $request->descripcion,
                 'unidades' => $request->unidades,
-                'precio' => $request->precio ?? $producto->precio
-            ]);
+                'precio' => $request->precio ?? $producto->precio,
+            ];
+
+            // Si suben nuevo PDF 1, borrar viejo y guardar nuevo
+            if ($request->hasFile('archivo_pdf_1')) {
+                $this->borrarPdf($producto->archivo_pdf_1);
+                $datos['archivo_pdf_1'] = $this->guardarPdf($request->file('archivo_pdf_1'));
+            }
+
+            // Si suben nuevo PDF 2, borrar viejo y guardar nuevo
+            if ($request->hasFile('archivo_pdf_2')) {
+                $this->borrarPdf($producto->archivo_pdf_2);
+                $datos['archivo_pdf_2'] = $this->guardarPdf($request->file('archivo_pdf_2'));
+            }
+            
+            $producto->update($datos);
 
             DB::commit();
 
@@ -163,6 +228,10 @@ class ProductosServiciosController extends Controller
                     ->with('error', 'No se puede eliminar el producto porque está siendo utilizado en csdetalles');
             }
 
+            // Borrar PDFs físicos antes de eliminar el registro
+            $this->borrarPdf($producto->archivo_pdf_1);
+            $this->borrarPdf($producto->archivo_pdf_2);
+
             $producto->delete();
 
             DB::commit();
@@ -181,7 +250,6 @@ class ProductosServiciosController extends Controller
     /**
      * Api para guardar Productos y servicios
      */
-
     function NuevoPS(Request $request)
     {
         try {
@@ -190,17 +258,25 @@ class ProductosServiciosController extends Controller
                 'descripcion' => 'required|string',
                 'unidades' => 'required|string|max:10',
                 'precio' => 'nullable|numeric|min:0',
+                'archivo_pdf_1' => 'nullable|file|mimes:pdf|max:10240',
+                'archivo_pdf_2' => 'nullable|file|mimes:pdf|max:10240',
             ]);
             
             $id = GetUuid();
+
+            // Guardar PDFs (si vienen)
+            $rutaPdf1 = $this->guardarPdf($request->file('archivo_pdf_1'));
+            $rutaPdf2 = $this->guardarPdf($request->file('archivo_pdf_2'));
             
             DB::table('productosyservicios')->insert([
                 'id' => $id,
                 'clave' => $request->clave,
                 'descripcion' => $request->descripcion,
                 'unidades' => $request->unidades,
-                'ult_costo' => 0, // Se guarda en 0 por defecto
+                'ult_costo' => 0,
                 'precio' => $request->precio ?? 0,
+                'archivo_pdf_1' => $rutaPdf1,
+                'archivo_pdf_2' => $rutaPdf2,
                 'created_at' => now(),
                 'updated_at' => now()
             ]);

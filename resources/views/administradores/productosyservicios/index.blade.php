@@ -66,6 +66,7 @@
                 <th style="white-space: nowrap;" class="text-end">Precio</th>
                 <th style="white-space: nowrap;" class="text-end">Último costo</th>
                 <th style="white-space: nowrap;" class="text-center">Fecha registro</th>
+                <th style="white-space: nowrap;" class="text-center">Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -106,10 +107,19 @@
                     </small>
                     @endif
                 </td>
+
+                <!-- Acciones -->
+                <td style="white-space: nowrap;" class="text-center">
+                    <a href="{{ route('aproductosyservicios.show', $producto->id) }}" 
+                       class="btn btn-sm btn-outline-primary"
+                       title="Ver detalle">
+                        <i class="fas fa-eye me-1"></i> Ver
+                    </a>
+                </td>
             </tr>
             @empty
             <tr>
-                <td colspan="6" class="text-center py-5">
+                <td colspan="7" class="text-center py-5">
                     <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
                     <h5 class="text-muted">No hay productos o servicios registrados</h5>
                     <p class="text-muted mb-4">

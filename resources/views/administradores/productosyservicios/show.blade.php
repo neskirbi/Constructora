@@ -2,177 +2,174 @@
 <html lang="es">
 <head>
     @include('header')
-    <title>{{Empresa()}} | Editar Producto/Servicio</title>
+    <title>{{Empresa()}} | Ver Producto/Servicio</title>
 </head>
 <body>
     <div class="main-container">
         @include('administradores.sidebar')
-        
+
         <main class="main-content" id="mainContent">
             @include('administradores.navbar')
 
             <div class="content-area">
                 <div class="container-fluid py-4">
-                    <!-- Card principal -->
                     <div class="card shadow-sm mb-4">
-                        <!-- Header simplificado -->
                         <div class="card-header bg-white py-3">
                             <div class="d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center">
-                                    <h5 class="mb-0">
-                                        <i class="fas fa-edit me-2 text-warning"></i>
-                                        Editar Producto/Servicio
-                                    </h5>
-                                </div>
-                                <!-- Eliminados los botones de ver detalles y eliminar -->
+                                <h5 class="mb-0">
+                                    <i class="fas fa-box me-2 text-primary"></i>
+                                    Detalle del Producto/Servicio
+                                </h5>
+                                <a href="{{ route('aproductosyservicios.index') }}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-arrow-left me-1"></i> Volver
+                                </a>
                             </div>
                         </div>
-                        
-                        <!-- Body -->
+
                         <div class="card-body">
-                            <!-- Etiqueta de edición -->
-                            <div class="alert alert-warning bg-warning bg-opacity-10 border-0 mb-4 d-flex align-items-center">
-                                <i class="fas fa-pencil-alt fa-lg me-2"></i>
-                                <span>Modo de edición - Modifica los campos que necesites y guarda los cambios</span>
+                            <div class="row g-4">
+                                <!-- Columna izquierda: datos -->
+                                <div class="col-md-8">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label text-muted small">Clave</label>
+                                            <p class="fw-bold mb-0">{{ $producto->clave }}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label text-muted small">Unidades</label>
+                                            <p class="fw-bold mb-0">{{ $producto->unidades }}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label text-muted small">Precio</label>
+                                            <p class="fw-bold mb-0">${{ number_format($producto->precio, 2) }}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label text-muted small">Último costo</label>
+                                            <p class="fw-bold mb-0">${{ number_format($producto->ult_costo, 2) }}</p>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label text-muted small">Descripción</label>
+                                            <p class="mb-0">{{ $producto->descripcion }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Columna derecha: info -->
+                                <div class="col-md-4">
+                                    <div class="card bg-light border-0">
+                                        <div class="card-body">
+                                            <h6 class="fw-bold mb-3">
+                                                <i class="fas fa-info-circle me-2 text-primary"></i>
+                                                Información
+                                            </h6>
+                                            <p class="small text-muted mb-2">
+                                                <i class="fas fa-calendar me-1"></i>
+                                                Creado: {{ $producto->created_at }}
+                                            </p>
+                                            <p class="small text-muted mb-0">
+                                                <i class="fas fa-calendar-check me-1"></i>
+                                                Actualizado: {{ $producto->updated_at }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- ===== PDFs ===== -->
+                                <div class="col-12">
+                                    <hr>
+                                    <label class="form-label fw-semibold">
+                                        <i class="fas fa-file-pdf me-1 text-danger"></i>
+                                        Archivos PDF
+                                    </label>
+                                </div>
+
+                                <!-- PDF 1 -->
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-light py-2">
+                                            <small class="fw-bold">PDF 1</small>
+                                        </div>
+                                        <div class="card-body text-center">
+                                            @if($producto->archivo_pdf_1)
+                                                @php $url1 = asset($producto->archivo_pdf_1); @endphp
+
+                                                <!-- Miniatura -->
+                                                <div class="mb-3 border rounded overflow-hidden" style="height: 220px; background: #f8f9fa;">
+                                                    <iframe src="{{ $url1 }}#toolbar=0&navpanes=0&scrollbar=0"
+                                                            style="width: 100%; height: 220px; border: 0;"
+                                                            title="Miniatura PDF 1"></iframe>
+                                                </div>
+
+                                                <!-- Botones -->
+                                                <div class="d-flex justify-content-center gap-2 flex-wrap">
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-danger"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#modalPdf1">
+                                                        <i class="fas fa-expand me-1"></i> Ver grande
+                                                    </button>
+                                                    <a href="{{ $url1 }}"
+                                                       download
+                                                       class="btn btn-sm btn-outline-secondary">
+                                                        <i class="fas fa-download me-1"></i> Descargar
+                                                    </a>
+                                                    <a href="{{ $url1 }}"
+                                                       target="_blank"
+                                                       class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-external-link-alt me-1"></i> Abrir
+                                                    </a>
+                                                </div>
+                                            @else
+                                                <p class="text-muted small mb-0 py-4">Sin archivo</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- PDF 2 -->
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-light py-2">
+                                            <small class="fw-bold">PDF 2</small>
+                                        </div>
+                                        <div class="card-body text-center">
+                                            @if($producto->archivo_pdf_2)
+                                                @php $url2 = asset($producto->archivo_pdf_2); @endphp
+
+                                                <!-- Miniatura -->
+                                                <div class="mb-3 border rounded overflow-hidden" style="height: 220px; background: #f8f9fa;">
+                                                    <iframe src="{{ $url2 }}#toolbar=0&navpanes=0&scrollbar=0"
+                                                            style="width: 100%; height: 220px; border: 0;"
+                                                            title="Miniatura PDF 2"></iframe>
+                                                </div>
+
+                                                <!-- Botones -->
+                                                <div class="d-flex justify-content-center gap-2 flex-wrap">
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-danger"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#modalPdf2">
+                                                        <i class="fas fa-expand me-1"></i> Ver grande
+                                                    </button>
+                                                    <a href="{{ $url2 }}"
+                                                       download
+                                                       class="btn btn-sm btn-outline-secondary">
+                                                        <i class="fas fa-download me-1"></i> Descargar
+                                                    </a>
+                                                    <a href="{{ $url2 }}"
+                                                       target="_blank"
+                                                       class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-external-link-alt me-1"></i> Abrir
+                                                    </a>
+                                                </div>
+                                            @else
+                                                <p class="text-muted small mb-0 py-4">Sin archivo</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- ===== FIN PDFs ===== -->
                             </div>
-                            
-                            <form method="POST" action="{{ route('aproductosyservicios.update', $producto->id) }}" id="productoForm">
-                                @csrf
-                                @method('PUT')
-                                
-                                <div class="row g-4">
-                                    <!-- Columna izquierda - Formulario -->
-                                    <div class="col-md-8">
-                                        <div class="row g-3">
-                                            <!-- Clave -->
-                                            <div class="col-md-4">
-                                                <label class="form-label">
-                                                    <i class="fas fa-tag me-1 text-primary"></i>
-                                                    Clave <span class="text-danger">*</span>
-                                                </label>
-                                                <input type="text" 
-                                                       class="form-control @error('clave') is-invalid @enderror" 
-                                                       name="clave" 
-                                                       value="{{ old('clave', $producto->clave) }}"
-                                                       maxlength="32"
-                                                       required>
-                                                @error('clave')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                                <small class="text-muted">Máximo 32 caracteres</small>
-                                            </div>
-
-                                            <!-- Unidades -->
-                                            <div class="col-md-4">
-                                                <label class="form-label">
-                                                    <i class="fas fa-ruler me-1 text-primary"></i>
-                                                    Unidades <span class="text-danger">*</span>
-                                                </label>
-                                                <input type="text" 
-                                                       class="form-control @error('unidades') is-invalid @enderror" 
-                                                       name="unidades" 
-                                                       value="{{ old('unidades', $producto->unidades) }}"
-                                                       maxlength="10"
-                                                       required>
-                                                @error('unidades')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                                <small class="text-muted">Ej: PZA, M2, LTS</small>
-                                            </div>
-
-                                            <!-- Último costo -->
-                                            <div class="col-md-4">
-                                                <label class="form-label">
-                                                    <i class="fas fa-dollar-sign me-1 text-primary"></i>
-                                                    Último costo <span class="text-danger">*</span>
-                                                </label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text">$</span>
-                                                    <input type="number" 
-                                                           class="form-control @error('ult_costo') is-invalid @enderror" 
-                                                           name="ult_costo" 
-                                                           value="{{ old('ult_costo', $producto->ult_costo) }}"
-                                                           step="0.0000000000000001" 
-                                                           min="0"
-                                                           required>
-                                                    @error('ult_costo')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-
-                                            <!-- Descripción -->
-                                            <div class="col-12">
-                                                <label class="form-label">
-                                                    <i class="fas fa-align-left me-1 text-primary"></i>
-                                                    Descripción <span class="text-danger">*</span>
-                                                </label>
-                                                <textarea class="form-control @error('descripcion') is-invalid @enderror" 
-                                                          name="descripcion" 
-                                                          rows="5"
-                                                          required>{{ old('descripcion', $producto->descripcion) }}</textarea>
-                                                @error('descripcion')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Columna derecha - Información del registro (simplificada) -->
-                                    <div class="col-md-4">
-                                        <div class="card bg-light border-0">
-                                            <div class="card-body">
-                                                <h6 class="fw-bold mb-3">
-                                                    <i class="fas fa-clock me-2 text-primary"></i>
-                                                    Información del registro
-                                                </h6>
-                                                
-                                                <div class="mb-3">
-                                                    <small class="text-muted d-block mb-2">
-                                                        <i class="fas fa-tag me-1"></i>Clave actual:
-                                                    </small>
-                                                    <p class="small">
-                                                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2">
-                                                            {{ $producto->clave }}
-                                                        </span>
-                                                    </p>
-                                                </div>
-
-                                                <div class="mb-3">
-                                                    <small class="text-muted d-block mb-2">
-                                                        <i class="fas fa-history me-1"></i>Última modificación:
-                                                    </small>
-                                                    <p class="small mb-0">
-                                                        {{ $producto->updated_at->format('d/m/Y h:i A') }}
-                                                        <br>
-                                                        <span class="text-muted">{{ $producto->updated_at->diffForHumans() }}</span>
-                                                    </p>
-                                                </div>
-
-                                                <hr>
-
-                                                <div class="alert alert-info py-2 mb-0 small">
-                                                    <i class="fas fa-info-circle me-1"></i>
-                                                    Los campos marcados con <span class="text-danger">*</span> son obligatorios
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Footer con botones simplificados -->
-                                <div class="row mt-4">
-                                    <div class="col-12">
-                                        <hr>
-                                        <div class="d-flex justify-content-end gap-2">
-                                           <a href="{{ route('aproductosyservicios.index') }}" class="btn btn-outline-secondary">
-                                                <i class="fas fa-arrow-left me-1"></i> Regresar
-                                            </a>
-                                            
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
                         </div>
                     </div>
                 </div>
@@ -180,28 +177,59 @@
         </main>
     </div>
 
+    <!-- ===== MODALES PDF ===== -->
+    @if($producto->archivo_pdf_1)
+    <div class="modal fade" id="modalPdf1" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-file-pdf me-1 text-danger"></i> PDF 1
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <iframe src="{{ asset($producto->archivo_pdf_1) }}"
+                            style="width: 100%; height: 80vh; border: 0;"
+                            title="PDF 1"></iframe>
+                </div>
+                <div class="modal-footer">
+                    <a href="{{ asset($producto->archivo_pdf_1) }}" download class="btn btn-outline-secondary">
+                        <i class="fas fa-download me-1"></i> Descargar
+                    </a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    @if($producto->archivo_pdf_2)
+    <div class="modal fade" id="modalPdf2" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-file-pdf me-1 text-danger"></i> PDF 2
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <iframe src="{{ asset($producto->archivo_pdf_2) }}"
+                            style="width: 100%; height: 80vh; border: 0;"
+                            title="PDF 2"></iframe>
+                </div>
+                <div class="modal-footer">
+                    <a href="{{ asset($producto->archivo_pdf_2) }}" download class="btn btn-outline-secondary">
+                        <i class="fas fa-download me-1"></i> Descargar
+                    </a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     @include('footer')
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const btnGuardar = document.getElementById('btnGuardar');
-            const form = document.getElementById('productoForm');
-
-            form.addEventListener('submit', function() {
-                btnGuardar.disabled = true;
-                btnGuardar.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Actualizando...';
-            });
-
-            // Auto-mayúsculas para clave
-            document.querySelector('input[name="clave"]').addEventListener('input', function(e) {
-                this.value = this.value.toUpperCase();
-            });
-
-            // Auto-mayúsculas para unidades
-            document.querySelector('input[name="unidades"]').addEventListener('input', function(e) {
-                this.value = this.value.toUpperCase();
-            });
-        });
-    </script>
 </body>
 </html>

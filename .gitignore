@@ -14,3 +14,5 @@ yarn-error.log
 /.idea
 /.vscode
 storage/app/public/facturas/*
+# PDFs de productos/servicios
+/public/productosyservicios/pdf/

@@ -43,7 +43,7 @@
                         
                         <!-- Body -->
                         <div class="card-body">
-                            <form method="POST" action="{{ route('productosyservicios.store') }}" id="productoForm">
+                            <form method="POST" action="{{ route('productosyservicios.store') }}" id="productoForm" enctype="multipart/form-data">
                                 @csrf
                                 
                                 <div class="row g-4">
@@ -141,6 +141,47 @@
                                                 </div>
                                                 @enderror
                                             </div>
+
+                                            <!-- ===== NUEVO: Archivos PDF (opcionales) ===== -->
+                                            <div class="col-12">
+                                                <hr class="my-2">
+                                                <label class="form-label fw-semibold">
+                                                    <i class="fas fa-file-pdf me-1 text-danger"></i>
+                                                    Archivos PDF
+                                                    <span class="text-muted small">(opcionales)</span>
+                                                </label>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">Archivo PDF 1</label>
+                                                <input type="file" 
+                                                       class="form-control @error('archivo_pdf_1') is-invalid @enderror" 
+                                                       name="archivo_pdf_1" 
+                                                       id="archivo_pdf_1"
+                                                       accept="application/pdf,.pdf">
+                                                @error('archivo_pdf_1')
+                                                <div class="invalid-feedback">
+                                                    {{ $message }}
+                                                </div>
+                                                @enderror
+                                                <small class="text-muted d-block" id="nombre_pdf_1"></small>
+                                            </div>
+
+                                            <div class="col-md-6">
+                                                <label class="form-label">Archivo PDF 2</label>
+                                                <input type="file" 
+                                                       class="form-control @error('archivo_pdf_2') is-invalid @enderror" 
+                                                       name="archivo_pdf_2" 
+                                                       id="archivo_pdf_2"
+                                                       accept="application/pdf,.pdf">
+                                                @error('archivo_pdf_2')
+                                                <div class="invalid-feedback">
+                                                    {{ $message }}
+                                                </div>
+                                                @enderror
+                                                <small class="text-muted d-block" id="nombre_pdf_2"></small>
+                                            </div>
+                                            <!-- ===== FIN NUEVO ===== -->
                                         </div>
                                     </div>
 
@@ -257,6 +298,34 @@
                     this.value = 0;
                 }
             });
+
+            // ===== NUEVO: Mostrar nombre del PDF seleccionado y validar tamaño =====
+            function mostrarNombrePdf(inputId, labelId, maxMB) {
+                const input = document.getElementById(inputId);
+                const label = document.getElementById(labelId);
+                if (!input || !label) return;
+
+                input.addEventListener('change', function() {
+                    if (this.files && this.files[0]) {
+                        const file = this.files[0];
+                        const sizeMB = file.size / (1024 * 1024);
+
+                        if (sizeMB > maxMB) {
+                            alert('El archivo "' + file.name + '" supera el tamaño máximo permitido de ' + maxMB + ' MB.');
+                            this.value = '';
+                            label.textContent = '';
+                            return;
+                        }
+                        label.textContent = 'Seleccionado: ' + file.name;
+                    } else {
+                        label.textContent = '';
+                    }
+                });
+            }
+
+            // Ajusta el 10 si tu límite real es otro (debe coincidir con el backend)
+            mostrarNombrePdf('archivo_pdf_1', 'nombre_pdf_1', 10);
+            mostrarNombrePdf('archivo_pdf_2', 'nombre_pdf_2', 10);
         });
     </script>
 </body>

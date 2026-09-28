@@ -23,7 +23,9 @@ class ProductoServicio extends Model
         'descripcion',
         'unidades',
         'ult_costo',
-        'precio'
+        'precio',
+        'archivo_pdf_1',
+        'archivo_pdf_2'
     ];
 
     public function stock()
