@@ -18,3 +18,22 @@ Considerar hacer un catalogo de: unidades , producto, partidas , marca
 Separar por partidas la requisiciones
 En la orden de compra agregar No.requicicion(la numeracion va dependiendo al contrato )
 Boton imprimir Solicitud de Cotizacion dentro de la requisicion 
+
+
+
+2026/10/28 
+
+1.-En productos y servicios que se pueda agregar cuando se da de alta que se le agregue provedor y obra 
+y unos check box que diga "por ejecutar" y otro "ejecutado"
+
+2.- en producto y servicios los archivos pdf que digan :
+cedula de precio "incluir cotizacion" y analizis de precios unitarios 
+
+3.- en el index de productos y servicios que aparesca  no. obra y contratista
+y que se vean los pdf cargados 
+
+4.-en el excel debe aparecer la info que se agregos en productos y servicios 
+
+Nota: cosiderar las vistas de administrador 
+
+
