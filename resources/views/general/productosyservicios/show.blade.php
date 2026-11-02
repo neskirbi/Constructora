@@ -102,6 +102,68 @@
                                                 @error('descripcion') <div class="invalid-feedback">{{ $message }}</div> @enderror
                                             </div>
 
+                                            <!-- ===== Proveedor / Contrato / Estatus ===== -->
+                                            <div class="col-12">
+                                                <hr class="my-2">
+                                                <label class="form-label fw-semibold">
+                                                    <i class="fas fa-briefcase me-1 text-primary"></i>
+                                                    Proveedor y Contrato
+                                                </label>
+                                            </div>
+
+                                            <!-- Proveedor -->
+                                            <div class="col-md-6">
+                                                <label for="id_proveedor" class="form-label">Proveedor</label>
+                                                <select class="form-select @error('id_proveedor') is-invalid @enderror"
+                                                        id="id_proveedor"
+                                                        name="id_proveedor"
+                                                        style="width: 100%;">
+                                                    <option value="">Seleccione un proveedor</option>
+                                                    @foreach($proveedores as $p)
+                                                        <option value="{{ $p->id }}" {{ old('id_proveedor', $producto->id_proveedor) == $p->id ? 'selected' : '' }}>
+                                                            {{ $p->clave }} - {{ $p->nombre }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('id_proveedor') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                            </div>
+
+                                            <!-- Contrato -->
+                                            <div class="col-md-6">
+                                                <label for="id_contrato" class="form-label">Contrato</label>
+                                                <select class="form-select @error('id_contrato') is-invalid @enderror"
+                                                        id="id_contrato"
+                                                        name="id_contrato"
+                                                        style="width: 100%;">
+                                                    <option value="">Seleccione un contrato</option>
+                                                    @foreach($contratos as $c)
+                                                        <option value="{{ $c->id }}" {{ old('id_contrato', $producto->id_contrato) == $c->id ? 'selected' : '' }}>
+                                                            {{ $c->consecutivo }} - {{ $c->refinterna ?? '' }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('id_contrato') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                            </div>
+
+                                            <!-- Estatus -->
+                                            <div class="col-12">
+                                                <label class="form-label d-block">Estatus de ejecución</label>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio"
+                                                           name="estatus_ejecucion" id="estatus_por_ejecutar" value="por_ejecutar"
+                                                           {{ old('estatus_ejecucion', $producto->estatus_ejecucion ?? 'por_ejecutar') == 'por_ejecutar' ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="estatus_por_ejecutar">Por ejecutar</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio"
+                                                           name="estatus_ejecucion" id="estatus_ejecutado" value="ejecutado"
+                                                           {{ old('estatus_ejecucion', $producto->estatus_ejecucion) == 'ejecutado' ? 'checked' : '' }}>
+                                                    <label class="form-check-label" for="estatus_ejecutado">Ejecutado</label>
+                                                </div>
+                                                @error('estatus_ejecucion') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                            </div>
+                                            <!-- ===== FIN Proveedor / Contrato / Estatus ===== -->
+
                                             <!-- ===== PDFs ===== -->
                                             <div class="col-12">
                                                 <hr class="my-2">
@@ -114,7 +176,7 @@
 
                                             <!-- PDF 1 -->
                                             <div class="col-md-6">
-                                                <label class="form-label">Archivo PDF 1</label>
+                                                <label class="form-label">Cédula de precio "incluir cotización"</label>
                                                 <input type="file" 
                                                        class="form-control @error('archivo_pdf_1') is-invalid @enderror" 
                                                        name="archivo_pdf_1" 
@@ -138,7 +200,7 @@
 
                                             <!-- PDF 2 -->
                                             <div class="col-md-6">
-                                                <label class="form-label">Archivo PDF 2</label>
+                                                <label class="form-label">Análisis de precios unitarios</label>
                                                 <input type="file" 
                                                        class="form-control @error('archivo_pdf_2') is-invalid @enderror" 
                                                        name="archivo_pdf_2" 
@@ -226,7 +288,6 @@
                 if (this.value < 0) this.value = 0;
             });
 
-            // ===== Mostrar nombre del PDF seleccionado =====
             function mostrarNombrePdf(inputId, labelId, maxMB) {
                 const input = document.getElementById(inputId);
                 const label = document.getElementById(labelId);
@@ -252,6 +313,21 @@
 
             mostrarNombrePdf('archivo_pdf_1', 'nombre_pdf_1', 10);
             mostrarNombrePdf('archivo_pdf_2', 'nombre_pdf_2', 10);
+        });
+
+        // Select2 para proveedor y contrato (requiere jQuery + select2 ya cargados)
+        $(document).ready(function() {
+            $('#id_proveedor').select2({
+                placeholder: 'Seleccione un proveedor',
+                allowClear: true,
+                width: '100%'
+            });
+
+            $('#id_contrato').select2({
+                placeholder: 'Seleccione un contrato',
+                allowClear: true,
+                width: '100%'
+            });
         });
     </script>
 </body>

@@ -15,6 +15,7 @@ use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use Illuminate\Support\Facades\DB;
 
 class ProductosServiciosExport implements 
     FromCollection, 
@@ -26,10 +27,23 @@ class ProductosServiciosExport implements
     WithColumnFormatting
 {
     protected $productos;
+    protected $proveedores;
+    protected $contratos;
 
     public function __construct($productos)
     {
         $this->productos = $productos;
+
+        // Proveedores y contratos indexados por id
+        $this->proveedores = DB::table('proveedores_servicios')
+            ->select('id', 'clave', 'nombre')
+            ->get()
+            ->keyBy('id');
+
+        $this->contratos = DB::table('contratos')
+            ->select('id', 'consecutivo', 'refinterna')
+            ->get()
+            ->keyBy('id');
     }
 
     public function collection()
@@ -43,6 +57,10 @@ class ProductosServiciosExport implements
             'CLAVE',
             'DESCRIPCIÓN',
             'UNIDADES',
+            'PROVEEDOR',
+            'CONTRATO',
+            'ESTATUS',
+            'PRECIO',
             'ÚLTIMO COSTO',
             'FECHA DE CREACIÓN',
             'FECHA DE MODIFICACIÓN',
@@ -52,14 +70,35 @@ class ProductosServiciosExport implements
     public function map($producto): array
     {
         $descripcion = $this->ajustarTexto($producto->descripcion ?? '', 60);
-        
+
+        // Proveedor
+        $proveedor = '';
+        if ($producto->id_proveedor && isset($this->proveedores[$producto->id_proveedor])) {
+            $p = $this->proveedores[$producto->id_proveedor];
+            $proveedor = trim(($p->clave ?? '') . ' - ' . ($p->nombre ?? ''));
+        }
+
+        // Contrato
+        $contrato = '';
+        if ($producto->id_contrato && isset($this->contratos[$producto->id_contrato])) {
+            $c = $this->contratos[$producto->id_contrato];
+            $contrato = trim(($c->consecutivo ?? '') . ' - ' . ($c->refinterna ?? ''));
+        }
+
+        // Estatus
+        $estatus = $producto->estatus_ejecucion == 'ejecutado' ? 'Ejecutado' : 'Por ejecutar';
+
         return [
             $producto->clave ?? '',
             $descripcion,
             $producto->unidades ?? '',
-            $producto->ult_costo ?? 0,  // Valor numérico sin formato
-            $this->getDateOnly($producto->created_at),  // Solo fecha, sin hora
-            $this->getDateOnly($producto->updated_at),  // Solo fecha, sin hora
+            $proveedor,
+            $contrato,
+            $estatus,
+            $producto->precio ?? 0,
+            $producto->ult_costo ?? 0,
+            $this->getDateOnly($producto->created_at),
+            $this->getDateOnly($producto->updated_at),
         ];
     }
 
@@ -137,9 +176,10 @@ class ProductosServiciosExport implements
     public function columnFormats(): array
     {
         return [
-            'D' => '#,##0.00',                          // Último costo
-            'E' => 'dd/mm/yyyy',  // Fecha creación (solo fecha)
-            'F' => 'dd/mm/yyyy',  // Fecha modificación (solo fecha)
+            'G' => '#,##0.00',    // Precio
+            'H' => '#,##0.00',    // Último costo
+            'I' => 'dd/mm/yyyy',  // Fecha creación
+            'J' => 'dd/mm/yyyy',  // Fecha modificación
         ];
     }
 
@@ -151,12 +191,16 @@ class ProductosServiciosExport implements
                 $lastRow = $sheet->getHighestRow();
                 $lastColumn = $sheet->getHighestColumn();
 
-                $sheet->getColumnDimension('A')->setWidth(15);
-                $sheet->getColumnDimension('B')->setWidth(55);
-                $sheet->getColumnDimension('C')->setWidth(12);
-                $sheet->getColumnDimension('D')->setWidth(18);
-                $sheet->getColumnDimension('E')->setWidth(18);
-                $sheet->getColumnDimension('F')->setWidth(18);
+                $sheet->getColumnDimension('A')->setWidth(15);  // Clave
+                $sheet->getColumnDimension('B')->setWidth(55);  // Descripción
+                $sheet->getColumnDimension('C')->setWidth(12);  // Unidades
+                $sheet->getColumnDimension('D')->setWidth(35);  // Proveedor
+                $sheet->getColumnDimension('E')->setWidth(30);  // Contrato
+                $sheet->getColumnDimension('F')->setWidth(15);  // Estatus
+                $sheet->getColumnDimension('G')->setWidth(18);  // Precio
+                $sheet->getColumnDimension('H')->setWidth(18);  // Último costo
+                $sheet->getColumnDimension('I')->setWidth(18);  // Fecha creación
+                $sheet->getColumnDimension('J')->setWidth(18);  // Fecha modificación
 
                 $sheet->getStyle('B2:B' . $lastRow)->getAlignment()
                     ->setWrapText(true)
@@ -173,8 +217,9 @@ class ProductosServiciosExport implements
 
                 $sheet->getStyle('A2:A' . $lastRow)->getAlignment()->setHorizontal('center');
                 $sheet->getStyle('C2:C' . $lastRow)->getAlignment()->setHorizontal('center');
-                $sheet->getStyle('E2:F' . $lastRow)->getAlignment()->setHorizontal('center');
-                $sheet->getStyle('D2:D' . $lastRow)->getAlignment()->setHorizontal('right');
+                $sheet->getStyle('F2:F' . $lastRow)->getAlignment()->setHorizontal('center');
+                $sheet->getStyle('I2:J' . $lastRow)->getAlignment()->setHorizontal('center');
+                $sheet->getStyle('G2:H' . $lastRow)->getAlignment()->setHorizontal('right');
 
                 $sheet->getStyle('A1:' . $lastColumn . '1')->getAlignment()->setHorizontal('center');
                 $sheet->getRowDimension('1')->setRowHeight(25);

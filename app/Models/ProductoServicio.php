@@ -24,6 +24,9 @@ class ProductoServicio extends Model
         'unidades',
         'ult_costo',
         'precio',
+        'id_proveedor',
+        'id_contrato',
+        'estatus_ejecucion',
         'archivo_pdf_1',
         'archivo_pdf_2'
     ];

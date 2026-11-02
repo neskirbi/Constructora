@@ -12,18 +12,28 @@ class ProductosServiciosController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+       public function index(Request $request)
     {
         $search = $request->get('search');
-        
+
         $productos = ProductoServicio::when($search, function($query, $search) {
                 return $query->where('clave', 'LIKE', "%{$search}%")
                              ->orWhere('descripcion', 'LIKE', "%{$search}%");
             })
             ->orderBy('clave')
-            ->paginate(12); // 12 items por página (3 columnas x 4 filas)
-        
-        return view('administradores.productosyservicios.index', compact('productos', 'search'));
+            ->paginate(12);
+
+        $proveedores = DB::table('proveedores_servicios')
+            ->select('id', 'clave', 'nombre')
+            ->get()
+            ->keyBy('id');
+
+        $contratos = DB::table('contratos')
+            ->select('id', 'consecutivo', 'refinterna')
+            ->get()
+            ->keyBy('id');
+
+        return view('administradores.productosyservicios.index', compact('productos', 'search', 'proveedores', 'contratos'));
     }
 
     /**
@@ -73,16 +83,32 @@ class ProductosServiciosController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+       public function show($id)
     {
         $producto = ProductoServicio::find($id);
-        
+
         if (!$producto) {
             return redirect()->route('productosyservicios.index')
                 ->with('error', 'Producto/Servicio no encontrado');
         }
 
-        return view('administradores.productosyservicios.show', compact('producto'));
+        $proveedor = null;
+        if ($producto->id_proveedor) {
+            $proveedor = DB::table('proveedores_servicios')
+                ->select('id', 'clave', 'nombre')
+                ->where('id', $producto->id_proveedor)
+                ->first();
+        }
+
+        $contrato = null;
+        if ($producto->id_contrato) {
+            $contrato = DB::table('contratos')
+                ->select('id', 'consecutivo', 'refinterna')
+                ->where('id', $producto->id_contrato)
+                ->first();
+        }
+
+        return view('administradores.productosyservicios.show', compact('producto', 'proveedor', 'contrato'));
     }
 
     /**

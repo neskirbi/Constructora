@@ -51,6 +51,39 @@
                                             <label class="form-label text-muted small">Descripción</label>
                                             <p class="mb-0">{{ $producto->descripcion }}</p>
                                         </div>
+
+                                        <!-- ===== Proveedor / Contrato / Estatus ===== -->
+                                        <div class="col-md-6">
+                                            <label class="form-label text-muted small">Proveedor</label>
+                                            <p class="fw-bold mb-0">
+                                                @if($proveedor)
+                                                    {{ $proveedor->clave }} - {{ $proveedor->nombre }}
+                                                @else
+                                                    <span class="text-muted">—</span>
+                                                @endif
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label text-muted small">Contrato</label>
+                                            <p class="fw-bold mb-0">
+                                                @if($contrato)
+                                                    {{ $contrato->consecutivo }} - {{ $contrato->refinterna ?? '' }}
+                                                @else
+                                                    <span class="text-muted">—</span>
+                                                @endif
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label text-muted small">Estatus de ejecución</label>
+                                            <p class="fw-bold mb-0">
+                                                @if($producto->estatus_ejecucion == 'ejecutado')
+                                                    <span class="badge bg-success">Ejecutado</span>
+                                                @else
+                                                    <span class="badge bg-warning text-dark">Por ejecutar</span>
+                                                @endif
+                                            </p>
+                                        </div>
+                                        <!-- ===== FIN Proveedor / Contrato / Estatus ===== -->
                                     </div>
                                 </div>
 
@@ -93,14 +126,12 @@
                                             @if($producto->archivo_pdf_1)
                                                 @php $url1 = asset($producto->archivo_pdf_1); @endphp
 
-                                                <!-- Miniatura -->
                                                 <div class="mb-3 border rounded overflow-hidden" style="height: 220px; background: #f8f9fa;">
                                                     <iframe src="{{ $url1 }}#toolbar=0&navpanes=0&scrollbar=0"
                                                             style="width: 100%; height: 220px; border: 0;"
                                                             title="Miniatura PDF 1"></iframe>
                                                 </div>
 
-                                                <!-- Botones -->
                                                 <div class="d-flex justify-content-center gap-2 flex-wrap">
                                                     <button type="button"
                                                             class="btn btn-sm btn-danger"
@@ -136,14 +167,12 @@
                                             @if($producto->archivo_pdf_2)
                                                 @php $url2 = asset($producto->archivo_pdf_2); @endphp
 
-                                                <!-- Miniatura -->
                                                 <div class="mb-3 border rounded overflow-hidden" style="height: 220px; background: #f8f9fa;">
                                                     <iframe src="{{ $url2 }}#toolbar=0&navpanes=0&scrollbar=0"
                                                             style="width: 100%; height: 220px; border: 0;"
                                                             title="Miniatura PDF 2"></iframe>
                                                 </div>
 
-                                                <!-- Botones -->
                                                 <div class="d-flex justify-content-center gap-2 flex-wrap">
                                                     <button type="button"
                                                             class="btn btn-sm btn-danger"

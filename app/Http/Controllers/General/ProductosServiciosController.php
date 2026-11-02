@@ -58,26 +58,50 @@ class ProductosServiciosController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+           public function index(Request $request)
     {
         $search = $request->get('search');
-        
+
         $productos = ProductoServicio::when($search, function($query, $search) {
                 return $query->where('clave', 'LIKE', "%{$search}%")
                              ->orWhere('descripcion', 'LIKE', "%{$search}%");
             })
             ->orderBy('clave')
             ->paginate(12);
-        
-        return view('general.productosyservicios.index', compact('productos', 'search'));
+
+        // Proveedores y contratos indexados por id (una sola consulta cada uno)
+        $proveedores = DB::table('proveedores_servicios')
+            ->select('id', 'clave', 'nombre')
+            ->get()
+            ->keyBy('id');
+
+        $contratos = DB::table('contratos')
+            ->select('id', 'consecutivo', 'refinterna')
+            ->get()
+            ->keyBy('id');
+
+        return view('general.productosyservicios.index', compact('productos', 'search', 'proveedores', 'contratos'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
+       
     public function create()
     {
-        return view('general.productosyservicios.create');
+        // Proveedores de servicios (para el select)
+        $proveedores = DB::table('proveedores_servicios')
+            ->select('id', 'nombre','clave')
+            ->orderBy('nombre')
+            ->get();
+
+        // Contratos / obras (para el select) - se muestra contrato_no
+        $contratos = DB::table('contratos')
+            ->select('id', 'refinterna','consecutivo')
+            ->orderBy('contrato_no')
+            ->get();
+
+        return view('general.productosyservicios.create', compact('proveedores', 'contratos'));
     }
 
     /**
@@ -125,19 +149,26 @@ class ProductosServiciosController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show($id)
+        public function show($id)
     {
         $producto = ProductoServicio::find($id);
-        
+
         if (!$producto) {
             return redirect()->route('productosyservicios.index')
                 ->with('error', 'Producto/Servicio no encontrado');
         }
 
-        return view('general.productosyservicios.show', compact('producto'));
+        $proveedores = DB::table('proveedores_servicios')
+            ->select('id', 'clave', 'nombre')
+            ->orderBy('nombre')
+            ->get();
+
+        $contratos = DB::table('contratos')
+            ->select('id', 'consecutivo', 'refinterna')
+            ->orderBy('consecutivo')
+            ->get();
+
+        return view('general.productosyservicios.show', compact('producto', 'proveedores', 'contratos'));
     }
 
     /**
@@ -155,17 +186,29 @@ class ProductosServiciosController extends Controller
         return view('general.productosyservicios.edit', compact('producto'));
     }
 
-    /**
+       /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, $id)
     {
         $producto = ProductoServicio::find($id);
-        
+
         if (!$producto) {
             return redirect('productosyservicios/'.$id)
                 ->with('error', 'Producto no encontrado');
         }
+
+        $request->validate([
+            'clave' => 'required|string|max:32|unique:productosyservicios,clave,'.$id,
+            'descripcion' => 'required|string',
+            'unidades' => 'required|string|max:10',
+            'precio' => 'nullable|numeric|min:0',
+            'id_proveedor' => 'nullable|string|max:32',
+            'id_contrato' => 'nullable|string|max:32',
+            'estatus_ejecucion' => 'nullable|in:por_ejecutar,ejecutado',
+            'archivo_pdf_1' => 'nullable|file|mimes:pdf|max:10240',
+            'archivo_pdf_2' => 'nullable|file|mimes:pdf|max:10240',
+        ]);
 
         try {
             DB::beginTransaction();
@@ -176,6 +219,9 @@ class ProductosServiciosController extends Controller
                 'descripcion' => $request->descripcion,
                 'unidades' => $request->unidades,
                 'precio' => $request->precio ?? $producto->precio,
+                'id_proveedor' => $request->id_proveedor ?: null,
+                'id_contrato' => $request->id_contrato ?: null,
+                'estatus_ejecucion' => $request->estatus_ejecucion ?: 'por_ejecutar',
             ];
 
             // Si suben nuevo PDF 1, borrar viejo y guardar nuevo
@@ -189,7 +235,7 @@ class ProductosServiciosController extends Controller
                 $this->borrarPdf($producto->archivo_pdf_2);
                 $datos['archivo_pdf_2'] = $this->guardarPdf($request->file('archivo_pdf_2'));
             }
-            
+
             $producto->update($datos);
 
             DB::commit();
